@@ -14,7 +14,7 @@ class Wait extends MY_Controller {
         // General purpose wait controler (no control)
         global $CFG;
 
-        $arr = json_read($CFG->config['base_data'] . 'conf\\Work.json');
+        $arr = json_read($CFG->config['conf'] . 'Work.json');
 
         if ($arr["error"] or $arr["json"]["State"] == "Halted") {
             header("Location:/error");
@@ -42,7 +42,7 @@ class Wait extends MY_Controller {
 
         switch ($_SERVER['REQUEST_METHOD']) {
             case 'POST':
-                $arr = json_read($CFG->config['base_data'] . 'conf\\Work.json');
+                $arr = json_read($CFG->config['conf'] . 'Work.json');
 
                 if ($arr["error"] or $arr["json"]["State"] == "Halted") {
                     header("Location:/error");
@@ -56,7 +56,7 @@ class Wait extends MY_Controller {
                         exit;
                 }
             default:
-                $arr = json_read($CFG->config['base_data'] . 'conf\\Work.json');
+                $arr = json_read($CFG->config['conf'] . 'Work.json');
 
                 if ($arr["error"] or $arr["json"]["State"] == "Halted") {
                     header("Location:/error");

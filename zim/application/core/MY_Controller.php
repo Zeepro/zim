@@ -14,16 +14,16 @@ class MY_Controller extends CI_Controller {
         // Workflow management
 
         if ($this->router->class != 'initialization') {
-            if (file_exists($CFG->config['base_data'] . 'conf\\Boot.json')) {
+            if (file_exists($CFG->config['conf'] . 'Boot.json')) {
                 // Initialization page redirect
                 header('location:/initialization');
             } else {
                 if ($this->router->class != 'connection') {
-                    if (!file_exists($CFG->config['base_data'] . 'conf\\Connection.json')) {
+                    if (!file_exists($CFG->config['conf'] . 'Connection.json')) {
                         // Connection page redirect
                         header('location:/connection');
                     }
-                    $arr = json_read($CFG->config['base_data'] . 'conf\\Work.json');
+                    $arr = json_read($CFG->config['conf'] . 'Work.json');
                     if (!$arr["error"] and
                             $arr["json"]["State"] == "Working" and
                             $arr["json"]["CallBackURL"] != $this->router->uri->uri_string) {
@@ -31,14 +31,14 @@ class MY_Controller extends CI_Controller {
                         header("Location:" . $arr["json"]["CallBackURL"]);
                     }
                 } else {
-                    if (file_exists($CFG->config['base_data'] . 'conf\\Connection.json')) {
+                    if (file_exists($CFG->config['conf'] . 'Connection.json')) {
                         // The connexion page shouldn't be accessed otherwise
                         header('location:/');
                     }
                 }
             }
         } else {
-            if (!file_exists($CFG->config['base_data'] . 'conf\\Boot.json')) {
+            if (!file_exists($CFG->config['conf'] . 'Boot.json')) {
                 // The initialisation page shouldn't be accessed otherwise
                 header('location:/');
             }

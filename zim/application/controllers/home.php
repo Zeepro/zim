@@ -154,12 +154,12 @@ class Home extends MY_Controller {
                 $this->lang->load('master', $this->config->item('language'));
                 $this->lang->load('home', $this->config->item('language'));
 
-                if (!file_exists($CFG->config['base_data'] . 'model/Model.json')) {
+                if (!file_exists($CFG->config['model'] . 'Model.json')) {
                     $this->load->view('home', array("lang" => $CFG->config['language_abbr'],
                         'img' => null,
                         "wait" => false));
                 } else {
-                    $arr = json_read($CFG->config['base_data'] . 'model/Model.json');
+                    $arr = json_read($CFG->config['model'] . 'Model.json');
 
                     if ($arr["error"] or !array_key_exists("Version", $arr["json"])) {
                         // Something went wrong... Wiping out
@@ -179,7 +179,7 @@ class Home extends MY_Controller {
                                     array_key_exists("zRot", $arr["json"]) and
                                     array_key_exists("Factor", $arr["json"])) {
                                 $img = substr(sha1($arr["json"]["File"]), 0, 10) . "xt" . $arr["json"]["xTrans"] . "yt" . $arr["json"]["yTrans"] . "zt" . $arr["json"]["zTrans"] . "xr" . $arr["json"]["xRot"] . "yr" . $arr["json"]["yRot"] . "zr" . $arr["json"]["zRot"] . "f" . rtrim(rtrim(number_format($arr["json"]["Factor"], 6), '0'), '.') . ".png";
-                                if (!file_exists($CFG->config['base_data'] . 'model/' . $img)) {
+                                if (!file_exists($CFG->config['model'] . $img)) {
                                     // Rendering the view
                                     exec('"' . $CFG->config['bin'] . 'RenderModel" -callbackurl "/wait"');
                                     header("Location:/wait");

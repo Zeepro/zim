@@ -9,10 +9,10 @@ class Initialization extends MY_Controller {
         global $CFG;
 
         do {
-            $json = @file_get_contents($CFG->config['base_data'] . 'conf\\Boot.json');
+            $json = @file_get_contents($CFG->config['conf'] . 'Boot.json');
             if ($json === false) {
                 // Can't access file...
-                if (file_exists($CFG->config['base_data'] . 'conf\\Boot.json')) {
+                if (file_exists($CFG->config['conf'] . 'Boot.json')) {
                     // ... cause it seems to be locked by the software layer
                     usleep(500000);
                     continue;

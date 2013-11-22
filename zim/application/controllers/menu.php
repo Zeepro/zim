@@ -11,12 +11,12 @@ class Menu extends MY_Controller {
         switch ($_SERVER['REQUEST_METHOD']) {
             case 'POST':
                 $arr = array('fill_option' => $_POST['fill_option']);
-                $fh = fopen($CFG->config['base_data'] . 'conf\\Settings.json', 'w');
+                $fh = fopen($CFG->config['conf'] . 'Settings.json', 'w');
                 fwrite($fh, json_encode($arr));
                 fclose($fh);
                 break;
             default: // GET
-                $arr = json_decode(file_get_contents($CFG->config['base_data'] . 'conf\\Settings.json'), true);
+                $arr = json_decode(file_get_contents($CFG->config['conf'] . 'Settings.json'), true);
                 break;
         }
 

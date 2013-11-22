@@ -15,7 +15,7 @@ class Upload extends MY_Controller {
 
         switch ($_SERVER['REQUEST_METHOD']) {
             case 'POST':
-                $config['upload_path'] = $CFG->config['base_data'] . 'model/';
+                $config['upload_path'] = $CFG->config['model'];
                 // 3D files mime extensions are unreliable
                 $config['allowed_types'] = '*';
 
@@ -57,7 +57,7 @@ class Upload extends MY_Controller {
                 $this->lang->load('master', $this->config->item('language'));
                 $this->lang->load('upload', $this->config->item('language'));
 
-                if (!file_exists($CFG->config['base_data'] . 'model/Model.json')) {
+                if (!file_exists($CFG->config['model'] . 'Model.json')) {
                     $this->load->view('upload', array('error' => '',
                         "lang" => $CFG->config['language_abbr']));
                 } else {

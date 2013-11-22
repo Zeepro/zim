@@ -29,7 +29,7 @@ class Connection extends MY_Controller {
             "IP.lease" => standard_date("DATE_ISO8601", local_to_gmt(time()))
         );
 
-        $fh = fopen($CFG->config['base_data'] . 'conf\\Connection.json', 'w');
+        $fh = fopen($CFG->config['conf'] . 'Connection.json', 'w');
         fwrite($fh, json_encode($arr));
         fclose($fh);
 
@@ -49,7 +49,7 @@ class Connection extends MY_Controller {
             "IP.lease" => standard_date("DATE_ISO8601", local_to_gmt(time()))
         );
 
-        $fh = fopen($CFG->config['base_data'] . 'conf\\Connection.json', 'w');
+        $fh = fopen($CFG->config['conf'] . 'Connection.json', 'w');
         fwrite($fh, json_encode($arr));
         fclose($fh);
 
@@ -69,7 +69,7 @@ class Connection extends MY_Controller {
             "IP.lease" => standard_date("DATE_ISO8601", local_to_gmt(time()))
         );
 
-        $fh = fopen($CFG->config['base_data'] . 'conf\\Connection.json', 'w');
+        $fh = fopen($CFG->config['conf'] . 'Connection.json', 'w');
         fwrite($fh, json_encode($arr));
         fclose($fh);
 
@@ -89,7 +89,7 @@ class Connection extends MY_Controller {
             "IP.lease" => standard_date("DATE_ISO8601", local_to_gmt(time()))
         );
 
-        $fh = fopen($CFG->config['base_data'] . 'conf\\Connection.json', 'w');
+        $fh = fopen($CFG->config['conf'] . 'Connection.json', 'w');
         fwrite($fh, json_encode($arr));
         fclose($fh);
 

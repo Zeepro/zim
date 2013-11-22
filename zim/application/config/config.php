@@ -373,6 +373,9 @@ $config['proxy_ips'] = '';
 |
 */
 $config['base_data'] = 'C:\\inetpub\\wwwroot\\zim\\data\\';
+$config['conf'] = 'C:\\Users\\Public\\Documents\\Projets locaux\\ZeeProEmbed\\data\\conf\\';
+$config['hardconf'] = 'C:\\Users\\Public\\Documents\\Projets locaux\\ZeeProEmbed\\data\\hardconf\\';
+$config['model'] = 'C:\\Users\\Public\\Documents\\Projets locaux\\ZeeProEmbed\\data\\model\\';
 $config['bin'] = 'C:\\Users\\Public\\Documents\\Projets locaux\\ZeeProEmbed\\bin\\';
 
 /* End of file config.php */

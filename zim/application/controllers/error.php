@@ -20,7 +20,7 @@ class Error extends MY_Controller {
         $this->template->set('lang', $CFG->config['language_abbr']);
         $this->template->set('header', "<title>" . t('ZeePro Personal Printer 21 - Error') . "</title>");
 
-        $arr = json_read($CFG->config['base_data'] . 'conf\\Work.json');
+        $arr = json_read($CFG->config['conf'] . 'Work.json');
 
         if ($arr["error"]) {
             // Json decoding error

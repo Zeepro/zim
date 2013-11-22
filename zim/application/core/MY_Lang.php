@@ -157,7 +157,7 @@ function message($arr) {
     } else {
         global $CFG;
 
-        $json = @file_get_contents($CFG->config['base_data'] . 'hardconf/' . $CFG->config['language_abbr'] . "/" . $arr["Context"] . ".json");
+        $json = @file_get_contents($CFG->config['hardconf'] . $CFG->config['language_abbr'] . "/" . $arr["Context"] . ".json");
         if ($json === false) {
             // Can't find message file
             if ($CFG->config['language_abbr'] == "en") {
@@ -165,7 +165,7 @@ function message($arr) {
                 return implode("-", $arr);
             } else {
                 // Try english version
-                $json = @file_get_contents($CFG->config['base_data'] . 'hardconf/en/' . $arr["Context"] . ".json");
+                $json = @file_get_contents($CFG->config['hardconf'] . 'en\\' . $arr["Context"] . ".json");
                 if ($json === false) {
                     // The english version can't be found
                     return implode("-", $arr);
