@@ -1,0 +1,11 @@
+.ui-icon-my-fr-flag {
+    background: url("/images/fr.png");
+    background-repeat: no-repeat;
+    background-position: 1px 3px;
+}
+
+.ui-icon-my-gb-flag {
+    background: url("/images/gb.png");
+    background-repeat: no-repeat;
+    background-position: 1px 3px;
+}
