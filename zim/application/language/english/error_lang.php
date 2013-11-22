@@ -1,6 +1,6 @@
 <?php
 
-$lang["ZeePro Personal Printer 21 - Error"] = "ZeePro Personal Printer 21 - Error";
+$lang["ZeePro Personal Printer 21 - Error"] = "Zim - Error";
 $lang['Internal error #1 (if this message persists, thank you to contact our maintenance service)'] =
         "Internal error #1 (if this message persists, thank you to contact our maintenance service)";
 $lang['Internal error #2 (if this message persists, thank you to contact our maintenance service)'] =

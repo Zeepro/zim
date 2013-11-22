@@ -1,7 +1,7 @@
 <?php
 
 $lang['ZeePro Personal Printer 21'] =
-        "ZeePro Personal Printer 21";
+        "Zim";
 $lang['Home'] =
         "Home";
 $lang['Menu'] =

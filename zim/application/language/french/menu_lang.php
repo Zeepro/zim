@@ -1,6 +1,6 @@
 <?php
 
-$lang['ZeePro Personal Printer 21 - Main menu'] = "Imprimante personnelle ZeePro PP21 - Menu principal";
+$lang['ZeePro Personal Printer 21 - Main menu'] = "Zim - Menu principal";
 $lang['Main menu'] = "Paramètres";
 $lang['Filling'] =
         "Remplissage";

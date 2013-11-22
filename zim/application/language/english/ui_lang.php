@@ -1,12 +1,12 @@
 <?php
 $lang['ZeePro Personal Printer 21 - Connection initialization'] =
-        "ZeePro Personal Printer 21 - Connection initialization";
+        "Zim - Connection initialization";
 $lang['ZeePro Personal Printer 21 - Print model'] =
-        "ZeePro Personal Printer 21 - Print model";
+        "Zim - Print model";
 $lang['ZeePro Personal Printer 21 - Parameters'] =
-        "ZeePro Personal Printer 21 - Parameters";
+        "Zim - Parameters";
 $lang['ZeePro Personal Printer 21'] =
-        "ZeePro Personal Printer 21";
+        "Zim";
 $lang['Select file'] =
         "Select file";
 $lang['Filling'] =

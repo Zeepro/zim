@@ -1,6 +1,6 @@
 <?php
 
-$lang['ZeePro Personal Printer 21 - Select model'] = "ZeePro Personal Printer 21 - Select model";
+$lang['ZeePro Personal Printer 21 - Select model'] = "Zim - Select model";
 $lang['Select a model'] = "Load model";
 $lang['File'] = "Select file";
 $lang['Upload'] = "Load";

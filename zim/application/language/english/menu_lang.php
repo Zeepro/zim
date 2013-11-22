@@ -1,6 +1,6 @@
 <?php
 
-$lang['ZeePro Personal Printer 21 - Main menu'] = "ZeePro Personal Printer 21 - Main menu";
+$lang['ZeePro Personal Printer 21 - Main menu'] = "Zim - Main menu";
 $lang['Main menu'] = "Parameters";
 $lang['Filling'] =
         "Filling";

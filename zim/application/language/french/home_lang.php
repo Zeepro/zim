@@ -1,6 +1,6 @@
 <?php
 
-$lang["ZeePro Personal Printer 21 - Print model"] = "Imprimante personnelle ZeePro PP21 - Imprimer";
+$lang["ZeePro Personal Printer 21 - Print model"] = "Zim - Imprimer";
 $lang["Upload model"] = "Charger un modèle";
 $lang["Clear model"] = "Fermer le modèle";
 $lang["Print model"] = "Imprimer";

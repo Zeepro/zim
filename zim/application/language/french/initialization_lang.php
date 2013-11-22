@@ -1,7 +1,7 @@
 <?php
 
 $lang['ZeePro Personal Printer 21 - Initialization in progress...'] =
-        "Imprimante personnelle ZeePro PP21 - Initialisation en cours...";
+        "Zim - Mise à jour en cours...";
 $lang['Initialization in progress...'] =
-        "Initialisation en cours...";
+        "Mise à jour en cours...";
 ?>

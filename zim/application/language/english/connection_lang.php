@@ -1,14 +1,13 @@
 <?php
 
 $lang['ZeePro Personal Printer 21 - Connection configuration'] =
-        "ZeePro Personal Printer 21 - Connection configuration";
+        "Zim - Connection configuration";
 $lang['Connection configuration'] =
-        "Connection configuration";
+        "Welcome!";
 $lang['Welcome...'] =
-        "Welcome !<br>
+        "<br>
             <br>
-            Your ZeePro Personal Printer 21 must be used through an internet browser;
-            this wizard will help you to choose the connection which will meet your needs.";
+            This wizard will help you to choose the connection which will meet your needs.";
 $lang['Option 1'] =
         "Wi-Fi network connected to the Internet through an acces point router";
 $lang['Option 2'] =
