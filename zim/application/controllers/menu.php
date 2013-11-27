@@ -30,7 +30,7 @@ class Menu extends MY_Controller {
                 break;
             default:
                 $language = t("english");
-                $flag_url = "/images/gb.png";
+                $flag_url = "/images/en.png";
                 break;
         }
         $this->load->view('menu', array("lang" => $CFG->config['language_abbr'],

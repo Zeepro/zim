@@ -18,12 +18,13 @@ class MY_Controller extends CI_Controller {
             	if ($this->router->class == 'rest') {
                 // Upgrade in progress error code
             		http_response_code(450);
+					echo("Upgrade in progress");
             		exit;
 				} else {
                 // Initialization page redirect
 					header('location:/initialization');
             	}
-            } else {
+            } elseif($this->router->class != 'rest') {
                 if ($this->router->class != 'connection') {
                     if (!file_exists($CFG->config['conf'] . 'Connection.json')) {
                         // Connection page redirect

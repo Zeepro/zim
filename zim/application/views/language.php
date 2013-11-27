@@ -20,7 +20,7 @@
             </div>     
             <div data-role="content">
                 <ul data-role="listview" data-inset="true" data-theme="b">
-                    <li data-icon="false"><a href="/en/menu" data-ajax="false"><img src="/images/gb.png" class="ui-li-icon ui-corner-none"><?= t('english') ?></a></li>
+                    <li data-icon="false"><a href="/en/menu" data-ajax="false"><img src="/images/en.png" class="ui-li-icon ui-corner-none"><?= t('english') ?></a></li>
                     <li data-icon="false"><a href="/fr/menu" data-ajax="false"><img src="/images/fr.png" class="ui-li-icon ui-corner-none"><?= t('french') ?></a></li>
                 </ul>
             </div>

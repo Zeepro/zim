@@ -37,7 +37,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
 
     </ul>
     <div id="flag">
-        <a href ="/en/"> <img src="/images/gb.png" border="0"></a>
+        <a href ="/en/"> <img src="/images/en.png" border="0"></a>
         <a href ="/fr/" ><img src="/images/fr.png" border="0"></a>
     </div>
 </div>

@@ -1,6 +1,6 @@
 <div style="height:30px">
     <div style="position:absolute;right:50px">
-        <a href ="/en/connection"> <img src="/images/gb.png" border="0"></a>
+        <a href ="/en/connection"> <img src="/images/en.png" border="0"></a>
         <a href ="/fr/connection" ><img src="/images/fr.png" border="0"></a>
     </div>
 </div>
@@ -35,4 +35,3 @@
         </tr>
     </table>
 </div>
-

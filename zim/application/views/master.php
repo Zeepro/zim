@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="<?= $lang ?>">
-      <head>
+	<head>
         <meta charset="utf-8">
         <?= $header ?>
         <link rel="stylesheet" href="/styles/jquery.mobile-1.3.0.min.css" />
@@ -11,7 +11,8 @@
             });
         </script>
         <script src="/scripts/jquery.mobile-1.3.0.min.js"></script>
-    </head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, target-densitydpi=medium-dpi, user-scalable=0" />
+	</head>
     <body>
         <div data-role="page">
             <div data-role="header" data-theme="b" data-position="fixed">
