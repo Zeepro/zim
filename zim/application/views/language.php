@@ -15,11 +15,11 @@
     </head>
     <body>
         <div data-role="page">
-            <div data-role="header" data-theme="b">
+            <div data-role="header" data-theme="d">
                 <h1><?= t("Select your language") ?></h1>
             </div>     
             <div data-role="content">
-                <ul data-role="listview" data-inset="true" data-theme="b">
+                <ul data-role="listview" data-inset="true" data-theme="d">
                     <li data-icon="false"><a href="/en/menu" data-ajax="false"><img src="/images/en.png" class="ui-li-icon ui-corner-none"><?= t('english') ?></a></li>
                     <li data-icon="false"><a href="/fr/menu" data-ajax="false"><img src="/images/fr.png" class="ui-li-icon ui-corner-none"><?= t('french') ?></a></li>
                 </ul>

@@ -15,8 +15,8 @@
         <script src="/scripts/jquery.mobile-1.3.0.min.js"></script>
     </head>
     <body>
-        <div data-role="dialog" data-close-btn="none" data-theme="e">
-            <div data-role="header" data-theme="e">
+        <div data-role="dialog" data-close-btn="none" data-theme="d">
+            <div data-role="header" data-theme="d">
                 <h1><?= t("Printing...") ?></h1>
             </div>     
             <div data-role="content">

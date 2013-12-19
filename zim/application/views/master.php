@@ -15,7 +15,7 @@
 	</head>
     <body>
         <div data-role="page">
-            <div data-role="header" data-theme="b" data-position="fixed">
+            <div data-role="header" data-theme="d" data-position="fixed">
                 <h1><?= t("ZeePro Personal Printer 21") ?></h1>
                 <a href="menu" data-icon="bars" class="ui-btn-right"><?= t("Menu") ?></a>
             </div>

@@ -44,7 +44,7 @@ class MY_Lang extends CI_Lang {
 
         //$index_page    = $config['index_page'];
         $index_page = '';
-        $lang_ignore = $config['lang_ignore'];
+        $lang_hide = $config['lang_hide'];
         $default_abbr = $config['language_abbr'];
         $lang_uri_abbr = $config['lang_uri_abbr'];
 
@@ -54,7 +54,7 @@ class MY_Lang extends CI_Lang {
         /* adjust the uri string leading slash */
         $URI->uri_string = preg_replace("|^\/?|", '/', $URI->uri_string);
 
-        if ($lang_ignore) {
+        if ($lang_hide) {
 
             if (isset($lang_uri_abbr[$uri_abbr])) {
 
@@ -83,6 +83,7 @@ class MY_Lang extends CI_Lang {
             /* set the language abbreviation */
             $lang_abbr = $uri_abbr;
         }
+      
 
         /* check validity against config array */
         if (isset($lang_uri_abbr[$lang_abbr])) {
@@ -96,7 +97,7 @@ class MY_Lang extends CI_Lang {
             $config['language_abbr'] = $lang_abbr;
 
             /* if abbreviation is not ignored */
-            if (!$lang_ignore) {
+            if (!$lang_hide) {
 
                 /* check and set the uri identifier */
                 $index_page .= empty($index_page) ? $lang_abbr : "/$lang_abbr";
@@ -109,8 +110,8 @@ class MY_Lang extends CI_Lang {
             $IN->set_cookie('user_lang', $lang_abbr, $config['sess_expiration']);
         } else {
 
-            /* if abbreviation is not ignored */
-            if (!$lang_ignore) {
+        	/* if abbreviation is not ignored */
+             if (!$lang_hide) {
 
                 /* Check the browser's language */
                 $lang_browser = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
@@ -130,10 +131,22 @@ class MY_Lang extends CI_Lang {
                 /* redirect */
                 header('Location: ' . $config['base_url'] . $index_page . $URI->uri_string);
                 exit;
-            }
+             }
 
+             /* Check the browser's language */
+             $lang_browser = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
+             if (isset($lang_uri_abbr[$lang_browser])) {
+             	$lang_abbr = $lang_browser;
+             } else {
+             	$lang_abbr = $default_abbr;
+             }
+             	
             /* set the language_abbreviation cookie */
-            $IN->set_cookie('user_lang', $default_abbr, $config['sess_expiration']);
+			$IN->set_cookie('user_lang', $lang_abbr, $config['sess_expiration']);
+
+            /* set config language values to match the user language */
+            $config['language'] = $lang_uri_abbr[$lang_abbr];
+            $config['language_abbr'] = $lang_abbr;
         }
 
         log_message('debug', "Language_Identifier Class Initialized");

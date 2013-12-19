@@ -5,15 +5,11 @@ $lang['ZeePro Personal Printer 21 - Connection configuration'] =
 $lang['Connection configuration'] =
         "Bienvenue !";
 $lang['Welcome...'] =
-        "<br>
-            <br>
-            Cet assistant va vous permettre de choisir la méthode de connexion qui correspond à vos besoins.";
+        "<br/>Activation de l'imprimante<br/><br/>Merci de choisir la connexion de votre imprimante :";
 $lang['Option 1'] =
-        "Connexion à un réseau Wi-Fi géré par une \" Box \"";
+        "Réseau WiFi connecté à Internet";
 $lang['Option 2'] =
-        "Connexion à un réseau filaire (\" Box \" en mode routeur, hub, switch...)";
+        "Connexion réseau filaire";
 $lang['Option 3'] =
-        "Wi-Fi en mode point à point (Access point)";
-$lang['Option 4'] =
-        "Connexion point à point par un câble";
+        "Point d'accès WiFi (point à point)";
 ?>

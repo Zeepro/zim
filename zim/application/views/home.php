@@ -14,7 +14,7 @@
     </head>
     <body>
         <div data-role="page">
-            <div data-role="header" data-theme="b" data-position="fixed">
+            <div data-role="header" data-theme="d" data-position="fixed">
                 <h1><?= t("ZeePro Personal Printer 21") ?></h1>
                 <a href="menu" data-icon="bars" class="ui-btn-right"><?= t("Menu") ?></a>
             </div>
@@ -27,8 +27,8 @@
                         <div id="controls">
                             <form method="post" data-ajax="false">
                                 <fieldset data-role="controlgroup" data-type="horizontal" style="text-align:center;">
-                                    <input type="submit" data-role="button" data-inline="true" data-theme="b" name="submitbutton" value="&lt;&lt;" />
-                                    <input type="submit" data-role="button" data-inline="true" data-theme="b" name="submitbutton" value="&lt;" />
+                                    <input type="submit" data-role="button" data-inline="true" data-theme="d" name="submitbutton" value="&lt;&lt;" />
+                                    <input type="submit" data-role="button" data-inline="true" data-theme="d" name="submitbutton" value="&lt;" />
                                     <select name="action" id="select-native-11" data-native-menu="false" data-inline="true">
                                         <option value="width"><?= t("width") ?></option>
                                         <option value="depth"<? if ($action == 'depth') echo " selected"; ?>><?= t("depth") ?></option>
@@ -38,8 +38,8 @@
                                         <option value="Z axis"<? if ($action == 'Z axis') echo " selected"; ?>><?= t("Z axis") ?></option>
                                         <option value="Size"<? if ($action == 'Size') echo " selected"; ?>><?= t("Size") ?></option>
                                     </select>
-                                    <input type="submit" data-role="button" data-inline="true" data-theme="b" name="submitbutton" value="&gt;" />
-                                    <input type="submit" data-role="button" data-inline="true" data-theme="b" name="submitbutton" value="&gt;&gt;" />
+                                    <input type="submit" data-role="button" data-inline="true" data-theme="d" name="submitbutton" value="&gt;" />
+                                    <input type="submit" data-role="button" data-inline="true" data-theme="d" name="submitbutton" value="&gt;&gt;" />
                                 </fieldset>
                             </form>
                             <center>
@@ -50,7 +50,7 @@
                 <? }
                 ?> 
             </div>
-            <div data-role="footer" data-theme="b" data-position="fixed">
+            <div data-role="footer" data-theme="d" data-position="fixed">
                 <div data-role="navbar">
                     <ul>
 

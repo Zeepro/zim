@@ -69,16 +69,16 @@ $config['url_suffix'] = '';
 | than english.
 |
 */
-$config['language'] = "french";
+$config['language'] = "english";
  
 /* default language abbreviation */
-$config['language_abbr'] = "fr";
+$config['language_abbr'] = "en";
  
 /* set available language abbreviations */
 $config['lang_uri_abbr'] = array("en" => "english", "fr" => "french");
  
 /* hide the language segment (use cookie) */
-$config['lang_ignore'] = true;
+$config['lang_hide'] = true;
 
 /*
 |--------------------------------------------------------------------------

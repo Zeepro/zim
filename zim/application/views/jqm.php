@@ -8,7 +8,7 @@
 
         <div data-role="page">
 
-            <div data-role="header" data-theme="b" data-position="fixed">
+            <div data-role="header" data-theme="d" data-position="fixed">
                 <h1>My Page</h1>
                 </div>            </div><!-- /header -->
 
@@ -30,7 +30,7 @@
                     ...
                 </div><!-- /content -->
 
-                <div data-role="footer" data-theme="b" data-position="fixed">
+                <div data-role="footer" data-theme="d" data-position="fixed">
                     <h4>The Footer</h4>
                 </div><!-- /Footer -->
             </div><!-- /page -->

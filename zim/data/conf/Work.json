@@ -1,1 +1,1 @@
-{"Version":"1.0","CommandLine":"ChangeModel -callbackurl \"/wait\" -xtrans 5","State":"Done","Cancel":null,"PauseOrResume":null,"CallBackURL":"/wait","Message":{"Contexte":null,"Id":null}}
+{"PauseOrResume":null,"Version":"1.0","Message":null,"CommandLine":"/add?file=C%3A%5Cstl%5CVirginie%5CPanda%5CMerged%20Panda.stl","CallBackURL":null,"Cancel":null,"State":"Done"}

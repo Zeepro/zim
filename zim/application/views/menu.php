@@ -15,7 +15,7 @@
     </head>
     <body>
         <div data-role="page">
-            <div data-role="header" data-theme="b" data-position="fixed">
+            <div data-role="header" data-theme="d" data-position="fixed">
                 <a href="/" data-icon="home" data-ajax="false"><?= t("Home") ?></a>
                 <h1><?= t("Main menu") ?></h1>
             </div>

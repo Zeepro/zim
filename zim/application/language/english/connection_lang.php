@@ -5,15 +5,11 @@ $lang['ZeePro Personal Printer 21 - Connection configuration'] =
 $lang['Connection configuration'] =
         "Welcome!";
 $lang['Welcome...'] =
-        "<br>
-            <br>
-            This wizard will help you to choose the connection which will meet your needs.";
+        "<br/>Printer activation<br/><br/>Please choose your printer connection:";
 $lang['Option 1'] =
-        "Wi-Fi network connected to the Internet through an acces point router";
+        "WiFi network connected to the Internet";
 $lang['Option 2'] =
-        "Wired network connected to the Internet through a router";
+        "Wired network connection";
 $lang['Option 3'] =
-        "Wi-Fi in Access Point mode";
-$lang['Option 4'] =
-        "Wired peer to peer connection";
+        "WiFi Access Point mode (peer to peer)";
 ?>

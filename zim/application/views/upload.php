@@ -14,7 +14,7 @@
     </head>
     <body>
         <div data-role="page">
-            <div data-role="header" data-theme="b" data-position="fixed">
+            <div data-role="header" data-theme="d" data-position="fixed">
                 <a href="/" data-icon="home"><?= t("Home") ?></a>
                 <h1><?= t("Select a model") ?></h1>
             </div>
