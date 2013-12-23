@@ -9,3 +9,15 @@
     background-repeat: no-repeat;
     background-position: 1px 3px;
 }
+
+.ui-icon-fr-flag {
+    background: url("/images/fr.png");
+    background-size: 18px 18px;
+    background-color: black;
+}
+
+.ui-icon-en-flag {
+    background: url("/images/en.png");
+    background-size: 18px 18px;
+    background-color: black;
+}

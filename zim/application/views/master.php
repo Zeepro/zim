@@ -12,7 +12,7 @@
         </script>
         <script src="/scripts/jquery.mobile-1.3.0.min.js"></script>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, target-densitydpi=medium-dpi, user-scalable=0" />
-	</head>
+		</head>
     <body>
         <div data-role="page">
             <div data-role="header" data-theme="d" data-position="fixed">

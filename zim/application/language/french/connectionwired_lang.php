@@ -2,11 +2,11 @@
 $lang['Wired network connection'] =
 		"Connexion réseau filaire";
 $lang['Text'] =
-        "Votre imprimante se configurera automatiquement lorsqu'elle sera connectée par câble à un réseau ou à un ordinateur.<br/><br/>L'accès WiFi sera désactivé";
+        "Votre imprimante se configurera automatiquement lorsqu'elle sera connectée par câble à un réseau ou à un ordinateur, l'accès WiFi sera désactivé";
 $lang['OK'] =
-        "Configuration automatique";
+        "Ok";
 $lang['Text2'] =
-        "Configuration manuelle";
+        "Votre connexion filaire sera configurée suivant vos sécifications (IP, DNS...)";
 $lang['Advanced'] =
         "Configuration avancée";
 ?>

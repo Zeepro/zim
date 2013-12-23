@@ -1,0 +1,294 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<head lang="en">
+	<meta http-equiv="content-type" content="text/html;charset=utf-8">
+	<title>emdot Documentation </title>
+	<!-- Framework CSS -->
+	<link rel="stylesheet" href="assets/blueprint-css/screen.css" type="text/css" media="screen, projection">
+	<link rel="stylesheet" href="assets/blueprint-css/print.css" type="text/css" media="print">
+	<!--[if lt IE 8]><link rel="stylesheet" href="assets/blueprint-css/ie.css" type="text/css" media="screen, projection"><![endif]-->
+	<link rel="stylesheet" href="assets/blueprint-css/plugins/fancy-type/screen.css" type="text/css" media="screen, projection">
+	<style type="text/css" media="screen">
+		p, table, hr, .box { margin-bottom:25px; }
+		.box p { margin-bottom:10px; }
+	</style>
+</head>
+
+
+<body style="background:#eee">
+	<div class="container" style="width:900px; background:#fff; padding:20px">
+	
+		<h3 class="center alt">&ldquo;emdot&rdquo; Documentation by &ldquo;Mike Ilsley - Beantown Design&rdquo; v1.1</h3>
+		
+		<hr>
+		
+		<h1 class="center">&ldquo;emdot Mobile Theme&rdquo;</h1>
+		
+		<div class="borderTop">
+			<div class="span-6 colborder info prepend-1">
+				<p class="prepend-top">
+					<strong>
+				Created: 1/8/2012<br />
+                Last Update: 6/12/13<br>
+			    By: Beantown Design<br>
+			    Support: <a href="http://support.beantowndesign.com">support.beantowndesign.com</a>
+			    </strong> </p>
+        </div><!-- end div .span-6 -->		
+	
+			<div class="span-12 last">
+				<p class="prepend-top append-0">Thank you for purchasing my theme. If you have any questions that are beyond the scope of this help file, please feel free to email via my user page contact form <a href="http://themeforest.net/user/BeantownDesign">here</a>. Thanks so much!</p>
+			</div>
+		</div><!-- end div .borderTop -->
+		
+		<hr>
+		
+		<h2 id="toc" class="alt">Table of Contents</h2>
+		<ol class="alpha">
+			<li><a href="#a">HTML Structure</a></li>
+			<li><a href="#b">Multi Column Layouts</a></li>
+			<li><a href="#c">Switching Color Schemes (Themes)</a></li>
+			<li><a href="#d">Customizing Your Theme</a></li>
+			<li><a href="#e">Interior Page Header Images</a></li>
+            <li><a href="#f">Styling Buttons</a></li>
+            <li><a href="#g">Styling Footer Navigation</a></li>
+            <li><a href="#h">Linking Pages</a></li>
+            <li><a href="#i">Custom Mobile Links</a></li>
+            <li><a href="#j">Portfolio</a></li>
+            <li><a href="#k">Contact Form</a></li>
+            <li><a href="#l">Add to Home Bubble</a></li>    
+            <li><a href="#m">Creating POPUP Dialogs</a></li>
+            <li><a href="#n">Twitter Feed</a></li>
+          	<li><a href="#o">PSD Files</a></li>
+            <li><a href="#p">Mobile Redirect</a></li>
+          <li><a href="#q">Sources and Credits</a></li>
+            
+		</ol>
+		
+		<hr>
+		
+		<h3 id="a"><strong>A) HTML Structure</strong> - <a href="#toc">top</a></h3>
+		<p>The interior pages in this theme are setup with 3 main sections; the header, the main content area, and the footer. The header includes the page title as well as back and home links. The main content section has banner images and the main content of the page (text, images, etc). The footer section contains links which can be customized.</p>
+		
+		<img src="assets/images/structure.jpg" alt="HTML Structure" />
+        
+        
+        	<hr>
+        
+        <h3 id="b"><strong>B) Multi Column Layouts</strong> - <a href="#toc">top</a></h3>
+        <h3 style="margin-top:25px">2 Column Layouts</h3>
+		
+	  <p>To create a 2 column layout you would use this code (template included with theme):</p>
+		<img src="assets/images/2col.jpg">
+
+
+	<h3 style="margin-top:25px">3 Column Layouts</h3>
+		
+	  <p>To create a 3 column layout you would use this code (template included with theme):</p>
+	<img src="assets/images/2col.jpg">
+    
+    
+  	<hr>  
+    
+     <h3 id="c"><strong>C) Switching Color Schemes (Themes)</strong> - <a href="#toc">top</a></h3>
+      
+      <p>12 different color schemes are included. In the head of your document you will see links to 2 separate css files. The top file switches the color scheme of your website, the second (style.css) contains universal code which is needed no matter what color scheme you choose. To switch color schemes switch the name of the top css file (from 1.css - 12.css)</p>
+      <p><img src="assets/images/css.jpg"></p>
+      
+      
+      
+      <hr>
+      
+      <h3 id="d"><strong>D) Customizing Your Theme</strong> - <a href="#toc">top</a></h3>
+      
+      <p>Each color scheme has 3 different color schemes within it, called data-themes. By default the theme uses the styles setup as "C". To have an item use one of the other 2 data-themes enter either <strong>data-theme="b"</strong> or <strong>data-theme="b"</strong> into the element, example: <img src="assets/images/data.jpg"></p>
+      
+      <p>At the bottom of each color scheme css file (1.css - 12.css) there are custom styles to set the background image, color, and other theme specific styles.</p>
+      <p><img src="assets/images/css2.jpg"></p>
+      
+      <p>To edit the main colors being used in the theme, edit the colors under the "C" swatch in the css file (1.css - 12.css).</p>
+      <p><img src="assets/images/c.jpg" alt="c"></p>
+      
+      
+      <hr>
+    
+    
+    <h3 id="e"><strong>E) Interior Page Header Images</strong> - <a href="#toc">top</a></h3>
+    <p>The banner images on interior pages are background images on the div with the <strong>class="box"</strong>.</p>
+    <p><img src="assets/images/banner.jpg" alt="banner"></p>
+    <p>Set another class on the div (about-page in this example), and then link to your background image in the style.css file.</p>
+    <p><img src="assets/images/background.jpg" alt="background"></p>
+        
+        <hr>
+    
+    
+    <h3 id="f"><strong>F) Styling Buttons</strong> - <a href="#toc">top</a></h3>
+    <img src="assets/images/nav.jpg">
+  
+    <p>The icons that are used on the buttons on the home page can be easily switched. Here are the available icons:</p>
+      <p style="width:605px; height:18px; background:url(assets/images/icons-18-black.png) 0 0 no-repeat"></p>
+   
+   <p>To switch the icon add <strong>data-icon="icon-name-here"</strong> to the list item. Here is a list of available icons:</p>
+   
+   <ul>
+   <li>data-icon="arrow-l"</li>
+	<li>data-icon="arrow-r"</li>
+	<li>data-icon="arrow-u"</li>
+	<li>data-icon="arrow-d"</li>
+	<li>data-icon="delete"</li>
+	<li>data-icon="plus"</li>
+	<li>data-icon="minus"</li>
+	<li>data-icon="check"</li>
+	<li>data-icon="gear"</li>
+	<li>data-icon="refresh"</li>
+	<li>data-icon="forward"</li>
+	<li>data-icon="back"</li>
+	<li>data-icon="grid"</li>
+	<li>data-icon="star"</li>
+	<li>data-icon="alert"</li>
+	<li>data-icon="info"</li>
+	<li>data-icon="home"</li>
+	<li>data-icon="search"</li>
+</ul>
+    
+    <p><strong>Example: </strong><img src="assets/images/icons-change.jpg"></p>
+    
+    	<hr>
+    
+
+
+		<h3 id="g"><strong>G) Styling Footer Navigation</strong> - <a href="#toc">top</a></h3>
+        
+        
+        <p>The following icons are included with the theme and can be switched into any footer link.<br />You can find all of the ids in the style.css file.</p>
+      <p><img src="assets/images/icons.jpg"></p>
+        <p>To switch the icon you need to change the id on the footer link tag.</p>
+        
+      <p><strong>Example: </strong><img src="assets/images/star.jpg"></p>
+        
+        
+        
+        <p><img src="assets/images/icons-css.jpg"></p>
+        
+        
+        
+        
+        <hr>
+    
+
+
+		<h3 id="h"><strong>H) Linking Pages</strong> - <a href="#toc">top</a></h3>
+
+		<p>If you're linking fom one page to a page that has custom scripts that need to be loaded on every page load you may need to use <strong>rel="external"</strong>. This is because of how jQuery mobile handles page loads. <strong>Example:</strong> <img src="assets/images/external.jpg"></p>
+        
+        
+        
+        <hr>
+        
+        <h3 id="i"><strong>I) Custom Mobile Links</strong> - <a href="#toc">top</a></h3>
+    
+    <ul>
+    	<li>Telephone link: <strong>href="tel:18005551234"</strong></li>
+        <li>Formatted email link: <strong>href="mailto:mailto:joe@example.com?&subject=Important%20Message&body=You%20should%20checkout%20the%20emdot%20mobile%20theme%20on%20Theme%20Forest!"</strong></li>
+     </ul>
+        
+        <hr>
+    
+
+
+	  <h3 id="j"><strong>J) Portfolio</strong> - <a href="#toc">top</a></h3>
+      <p>Galleries used in the portfolio are located on the main portfolio.html file. You link to the gallery by linking to the id of the gallery "page".</p>
+      <p><img src="assets/images/gal.jpg"></p>
+      <p>The images in the portfolio are included in an unordered list. You can set a title for the image by setting the alt tag.</p>
+      <p><img src="assets/images/gal2.jpg"></p>
+      <hr>
+    
+
+
+	  <h3 id="k"><strong>K) Contact Form</strong> - <a href="#toc">top</a></h3>
+      <p>To setup your contact form open <strong>assets > contact > assets > config.php</strong></p>
+      <p><img src="assets/images/config.jpg"></p>
+      
+      <p>Make sure to set your name and the email address for the form to send to (lines 5 &amp; 6).</p>
+      
+      <p><img src="assets/images/contact2.jpg" width="751" height="237"></p>
+      
+      <p>You can change the text used for items by editing the language.php file in the assets folder.</p>
+      <p><img src="assets/images/language.jpg" ></p>
+      
+      <p>After submitting the form you are brought to a thank you page. This page is located at the bottom of the contact.php page.</p>
+      <p><img src="assets/images/submit.jpg" width="613" height="124"></p>
+      
+      <hr>
+    
+
+
+	  <h3 id="l"><strong>L) Add to Home Bubble</strong> - <a href="#toc">top</a></h3>
+      <p>The homepage uses a script which creates a "Add to Home" bubble on iPhones and iPads. This reminds people that they can install an icon on their device which will link back to your website. To edit the icon used in the bubble open and edit <strong>assets > images > apple-touch-icon.png</strong></p>
+      
+      <p><img src="assets/images/bubble.jpg" width="320" height="480"></p>
+      
+      <p>To change settings of the bubble open <strong>assets > add-bubble > src > add2home.js</strong> You can change the animation entering and leaving the page, how long you want the bubble to stay on the page and how long before it shows up again.</p>
+      <p><img src="assets/images/bubble2.jpg"></p>
+      
+      <hr>
+    
+
+
+	 
+
+
+	
+      
+    
+    <h3 id="m"><strong>M) Creating POPUP Dialogs</strong> - <a href="#toc">top</a></h3>
+		
+		<p>To create a popup like on the homepage "important link" create a regular page and link to it by adding <strong>data-rel="dialog"</strong> to the link.</p>
+		<p><img src="assets/images/pop.jpg" alt="popup"></p>
+        <p><img src="assets/images/popup.jpg" alt="popup"></p>
+		
+        
+        <hr>
+
+
+<h3 id="n"><strong>N) Twitter Feed</strong> - <a href="#toc">top</a></h3>
+<p>Setup your Twitter feed by opening <strong>assets > js > twitter.js</strong>. Set your Twitter user name and the amount of tweets to show.</p>
+
+<hr>
+
+
+<h3 id="o"><strong>O) PSD Files</strong> - <a href="#toc">top</a></h3>
+		
+	  <p>I've included the following PSD files:</p>
+		
+			<ul>
+				<li>apple-touch-icon.psd</li>
+				<li>12 background psd files</li>
+			</ul>
+		
+    <hr>
+    
+    <h3 id="p"><strong>P) Mobile Redirect</strong> - <a href="#toc">top</a></h3>
+    <p>I created a blog entry on my design blog <a href="http://wp.me/p11izc-RT"><strong>right here</strong></a> to show how to handle redirecting people visiting your full website to your new mobile website.</p>
+    
+    <hr>
+    
+		
+	  <h3 id="q"><strong>Q) Sources and Credits</strong> - <a href="#toc">top</a></h3>
+		
+		<p>Resources &amp; Licensing:<ul>
+        	<li><a href="http://jquerymobile.com/">jQuery Mobile</a></li>
+			<li><a href="http://cubiq.org/add-to-home-screen">Add to home bubble</a> (MIT License)</li>
+		  	<li>Some backgrounds from <a href="http://subtlepatterns.com/">SubtlePatterns.com</a> (MIT License)</li>
+			<li><a href="http://codecanyon.net/item/ajax-mobile-contact-form/247222">Ajax Form from Shizzoweb</a> (Extended License)</li>
+		</ul>
+		
+<hr>
+		
+		<p>Once again, thank you so much for purchasing this theme. </p> 
+		
+		<p class="append-bottom alt large"><strong>Mike Ilsley</strong></p>
+		<p><a href="#toc">Go To Table of Contents</a></p>
+		
+		<hr class="space">
+	</div><!-- end div .container -->
+</body>
+</html>

@@ -16,7 +16,7 @@ class Connection extends MY_Controller {
         $this->template->load('connectionmaster', 'connection');
     }
 
-    public function wifinetwork() {
+    public function wifissid() {
         global $CFG;
     	
     	$this->load->helper ( array (
@@ -29,7 +29,7 @@ class Connection extends MY_Controller {
 		$this->form_validation->set_rules('ssid', 'SSID', 'required');
 				
 		$this->lang->load ( 'connectionmaster', $this->config->item ( 'language' ) );
-		$this->lang->load ( 'connectionwifinetwork', $this->config->item ( 'language' ) );
+		$this->lang->load ( 'connectionwifissid', $this->config->item ( 'language' ) );
 		
 		$this->template->set ( 'lang', $CFG->config ['language_abbr'] );
 		$this->template->set ( 'header', "<title>" . t ( 'ZeePro Personal Printer 21 - Connection configuration' ) . "</title>" );
@@ -37,7 +37,30 @@ class Connection extends MY_Controller {
 		if ($this->form_validation->run () == FALSE) {
 			$data['listSSID'] = ListSSID();
 			
-			$this->template->load ( 'connectionmaster', 'connectionwifinetwork', $data );
+			$this->template->load ( 'connectionmaster', 'connectionwifissid', $data );
+		} else {
+			header ( "Location:/connection/wifipswd" );
+		}
+    }
+
+    public function wifipswd() {
+        global $CFG;
+    	
+    	$this->load->helper ( array (
+				'form',
+				'url'
+		) );
+		
+		$this->load->library ( 'form_validation' );
+				
+		$this->lang->load ( 'connectionmaster', $this->config->item ( 'language' ) );
+		$this->lang->load ( 'connectionwifipswd', $this->config->item ( 'language' ) );
+		
+		$this->template->set ( 'lang', $CFG->config ['language_abbr'] );
+		$this->template->set ( 'header', "<title>" . t ( 'ZeePro Personal Printer 21 - Connection configuration' ) . "</title>" );
+		
+		if ($this->form_validation->run () == FALSE) {
+			$this->template->load ( 'connectionmaster', 'connectionwifipswd', $data );
 		} else {
 			$arr = array (
 					"Connection.Topology" => "Network",
@@ -53,7 +76,7 @@ class Connection extends MY_Controller {
 			fwrite ( $fh, json_encode ( $arr ) );
 			fclose ( $fh );
 			
-			header ( "Location:/" . $CFG->config ['language_abbr'] );
+			header ( "Location:/" );
 		}
     }
 

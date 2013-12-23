@@ -1,0 +1,73 @@
+<!DOCTYPE html> 
+<html> 
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, maximum-scale=1.0, initial-scale=1.0">  
+	<title>emdot - Mobile Website Theme</title> 
+	
+    <!-- scripts -->
+	<script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
+    <script src="assets/js/twitter.js"></script>
+    
+    <!-- css / theme -->
+   	<link rel="stylesheet" href="assets/css/1.css"><!-- change the number of the css file to switch themes -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    
+</head> 
+
+
+<body>
+<div data-role="page">
+
+
+	<!-- header -->
+	<div data-role="header" class="page-header">
+    	<a  data-icon="arrow-l" data-iconpos="left" data-direction="reverse"  rel="external" data-rel="back" href="m.yourdomain.com">Back</a>
+		<h1>Our Twitter Feed</h1>
+        <a href="index.html" data-icon="home" data-iconpos="notext" data-direction="reverse"  rel="external" >Home</a>
+	</div>
+    <!--/header -->
+
+
+	<div data-role="content">
+    
+    <!-- banner image -->
+    <div class="box twitter-page"></div><!-- change these images in the style.css file -->
+    <img src="assets/images/shadow.png" class="shadow" alt="shadow">
+    <!-- /banner image -->
+    	
+    
+    <!-- twitter follow button -->
+    <div class="followButton">
+    	<a href="https://twitter.com/BeantownDesign" class="twitter-follow-button" data-show-count="false" data-size="large">Follow @BeantownDesign</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+	</div>
+	<!-- /twitter follow button -->
+    
+    <!-- twitter feed -->
+	<div id="jstwitter"></div>
+    <!-- /twitter feed -->
+
+	
+    </div><!-- /content -->
+	
+	<!-- footer -->
+	<div data-role="footer">
+		<div data-role="navbar" class="custom-icons" data-grid="c"  data-position="fixed">
+			<ul>
+				<li><a href="http://bit.ly/yx2mXZ" id="map-marker" data-icon="custom">Directions</a></li>
+				<li><a href="contact.php" id="mail" data-icon="custom" rel="external">Contact</a></li>
+				<li><a href="portfolio.html" rel="external"  id="camera" data-icon="custom">Portfolio</a></li>
+				<li><a href="icons.html" id="star" data-icon="custom">Icons!</a></li>
+			</ul>
+		</div>
+	</div>
+	<!-- /footer -->
+
+	
+</div><!-- /page -->
+
+</body>
+</html>
