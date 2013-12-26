@@ -1,20 +1,13 @@
 <div id="container">
     <h2><?= t('WiFi network connected to the Internet') ?></h2>
 
-	<?php echo validation_errors(); ?>
-	
-	<?php echo form_open('connection/wifissid'); ?>
-	
-	<label for="ssid" class="select"><?= htmlspecialchars(t("SSID")) ?></label>
-	<select name="ssid" id="ssid" data-native-menu="false">
-		<option value="choose" data-placeholder="true"><?= htmlspecialchars(t("Choose one...")) ?></option>
+	<label for="ssid" class="select"><?= htmlspecialchars(t("Choose your network:")) ?></label>
+	<ul data-role="listview" data-inset="true" id="listview" class="shadowBox">
 		<?php foreach ($listSSID as $ssid) {
-		    echo '<option value="' . htmlspecialchars($ssid) . '">' . htmlspecialchars($ssid) . '</option>';
+		    echo '<li><a href="/connection/wifipswd?ssid=' . htmlspecialchars($ssid) . '">' . htmlspecialchars($ssid) . '</a></li>';
 		}
 		?>
-	</select>
-	
-	<div><input type="submit" value="<?= htmlspecialchars(t("OK")) ?>" /></div>
-	
-	</form>
+		<li><a href="/connection/wired" data-theme="c"><?= htmlspecialchars(t("Not visible...")) ?></a></li>
+	</ul>
+    <img src="/assets/images/shadow2.png" class="shadow" alt="shadow">
 </div>

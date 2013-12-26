@@ -3,9 +3,9 @@
 $lang['ZeePro Personal Printer 21 - Connection configuration'] =
         "Zim - Configuration de la connexion";
 $lang['Connection configuration'] =
-        "Bienvenue !";
+        "Activation de l'imprimante";
 $lang['Welcome...'] =
-        "<br/>Activation de l'imprimante<br/><br/>Merci de choisir la connexion de votre imprimante :";
+        "<br/>Bienvenue !<br/><br/>Merci de choisir la connexion de votre imprimante :";
 $lang['Option 1'] =
         "Réseau WiFi connecté à Internet";
 $lang['Option 2'] =
