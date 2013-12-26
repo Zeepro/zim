@@ -26,7 +26,8 @@ class Connection extends MY_Controller {
 		) );
 		
 		$this->load->library ( 'form_validation' );
-		$this->form_validation->set_rules('ssid', 'SSID', 'required');
+
+		$this->form_validation->set_rules('ssid', $CFG->config['language_abbr'] . ':ssid error', 'callback_ssid_check');
 				
 		$this->lang->load ( 'connectionmaster', $this->config->item ( 'language' ) );
 		$this->lang->load ( 'connectionwifissid', $this->config->item ( 'language' ) );
@@ -43,6 +44,20 @@ class Connection extends MY_Controller {
 		}
     }
 
+
+    public function ssid_check($str)
+    {
+    	if ($str == 'choose-one')
+    	{
+    		$this->form_validation->set_message('ssid', t ( 'ssid error' ));
+    		return FALSE;
+    	}
+    	else
+    	{
+    		return TRUE;
+    	}
+    }
+    
     public function wifipswd() {
         global $CFG;
     	
