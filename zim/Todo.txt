@@ -1,2 +1,2 @@
-Utiliser json_helper dans la page initialize
+﻿Utiliser json_helper dans la page initialize
 Créer /error
