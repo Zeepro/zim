@@ -4,7 +4,7 @@ if (!defined('BASEPATH'))
 	exit('No direct script access allowed');
 
 
-if (!defined(ERROR_OK)) {
+if (!defined("ERROR_OK")) {
 	define("ERROR_OK",				200);
 	define("ERROR_MISS_PRM",		432);
 	define("ERROR_WRONG_PRM",		433);
@@ -15,7 +15,6 @@ if (!defined(ERROR_OK)) {
 	define("ERROR_MISS_CARTRIDGE",	438);
 	define("ERROR_MISS_FILAMENT",	439);
 	define("ERROR_PRES_FILAMENT",	440);
-// 	define("ERROR_WRONG_FORMAT",	440);
 	define("ERROR_EMPTY_PLATFORM",	441);
 	define("ERROR_MISS_LEFT_FILA",	442);
 	define("ERROR_MISS_RIGT_FILA",	443);
@@ -28,6 +27,7 @@ if (!defined(ERROR_OK)) {
 	define("ERROR_TOOBIG_FILE",		450);
 	define("ERROR_TOOBIG_MODEL",	451);
 	define("ERROR_IN_UPDATE",		452);
+ 	define("ERROR_WRONG_FORMAT",	453);
 	
 	define("ERROR_INTERNAL",		499);
 	
@@ -42,7 +42,6 @@ if (!defined(ERROR_OK)) {
 		ERROR_MISS_CARTRIDGE	=> "Cartridge missing",
 		ERROR_MISS_FILAMENT		=> "Filament missing",
 		ERROR_PRES_FILAMENT		=> "Filament present",
-// 		ERROR_WRONG_FORMAT		=> "Incorrect format",
 		ERROR_EMPTY_PLATFORM	=> "Platform empty",
 		ERROR_MISS_LEFT_FILA	=> "Left filament missing",
 		ERROR_MISS_RIGT_FILA	=> "Right filament missing",
@@ -55,6 +54,7 @@ if (!defined(ERROR_OK)) {
 		ERROR_TOOBIG_FILE		=> "File too big", //"to" -> "too", error in spec
 		ERROR_TOOBIG_MODEL		=> "Model too big", // same above
 		ERROR_IN_UPDATE			=> "Update in progress",
+ 		ERROR_WRONG_FORMAT		=> "Incorrect format",
 		
 		ERROR_INTERNAL			=> "Internal API error",
 	);
