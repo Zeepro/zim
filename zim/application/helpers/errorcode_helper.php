@@ -29,6 +29,8 @@ if (!defined(ERROR_OK)) {
 	define("ERROR_TOOBIG_MODEL",	451);
 	define("ERROR_IN_UPDATE",		452);
 	
+	define("ERROR_INTERNAL",		499);
+	
 	$MY_ERRMSG_ARRAY = array (
 		ERROR_OK				=> "Ok",
 		ERROR_MISS_PRM			=> "Missing parameter",
@@ -53,6 +55,8 @@ if (!defined(ERROR_OK)) {
 		ERROR_TOOBIG_FILE		=> "File too big", //"to" -> "too", error in spec
 		ERROR_TOOBIG_MODEL		=> "Model too big", // same above
 		ERROR_IN_UPDATE			=> "Update in progress",
+		
+		ERROR_INTERNAL			=> "Internal API error",
 	);
 	
 	function MyERRMSG($CODEERR) {
