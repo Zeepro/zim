@@ -58,9 +58,37 @@ class Connection extends MY_Controller {
     	}
     }
     
+    public function wifinotvisiblessid() {
+        global $CFG;
+    	
+		$this->lang->load ( 'connectionmaster', $this->config->item ( 'language' ) );
+		$this->lang->load ( 'connectionwifinotvisiblessid', $this->config->item ( 'language' ) );
+		
+        $this->load->helper ( array (
+				'form',
+				'url'
+		) );
+		
+		$this->load->library ( 'form_validation' );
+
+		$this->form_validation->set_rules('ssid', 'SSID', 'required');
+		$this->form_validation->set_message('required', t ('required ssid'));
+				
+		$this->template->set ( 'lang', $CFG->config ['language_abbr'] );
+		$this->template->set ( 'header', "<title>" . t ( 'ZeePro Personal Printer 21 - Connection configuration' ) . "</title>" );
+		
+		if ($this->form_validation->run () == FALSE) {
+			$this->template->load ( 'connectionmaster', 'connectionwifinotvisiblessid');
+		} else {
+			header ( "Location:/connection/wifipswd?ssid=" . rawurlencode($this->input->post('ssid')));
+		}
+    }
+    
     public function wifipswd() {
         global $CFG;
     	
+        $ssid = $id=$this->input->get('ssid');
+        
     	$this->load->helper ( array (
 				'form',
 				'url'
@@ -75,7 +103,7 @@ class Connection extends MY_Controller {
 		$this->template->set ( 'header', "<title>" . t ( 'ZeePro Personal Printer 21 - Connection configuration' ) . "</title>" );
 		
 		if ($this->form_validation->run () == FALSE) {
-			$this->template->load ( 'connectionmaster', 'connectionwifipswd', $data );
+			$this->template->load ('connectionmaster', 'connectionwifipswd', array('ssid' => $ssid));
 		} else {
 			$arr = array (
 					"Connection.Topology" => "Network",

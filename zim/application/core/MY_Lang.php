@@ -156,9 +156,13 @@ class MY_Lang extends CI_Lang {
 
 /* translate helper */
 
-function t($line) {
+function t($line, $arg = NULL) {
     global $LANG;
-    return ($t = $LANG->line($line)) ? $t : $line;
+    
+//     $t = $LANG->line($line);
+//     return $t ? vsprintf($t, $arg) : $line;
+    
+     return ($t = $LANG->line($line)) ? vsprintf($t, $arg) : $line;
 }
 
 /* message translate helper */
