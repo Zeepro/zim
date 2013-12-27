@@ -7,7 +7,7 @@
 	<script src="/scripts/jquery-1.9.1.min.js"></script>
 	<script>
 		$(document).bind("mobileinit", function() {
-			$.mobile.defaultPageTransition = 'pop';
+			$.mobile.defaultPageTransition = 'slide';
 		});
 	</script>
 <script src="/scripts/jquery.mobile-1.3.0.min.js"></script>
@@ -19,18 +19,6 @@
 
 </head>
 <body>
-	<div data-role="page">
-		<header data-role ="header" class="page-header"> 
-			<a data-icon="arrow-l" data-role="button" data-direction="reverse" data-rel="back">Back</a>
-<!-- 		    <div class="ui-btn-right" data-role="controlgroup" data-type="horizontal"> -->
-<!-- 				<a href="javascript:$.mobile.changePage('/en' + $.mobile.path.parseUrl(window.location.href).pathname)" data-role="button" data-iconpos="notext" data-icon="en-flag">en</a> -->
-<!-- 				<a href="javascript:$.mobile.changePage('/fr' + $.mobile.path.parseUrl(window.location.href).pathname)" data-role="button" data-iconpos="notext" data-icon="fr-flag">fr</a> -->
-<!-- 		    </div> -->
-		</header>
-		<div class="logo"></div>
-		<div data-role="content">
-             <?= $contents?>
-        </div>
-	</div>
+<?= $contents?>
 </body>
 </html>

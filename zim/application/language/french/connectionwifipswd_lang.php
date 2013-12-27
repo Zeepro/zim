@@ -1,8 +1,8 @@
 <?php
-$lang['WiFi network connected to the Internet'] =
-		"Réseau WiFi connecté à Internet";
+$lang['network'] =
+        "Réseau wifi %s";
 $lang['network password'] =
-        "Veuillez saisir le mot de passe du réseau %s";
+        "Saisissez le mot de passe";
 $lang['OK'] =
         "Valider";
 ?>

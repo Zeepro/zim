@@ -1,11 +1,10 @@
 <?php
-
 $lang['ZeePro Personal Printer 21 - Connection configuration'] =
         "Zim - Connection configuration";
 $lang['Connection configuration'] =
-        "Printer activation";
+        "Welcome!";
 $lang['Welcome...'] =
-        "<br/>Welcome!<br/><br/>Please choose your printer connection:";
+        "Choose your printer connection:";
 $lang['Option 1'] =
         "WiFi network connected to the Internet";
 $lang['Option 2'] =

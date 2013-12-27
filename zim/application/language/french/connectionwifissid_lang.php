@@ -1,8 +1,6 @@
 <?php
 $lang['WiFi network connected to the Internet'] =
-		"Réseau WiFi connecté à Internet";
-$lang['Choose your network:'] =
-        "Choisissez votre réseau :";
+		"Sélectionnez votre réseau";
 $lang['Not visible...'] =
-        "SSID masqué...";
+        "mon réseau n'est pas dans la liste...";
 ?>

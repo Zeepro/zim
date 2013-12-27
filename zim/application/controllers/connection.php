@@ -27,8 +27,6 @@ class Connection extends MY_Controller {
 		
 		$this->load->library ( 'form_validation' );
 
-		$this->form_validation->set_rules('ssid', $CFG->config['language_abbr'] . ':ssid error', 'callback_ssid_check');
-				
 		$this->lang->load ( 'connectionmaster', $this->config->item ( 'language' ) );
 		$this->lang->load ( 'connectionwifissid', $this->config->item ( 'language' ) );
 		
@@ -44,20 +42,6 @@ class Connection extends MY_Controller {
 		}
     }
 
-
-    public function ssid_check($str)
-    {
-    	if ($str == 'choose-one')
-    	{
-    		$this->form_validation->set_message('ssid', t ( 'ssid error' ));
-    		return FALSE;
-    	}
-    	else
-    	{
-    		return TRUE;
-    	}
-    }
-    
     public function wifinotvisiblessid() {
         global $CFG;
     	
@@ -170,22 +154,66 @@ class Connection extends MY_Controller {
 		$this->template->set ( 'lang', $CFG->config ['language_abbr'] );
 		$this->template->set ( 'header', "<title>" . t ( 'ZeePro Personal Printer 21 - Connection configuration' ) . "</title>" );
 		
+ 		$this->form_validation->set_rules('ip', 'ip error', 'callback_ip_check');
+		$this->form_validation->set_message('ip_check', t("ip error"));
+ 		$this->form_validation->set_rules('mask', 'mask error', 'callback_mask_check');
+		$this->form_validation->set_message('mask_check', t("mask error"));
+ 		$this->form_validation->set_rules('gateway', 'gateway error', 'callback_gateway_check');
+		$this->form_validation->set_message('gateway_check', t("gateway error"));
+ 		$this->form_validation->set_rules('dns', 'dns error', 'callback_ip_check');
+ 		$this->form_validation->set_message('ip_check', t("dns error"));
+ 		$this->form_validation->set_error_delimiters('<i>', '</i>');
+ 		 			
 		if ($this->form_validation->run () == FALSE) {
 			$this->template->load ( 'connectionmaster', 'connectionwiredadvanced', $data );
 		} else {
-			$arr = array("Connection.Topology" => "Network",
-            "Connection.Support" => "RJ45"
+			$arr = array (
+					"Topology" => "Network",
+					"Support" => "RJ45",
+					"IPV4" => array (
+							array (
+									"Address" => set_value('ip'), 
+									"Mask" => set_value('mask'), 
+									"Gateway" => set_value('gateway'), 
+									"DNS" => set_value('dns'), 
+							) 
+					) 
 			);
 
 	        $fh = fopen($CFG->config['conf'] . 'Connection.json', 'w');
 	        fwrite($fh, json_encode($arr));
 	        fclose($fh);
 	
-	        header ( "Location:/" . $CFG->config ['language_abbr'] );
+	        header("Location:/");
         }
     }
-        
-    public function wifip2p() {
+    
+	public function ip_check($ip) {
+		if (filter_var ( $ip, FILTER_VALIDATE_IP )) {
+			return TRUE;
+		} else {
+			return FALSE;
+		}
+	}
+    
+	public function mask_check($mask) {
+		if (! $m = ip2long ( $mask ))
+			return false;
+		
+		$m = ~ $m;
+		return $m && ~ $m && ! ($m & ($m + 1));
+	}
+    
+	public function gateway_check($ip) {
+    // @todo The gateway should be within the mask
+		if (filter_var ( $ip, FILTER_VALIDATE_IP )) {
+			return TRUE;
+		} else {
+			return FALSE;
+		}
+	}
+    
+	public function wifip2p() {
         global $CFG;
 
         // To be managed by API...

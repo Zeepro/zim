@@ -4,9 +4,9 @@ $lang['Wired network connection'] =
 $lang['Text'] =
         "Your printer will auto-configure itself when it will be wirely connected to a network or a computer, the Wifi access will be disabled.";
 $lang['OK'] =
-        "Ok";
+        "Auto configuration";
 $lang['Text2'] =
-        "Manual settings";
+        "Manual settings (IP, DNS...)";
 $lang['Advanced'] =
 		"Avanced configuration";
 ?>
