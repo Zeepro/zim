@@ -379,5 +379,13 @@ $config['model'] = 'C:\\inetpub\\wwwroot\\zim\\data\\model\\';
 $config['bin'] = 'C:\\inetpub\\wwwroot\\zim\\bin\\';
 $config['printlist'] = 'C:\\inetpub\\wwwroot\\zim\\data\\printlist\\';
 
+/*
+|--------------------------------------------------------------------------
+| Temp directory
+|--------------------------------------------------------------------------
+|
+*/
+$config['temp'] = 'C:\\inetpub\\wwwroot\\zim\\tmp\\';
+
 /* End of file config.php */
 /* Location: ./application/config/config.php */
