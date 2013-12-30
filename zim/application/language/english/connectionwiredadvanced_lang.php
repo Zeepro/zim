@@ -19,4 +19,12 @@ $lang['dns'] =
         "DNS server";
 $lang['dns error'] =
         "Invalid address";
+$lang['ip ex'] =
+        "ex: 192.168.0.100";
+$lang['mask ex'] =
+        "ex: 255.255.255.0";
+$lang['gateway ex'] =
+        "ex: 192.168.0.1";
+$lang['dns ex'] =
+        "ex: 192.168.0.1";
 ?>

@@ -1,4 +1,4 @@
-<div data-role="page" data-url="connectionwifipswd">
+<div data-role="page" data-url="/connection/wifipswd">
 	<header data-role="header" class="page-header">
 		<a data-icon="arrow-l" data-role="button" data-direction="reverse"
 			data-rel="back"><?= t('Back') ?></a>

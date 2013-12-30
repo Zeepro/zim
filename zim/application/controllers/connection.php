@@ -80,6 +80,8 @@ class Connection extends MY_Controller {
 		
 		$this->load->library ( 'form_validation' );
 				
+		$this->form_validation->set_rules('password', 'password', '');
+		
 		$this->lang->load ( 'connectionmaster', $this->config->item ( 'language' ) );
 		$this->lang->load ( 'connectionwifipswd', $this->config->item ( 'language' ) );
 		
@@ -89,21 +91,21 @@ class Connection extends MY_Controller {
 		if ($this->form_validation->run () == FALSE) {
 			$this->template->load ('connectionmaster', 'connectionwifipswd', array('ssid' => $ssid));
 		} else {
-			$arr = array (
-					"Connection.Topology" => "Network",
-					"Connection.Support" => "WiFi",
-					"IP.addresses.V4" => array (
-							array (
-									"Address" => "0.0.0.0" 
-							) 
-					) 
-			);
+// 			$arr = array (
+// 					"Connection.Topology" => "Network",
+// 					"Connection.Support" => "WiFi",
+// 					"IP.addresses.V4" => array (
+// 							array (
+// 									"Address" => "0.0.0.0" 
+// 							) 
+// 					) 
+// 			);
 			
-			$fh = fopen ( $CFG->config ['conf'] . 'Connection.json', 'w' );
-			fwrite ( $fh, json_encode ( $arr ) );
-			fclose ( $fh );
+// 			$fh = fopen ( $CFG->config ['conf'] . 'Connection.json', 'w' );
+// 			fwrite ( $fh, json_encode ( $arr ) );
+// 			fclose ( $fh );
 			
-			header ( "Location:/" );
+			header ( "Location:/connection/confirmation" );
 		}
     }
 
@@ -126,18 +128,36 @@ class Connection extends MY_Controller {
 		if ($this->form_validation->run () == FALSE) {
 			$this->template->load ( 'connectionmaster', 'connectionwired', $data );
 		} else {
-			$arr = array("Connection.Topology" => "Network",
-            "Connection.Support" => "RJ45"
-			);
+// 			$arr = array("Connection.Topology" => "Network",
+//             "Connection.Support" => "RJ45"
+// 			);
 
-	        $fh = fopen($CFG->config['conf'] . 'Connection.json', 'w');
-	        fwrite($fh, json_encode($arr));
-	        fclose($fh);
+// 	        $fh = fopen($CFG->config['conf'] . 'Connection.json', 'w');
+// 	        fwrite($fh, json_encode($arr));
+// 	        fclose($fh);
 	
-	        header ( "Location:/" . $CFG->config ['language_abbr'] );
-        }
+			header ( "Location:/connection/confirmation" );
+	    }
     }
         
+	public function wiredauto() {
+        global $CFG;
+
+        // To be managed by API...
+        
+//         $arr = array("Connection.Topology" => "P2P",
+//             "Connection.Support" => "WiFi",
+//             "IP.addresses.V4" => array(array("Address" => "0.0.0.0")),
+//             "IP.lease" => standard_date("DATE_ISO8601", local_to_gmt(time()))
+//         );
+
+//         $fh = fopen($CFG->config['conf'] . 'Connection.json', 'w');
+//         fwrite($fh, json_encode($arr));
+//         fclose($fh);
+
+		header ( "Location:/connection/confirmation" );
+    }
+    
     public function wiredadvanced() {
         global $CFG;
     	
@@ -167,24 +187,24 @@ class Connection extends MY_Controller {
 		if ($this->form_validation->run () == FALSE) {
 			$this->template->load ( 'connectionmaster', 'connectionwiredadvanced', $data );
 		} else {
-			$arr = array (
-					"Topology" => "Network",
-					"Support" => "RJ45",
-					"IPV4" => array (
-							array (
-									"Address" => set_value('ip'), 
-									"Mask" => set_value('mask'), 
-									"Gateway" => set_value('gateway'), 
-									"DNS" => set_value('dns'), 
-							) 
-					) 
-			);
+// 			$arr = array (
+// 					"Topology" => "Network",
+// 					"Support" => "RJ45",
+// 					"IPV4" => array (
+// 							array (
+// 									"Address" => set_value('ip'), 
+// 									"Mask" => set_value('mask'), 
+// 									"Gateway" => set_value('gateway'), 
+// 									"DNS" => set_value('dns'), 
+// 							) 
+// 					) 
+// 			);
 
-	        $fh = fopen($CFG->config['conf'] . 'Connection.json', 'w');
-	        fwrite($fh, json_encode($arr));
-	        fclose($fh);
+// 	        $fh = fopen($CFG->config['conf'] . 'Connection.json', 'w');
+// 	        fwrite($fh, json_encode($arr));
+// 	        fclose($fh);
 	
-	        header("Location:/");
+			header ( "Location:/connection/confirmation" );
         }
     }
     
@@ -218,16 +238,29 @@ class Connection extends MY_Controller {
 
         // To be managed by API...
         
-        $arr = array("Connection.Topology" => "P2P",
-            "Connection.Support" => "WiFi",
-            "IP.addresses.V4" => array(array("Address" => "0.0.0.0")),
-            "IP.lease" => standard_date("DATE_ISO8601", local_to_gmt(time()))
-        );
+//         $arr = array("Connection.Topology" => "P2P",
+//             "Connection.Support" => "WiFi",
+//             "IP.addresses.V4" => array(array("Address" => "0.0.0.0")),
+//             "IP.lease" => standard_date("DATE_ISO8601", local_to_gmt(time()))
+//         );
 
-        $fh = fopen($CFG->config['conf'] . 'Connection.json', 'w');
-        fwrite($fh, json_encode($arr));
-        fclose($fh);
+//         $fh = fopen($CFG->config['conf'] . 'Connection.json', 'w');
+//         fwrite($fh, json_encode($arr));
+//         fclose($fh);
 
-        header("Location:/" . $CFG->config['language_abbr']);
+		header ( "Location:/connection/confirmation" );
     }
+    
+	public function confirmation() {
+        global $CFG;
+
+        $this->lang->load('connectionmaster', $this->config->item('language'));
+        $this->lang->load('confirmation', $this->config->item('language'));
+
+        $this->template->set('lang', $CFG->config['language_abbr']);
+        $this->template->set('header', "<title>" . t('ZeePro Personal Printer 21 - Connection configuration') . "</title>");
+        $this->template->load('connectionmaster', 'confirmation');
+
+	}
+    
 }
