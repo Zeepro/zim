@@ -31,7 +31,11 @@ if (!defined('PRINTLIST_MAX_PIC_SIZE')) {
 	define('PRINTLIST_FILE_JSON',		'model.json');
 	
 // 	define('PRINTLIST_GETPIC_BASE_WEB',	base_url() . 'getpicture');
- 	define('PRINTLIST_GETPIC_BASE_WEB',	'http://' . $_SERVER['HTTP_HOST'] . base_url('getpicture'));
+	if ($_SERVER['SERVER_PORT'] != 80) {
+ 		define('PRINTLIST_GETPIC_BASE_WEB',	'http://' . $_SERVER['HTTP_HOST'] . ':' . $_SERVER['SERVER_PORT'] . base_url('getpicture'));
+	} else {
+		define('PRINTLIST_GETPIC_BASE_WEB',	'http://' . $_SERVER['HTTP_HOST'] . base_url('getpicture'));
+	}
 	define('PRINTLIST_GETPIC_PRM_MID',	'mid');
 	define('PRINTLIST_GETPIC_PRM_PIC',	'p');
 }
