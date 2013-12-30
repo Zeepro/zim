@@ -4,6 +4,7 @@ if (!defined('BASEPATH'))
 	exit('No direct script access allowed');
 
 
+//TODO modify filename (and route) when passing the test phase, and we don't need ui display(disable view printlist_form.php)
 class T_printlist extends MY_Controller {
 
 	public function index()

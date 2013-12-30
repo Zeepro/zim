@@ -22,7 +22,7 @@
             <?php
 //				echo form_open_multipart('t_printlist/send', $attributes);
               ?>
-            <form action="/t_printlist/send" method="post" accept-charset="utf-8" enctype="multipart/form-data" data-ajax="false">
+            <form action="/store" method="post" accept-charset="utf-8" enctype="multipart/form-data" data-ajax="false">
             <?php echo form_label('Name', 'L_Name'); ?>
             <?php echo form_input('n', 'Name'); ?>
             <?php echo form_label('Desp', 'L_Desp');?>
