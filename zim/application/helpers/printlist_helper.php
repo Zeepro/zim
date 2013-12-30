@@ -10,6 +10,7 @@ $CI->load->helper(array (
 		'file',
 		'directory',
 		'json',
+		'url',
 ));
 
 if (!defined('PRINTLIST_MAX_PIC_SIZE')) {
@@ -29,7 +30,8 @@ if (!defined('PRINTLIST_MAX_PIC_SIZE')) {
 	define('PRINTLIST_FILE_GCODE',		'model.gcode');
 	define('PRINTLIST_FILE_JSON',		'model.json');
 	
-	define('PRINTLIST_GETPIC_BASE_WEB',	BASEPATH . 'getpicture');
+// 	define('PRINTLIST_GETPIC_BASE_WEB',	base_url() . 'getpicture');
+ 	define('PRINTLIST_GETPIC_BASE_WEB',	'http://' . $_SERVER['HTTP_HOST'] . base_url('getpicture'));
 	define('PRINTLIST_GETPIC_PRM_MID',	'mid');
 	define('PRINTLIST_GETPIC_PRM_PIC',	'p');
 }
