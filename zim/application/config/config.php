@@ -377,7 +377,7 @@ $config['conf'] = 'C:\\inetpub\\wwwroot\\zim\\data\\conf\\';
 $config['hardconf'] = 'C:\\inetpub\\wwwroot\\zim\\data\\hardconf\\';
 $config['model'] = 'C:\\inetpub\\wwwroot\\zim\\data\\model\\';
 $config['bin'] = 'C:\\inetpub\\wwwroot\\zim\\bin\\';
-$config['printlist'] = 'C:\\inetpub\\wwwroot\\zim\\data\\printlist\\';
+$config['printlist'] = 'C:/inetpub/wwwroot/zim/data/printlist/';
 
 /*
 |--------------------------------------------------------------------------
@@ -385,7 +385,7 @@ $config['printlist'] = 'C:\\inetpub\\wwwroot\\zim\\data\\printlist\\';
 |--------------------------------------------------------------------------
 |
 */
-$config['temp'] = 'C:\\inetpub\\wwwroot\\zim\\tmp\\';
+$config['temp'] = 'C:/inetpub/wwwroot/zim/tmp/';
 
 /* End of file config.php */
 /* Location: ./application/config/config.php */

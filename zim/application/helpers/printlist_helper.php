@@ -6,9 +6,10 @@ if (!defined('BASEPATH'))
 // call error list if we want
 $CI = &get_instance();
 $CI->load->helper(array (
-	'errorcode',
-	'file',
-	'json',
+		'errorcode',
+		'file',
+		'directory',
+		'json',
 ));
 
 if (!defined('PRINTLIST_MAX_PIC_SIZE')) {
@@ -72,7 +73,8 @@ function ModelList_add($data_array) {
 			if ($model_gcode['file_size'] > PRINTLIST_MAX_GCODE_SIZE) {
 				return ERROR_TOOBIG_MODEL;
 			}
-			if ($model_gcode['file_type'] != 'text/plain'
+			if (($model_gcode['file_type'] != 'application/octet-stream' 
+					 && $model_gcode['file_type'] != 'text/plain')
 					|| $model_gcode['file_ext'] != '.gcode') {
 				return ERROR_WRONG_FORMAT;
 			}
@@ -155,9 +157,9 @@ function ModelList_add($data_array) {
 				if ($picture['file_size'] > PRINTLIST_MAX_PIC_SIZE) {
 					return ERROR_TOOBIG_FILE;
 				}
-				if ($picture['is_image'] != 1
-						|| $picture['image_type'] != 'jpeg'
-						|| $picture['image_type'] != 'png') {
+				if ($picture['is_image'] != TRUE
+						|| ($picture['image_type'] != 'jpeg'
+						 && $picture['image_type'] != 'png')) {
 					return ERROR_WRONG_FORMAT;
 				}
 			}
@@ -171,13 +173,14 @@ function ModelList_add($data_array) {
 	//==========================================================
 	//model name, description, duration, filament1+2
 	$json_data = array(
-		PRINTLIST_TITLE_NAME	=> $model_name,
-		PRINTLIST_TITLE_DESP	=> $model_desp,
-		PRINTLIST_TITLE_TIME	=> $model_printtime,
-		PRINTLIST_TITLE_LENG_F1	=> $model_filament1,
-		PRINTLIST_TITLE_LENG_F2	=> $model_filament2,
-// 		PRINTLIST_TITLE_GCODE	=> NULL,
-		PRINTLIST_TITLE_PIC		=> array(),
+			PRINTLIST_TITLE_ID		=> md5($model_name),
+			PRINTLIST_TITLE_NAME	=> $model_name,
+			PRINTLIST_TITLE_DESP	=> $model_desp,
+			PRINTLIST_TITLE_TIME	=> $model_printtime,
+			PRINTLIST_TITLE_LENG_F1	=> $model_filament1,
+			PRINTLIST_TITLE_LENG_F2	=> $model_filament2,
+	// 		PRINTLIST_TITLE_GCODE	=> NULL,
+			PRINTLIST_TITLE_PIC		=> array(),
 	);
 	$model_path = $printlist_basepath . $model_name . '/';
 	//always create a new folder to overwrite the old one
@@ -196,7 +199,8 @@ function ModelList_add($data_array) {
 	
 	//model picture
 	foreach ($model_pictures as $picture) {
-		$tmp_string = 'img' . time() . $picture['file_ext']; //new picture name
+		$i_tmp = isset($i_tmp) ? ++$i_tmp : 1;
+		$tmp_string = 'img' . $i_tmp . '_' . time() . $picture['file_ext']; //new picture name
 		rename($picture['full_path'], $model_path . $tmp_string);
 		$json_data[PRINTLIST_TITLE_PIC][] = $tmp_string;
 	}
@@ -214,8 +218,8 @@ function ModelList_add($data_array) {
 }
 
 function ModelList_delete($id_model_del) {
-	$model_path = ModelList__find($id_model_del);
-	if ($model_path) {
+	$model_cr = ModelList__find($id_model, $model_path);
+	if (($model_cr == ERROR_OK) && $model_path) {
 		delete_files($model_path, TRUE); //there are no folders inside normally, but we delete all
 		rmdir($model_path);
 		return ERROR_OK;
@@ -230,13 +234,13 @@ function ModelList_list() {
 	$json_data = array();
 	$tmp_array = NULL;
 	
-	$model_array = get_filenames($printlist_basepath);
+	$model_array = directory_map($printlist_basepath, 1);
 	foreach ($model_array as $model_name) {
 		$model_path = $printlist_basepath . $model_name . '/';
 		$nb_pic = 0;
 		
 		try {
-			$tmp_array = json_read($model_path . PRINTLIST_FILE_JSON);
+			$tmp_array = json_read($model_path . PRINTLIST_FILE_JSON, TRUE);
 			if ($tmp_array['error']) {
 				throw new Exception('read json error');
 			}
@@ -262,18 +266,20 @@ function ModelList_list() {
 	return json_encode($json_data);
 }
 
-function ModelList_getPic($id_model, $id_picture) {
+function ModelList_getPic($id_model, $id_picture, &$path_pid) {
 	$json_data = NULL;
 	$model_path = NULL;
+	$model_cr = 0;
 	
-	if ($id_picture < 0 || $id_picture >= PRINTLIST_MAX_FILE_PIC) {
+	if ($id_picture <= 0 || $id_picture > PRINTLIST_MAX_FILE_PIC) {
 		return ERROR_UNKNOWN_PIC;
 	}
-	
-	$model_path = ModelList__find($id_model);
-	if ($model_path) {
+	--$id_picture; //adapt id number
+
+	$model_cr = ModelList__find($id_model, $model_path);
+	if (($model_cr == ERROR_OK) && $model_path) {
 		try {
-			$json_data = json_read($model_path . PRINTLIST_FILE_JSON);
+			$json_data = json_read($model_path . PRINTLIST_FILE_JSON, TRUE);
 			if ($json_data['error']) {
 				throw new Exception('read json error');
 			}
@@ -282,7 +288,8 @@ function ModelList_getPic($id_model, $id_picture) {
 		}
 		
 		if (isset($json_data['json'][PRINTLIST_TITLE_PIC][$id_picture])) {
-			return $model_path . $json_data['json'][PRINTLIST_TITLE_PIC][$id_picture]; //image file full path
+			$path_pid = $model_path . $json_data['json'][PRINTLIST_TITLE_PIC][$id_picture]; //image file full path
+			return ERROR_OK;
 		} else {
 			return ERROR_UNKNOWN_PIC;
 		}
@@ -294,9 +301,10 @@ function ModelList_getPic($id_model, $id_picture) {
 function ModelList_print($id_model) {
 	$json_data = NULL;
 	$gcode_path = NULL;
+	$model_path = NULL;
 
-	$model_path = ModelList__find($id_model);
-	if ($model_path) {
+	$model_cr = ModelList__find($id_model, $model_path);
+	if (($model_cr == ERROR_OK) && $model_path) {
 //		//if we don't fix the filename of gcode
 // 		try {
 // 			$json_data = json_read($model_path . PRINTLIST_FILE_JSON);
@@ -318,23 +326,26 @@ function ModelList_print($id_model) {
 }
 
 //internal function
-function ModelList__find($id_model) {
+function ModelList__find($id_model_find, &$model_path) {
 	global $CFG;
 	$printlist_basepath	= $CFG->config['printlist'];
 	$model_path = NULL;
 	
-	if (strlen($id_model_del) != 32) { //default length of md5
+	if (strlen($id_model_find) != 32) { //default length of md5
 		return ERROR_UNKNOWN_MODEL;
 	}
 
-	$model_array = get_filenames($printlist_basepath);
+	$model_array = directory_map($printlist_basepath, 1);
 	foreach ($model_array as $model_name) {
+		if (!is_dir($printlist_basepath . $model_name)) { //check whether it is a folder or not
+			continue;
+		}
 		$id_model_cal = md5($model_name);
-		if ($id_model_cal == $id_model_del) {
+		if ($id_model_cal == $id_model_find) {
 			$model_path = $printlist_basepath . $model_name . '/';
 			break; //leave directly the loop when finding the correct folder
 		}
 	}
 	
-	return $model_path;
+	return ERROR_OK;
 }

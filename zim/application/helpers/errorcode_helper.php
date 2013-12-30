@@ -31,6 +31,7 @@ if (!defined("ERROR_OK")) {
 	
 	define("ERROR_INTERNAL",		499);
 	
+	global $MY_ERRMSG_ARRAY;
 	$MY_ERRMSG_ARRAY = array (
 		ERROR_OK				=> "Ok",
 		ERROR_MISS_PRM			=> "Missing parameter",
@@ -51,8 +52,8 @@ if (!defined("ERROR_OK")) {
 		ERROR_FULL_PRTLST		=> "Print list full",
 		ERROR_UNKNOWN_MODEL		=> "Unknown model",
 		ERROR_UNKNOWN_PIC		=> "Unknown picture",
-		ERROR_TOOBIG_FILE		=> "File too big", //"to" -> "too", error in spec
-		ERROR_TOOBIG_MODEL		=> "Model too big", // same above
+		ERROR_TOOBIG_FILE		=> "File too big",
+		ERROR_TOOBIG_MODEL		=> "Model too big",
 		ERROR_IN_UPDATE			=> "Update in progress",
  		ERROR_WRONG_FORMAT		=> "Incorrect format",
 		
@@ -60,6 +61,7 @@ if (!defined("ERROR_OK")) {
 	);
 	
 	function MyERRMSG($CODEERR) {
+		global $MY_ERRMSG_ARRAY;
 		return t($MY_ERRMSG_ARRAY[$CODEERR]);
 	}
 	

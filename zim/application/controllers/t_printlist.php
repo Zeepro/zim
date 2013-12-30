@@ -17,8 +17,9 @@ class T_printlist extends MY_Controller {
 		$data = array('error'=> '');
 		$upload_config = NULL;
 		$api_data = array();
+		$cr = 0; //return code
 		
-		$this->load->helper('printlist');
+		$this->load->helper(array('form', 'printlist', 'errorcode'));
 		
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			//validation
@@ -29,7 +30,8 @@ class T_printlist extends MY_Controller {
 			
 			if ($this->form_validation->run() == FALSE)
 			{	// Here is where you do stuff when the submitted form is invalid.
-				$data['error'] .= validation_errors();
+// 				$data['error'] .= validation_errors();
+				$data['error'] = ERROR_MISS_PRM . " " . t(MyERRMSG(ERROR_MISS_PRM));
 				$this->load->view('test/printlist_form', $data);
 				return;
 			}
@@ -49,8 +51,8 @@ class T_printlist extends MY_Controller {
 			
 			$upload_config = array (
 					'upload_path'	=> $CFG->config['temp'],
-				//	'allowed_types'	=> 'gocde|jpg|png',
-					'allowed_types'	=> '*',
+					'allowed_types'	=> 'jpg|png|gcode',
+// 					'allowed_types'	=> '*',
 					'overwrite'		=> TRUE,
 					'remove_spaces'	=> TRUE,
 					'encrypt_name'	=> TRUE,
@@ -61,19 +63,27 @@ class T_printlist extends MY_Controller {
 			if ($this->upload->do_upload('f')) {
 				$api_data['f'] = $this->upload->data();
 			} else {
-				//treat error TODO return error
-				$data['error'] .= $this->upload->display_errors();
+				//treat error - missing gcode file
+// 				$data['error'] .= $this->upload->display_errors();
+				$data['error'] = ERROR_MISS_PRM . " " . t(MyERRMSG(ERROR_MISS_PRM));
 			}
 			//picture
 			for($i=1; $i <= PRINTLIST_MAX_FILE_PIC; $i++) {
 				if ($this->upload->do_upload("p$i")) {
 					$api_data["p$i"] = $this->upload->data();
-				} else {
-					//treat error - optional
-					$data['error'] .= $this->upload->display_errors();
+// 				} else {
+// 					//treat error - optional
+// 					$data['error'] .= $this->upload->display_errors();
 				}
 			}
-			//TODO call helper function here
+			
+			//call function
+			$cr = ModelList_add($api_data);
+			if ($cr != ERROR_OK) {
+				$data['error'] = $cr . " " . t(MyERRMSG($cr));
+			} else { //TODO show a success message here
+				$data['error'] = $cr . " " . t(MyERRMSG($cr));
+			}
 			
 			$this->load->view('test/printlist_form', $data);
 		} else {
@@ -81,6 +91,88 @@ class T_printlist extends MY_Controller {
 			$this->load->view('test/printlist_form', $data);
 		}
 		
+		return;
+	}
+	
+	public function delete() {
+		$mid = '';
+		$display = '';
+		$cr = 0; //return code
+
+		$this->load->helper(array('errorcode', 'printlist'));
+		
+		$mid = $this->input->get('id'); //return false if missing
+		
+		//check mid
+		if ($mid) {
+			//call function
+			$cr = ModelList_delete($mid);
+			if ($cr != ERROR_OK) {
+				$display = $cr . " " . t(MyERRMSG($cr));
+			} else { //TODO show a success message here
+				$display = $cr . " " . t(MyERRMSG($cr));
+			}
+		} else {
+			$display = ERROR_MISS_PRM . " " . t(MyERRMSG(ERROR_MISS_PRM));
+		}
+		
+		echo $display;
+		
+		return;
+	}
+	
+	public function mlist() {
+		$display = '';
+		$cr = 0; //return code
+		
+// 		$this->load->helper(array('errorcode', 'printlist'));
+		$this->load->helper('printlist');
+		
+		$display = ModelList_list();
+		
+		echo $display;
+		
+		return;
+	}
+	
+	public function getpicture() {
+		$mid = '';
+		$pid = 0;
+		$url_pid = '';
+		$display = '';
+		$cr = 0; //return code
+	
+		$this->load->helper(array('errorcode', 'printlist', 'file'));
+	
+		$mid = $this->input->get('id'); //return false if missing
+		$pid = (int)$this->input->get('p'); //return false if missing
+	
+		//check mid
+		if ($mid && $pid) {
+			//call function
+			$cr = ModelList_getPic($mid, $pid, $path_pid);
+			if ($cr != ERROR_OK) {
+				$display = $cr . " " . t(MyERRMSG($cr));
+			} else {
+// 				header('Content-Length: ' . filesize($path_pid));
+// 				header('Content-Type: ' . get_mime_by_extension($path_pid));
+// 				header('Content-Disposition: inline; filename="img' . $pid . '";'); //filename header
+// 				exit(file_get_contents($path_pid));
+				$this->output->set_content_type(get_mime_by_extension($path_pid))->set_output(file_get_contents($path_pid));
+				return;
+			}
+		} else {
+			$display = ERROR_MISS_PRM . " " . t(MyERRMSG(ERROR_MISS_PRM));
+		}
+	
+		echo $display;
+	
+		return;
+	}
+	
+	public function mprint() {
+		//TODO finish this controller
+		echo 'under construction... :)';
 		return;
 	}
 }

@@ -3,8 +3,9 @@
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
-function json_read($source) {
+function json_read($source, $normal = FALSE) {
 
+	//$normal: read normal json file if it is TRUE
     $retry = 0;
 
     do {
@@ -33,7 +34,8 @@ function json_read($source) {
     // Json decoding
     $arr = json_decode($json, true);
 
-    if ($arr === null or !array_key_exists("Version", $arr)) {
+//     if ($arr === null or !array_key_exists("Version", $arr)) {
+    if ($arr === null or (!array_key_exists("Version", $arr) && ($normal == FALSE))) {
         // Json decoding error
         return array("error" => array("context" => "error",
                 "id" => "Internal error #6 (invalid json ; if this message persists, thank you to contact our maintenance service)",
