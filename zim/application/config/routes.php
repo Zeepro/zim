@@ -45,12 +45,5 @@ $route['404_override'] = '';
 $route['(\w{2})/(.*)'] = '$2';
 $route['(\w{2})'] = $route['default_controller'];
 
-//custom - printlist
-$route['store']				= 't_printlist/send';
-$route['delete']			= 't_printlist/delete';
-$route['list']				= 't_printlist/mlist';
-$route['getpicture']		= 't_printlist/getpicture';
-$route['preslicedprint']	= 't_printlist/mprint';
-
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */
