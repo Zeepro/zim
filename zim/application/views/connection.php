@@ -1,7 +1,5 @@
 <div data-role="page" data-url="/connection">
 	<header data-role="header" class="page-header">
-		<a data-icon="arrow-l" data-role="button" data-direction="reverse"
-			data-rel="back"><?= t('Back') ?></a>
 	</header>
 	<div class="logo"></div>
 	<div data-role="content">
