@@ -9,7 +9,7 @@
 //				$attributes = array('accept-charset' => 'utf-8'); 
 //				echo form_open_multipart('t_printlist/send', $attributes);
             ?>
-            <form action="/rest/store" method="post" accept-charset="utf-8" enctype="multipart/form-data">
+            <form action="/rest/storemodel" method="post" accept-charset="utf-8" enctype="multipart/form-data">
             <?php echo form_label('Name', 'L_Name'); ?><br />
             <?php echo form_input('n', 'Name'); ?><br />
             <?php echo form_label('Desp', 'L_Desp');?><br />
