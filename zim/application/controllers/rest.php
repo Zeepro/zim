@@ -30,8 +30,9 @@ class Rest extends MY_Controller {
 		$arr = json_read ( $CFG->config ['conf'] . 'Work.json' );
 		if (! $arr ["error"] and $arr ["json"] ["State"] == "Working") {
 			// Work in progress
-			http_response_code ( 446 );
-			echo("Printer busy");
+// 			http_response_code ( 446 );
+			$this->output->set_status_header(ERROR_BUSY_PRINTER, "Printer busy");
+ 			echo("Printer busy"); //optional
 			exit ();
 		}
 		
@@ -62,7 +63,7 @@ class Rest extends MY_Controller {
 		$this->load->helper(array('form', 'printlist', 'errorcode'));
 	
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-			//validation
+			//validation (not file check included)
 			$this->load->library('form_validation');
 			
 			$this->form_validation->set_rules('n', 'Modelname', 'required');
@@ -70,8 +71,6 @@ class Rest extends MY_Controller {
 			if ($this->form_validation->run() == FALSE) {
 				// Here is where you do stuff when the submitted form is invalid.
 				$cr = ERROR_MISS_PRM;
-// 				$data['error'] = ERROR_MISS_PRM . " " . t(MyERRMSG(ERROR_MISS_PRM));
-// 				return;
 			} else {
 				$api_data['n'] = $this->input->post('n');
 				if ($this->input->post('d')) {
@@ -97,7 +96,8 @@ class Rest extends MY_Controller {
 				);
 				$this->load->library('upload', $upload_config);
 //	 			$this->upload->initialize();
-		
+				
+				//check gcode file required
 				if ($this->upload->do_upload('f')) {
 					//gcode file
 					$api_data['f'] = $this->upload->data();
@@ -115,17 +115,19 @@ class Rest extends MY_Controller {
 					$cr = ModelList_add($api_data);
 				} else {
 					//treat error - missing gcode file
-//					$data['error'] .= $this->upload->display_errors(); //test
+//					$display .= $this->upload->display_errors(); //test
 					$cr = ERROR_MISS_PRM;
 				}
 			}
 		} else {
-// 			$data['error'] .= 'no post';
+// 			$display .= 'no post';
 			$cr = ERROR_MISS_PRM;
 		}
 		
-		http_response_code($cr);
 		$display = $cr . " " . t(MyERRMSG($cr));
+		$this->output->set_status_header($cr, $display);
+// 		http_response_code($cr);
+		echo $display; //optional
 		
 		return;
 	}
@@ -154,9 +156,10 @@ class Rest extends MY_Controller {
 			$cr = ERROR_MISS_PRM;
 		}
 		$display = $cr . " " . t(MyERRMSG($cr));
-		
-		http_response_code($cr);
-		echo $display;
+
+		$this->output->set_status_header($cr, $display);
+// 		http_response_code($cr);
+		echo $display; //optional
 		
 		return;
 	}
@@ -200,10 +203,11 @@ class Rest extends MY_Controller {
 		} else {
 			$cr = ERROR_MISS_PRM;
 		}
-		
-		http_response_code($cr);
+
 		$display = $cr . " " . t(MyERRMSG($cr));
-		echo $display;
+		$this->output->set_status_header($cr, $display);
+// 		http_response_code($cr);
+ 		echo $display; //optional
 		
 		return;
 	}
