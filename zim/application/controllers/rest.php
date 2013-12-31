@@ -88,8 +88,8 @@ class Rest extends MY_Controller {
 					
 				$upload_config = array (
 						'upload_path'	=> $CFG->config['temp'],
-						'allowed_types'	=> 'jpg|png|gcode',
-//	 					'allowed_types'	=> '*',
+// 						'allowed_types'	=> 'jpg|png|gcode',
+	 					'allowed_types'	=> '*',
 						'overwrite'		=> TRUE,
 						'remove_spaces'	=> TRUE,
 						'encrypt_name'	=> TRUE,
@@ -120,21 +120,14 @@ class Rest extends MY_Controller {
 				}
 			}
 		} else {
-// 			$display .= 'no post';
-			$cr = ERROR_MISS_PRM;
+			$this->load->view('test/printlist_form');
+			return;
 		}
 		
 		$display = $cr . " " . t(MyERRMSG($cr));
 		$this->output->set_status_header($cr, $display);
 // 		http_response_code($cr);
 		echo $display; //optional
-		
-		return;
-	}
-	
-	public function teststoremodel() {
-		//TODO delete or comment this function after passing test phase
-		$this->load->view('test/printlist_form');
 		
 		return;
 	}

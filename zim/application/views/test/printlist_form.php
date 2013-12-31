@@ -11,15 +11,15 @@
             ?>
             <form action="/rest/storemodel" method="post" accept-charset="utf-8" enctype="multipart/form-data">
             <?php echo form_label('Name', 'L_Name'); ?><br />
-            <?php echo form_input('n', 'Name'); ?><br />
-            <?php echo form_label('Desp', 'L_Desp');?><br />
-            <?php echo form_textarea('d', 'Desp'); ?><br />
+            <?php echo form_input('n'); ?><br />
+            <?php echo form_label('Desc', 'L_Desp');?><br />
+            <?php echo form_textarea('d'); ?><br />
             <?php echo form_label('Time', 'L_Time'); ?><br />
-            <?php echo form_input('t', '3'); ?><br />
+            <?php echo form_input('t'); ?><br />
             <?php echo form_label('Length1', 'L_Leng1'); ?><br />
-            <?php echo form_input('l1', '1'); ?><br />
+            <?php echo form_input('l1'); ?><br />
             <?php echo form_label('Length2', 'L_Leng2'); ?><br />
-            <?php echo form_input('l2', '2'); ?><br />
+            <?php echo form_input('l2'); ?><br />
             <?php echo form_label('Gcode', 'L_Gcode'); ?><br />
             <?php echo form_upload('f'); ?><br />
             <?php echo form_label('Pic1', 'L_Pic1'); ?><br />
