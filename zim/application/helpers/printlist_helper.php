@@ -37,7 +37,7 @@ if (!defined('PRINTLIST_MAX_PIC_SIZE')) {
 // 	} else {
 		define('PRINTLIST_GETPIC_BASE_WEB',	'http://' . $_SERVER['HTTP_HOST'] . base_url('rest/getpicture'));
 // 	}
-	define('PRINTLIST_GETPIC_PRM_MID',	'mid');
+	define('PRINTLIST_GETPIC_PRM_MID',	'id');
 	define('PRINTLIST_GETPIC_PRM_PIC',	'p');
 }
 
