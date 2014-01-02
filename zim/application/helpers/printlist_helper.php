@@ -189,10 +189,12 @@ function ModelList_add($data_array) {
 			PRINTLIST_TITLE_PIC		=> array(),
 	);
 	$model_path = $printlist_basepath . $model_name . '/';
+	$model_path = utf8_decode($model_path); //decode path for accent and special character
 	//always create a new folder to overwrite the old one
 	if (file_exists($model_path)) {
 		delete_files($model_path, TRUE); //there are no folders inside normally, but we delete all
 		rmdir($model_path);
+		usleep(3); //to make sure the folder is deleted
 	}
 	mkdir($model_path);
 	
