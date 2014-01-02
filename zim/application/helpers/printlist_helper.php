@@ -31,11 +31,12 @@ if (!defined('PRINTLIST_MAX_PIC_SIZE')) {
 	define('PRINTLIST_FILE_JSON',		'model.json');
 	
 // 	define('PRINTLIST_GETPIC_BASE_WEB',	base_url() . 'getpicture');
-	if ($_SERVER['SERVER_PORT'] != 80) {
- 		define('PRINTLIST_GETPIC_BASE_WEB',	'http://' . $_SERVER['HTTP_HOST'] . ':' . $_SERVER['SERVER_PORT'] . base_url('getpicture'));
-	} else {
-		define('PRINTLIST_GETPIC_BASE_WEB',	'http://' . $_SERVER['HTTP_HOST'] . base_url('getpicture'));
-	}
+	//for IIS, we use only HTTP_HOST?
+// 	if ($_SERVER['SERVER_PORT'] != 80) {
+//  		define('PRINTLIST_GETPIC_BASE_WEB',	'http://' . $_SERVER['HTTP_HOST'] . ':' . $_SERVER['SERVER_PORT'] . base_url('rest/getpicture'));
+// 	} else {
+		define('PRINTLIST_GETPIC_BASE_WEB',	'http://' . $_SERVER['HTTP_HOST'] . base_url('rest/getpicture'));
+// 	}
 	define('PRINTLIST_GETPIC_PRM_MID',	'mid');
 	define('PRINTLIST_GETPIC_PRM_PIC',	'p');
 }
@@ -261,7 +262,7 @@ function ModelList_list() {
 		if (isset($tmp_array['json'][PRINTLIST_TITLE_PIC])
 				&& count($tmp_array['json'][PRINTLIST_TITLE_PIC])) {
 			$nb_pic = count($tmp_array['json'][PRINTLIST_TITLE_PIC]);
-			for ($i=0; $i < $nb_pic; $i++) { //we cannot use foreach to change value
+			for ($i=1; $i <= $nb_pic; $i++) { //we cannot use foreach to change value
 				$tmp_array['json'][PRINTLIST_TITLE_PIC][$i] = PRINTLIST_GETPIC_BASE_WEB
 					. '?' . PRINTLIST_GETPIC_PRM_MID . '=' . md5($model_name)
 					. '&' . PRINTLIST_GETPIC_PRM_PIC . '=' . $i;
