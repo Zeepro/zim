@@ -85,7 +85,13 @@ class Rest extends MY_Controller {
 				if ($this->input->post('l2')) {
 					$api_data['l2'] = (int)$this->input->post('l2');
 				}
-					
+				if ($this->input->post('c1')) {
+					$api_data['c1'] = $this->input->post('c1');
+				}
+				if ($this->input->post('c2')) {
+					$api_data['c2'] = $this->input->post('c2');
+				}
+				
 				$upload_config = array (
 						'upload_path'	=> $CFG->config['temp'],
 // 						'allowed_types'	=> 'jpg|png|gcode',

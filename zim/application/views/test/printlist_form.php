@@ -20,6 +20,10 @@
             <?php echo form_input('l1'); ?><br />
             <?php echo form_label('Length2', 'L_Leng2'); ?><br />
             <?php echo form_input('l2'); ?><br />
+            <?php echo form_label('Color1', 'L_Col1'); ?><br />
+            <?php echo form_input('c1'); ?><br />
+            <?php echo form_label('Color2', 'L_Col2'); ?><br />
+            <?php echo form_input('c2'); ?><br />
             <?php echo form_label('Gcode', 'L_Gcode'); ?><br />
             <?php echo form_upload('f'); ?><br />
             <?php echo form_label('Pic1', 'L_Pic1'); ?><br />

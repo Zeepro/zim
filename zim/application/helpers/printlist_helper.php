@@ -22,8 +22,10 @@ if (!defined('PRINTLIST_MAX_PIC_SIZE')) {
 	define('PRINTLIST_TITLE_NAME',		'name');
 	define('PRINTLIST_TITLE_DESP',		'description');
 	define('PRINTLIST_TITLE_TIME',		'duration');
-	define('PRINTLIST_TITLE_LENG_F1',	'filmament1');
-	define('PRINTLIST_TITLE_LENG_F2',	'filmament2');
+	define('PRINTLIST_TITLE_LENG_F1',	'l1');
+	define('PRINTLIST_TITLE_LENG_F2',	'l2');
+	define('PRINTLIST_TITLE_COLOR_F1',	'c1');
+	define('PRINTLIST_TITLE_COLOR_F2',	'c2');
 	define('PRINTLIST_TITLE_PIC',		'picture');
 // 	define('PRINTLIST_TITLE_GCODE',		'gcode');
 	
@@ -54,6 +56,8 @@ function ModelList_add($data_array) {
 	$model_printtime	= 0;	// int by $data_array['t'], int
 	$model_filament1	= 0;	// int by $data_array['l1'], int
 	$model_filament2	= 0;	// int by $data_array['l2'], int
+	$model_color1		= '';	// string by $data_array['c1'], string
+	$model_color2		= '';	// string by $data_array['c2'], string
 	$model_gcode		= NULL;	// file array by $data_array['f'], array
 	//other parameters
 	//$data_array['p1'] ~ $data_array['p5']: file array which contain images
@@ -116,6 +120,16 @@ function ModelList_add($data_array) {
 				if ($model_filament2 <= 0) {
 					return ERROR_WRONG_PRM;
 				}
+			}
+
+			//model filament1 length
+			if (isset($data_array['c1'])) {
+				$model_color1 = $data_array['c1'];
+			}
+
+			//model filament1 length
+			if (isset($data_array['c2'])) {
+				$model_color2 = $data_array['c2'];
 			}
 			
 			//model picture 1
@@ -180,14 +194,16 @@ function ModelList_add($data_array) {
 	//==========================================================
 	//model name, description, duration, filament1+2
 	$json_data = array(
-			PRINTLIST_TITLE_ID		=> md5($model_name),
-			PRINTLIST_TITLE_NAME	=> $model_name,
-			PRINTLIST_TITLE_DESP	=> $model_desp,
-			PRINTLIST_TITLE_TIME	=> $model_printtime,
-			PRINTLIST_TITLE_LENG_F1	=> $model_filament1,
-			PRINTLIST_TITLE_LENG_F2	=> $model_filament2,
-	// 		PRINTLIST_TITLE_GCODE	=> NULL,
-			PRINTLIST_TITLE_PIC		=> array(),
+			PRINTLIST_TITLE_ID			=> md5($model_name),
+			PRINTLIST_TITLE_NAME		=> $model_name,
+			PRINTLIST_TITLE_DESP		=> $model_desp,
+			PRINTLIST_TITLE_TIME		=> $model_printtime,
+			PRINTLIST_TITLE_LENG_F1		=> $model_filament1,
+			PRINTLIST_TITLE_LENG_F2		=> $model_filament2,
+			PRINTLIST_TITLE_COLOR_F1	=> $model_color1,
+			PRINTLIST_TITLE_COLOR_F2	=> $model_color2,
+	// 		PRINTLIST_TITLE_GCODE		=> NULL,
+			PRINTLIST_TITLE_PIC			=> array(),
 	);
 	$model_path = $printlist_basepath . $model_name . '/';
 	$model_path = utf8_decode($model_path); //decode path for accent and special character
