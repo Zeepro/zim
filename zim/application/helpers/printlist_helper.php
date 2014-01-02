@@ -262,10 +262,10 @@ function ModelList_list() {
 		if (isset($tmp_array['json'][PRINTLIST_TITLE_PIC])
 				&& count($tmp_array['json'][PRINTLIST_TITLE_PIC])) {
 			$nb_pic = count($tmp_array['json'][PRINTLIST_TITLE_PIC]);
-			for ($i=1; $i <= $nb_pic; $i++) { //we cannot use foreach to change value
+			for ($i=0; $i < $nb_pic; $i++) { //we cannot use foreach to change value
 				$tmp_array['json'][PRINTLIST_TITLE_PIC][$i] = PRINTLIST_GETPIC_BASE_WEB
 					. '?' . PRINTLIST_GETPIC_PRM_MID . '=' . md5($model_name)
-					. '&' . PRINTLIST_GETPIC_PRM_PIC . '=' . $i;
+					. '&' . PRINTLIST_GETPIC_PRM_PIC . '=' . ($i + 1);
 			}
 		}
 		
