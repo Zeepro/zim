@@ -127,6 +127,7 @@ class Rest extends MY_Controller {
 		$display = $cr . " " . t(MyERRMSG($cr));
 		$this->output->set_status_header($cr, $display);
 // 		http_response_code($cr);
+		$this->output->set_content_type('text/plain');
 		echo $display; //optional
 		
 		return;
@@ -152,6 +153,7 @@ class Rest extends MY_Controller {
 
 		$this->output->set_status_header($cr, $display);
 // 		http_response_code($cr);
+		$this->output->set_content_type('text/plain');
 		echo $display; //optional
 		
 		return;
@@ -164,6 +166,7 @@ class Rest extends MY_Controller {
 		$this->load->helper('printlist');
 		
 		$display = ModelList_list();
+		$this->output->set_content_type('text/plain');
 		echo $display;
 		
 		return;
@@ -200,6 +203,7 @@ class Rest extends MY_Controller {
 		$display = $cr . " " . t(MyERRMSG($cr));
 		$this->output->set_status_header($cr, $display);
 // 		http_response_code($cr);
+		$this->output->set_content_type('text/plain');
  		echo $display; //optional
 		
 		return;
