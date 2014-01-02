@@ -226,7 +226,7 @@ function ModelList_add($data_array) {
 	return ERROR_OK;
 }
 
-function ModelList_delete($id_model_del) {
+function ModelList_delete($id_model) {
 	$model_cr = ModelList__find($id_model, $model_path);
 	if (($model_cr == ERROR_OK) && $model_path) {
 		delete_files($model_path, TRUE); //there are no folders inside normally, but we delete all
