@@ -233,7 +233,8 @@ function ModelList_add($data_array) {
 	//write model json info
 	try {
 		$fp = fopen($model_path . PRINTLIST_FILE_JSON, 'w');
-		fwrite($fp, json_encode($json_data));
+		fwrite($fp, json_unicode_decode(json_encode($json_data)));
+// 		fwrite($fp, json_encode($json_data));
 		fclose($fp);
 	} catch (Exception $e) {
 		return ERROR_INTERNAL;
@@ -288,7 +289,7 @@ function ModelList_list() {
 		$json_data[] = $tmp_array['json']; //asign final data
 	}
 	
-	return json_encode($json_data);
+	return json_unicode_decode(json_encode($json_data));
 }
 
 function ModelList_getPic($id_model, $id_picture, &$path_pid) {

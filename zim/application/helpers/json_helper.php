@@ -45,3 +45,14 @@ function json_read($source, $normal = FALSE) {
             "json" => $arr);
     }
 }
+
+function json_unicode_decode($str){
+	return preg_replace("/\\\u([0-9A-F]{4})/ie", "iconv('utf-16', 'utf-8', json__hex2str(\"$1\"))", $str);
+}
+
+function json__hex2str($hex) {
+	$r = '';
+	for ($i = 0; $i < strlen($hex) - 1; $i += 2)
+		$r .= chr(hexdec($hex[$i] . $hex[$i + 1]));
+	return $r;
+}
