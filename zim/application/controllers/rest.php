@@ -301,7 +301,7 @@ class Rest extends MY_Controller {
 						$cr = ERROR_WRONG_PRM;
 					}
 					else {
-						$api_prm = ($has_e) ? 'e' : 'h';
+						$api_prm = is_null($has_e) ? 'h' : 'e';
 						$cr = PrinterState_getTemperature($display, $api_prm);
 // 						if ($cr == ERROR_INTERNAL) {
 // 							echo 'INTERNAL';
@@ -369,7 +369,7 @@ class Rest extends MY_Controller {
 						$cr = ERROR_WRONG_PRM;
 					}
 					else {
-						$api_prm = ($has_e) ? 'e' : 'h';
+						$api_prm = is_null($has_e) ? 'h' : 'e';
 						$cr = PrinterState_setTemperature($val_temper, $api_prm);
 // 						if ($cr == ERROR_INTERNAL) {
 // 							echo 'INTERNAL';
