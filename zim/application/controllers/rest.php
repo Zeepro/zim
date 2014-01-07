@@ -294,14 +294,14 @@ class Rest extends MY_Controller {
 					// check which temperature we want
 					$has_e = $this->input->get('e');
 					$has_h = $this->input->get('h');
-					if (is_null($has_e) && is_null($has_h)) {
+					if (($has_e === FALSE) && ($has_h === FALSE)) {
 						$cr = ERROR_MISS_PRM;
 					}
-					else if ($has_e && $has_h) {
+					else if (!($has_e === FALSE) && !($has_h === FALSE)) {
 						$cr = ERROR_WRONG_PRM;
 					}
 					else {
-						$api_prm = is_null($has_e) ? 'h' : 'e';
+						$api_prm = ($has_e === FALSE) ? 'h' : 'e';
 						$cr = PrinterState_getTemperature($display, $api_prm);
 // 						if ($cr == ERROR_INTERNAL) {
 // 							echo 'INTERNAL';
@@ -362,14 +362,14 @@ class Rest extends MY_Controller {
 					$val_temper = $this->input->get('v');
 					$has_e = $this->input->get('e');
 					$has_h = $this->input->get('h');
-					if (is_null($has_e) && is_null($has_h)) {
+					if (($has_e === FALSE) && ($has_h === FALSE)) {
 						$cr = ERROR_MISS_PRM;
 					}
-					else if ($has_e && $has_h) {
+					else if (!($has_e === FALSE) && !($has_h === FALSE)) {
 						$cr = ERROR_WRONG_PRM;
 					}
 					else {
-						$api_prm = is_null($has_e) ? 'h' : 'e';
+						$api_prm = ($has_e === FALSE) ? 'h' : 'e';
 						$cr = PrinterState_setTemperature($val_temper, $api_prm);
 // 						if ($cr == ERROR_INTERNAL) {
 // 							echo 'INTERNAL';
@@ -386,9 +386,9 @@ class Rest extends MY_Controller {
 			$cr = ERROR_MISS_PRM;
 		}
 		
-		if ($cr != ERROR_OK) {
+// 		if ($cr != ERROR_OK) {
 			$display = $cr . " " . t(MyERRMSG($cr));
-		}
+// 		}
 		$this->output->set_status_header($cr, $display);
 // 		http_response_code($cr);
 		$this->output->set_content_type(RETURN_CONTENT_TYPE);
