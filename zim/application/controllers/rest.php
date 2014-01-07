@@ -1,6 +1,11 @@
 <?php
 if (! defined ( 'BASEPATH' ))
 	exit ( 'No direct script access allowed' );
+
+if (!defined('RETURN_CONTENT_TYPE')) {
+	define('RETURN_CONTENT_TYPE', 'text/plain; charset=UTF-8');
+}
+
 class Rest extends MY_Controller {
 	function __construct() {
 		parent::__construct ();
@@ -51,7 +56,7 @@ class Rest extends MY_Controller {
 	
 	//==========================================================
 	//print list web service
-	//==========================================================	
+	//==========================================================
 	public function storemodel() {
 		global $CFG;
 		$data = array('error'=> '');
@@ -60,7 +65,7 @@ class Rest extends MY_Controller {
 		$cr = 0; //return code
 		$display = '';
 	
-		$this->load->helper(array('form', 'printlist', 'errorcode'));
+		$this->load->helper(array('printlist', 'errorcode'));
 	
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			//validation (not file check included)
@@ -133,7 +138,7 @@ class Rest extends MY_Controller {
 		$display = $cr . " " . t(MyERRMSG($cr));
 		$this->output->set_status_header($cr, $display);
 // 		http_response_code($cr);
-		$this->output->set_content_type('text/plain; charset=UTF-8');
+		$this->output->set_content_type(RETURN_CONTENT_TYPE);
 		echo $display; //optional
 		
 		return;
@@ -159,7 +164,7 @@ class Rest extends MY_Controller {
 
 		$this->output->set_status_header($cr, $display);
 // 		http_response_code($cr);
-		$this->output->set_content_type('text/plain; charset=UTF-8');
+		$this->output->set_content_type(RETURN_CONTENT_TYPE);
 		echo $display; //optional
 		
 		return;
@@ -172,7 +177,7 @@ class Rest extends MY_Controller {
 		$this->load->helper('printlist');
 		
 		$display = ModelList_list();
-		$this->output->set_content_type('text/plain; charset=UTF-8');
+		$this->output->set_content_type(RETURN_CONTENT_TYPE);
 		echo $display;
 		
 		return;
@@ -209,19 +214,185 @@ class Rest extends MY_Controller {
 		$display = $cr . " " . t(MyERRMSG($cr));
 		$this->output->set_status_header($cr, $display);
 // 		http_response_code($cr);
-		$this->output->set_content_type('text/plain; charset=UTF-8');
+		$this->output->set_content_type(RETURN_CONTENT_TYPE);
  		echo $display; //optional
 		
 		return;
 	}
 	
-	public function printmodel() {
+	public function preslicedprint() {
+		$mid = '';
+		$cr = 0; //return code
+		
+		$this->load->helper(array('errorcode', 'printlist'));
+		
+		$mid = $this->input->get('id'); //return false if missing
+		
+		if ($mid) {
+			$cr = ModelList_print($mid);
+		}
+		else {
+			$cr = ERROR_MISS_PRM;
+		}
+		
+		if ($cr == ERROR_OK) {
+			//TODO change status file to indicate we are in printing now,
+			// but think another condition:
+			// when we have finished printing, how can we know that?
+			// arcontrol client return directly, and will not infect file system with json file.
+			// perhaps we have to lance a thread of PHP to check print status by arcontrol
+			// time by time util the printing is finished?
+			// if not, we will rely on the client to check status,
+			// that means we force the client only accessing check print status page when we are in printing.
+			// in that way, we can know when the printing is finished, and then change the status in json file
+		}
+
+		$display = $cr . " " . t(MyERRMSG($cr));
+		$this->output->set_status_header($cr, $display);
+// 		http_response_code($cr);
+		$this->output->set_content_type(RETURN_CONTENT_TYPE);
+ 		echo $display; //optional
+		
+		return;
+	}
+	
+	
+	//==========================================================
+	//printer state web service
+	//==========================================================
+	public function status() {
 		//TODO finish this controller
 		echo 'under construction... :)';
 		
 		return;
 	}
 	
+	public function get() {
+		$parameter = NULL;
+		$cr = 0;
+		$display = NULL;
+		$api_prm = NULL;
+		
+		$this->load->helper(array('errorcode', 'printerstate'));
+		
+		$parameter = $this->input->get('p'); //return false if missing
+		
+		if ($parameter) {
+			switch($parameter) {
+				case PRINTERSTATE_PRM_EXTRUDER:
+					$cr = PrinterState_getExtruder($display); //$abb_extruder
+// 					if ($cr == ERROR_INTERNAL) {
+// 						$display = 'INTERNAL';
+// 					}
+					break;
+					
+				case PRINTERSTATE_PRM_TEMPER:
+					// check which temperature we want
+					$has_e = $this->input->get('e');
+					$has_h = $this->input->get('h');
+					if (is_null($has_e) && is_null($has_h)) {
+						$cr = ERROR_MISS_PRM;
+					}
+					else if ($has_e && $has_h) {
+						$cr = ERROR_WRONG_PRM;
+					}
+					else {
+						$api_prm = ($has_e) ? 'e' : 'h';
+						$cr = PrinterState_getTemperature($display, $api_prm);
+// 						if ($cr == ERROR_INTERNAL) {
+// 							echo 'INTERNAL';
+// 							return;
+// 						}
+					}
+					break;
+					
+				case PRINTERSTATE_PRM_CARTRIDGE:
+					$api_prm = $this->input->get('v');
+					$cr = PrinterState_getCartridge($display, $api_prm);
+					break;
+					
+				default:
+					$cr = ERROR_WRONG_PRM;
+					break;
+			}
+		} else {
+			$cr = ERROR_MISS_PRM;
+		}
+		
+		if ($cr != ERROR_OK) {
+			$display = $cr . " " . t(MyERRMSG($cr));
+		}
+		$this->output->set_status_header($cr, $display);
+// 		http_response_code($cr);
+		$this->output->set_content_type(RETURN_CONTENT_TYPE);
+ 		echo $display;
+		
+		return;
+	}
+	
+	public function set() {
+		$parameter = NULL;
+		$cr = 0;
+		$display = NULL;
+		$api_prm = NULL;
+		
+		$this->load->helper(array('errorcode', 'printerstate'));
+		
+		$parameter = $this->input->get('p'); //return false if missing
+		
+		if ($parameter) {
+			switch($parameter) {
+				case PRINTERSTATE_PRM_EXTRUDER:
+					$api_prm = $this->input->get('v');
+					if ($api_prm) {
+						$cr = PrinterState_setExtruder($api_prm);
+					} else {
+						$cr = ERROR_MISS_PRM;
+					}
+					break;
+					
+				case PRINTERSTATE_PRM_TEMPER:
+					// check which temperature we want
+					$val_temper = 0;
+					
+					$val_temper = $this->input->get('v');
+					$has_e = $this->input->get('e');
+					$has_h = $this->input->get('h');
+					if (is_null($has_e) && is_null($has_h)) {
+						$cr = ERROR_MISS_PRM;
+					}
+					else if ($has_e && $has_h) {
+						$cr = ERROR_WRONG_PRM;
+					}
+					else {
+						$api_prm = ($has_e) ? 'e' : 'h';
+						$cr = PrinterState_setTemperature($val_temper, $api_prm);
+// 						if ($cr == ERROR_INTERNAL) {
+// 							echo 'INTERNAL';
+// 							return;
+// 						}
+					}
+					break;
+					
+				default:
+					$cr = ERROR_WRONG_PRM;
+					break;
+			}
+		} else {
+			$cr = ERROR_MISS_PRM;
+		}
+		
+		if ($cr != ERROR_OK) {
+			$display = $cr . " " . t(MyERRMSG($cr));
+		}
+		$this->output->set_status_header($cr, $display);
+// 		http_response_code($cr);
+		$this->output->set_content_type(RETURN_CONTENT_TYPE);
+		echo $display; //optional
+		
+		return;
+		
+	}
 	
 	//==========================================================
 	//another part (end of print list)

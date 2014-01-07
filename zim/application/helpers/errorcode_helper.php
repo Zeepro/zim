@@ -31,6 +31,9 @@ if (!defined("ERROR_OK")) {
 	
 	define("ERROR_INTERNAL",		499);
 	
+	// normal program return code
+	define('ERROR_NORMAL_RC_OK',	0);
+	
 	global $MY_ERRMSG_ARRAY;
 	$MY_ERRMSG_ARRAY = array (
 		ERROR_OK				=> "Ok",

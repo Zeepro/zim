@@ -331,6 +331,12 @@ function ModelList_print($id_model) {
 
 	$model_cr = ModelList__find($id_model, $model_path);
 	if (($model_cr == ERROR_OK) && $model_path) {
+		$command = '';
+		$output = array();
+		$ret_val = 0;
+		
+		$CI = &get_instance();
+		$CI->load->helper('printerstate');
 //		//if we don't fix the filename of gcode
 // 		try {
 // 			$json_data = json_read($model_path . PRINTLIST_FILE_JSON);
@@ -343,7 +349,30 @@ function ModelList_print($id_model) {
 // 		$gcode_path = $json_data['json'][PRINTLIST_TITLE_GCODE];
 		$gcode_path = $model_path . PRINTLIST_FILE_GCODE;
 		
-		//TODO finish me ModelList_print($id_model) by passing gcode to printer
+		// check if in printing
+		$ret_val = PrinterState__checkInPrint();
+		if ($ret_val == TRUE) {
+			return ERROR_IN_PRINT;
+		}
+		
+		// check if having enough filament
+		$ret_val = PrinterState__checkFilament();
+		if ($ret_val != ERROR_OK) {
+			return $ret_val;
+		}
+		
+		// pass gcode to printer
+		$command = PrinterState__getPrintCommand() . $gcode_path;
+		exec($command, $output, $ret_val);
+		if ($ret_val != ERROR_NORMAL_RC_OK) {
+			return ERROR_INTERNAL;
+		}
+		
+		//TODO reduce the quantity of filament here
+		$ret_val = PrinterState__changeFilament();
+		if ($ret_val != ERROR_OK) {
+			return $ret_val;
+		}
 		
 		return ERROR_OK;
 	} else {
@@ -374,4 +403,9 @@ function ModelList__find($id_model_find, &$model_path) {
 	}
 	
 	return ERROR_OK;
+}
+
+function ModelList__getDuration($mid, &$duration) {
+	//TODO finish this function if necessary
+	return;
 }
