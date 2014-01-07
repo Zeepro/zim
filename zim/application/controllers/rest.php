@@ -285,9 +285,6 @@ class Rest extends MY_Controller {
 			switch($parameter) {
 				case PRINTERSTATE_PRM_EXTRUDER:
 					$cr = PrinterState_getExtruder($display); //$abb_extruder
-// 					if ($cr == ERROR_INTERNAL) {
-// 						$display = 'INTERNAL';
-// 					}
 					break;
 					
 				case PRINTERSTATE_PRM_TEMPER:
@@ -303,10 +300,6 @@ class Rest extends MY_Controller {
 					else {
 						$api_prm = ($has_e === FALSE) ? 'h' : 'e';
 						$cr = PrinterState_getTemperature($display, $api_prm);
-// 						if ($cr == ERROR_INTERNAL) {
-// 							echo 'INTERNAL';
-// 							return;
-// 						}
 					}
 					break;
 					
@@ -371,10 +364,6 @@ class Rest extends MY_Controller {
 					else {
 						$api_prm = ($has_e === FALSE) ? 'h' : 'e';
 						$cr = PrinterState_setTemperature($val_temper, $api_prm);
-// 						if ($cr == ERROR_INTERNAL) {
-// 							echo 'INTERNAL';
-// 							return;
-// 						}
 					}
 					break;
 					
@@ -386,9 +375,8 @@ class Rest extends MY_Controller {
 			$cr = ERROR_MISS_PRM;
 		}
 		
-// 		if ($cr != ERROR_OK) {
-			$display = $cr . " " . t(MyERRMSG($cr));
-// 		}
+
+		$display = $cr . " " . t(MyERRMSG($cr));
 		$this->output->set_status_header($cr, $display);
 // 		http_response_code($cr);
 		$this->output->set_content_type(RETURN_CONTENT_TYPE);

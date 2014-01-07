@@ -271,7 +271,8 @@ function ModelList_list() {
 				throw new Exception('read json error');
 			}
 		} catch (Exception $e) {
-			return json_encode($json_data); //TODO how about return ERROR_INTERNAL here?
+			continue; // just jump through the wrong data file
+// 			return json_encode($json_data); //TODO how about return ERROR_INTERNAL here?
 		}
 		$tmp_array['json'][PRINTLIST_TITLE_ID] = md5($model_name); //add model id to data array
 		
@@ -406,7 +407,28 @@ function ModelList__find($id_model_find, &$model_path) {
 	return ERROR_OK;
 }
 
-function ModelList__getDuration($mid, &$duration) {
+function ModelList__getDuration($id_model, &$duration) {
 	//TODO finish this function if necessary
+	// but now, print presliced file always finish in 20s (random select between 0 and 20)
+	$json_data = NULL;
+	$tmp_array = NULL;
+	$json_path = NULL;
+	$model_path = NULL;
+
+	$model_cr = ModelList__find($id_model, $model_path);
+	if (($model_cr == ERROR_OK) && $model_path) {
+		$json_path = $model_path . PRINTLIST_FILE_JSON;
+		$tmp_array = json_read($json_path);
+		if ($tmp_array['error']) {
+			return ERROR_INTERNAL;
+		}
+		$json_data = $tmp_array['json'];
+		$duration = $json_data[PRINTLIST_TITLE_TIME];
+	
+		return ERROR_OK;
+	} else {
+		return ERROR_UNKNOWN_MODEL;
+	}
+	
 	return;
 }
