@@ -331,7 +331,7 @@ function PrinterState_getCartridge(&$json_cartridge, $abb_cartridge = 'r') { //T
 	return ERROR_OK;
 }
 
-function PrinterState_checkStatus(&$percentage, &$duration = 0) {
+function PrinterState_checkStatus() {
 	global $CFG;
 	$arcontrol_fullpath = $CFG->config['arcontrol'];
 	$command = '';

@@ -172,7 +172,6 @@ class Rest extends MY_Controller {
 	
 	public function listmodel() {
 		$display = '';
-		$cr = 0; //return code
 		
 		$this->load->helper('printlist');
 		
@@ -261,8 +260,13 @@ class Rest extends MY_Controller {
 	//printer state web service
 	//==========================================================
 	public function status() {
-		//TODO finish this controller
-		echo 'under construction... :)';
+		$display = NULL;
+		
+		$this->load->helper(array('errorcode', 'printerstate'));
+		
+		$display = PrinterState_checkStatus();
+		$this->output->set_content_type(RETURN_CONTENT_TYPE);
+		echo $display;
 		
 		return;
 	}
