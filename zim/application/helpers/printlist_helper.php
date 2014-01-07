@@ -363,10 +363,11 @@ function ModelList_print($id_model) {
 		
 		// pass gcode to printer
 		$command = PrinterState__getPrintCommand() . $gcode_path;
-		exec($command, $output, $ret_val);
-		if ($ret_val != ERROR_NORMAL_RC_OK) {
-			return ERROR_INTERNAL;
-		}
+// 		exec($command, $output, $ret_val);
+// 		if ($ret_val != ERROR_NORMAL_RC_OK) {
+// 			return ERROR_INTERNAL;
+// 		}
+		pclose(popen($command, 'r')); // only for windows arcontrol client
 		
 		//TODO reduce the quantity of filament here
 		$ret_val = PrinterState__changeFilament();

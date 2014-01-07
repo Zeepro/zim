@@ -191,10 +191,11 @@ function PrinterState_setTemperature($val_temperature, $type) {
 	// check if we are in printing
 	$ret_val = PrinterState__checkInPrint();
 	if ($ret_val == FALSE) {
-		exec($command, $output, $ret_val);
-		if ($ret_val != ERROR_NORMAL_RC_OK) {
-			return ERROR_INTERNAL;
-		}
+// 		exec($command, $output, $ret_val);
+// 		if ($ret_val != ERROR_NORMAL_RC_OK) {
+// 			return ERROR_INTERNAL;
+// 		}
+		pclose(popen($command, 'r')); // only for windows arcontrol client
 	} else {
 		return ERROR_IN_PRINT;
 	}
@@ -388,7 +389,7 @@ function PrinterState__checkFilament($left_filament = 0, $right_filament = 0) {
 	foreach(array('l', 'r') as $abb_cartridge) {
 		$ret_val = PrinterState_getCartridge($json_cartridge, $abb_cartridge);
 		if ($ret_val == ERROR_OK) {
-			$data_json = json_decode($json_cartridge);
+			$data_json = json_decode($json_cartridge, TRUE);
 			//TODO check if cartridge is missing
 			
 			// check if cartridge is not enough
