@@ -53,7 +53,7 @@ class Printmodel extends CI_Controller {
 		// parse all page
 		$template_data = array(
 				'lang'			=> $CFG->config ['language_abbr'],
-				'headers'		=> 'ZeePro Personal Printer 21 - Quick print list',
+				'headers'		=> '<title>ZeePro Personal Printer 21 - Quick print list</title>',
 				'contents'		=> $body_page,
 		);
 		
@@ -111,10 +111,8 @@ class Printmodel extends CI_Controller {
 		
 		// get color of cartridge
 		foreach(array('l', 'r') as $abb_cartridge) {
-			$ret_val = PrinterState_getCartridge($cartridge_data, $abb_cartridge);
+			$ret_val = PrinterState__getCartridgeAsArray($cartridge_data, $abb_cartridge);
 			if ($ret_val == ERROR_OK) {
-				$data_json = json_decode($cartridge_data, TRUE);
-				
 				if($abb_cartridge == 'r') {
 					$color_left_filament = $cartridge_data[PRINTERSTATE_TITLE_COLOR];
 				}
@@ -150,7 +148,7 @@ class Printmodel extends CI_Controller {
 		// parse all page
 		$template_data = array(
 				'lang'			=> $CFG->config ['language_abbr'],
-				'headers'		=> 'ZeePro Personal Printer 21 - Quick print list',
+				'headers'		=> '<title>ZeePro Personal Printer 21 - Quick print list</title>',
 				'contents'		=> $body_page,
 		);
 		
