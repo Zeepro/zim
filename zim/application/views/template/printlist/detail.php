@@ -4,7 +4,7 @@
 	<div class="logo"></div>
 	<div data-role="content">
 		<div id="container">
-			<h2>{title}</h2>
+			<h2 style="text-align: center;">{title}</h2>
 			<div data-role="collapsible" data-collapsed="false" style="text-align: center;">
 				<h4>{title}</h4><br>
 				<img src="{image}" style="max-width: 100%;"><br>
