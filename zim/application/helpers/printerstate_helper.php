@@ -219,29 +219,7 @@ function PrinterState_getCartridge(&$json_cartridge, $abb_cartridge = 'r') { //T
 }
 
 function PrinterState_checkStatus() {
-	global $CFG;
-	$arcontrol_fullpath = $CFG->config['arcontrol'];
-	$command = '';
-	$output = array();
-	$ret_val = 0;
-	$data_json = array();
-	
-	// if we need duration, the function that get duration by id is necessary
-	// and we must stock print list id somewhere in json file
-// 	$CI = &get_instance();
-// 	$CI->load->helper('printlist');
-
-	$command = $arcontrol_fullpath . PRINTERSTATE_CHECK_STATE;
-	exec($command, $output, $ret_val);
-	if ($ret_val == ERROR_NORMAL_RC_OK && count($output) == 0) {
-		// not in printing(?), now we consider it is just idle (no slicing)
-		$data_json[PRINTERSTATE_TITLE_STATUS] = PRINTERSTATE_VALUE_IDLE;
-	} else {
-		// in printing
-		$data_json[PRINTERSTATE_TITLE_STATUS] = PRINTERSTATE_VALUE_IN_PRINT;
-		$data_json[PRINTERSTATE_TITLE_PERCENT] = $output[0];
-		// we can calculate duration by mid(to get total duration) and percentage
-	}
+	$data_json = PrinterState__checkStatusAsArray();
 	
 	return json_encode($data_json);
 }
@@ -426,6 +404,34 @@ function PrinterState__getPrintCommand() {
 	$command = $CFG->config['arcontrol'] . ' -f ';
 	
 	return $command;
+}
+
+function PrinterState__checkStatusAsArray() {
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol'];
+	$command = '';
+	$output = array();
+	$ret_val = 0;
+	$data_json = array();
+	
+	// if we need duration, the function that get duration by id is necessary
+	// and we must stock print list id somewhere in json file
+// 	$CI = &get_instance();
+// 	$CI->load->helper('printlist');
+
+	$command = $arcontrol_fullpath . PRINTERSTATE_CHECK_STATE;
+	exec($command, $output, $ret_val);
+	if ($ret_val == ERROR_NORMAL_RC_OK && count($output) == 0) {
+		// not in printing(?), now we consider it is just idle (no slicing)
+		$data_json[PRINTERSTATE_TITLE_STATUS] = PRINTERSTATE_VALUE_IDLE;
+	} else {
+		// in printing
+		$data_json[PRINTERSTATE_TITLE_STATUS] = PRINTERSTATE_VALUE_IN_PRINT;
+		$data_json[PRINTERSTATE_TITLE_PERCENT] = $output[0];
+		// we can calculate duration by mid(to get total duration) and percentage
+	}
+	
+	return $data_json;	
 }
 
 function PrinterState__changeFilament($left_filament = 0, $right_filament = 0) {

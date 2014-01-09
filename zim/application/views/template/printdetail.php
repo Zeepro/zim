@@ -1,0 +1,26 @@
+<div data-role="page" data-url="/printdetail/status">
+	<header data-role="header" class="page-header">
+	</header>
+	<div class="logo"></div>
+	<div data-role="content">
+		<div id="container" style="text-align: center;">
+			<h2>{title}</h2>
+			<canvas id="videoCanvas" width="640" height="480">
+				<p>
+					Please use a browser that supports the Canvas Element, like
+					<a href="http://www.google.com/chrome">Chrome</a>,
+					<a href="http://www.mozilla.com/firefox/">Firefox</a>,
+					<a href="http://www.apple.com/safari/">Safari</a> or Internet Explorer 10
+				</p>
+			</canvas>
+			<div data-role="collapsible" data-collapsed="false" style="align: center;">
+				<h4>{print_detail}</h4><br>
+				<p>{print_percent}</p>
+				<p>{print_remain}</p>
+				<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete">{print_stop}</button>
+			</div>
+			<img src="/assets/images/shadow2.png" class="shadow" alt="shadow">
+		</div>
+	</div>
+</div>
+

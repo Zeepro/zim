@@ -30,7 +30,7 @@
 				</div><br>
 				<br><br><br><br>
 				<div style="clear: both;">
-					<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh" onclick="window.location.href='/print?id={model_id}'">{print_model}</button>
+					<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh" onclick="window.location.href='/printdetail?id={model_id}'">{print_model}</button>
 				</div>
 <!-- 				<a href="/print?id={model_id}" class="ui-btn ui-btn-inline ui-icon-action ui-btn-icon-left">{print_model}</a> -->
 			</div>

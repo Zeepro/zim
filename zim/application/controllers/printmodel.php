@@ -148,7 +148,7 @@ class Printmodel extends CI_Controller {
 		// parse all page
 		$template_data = array(
 				'lang'			=> $CFG->config ['language_abbr'],
-				'headers'		=> '<title>ZeePro Personal Printer 21 - Quick print list</title>',
+				'headers'		=> '<title>ZeePro Personal Printer 21 - Quick print detail</title>',
 				'contents'		=> $body_page,
 		);
 		
