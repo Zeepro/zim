@@ -204,6 +204,67 @@ function PrinterState_setTemperature($val_temperature, $type) {
 }
 
 function PrinterState_getCartridge(&$json_cartridge, $abb_cartridge = 'r') { //TODO verify in spec: no default value here
+	$array_data = array();
+	$cr = 0;
+	
+	$cr = PrinterState__GetCartridgeAsArray($array_data, $abb_cartridge);
+	if ($cr == ERROR_OK) {
+		$json_cartridge = json_encode($array_data);
+	}
+	else {
+		$json_cartridge = array();
+	}
+	
+	return $cr;
+}
+
+function PrinterState_checkStatus() {
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol'];
+	$command = '';
+	$output = array();
+	$ret_val = 0;
+	$data_json = array();
+	
+	// if we need duration, the function that get duration by id is necessary
+	// and we must stock print list id somewhere in json file
+// 	$CI = &get_instance();
+// 	$CI->load->helper('printlist');
+
+	$command = $arcontrol_fullpath . PRINTERSTATE_CHECK_STATE;
+	exec($command, $output, $ret_val);
+	if ($ret_val == ERROR_NORMAL_RC_OK && count($output) == 0) {
+		// not in printing(?), now we consider it is just idle (no slicing)
+		$data_json[PRINTERSTATE_TITLE_STATUS] = PRINTERSTATE_VALUE_IDLE;
+	} else {
+		// in printing
+		$data_json[PRINTERSTATE_TITLE_STATUS] = PRINTERSTATE_VALUE_IN_PRINT;
+		$data_json[PRINTERSTATE_TITLE_PERCENT] = $output[0];
+		// we can calculate duration by mid(to get total duration) and percentage
+	}
+	
+	return json_encode($data_json);
+}
+
+//internal function
+function PrinterState__checkInPrint() {
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol'];
+	$command = '';
+	$output = array();
+	$ret_val = 0;
+
+	$command = $arcontrol_fullpath . PRINTERSTATE_CHECK_STATE;
+	exec($command, $output, $ret_val);
+	if ($ret_val == ERROR_NORMAL_RC_OK && count($output) == 0) {
+		return FALSE;
+	} else {
+		return TRUE;
+	}
+	
+}
+
+function PrinterState__GetCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 	global $CFG;
 	$arcontrol_fullpath = $CFG->config['arcontrol'];
 	$command = '';
@@ -324,72 +385,24 @@ function PrinterState_getCartridge(&$json_cartridge, $abb_cartridge = 'r') { //T
 		// $data_json[PRINTERSTATE_TITLE_SETUP_DATE] = date("Y-m-d\TH:i:sO", $time_pack);
 		$data_json[PRINTERSTATE_TITLE_SETUP_DATE] = date("Y-m-d\TH:i:s\Z", $time_pack);
 		
-		$json_cartridge = json_encode($data_json);
+		$json_cartridge = $data_json;
 	} else {
-		$json_cartridge = json_encode(array());
+		$json_cartridge = array();
 	}
 	
 	return ERROR_OK;
 }
 
-function PrinterState_checkStatus() {
-	global $CFG;
-	$arcontrol_fullpath = $CFG->config['arcontrol'];
-	$command = '';
-	$output = array();
-	$ret_val = 0;
-	$data_json = array();
-	
-	// if we need duration, the function that get duration by id is necessary
-	// and we must stock print list id somewhere in json file
-// 	$CI = &get_instance();
-// 	$CI->load->helper('printlist');
-
-	$command = $arcontrol_fullpath . PRINTERSTATE_CHECK_STATE;
-	exec($command, $output, $ret_val);
-	if ($ret_val == ERROR_NORMAL_RC_OK && count($output) == 0) {
-		// not in printing(?), now we consider it is just idle (no slicing)
-		$data_json[PRINTERSTATE_TITLE_STATUS] = PRINTERSTATE_VALUE_IDLE;
-	} else {
-		// in printing
-		$data_json[PRINTERSTATE_TITLE_STATUS] = PRINTERSTATE_VALUE_IN_PRINT;
-		$data_json[PRINTERSTATE_TITLE_PERCENT] = $output[0];
-		// we can calculate duration by mid(to get total duration) and percentage
-	}
-	
-	return json_encode($data_json);
-}
-
-//internal function
-function PrinterState__checkInPrint() {
-	global $CFG;
-	$arcontrol_fullpath = $CFG->config['arcontrol'];
-	$command = '';
-	$output = array();
-	$ret_val = 0;
-
-	$command = $arcontrol_fullpath . PRINTERSTATE_CHECK_STATE;
-	exec($command, $output, $ret_val);
-	if ($ret_val == ERROR_NORMAL_RC_OK && count($output) == 0) {
-		return FALSE;
-	} else {
-		return TRUE;
-	}
-	
-}
-
 function PrinterState__checkFilament($left_filament = 0, $right_filament = 0) {
 	$ret_val = 0;
-	$json_cartridge = '';
 	$need_filament = 0;
 	$cr = 0;
 	$has_filament = 0;
 	$data_json = array();
 	
 	foreach(array('l', 'r') as $abb_cartridge) {
-		$ret_val = PrinterState_getCartridge($json_cartridge, $abb_cartridge);
+		$ret_val = PrinterState__getCartridgeAsArray($data_json, $abb_cartridge);
 		if ($ret_val == ERROR_OK) {
-			$data_json = json_decode($json_cartridge, TRUE);
 			//TODO check if cartridge is missing
 			
 			// check if cartridge is not enough
