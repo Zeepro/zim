@@ -21,12 +21,12 @@
 				<div style="width: 50%; float: left; text-align: center;">
 					<div style="width: 16px; height: 16px; background-color: {state_c1}; margin: 0 auto;"></div>
 					<p>{state_f1}</p>
-					<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh">{change_filament}</button>
+					<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh" onclick="window.location.href='/printerstate/changecartridge?v=l'">{change_filament}</button>
 				</div>
 				<div style="width: 50%; float: left; text-align: center;">
 					<div style="width: 16px; height: 16px; background-color: {state_c2}; margin: 0 auto;"></div>
 					<p>{state_f2}</p>
-					<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh">{change_filament}</button>
+					<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh" onclick="window.location.href='/printerstate/changecartridge?v=r'">{change_filament}</button>
 				</div><br>
 				<br><br><br><br>
 				<div style="clear: both;">

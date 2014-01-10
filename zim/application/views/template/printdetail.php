@@ -15,12 +15,33 @@
 			</canvas>
 			<div data-role="collapsible" data-collapsed="false" style="align: center;">
 				<h4>{print_detail}</h4><br>
-				<p>{print_percent}</p>
-				<p>{print_remain}</p>
+				<div id="print_detail_info">
+					<p>{print_percent}</p>
+					<p>{print_remain}</p>
+				</div>
 				<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete">{print_stop}</button>
 			</div>
 			<img src="/assets/images/shadow2.png" class="shadow" alt="shadow">
 		</div>
 	</div>
 </div>
+
+<script>
+$(document).ready(function() {
+	function refreshPrintStatus() {
+		$.ajax({
+			url: "/printdetail/status_ajax",
+			cache: false,
+		})
+		.done(function ( html ) {
+			$( "#print_detail_info" ).html( html );
+		})
+		.fail(function () {
+// 			alert("done");
+			window.location.replace("/menu_home");
+		});
+	}
+	setInterval(refreshPrintStatus, 1000);
+});
+</script>
 

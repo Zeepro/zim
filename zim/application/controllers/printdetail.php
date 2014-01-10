@@ -80,5 +80,30 @@ class Printdetail extends CI_Controller {
 		
 		return;
 	}
-
+	
+	public function status_ajax() {
+		$template_data = array();
+		$data_status = array();
+		
+		$this->load->helper('printerstate');
+		$this->load->library('parser');
+		
+		// check status, if we are not in printing, send users to menu home
+		$data_status = PrinterState__checkStatusAsArray();
+		if ($data_status[PRINTERSTATE_TITLE_STATUS] != PRINTERSTATE_VALUE_IN_PRINT) {
+			$this->output->set_status_header(404);
+			return;
+		}
+		
+		$time_remain = isset($data_status[PRINTERSTATE_TITLE_DURATION]) ? $data_status[PRINTERSTATE_TITLE_DURATION] : 'Unknown';
+		
+		// parse the ajax part
+		$template_data = array(
+				'print_percent'	=> 'Percentage: ' . $data_status[PRINTERSTATE_TITLE_PERCENT] . '%',
+				'print_remain'	=> 'Time remaining: ' . $time_remain,
+		);
+		
+		$this->parser->parse('template/printdetail_ajax', $template_data);
+		$this->output->set_content_type('text/plain; charset=UTF-8');
+	}
 }
