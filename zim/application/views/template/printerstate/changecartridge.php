@@ -1,5 +1,6 @@
 <div data-role="page" data-url="/printerstate/changecartridge">
 	<header data-role="header" class="page-header">
+		<a href="javascript:history.back();" data-icon="back" data-ajax="false">{back}</a>
 	</header>
 	<div class="logo"></div>
 	<div data-role="content">

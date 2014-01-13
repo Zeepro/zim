@@ -46,6 +46,7 @@ class Printmodel extends CI_Controller {
 				'title'				=> 'Quick Print',
 				'baseurl_detail'	=> '/printmodel/detail',
 				'model_lists'		=> $display_printlist,
+				'back'				=> t('back'),
 		);
 		
 		$body_page = $this->parser->parse('template/printlist/listmodel', $template_data, TRUE);
@@ -141,6 +142,8 @@ class Printmodel extends CI_Controller {
 				'title_current' 	=> 'Current material',
 				'change_filament'	=> 'Change',
 				'print_model'		=> 'Print',
+				'back'				=> t('back'),
+				'preview_title'		=> t('Preview'),
 		);
 		
 		$body_page = $this->parser->parse('template/printlist/detail', $template_data, TRUE);

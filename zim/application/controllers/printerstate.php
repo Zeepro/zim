@@ -38,14 +38,14 @@ class Printerstate extends CI_Controller {
 		
 		// parse the main body
 		$template_data = array(
-				'title'			=> 'Cartridge change',
-				'step1_title'	=> 'Step one: Clear out the filament',
-				'step1_action'	=> 'Clear out',
-				'step1_message'	=> 'Pull out the cartridge',
-				'step2_title'	=> 'Step two: pull on the cartridge',
-				'step2_action'	=> 'Pull on',
-				'step2_message'	=> 'Filament charging',
-				'step_process'	=> 'Running',
+				'title'			=> ($abb_cartridge == 'l') ? t('Left cartridge change') : t('Right cartridge change'),
+				'step1_title'	=> t('Step one: Clear out the filament'),
+				'step1_action'	=> t('Clear out'),
+				'step1_message'	=> t('Pull out the cartridge'),
+				'step2_title'	=> t('Step two: pull on the cartridge'),
+				'step2_action'	=> t('Pull on'),
+				'step2_message'	=> t('Filament charging'),
+				'step_process'	=> t('Running'),
 		);
 		
 		$body_page = $this->parser->parse('template/printerstate/changecartridge', $template_data, TRUE);
