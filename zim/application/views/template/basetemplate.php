@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 	{headers}
-	<link rel="stylesheet" href="/styles/jquery.mobile-1.4.0.min.css" />
+	<link rel="stylesheet" href="/styles/jquery.mobile-1.3.0.min.css" />
 	<script src="/scripts/jquery-1.9.1.min.js"></script>
 	<script>
 		$(document).bind("mobileinit", function() {
