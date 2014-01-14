@@ -42,6 +42,7 @@ class Printdetail extends CI_Controller {
 		$body_page = NULL;
 		$template_data = array();
 		$data_status = array();
+		$temper_status = array();
 		
 		$this->load->helper('printerstate');
 		$this->load->library('parser');
@@ -58,7 +59,13 @@ class Printdetail extends CI_Controller {
 			return;
 		}
 		
-// 		$time_remain = isset($data_status[PRINTERSTATE_TITLE_DURATION]) ? $data_status[PRINTERSTATE_TITLE_DURATION] : t('Unknown');
+		// get temperatures of extruders
+		$temper_status = PrinterState__getTemperaturesAsArray();
+		if (!is_array($temper_status)) {
+			//TODO treat the internal error when getting temperatures of extruders
+		}
+		
+		// get time remaining
 		if (isset($data_status[PRINTERSTATE_TITLE_DURATION])) {
 			$time_remain = TimeDisplay__convertsecond(
 					$data_status[PRINTERSTATE_TITLE_DURATION], t('Time remaining: '), t('Under calculating'));
@@ -74,6 +81,8 @@ class Printdetail extends CI_Controller {
  				'print_percent'	=> t('Percentage: %d%%', array($data_status[PRINTERSTATE_TITLE_PERCENT])),
 				'print_remain'	=> $time_remain,
 				'print_stop'	=> t('Stop'),
+				'print_temperL'	=> t('Temperature of left extruder: %d °C', array($temper_status[PRINTERSTATE_LEFT_EXTRUD])),
+				'print_temperR'	=> t('Temperature of right extruder: %d °C', array($temper_status[PRINTERSTATE_RIGHT_EXTRUD])),
 		);
 		
 		$body_page = $this->parser->parse('template/printdetail', $template_data, TRUE);
@@ -93,6 +102,7 @@ class Printdetail extends CI_Controller {
 	public function status_ajax() {
 		$template_data = array();
 		$data_status = array();
+		$temper_status = array();
 		
 		$this->load->helper('printerstate');
 		$this->load->library('parser');
@@ -106,7 +116,13 @@ class Printdetail extends CI_Controller {
 			return;
 		}
 		
-// 		$time_remain = isset($data_status[PRINTERSTATE_TITLE_DURATION]) ? $data_status[PRINTERSTATE_TITLE_DURATION] : 'Unknown';
+		// get temperatures of extruders
+		$temper_status = PrinterState__getTemperaturesAsArray();
+		if (!is_array($temper_status)) {
+			//TODO treat the internal error when getting temperatures of extruders
+		}
+		
+		// get time remaining
 		if (isset($data_status[PRINTERSTATE_TITLE_DURATION])) {
 			$time_remain = TimeDisplay__convertsecond(
 					$data_status[PRINTERSTATE_TITLE_DURATION], t('Time remaining: '), t('Under calculating'));
@@ -119,6 +135,8 @@ class Printdetail extends CI_Controller {
 		$template_data = array(
 				'print_percent'	=> t('Percentage: %d%%', array($data_status[PRINTERSTATE_TITLE_PERCENT])),
 				'print_remain'	=> $time_remain,
+				'print_temperL'	=> t('Temperature of left extruder: %d °C', array($temper_status[PRINTERSTATE_LEFT_EXTRUD])),
+				'print_temperR'	=> t('Temperature of right extruder: %d °C', array($temper_status[PRINTERSTATE_RIGHT_EXTRUD])),
 		);
 		
 		$this->parser->parse('template/printdetail_ajax', $template_data);

@@ -16,5 +16,9 @@ $lang['Percentage: %d%%']
 	= 'Pourcentage: %d%%';
 $lang['Stop']
 	= 'Arrêter';
+$lang['Temperature of left extruder: %d °C']
+	= 'Température de l\'extrudeur gauche: %d °C';
+$lang['Temperature of right extruder: %d °C']
+	= 'Température de l\'extrudeur droit: %d °C';
 
 ?>

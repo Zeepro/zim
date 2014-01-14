@@ -18,10 +18,11 @@
 				<div id="print_detail_info">
 					<p>{print_percent}</p>
 					<p>{print_remain}</p>
+					<p>{print_temperL}</p>
+					<p>{print_temperR}</p>
 				</div>
 				<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete">{print_stop}</button>
 			</div>
-			<img src="/assets/images/shadow2.png" class="shadow" alt="shadow">
 		</div>
 	</div>
 </div>

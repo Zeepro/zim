@@ -14,7 +14,9 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_GET_EXTRUD',		' M1601');
 	define('PRINTERSTATE_SET_EXTRUDR',		' T0');
 	define('PRINTERSTATE_SET_EXTRUDL',		' T1');
-	define('PRINTERSTATE_GET_TEMPEREXT',	' M1300');
+// 	define('PRINTERSTATE_GET_TEMPEREXT',	' M1300');
+	define('PRINTERSTATE_GET_TEMPEREXT_R',	' M1300');
+	define('PRINTERSTATE_GET_TEMPEREXT_L',	' M1301');
 	define('PRINTERSTATE_SET_TEMPEREXT',	' M104 '); // add space in the last
 	define('PRINTERSTATE_GET_CARTRIDGER',	' M1602');
 	define('PRINTERSTATE_GET_CARTRIDGEL',	' M1603');
@@ -139,15 +141,29 @@ function PrinterState_getTemperature(&$val_temperature, $type = 'e') {
 	$output = array();
 	$last_output = NULL;
 	$ret_val = 0;
+	$abb_extruder = '';
 	
 	switch ($type) {
 		case 'e':
-			$command = $arcontrol_fullpath . PRINTERSTATE_GET_TEMPEREXT;
+			// get current extruder
+			$ret_val = PrinterState_getExtruder($abb_extruder);
+			if ($ret_val != ERROR_OK) {
+				return ERROR_INTERNAL;
+			}
+			if ($abb_extruder == 'l') {
+				$command = $arcontrol_fullpath . PRINTERSTATE_GET_TEMPEREXT_L;
+			}
+			else if ($abb_extruder == 'r') {
+				$command = $arcontrol_fullpath . PRINTERSTATE_GET_TEMPEREXT_R;
+			}
+			else {
+				return ERROR_INTERNAL;
+			}
 			break;
 			
 		case 'h':
 			//TODO finish this case in future when functions of platform are finished
-			$command = 'echo 20'; // let default temperature of platform to be 20 CD
+			$command = 'echo -1'; // let default temperature of platform to be 20 CD
 			break;
 			
 		default:
@@ -155,19 +171,13 @@ function PrinterState_getTemperature(&$val_temperature, $type = 'e') {
 			break;
 	}
 	
-	// check if we are in printing
-	$ret_val = PrinterState__checkInPrint();
-	if ($ret_val == FALSE) {
-		exec($command, $output, $ret_val);
-		if ($ret_val != ERROR_NORMAL_RC_OK) {
-			return ERROR_INTERNAL;
-		}
-		else {
-			$last_output = $output[0];
-			$val_temperature = (int)$last_output;
-		}
-	} else {
-		return ERROR_IN_PRINT;
+	exec($command, $output, $ret_val);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		return ERROR_INTERNAL;
+	}
+	else {
+		$last_output = $output[0];
+		$val_temperature = (int)$last_output;
 	}
 	
 	return ERROR_OK;
@@ -432,6 +442,33 @@ function PrinterState__checkStatusAsArray() {
 	}
 	
 	return $data_json;	
+}
+
+function PrinterState__getTemperaturesAsArray() {
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol'];
+	$command = '';
+	$ret_val = 0;
+	$data_json = array();
+	
+	foreach (array(
+					PRINTERSTATE_GET_TEMPEREXT_L => PRINTERSTATE_LEFT_EXTRUD,
+					PRINTERSTATE_GET_TEMPEREXT_R => PRINTERSTATE_RIGHT_EXTRUD,
+			) as $parameter_cmd => $data_key ) {
+		$output = array();
+		
+		$command = $arcontrol_fullpath . $parameter_cmd;
+		exec($command, $output, $ret_val);
+		if ($ret_val != ERROR_NORMAL_RC_OK) {
+			return ERROR_INTERNAL;
+		}
+		else {
+			$last_output = $output[0];
+			$data_json[$data_key] = (int)$last_output;
+		}
+	}
+	
+	return $data_json;
 }
 
 function PrinterState__changeFilament($left_filament = 0, $right_filament = 0) {
