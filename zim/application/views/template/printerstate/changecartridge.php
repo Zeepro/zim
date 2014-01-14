@@ -16,7 +16,6 @@
 				<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh">{step2_action}</button>
 				<p id="step2-message"></p>
 			</div>
-			<img src="/assets/images/shadow2.png" class="shadow" alt="shadow">
 		</div>
 	</div>
 </div>

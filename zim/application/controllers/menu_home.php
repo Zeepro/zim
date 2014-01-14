@@ -17,12 +17,13 @@ class Menu_home extends CI_Controller {
 		$body_page = NULL;
 		
 		$this->load->library('parser');
+		$this->lang->load('menu_home', $this->config->item('language'));
 		
 		// parse the main body
 		$template_data = array(
-				'title'				=> 'Home',
-				'menu_printlist'	=> 'Quick print',
-				'menu_printerstate'		=> 'Printer details',
+				'title'				=> t('Home'),
+				'menu_printlist'	=> t('Quick print'),
+				'menu_printerstate'	=> t('Printer details'),
 		);
 		
 		$body_page = $this->parser->parse('template/menu_home', $template_data, TRUE);
@@ -30,7 +31,7 @@ class Menu_home extends CI_Controller {
 		// parse all page
 		$template_data = array(
 				'lang'			=> $CFG->config ['language_abbr'],
-				'headers'		=> '<title>ZeePro Personal Printer 21 - Menu Home</title>',
+				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Menu Home') . '</title>',
 				'contents'		=> $body_page,
 		);
 		

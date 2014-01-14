@@ -27,6 +27,7 @@ class Printmodel extends CI_Controller {
 		
 		$this->load->helper('printlist');
 		$this->load->library('parser');
+		$this->lang->load('printlist', $this->config->item('language'));
 		
 		$json_data = ModelList__listAsArray();
 		
@@ -43,7 +44,7 @@ class Printmodel extends CI_Controller {
 		
 		// parse the main body
 		$template_data = array(
-				'title'				=> 'Quick Print',
+				'title'				=> t('Quick Print'),
 				'baseurl_detail'	=> '/printmodel/detail',
 				'model_lists'		=> $display_printlist,
 				'back'				=> t('back'),
@@ -54,7 +55,7 @@ class Printmodel extends CI_Controller {
 		// parse all page
 		$template_data = array(
 				'lang'			=> $CFG->config ['language_abbr'],
-				'headers'		=> '<title>ZeePro Personal Printer 21 - Quick print list</title>',
+				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Quick print list') . '</title>',
 				'contents'		=> $body_page,
 		);
 		
@@ -69,14 +70,17 @@ class Printmodel extends CI_Controller {
 		$cartridge_data = array();
 		$template_data = array();
 		$cr = 0;
-		$check_left_filament = 'ok';
-		$check_right_filament = 'ok';
+		$check_left_filament = '';
+		$check_right_filament = '';
 		$color_left_filament = '';
 		$color_right_filament = '';
+		$time_estimation = '';
 		$body_page = NULL;
 		
-		$this->load->helper(array('printlist', 'printerstate'));
+		$this->load->helper(array('printlist', 'printerstate', 'timedisplay'));
 		$this->load->library('parser');
+		$this->lang->load('printlist', $this->config->item('language'));
+		$this->lang->load('timedisplay', $this->config->item('language'));
 		
 		$mid = $this->input->get('id');
 		
@@ -94,15 +98,17 @@ class Printmodel extends CI_Controller {
 			return;
 		}
 		
-		//check quantity of filament
+		// check quantity of filament
 		$cr = PrinterState__checkFilament($model_data[PRINTLIST_TITLE_LENG_F1], $model_data[PRINTLIST_TITLE_LENG_F2]);
+		$check_left_filament = t('ok');
+		$check_right_filament = t('ok');
 		switch ($cr) {
 			case ERROR_LOW_RIGT_FILA:
-				$check_left_filament = 'not enough';
+				$check_left_filament = t('not enough');
 				break;
 				
 			case ERROR_LOW_RIGT_FILA:
-				$check_right_filament = 'not enough';
+				$check_right_filament = t('not enough');
 				break;
 				
 			default:
@@ -126,6 +132,9 @@ class Printmodel extends CI_Controller {
 			}
 		}
 		
+		// get a more legible time of estimation
+		$time_estimation = TimeDisplay__convertsecond(
+				$model_data[PRINTLIST_TITLE_TIME], t('Time estimation: '), t('Unknown'));
 		
 		// show detail page if valid, parse the body of page
 		$template_data = array(
@@ -133,15 +142,16 @@ class Printmodel extends CI_Controller {
 				'image'				=> $model_data[PRINTLIST_TITLE_PIC][0],
 				'model_c1'			=> $model_data[PRINTLIST_TITLE_COLOR_F1],
 				'model_c2'			=> $model_data[PRINTLIST_TITLE_COLOR_F2],
-				'time'				=> 'Time estimation: ' . $model_data[PRINTLIST_TITLE_TIME],
+// 				'time'				=> 'Time estimation: ' . $model_data[PRINTLIST_TITLE_TIME],
+				'time'				=> $time_estimation,
 				'state_c1'			=> $color_left_filament,
 				'state_c2'			=> $color_right_filament,
 				'state_f1'			=> $check_left_filament,
 				'state_f2'			=> $check_right_filament,
 				'model_id'			=> $mid,
-				'title_current' 	=> 'Current material',
-				'change_filament'	=> 'Change',
-				'print_model'		=> 'Print',
+				'title_current' 	=> t('Current material'),
+				'change_filament'	=> t('Change'),
+				'print_model'		=> t('Print'),
 				'back'				=> t('back'),
 				'preview_title'		=> t('Preview'),
 		);
@@ -151,7 +161,7 @@ class Printmodel extends CI_Controller {
 		// parse all page
 		$template_data = array(
 				'lang'			=> $CFG->config ['language_abbr'],
-				'headers'		=> '<title>ZeePro Personal Printer 21 - Quick print detail</title>',
+				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Quick print detail') . '</title>',
 				'contents'		=> $body_page,
 		);
 		

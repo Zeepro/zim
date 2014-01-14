@@ -45,6 +45,8 @@ class Printdetail extends CI_Controller {
 		
 		$this->load->helper('printerstate');
 		$this->load->library('parser');
+		$this->lang->load('printdetail', $this->config->item('language'));
+		$this->lang->load('timedisplay', $this->config->item('language'));
 		
 		//wait a little for the arcontrol emulator starting printing
 		usleep(500000);
@@ -56,15 +58,22 @@ class Printdetail extends CI_Controller {
 			return;
 		}
 		
-		$time_remain = isset($data_status[PRINTERSTATE_TITLE_DURATION]) ? $data_status[PRINTERSTATE_TITLE_DURATION] : 'Unknown';
+// 		$time_remain = isset($data_status[PRINTERSTATE_TITLE_DURATION]) ? $data_status[PRINTERSTATE_TITLE_DURATION] : t('Unknown');
+		if (isset($data_status[PRINTERSTATE_TITLE_DURATION])) {
+			$time_remain = TimeDisplay__convertsecond(
+					$data_status[PRINTERSTATE_TITLE_DURATION], t('Time remaining: '), t('Under calculating'));
+		}
+		else {
+			$time_remain = t('Time remaining: ') . t('Unknown');
+		}
 		
 		// parse the main body
 		$template_data = array(
-				'title'			=> 'Control your creation',
+				'title'			=> t('Control your creation'),
 				'print_detail'	=> 'Printing details',
-				'print_percent'	=> 'Percentage: ' . $data_status[PRINTERSTATE_TITLE_PERCENT] . '%',
-				'print_remain'	=> 'Time remaining: ' . $time_remain,
-				'print_stop'	=> 'Stop',
+ 				'print_percent'	=> t('Percentage: %d%%', array($data_status[PRINTERSTATE_TITLE_PERCENT])),
+				'print_remain'	=> $time_remain,
+				'print_stop'	=> t('Stop'),
 		);
 		
 		$body_page = $this->parser->parse('template/printdetail', $template_data, TRUE);
@@ -72,7 +81,7 @@ class Printdetail extends CI_Controller {
 		// parse all page
 		$template_data = array(
 				'lang'			=> $CFG->config ['language_abbr'],
-				'headers'		=> '<title>ZeePro Personal Printer 21 - Printing details</title>',
+				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Printing details') . '</title>',
 				'contents'		=> $body_page,
 		);
 		
@@ -87,6 +96,8 @@ class Printdetail extends CI_Controller {
 		
 		$this->load->helper('printerstate');
 		$this->load->library('parser');
+		$this->lang->load('printdetail', $this->config->item('language'));
+		$this->lang->load('timedisplay', $this->config->item('language'));
 		
 		// check status, if we are not in printing, send users to menu home
 		$data_status = PrinterState__checkStatusAsArray();
@@ -95,12 +106,19 @@ class Printdetail extends CI_Controller {
 			return;
 		}
 		
-		$time_remain = isset($data_status[PRINTERSTATE_TITLE_DURATION]) ? $data_status[PRINTERSTATE_TITLE_DURATION] : 'Unknown';
+// 		$time_remain = isset($data_status[PRINTERSTATE_TITLE_DURATION]) ? $data_status[PRINTERSTATE_TITLE_DURATION] : 'Unknown';
+		if (isset($data_status[PRINTERSTATE_TITLE_DURATION])) {
+			$time_remain = TimeDisplay__convertsecond(
+					$data_status[PRINTERSTATE_TITLE_DURATION], t('Time remaining: '), t('Under calculating'));
+		}
+		else {
+			$time_remain = t('Time remaining: ') . t('Unknown');
+		}
 		
 		// parse the ajax part
 		$template_data = array(
-				'print_percent'	=> 'Percentage: ' . $data_status[PRINTERSTATE_TITLE_PERCENT] . '%',
-				'print_remain'	=> 'Time remaining: ' . $time_remain,
+				'print_percent'	=> t('Percentage: %d%%', array($data_status[PRINTERSTATE_TITLE_PERCENT])),
+				'print_remain'	=> $time_remain,
 		);
 		
 		$this->parser->parse('template/printdetail_ajax', $template_data);
