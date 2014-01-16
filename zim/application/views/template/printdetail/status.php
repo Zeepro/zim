@@ -5,21 +5,14 @@
 	<div data-role="content">
 		<div id="container" style="text-align: center;">
 			<h2>{title}</h2>
-			<canvas id="videoCanvas" width="640" height="480">
-				<p>
-					Please use a browser that supports the Canvas Element, like
-					<a href="http://www.google.com/chrome">Chrome</a>,
-					<a href="http://www.mozilla.com/firefox/">Firefox</a>,
-					<a href="http://www.apple.com/safari/">Safari</a> or Internet Explorer 10
-				</p>
-			</canvas>
+			<video width="320" height="240" autoplay controls>
+				<source src="/zim.m3u8" type="application/x-mpegURL" />
+				Your browser does not support HTML5 streaming!
+			</video>
 			<div data-role="collapsible" data-collapsed="false" style="align: center;">
-				<h4>{print_detail}</h4><br>
+				<h4>{print_detail}</h4>
 				<div id="print_detail_info">
-					<p>{print_percent}</p>
-					<p>{print_remain}</p>
-					<p>{print_temperL}</p>
-					<p>{print_temperR}</p>
+					<p>{wait_info}</p>
 				</div>
 				<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete">{print_stop}</button>
 			</div>
@@ -28,21 +21,24 @@
 </div>
 
 <script>
-$(document).ready(function() {
+// $(document).ready(refreshPrintStatus());
+$(document).ready(checkPrintStatus());
+
+function checkPrintStatus() {
 	function refreshPrintStatus() {
 		$.ajax({
 			url: "/printdetail/status_ajax",
 			cache: false,
 		})
-		.done(function ( html ) {
-			$( "#print_detail_info" ).html( html );
+		.done(function(html) {
+			$("#print_detail_info").html(html);
 		})
-		.fail(function () {
-// 			alert("done");
+		.fail(function() {
+//			alert("done");
 			window.location.replace("/menu_home");
 		});
 	}
-	setInterval(refreshPrintStatus, 1000);
-});
+ 	var var_refreshPrintStatus = setInterval(refreshPrintStatus, 1000);
+}
 </script>
 

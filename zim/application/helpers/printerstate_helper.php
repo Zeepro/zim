@@ -20,6 +20,12 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_SET_TEMPEREXT',	' M104 '); // add space in the last
 	define('PRINTERSTATE_GET_CARTRIDGER',	' M1602');
 	define('PRINTERSTATE_GET_CARTRIDGEL',	' M1603');
+	define('PRINTERSTATE_LOAD_FILAMENT_R',	' M1604');
+	define('PRINTERSTATE_LOAD_FILAMENT_L',	' M1605');
+	define('PRINTERSTATE_UNIN_FILAMENT_R',	' M1606');
+	define('PRINTERSTATE_UNIN_FILAMENT_L',	' M1607');
+	define('PRINTERSTATE_GET_FILAMENT_R',	' M1608');
+	define('PRINTERSTATE_GET_FILAMENT_L',	' M1609');
 
 	define('PRINTERSTATE_RIGHT_EXTRUD',	0);
 	define('PRINTERSTATE_LEFT_EXTRUD',	1);
@@ -183,7 +189,7 @@ function PrinterState_getTemperature(&$val_temperature, $type = 'e') {
 	return ERROR_OK;
 }
 
-function PrinterState_setTemperature($val_temperature, $type) {
+function PrinterState_setTemperature($val_temperature, $type = 'e') {
 	global $CFG;
 	$arcontrol_fullpath = $CFG->config['arcontrol'];
 	$output = array();
@@ -217,7 +223,7 @@ function PrinterState_getCartridge(&$json_cartridge, $abb_cartridge = 'r') { //T
 	$array_data = array();
 	$cr = 0;
 	
-	$cr = PrinterState__GetCartridgeAsArray($array_data, $abb_cartridge);
+	$cr = PrinterState__getCartridgeAsArray($array_data, $abb_cartridge);
 	if ($cr == ERROR_OK) {
 		$json_cartridge = json_encode($array_data);
 	}
@@ -252,7 +258,7 @@ function PrinterState__checkInPrint() {
 	
 }
 
-function PrinterState__GetCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
+function PrinterState__getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 	global $CFG;
 	$arcontrol_fullpath = $CFG->config['arcontrol'];
 	$command = '';
@@ -444,12 +450,12 @@ function PrinterState__checkStatusAsArray() {
 	return $data_json;	
 }
 
-function PrinterState__getTemperaturesAsArray() {
+function PrinterState__getExtruderTemperaturesAsArray() {
 	global $CFG;
 	$arcontrol_fullpath = $CFG->config['arcontrol'];
 	$command = '';
 	$ret_val = 0;
-	$data_json = array();
+	$data_array = array();
 	
 	foreach (array(
 					PRINTERSTATE_GET_TEMPEREXT_L => PRINTERSTATE_LEFT_EXTRUD,
@@ -464,11 +470,11 @@ function PrinterState__getTemperaturesAsArray() {
 		}
 		else {
 			$last_output = $output[0];
-			$data_json[$data_key] = (int)$last_output;
+			$data_array[$data_key] = (int)$last_output;
 		}
 	}
 	
-	return $data_json;
+	return $data_array;
 }
 
 function PrinterState__changeFilament($left_filament = 0, $right_filament = 0) {
@@ -476,4 +482,45 @@ function PrinterState__changeFilament($left_filament = 0, $right_filament = 0) {
 	// so we also need a function to change the cartridge info
 	// in the other hand, when we stop a printing task, how can we get the quantity that was used
 	return ERROR_OK;
+}
+
+function PrinterState__getFilamentStatus($abb_filament) {
+	// return TRUE only when filament is loaded
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol'];
+	$command = '';
+	$ret_val = 0;
+	$output = array();
+	$last_output = '';
+	
+	switch ($abb_filament) {
+		case 'l':
+			$command = $arcontrol_fullpath . PRINTERSTATE_GET_FILAMENT_L;
+			break;
+			
+		case 'r':
+			$command = $arcontrol_fullpath . PRINTERSTATE_GET_FILAMENT_R;
+			break;
+			
+		default:
+			return FALSE; //TODO generate a way to indicate internal error
+			break; // never reach here
+	}
+	
+	exec($command, $output, $ret_val);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		return FALSE;
+	}
+	else {
+		$last_output = $output[0];
+		if ($last_output == 'ok') {
+			return TRUE;
+		}
+		else if ($last_output == 'no filament') {
+			return FALSE;
+		}
+		else {
+			return FALSE;
+		}
+	}
 }

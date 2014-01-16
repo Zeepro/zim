@@ -20,5 +20,7 @@ $lang['Temperature of left extruder: %d °C']
 	= 'Temperature of left extruder: %d °C';
 $lang['Temperature of right extruder: %d °C']
 	= 'Temperature of right extruder: %d °C';
+$lang['Waiting for starting...']
+	= 'Waiting for starting...';
 
 ?>
