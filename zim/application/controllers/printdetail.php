@@ -2,7 +2,7 @@
 if (! defined ( 'BASEPATH' ))
 	exit ( 'No direct script access allowed' );
 
-class Printdetail extends CI_Controller {
+class Printdetail extends MY_Controller {
 	function __construct() {
 		parent::__construct ();
 		$this->load->helper( array(
@@ -21,7 +21,7 @@ class Printdetail extends CI_Controller {
 		$cr = 0;
 		
 		// check model id, and then send it to print command
-		$this->load->helper(array('printer', 'printlist'));
+		$this->load->helper('printer');
 		$mid = $this->input->get('id');
 		
 		if ($mid) {
@@ -110,6 +110,12 @@ class Printdetail extends CI_Controller {
 				
 				$ret_val = Printer_checkPrint($data_status);
 				if ($ret_val == FALSE) {
+					$this->load->helper('corestatus');
+					$ret_val = CoreStatus_setInIdle();
+					if ($ret_val == FALSE) {
+						//TODO treat internal error here
+					}
+					
 					$this->output->set_status_header(403);
 					return;
 				}

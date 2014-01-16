@@ -41,7 +41,7 @@ function Printer_printFromFile($gcode_path) {
 	$ret_val = 0;
 	
 	$CI = &get_instance();
-	$CI->load->helper('printerstate');
+	$CI->load->helper(array('printerstate', 'corestatus'));
 	
 	// check if we have no file
 	if (!file_exists($gcode_path)) {
@@ -58,6 +58,12 @@ function Printer_printFromFile($gcode_path) {
 	$ret_val = PrinterState__checkFilament();
 	if ($ret_val != ERROR_OK) {
 		return $ret_val;
+	}
+
+	// change status json file
+	$ret_val = CoreStatus_setInPrinting();
+	if ($ret_val == FALSE) {
+		return ERROR_INTERNAL;
 	}
 
 	// pass gcode to printer

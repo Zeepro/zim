@@ -2,7 +2,7 @@
 if (! defined ( 'BASEPATH' ))
 	exit ( 'No direct script access allowed' );
 
-class Menu_home extends CI_Controller {
+class Menu_home extends MY_Controller {
 	function __construct() {
 		parent::__construct ();
 		$this->load->helper( array(

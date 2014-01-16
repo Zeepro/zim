@@ -20,48 +20,49 @@ class MY_Controller extends CI_Controller {
 			return;
 		}
 		else {
+			$status_current = '';
 			$url_redirect = '';
 			
 			// check initialization issue
 			if (CoreStatus_checkInInitialization()) {
-				if (!CoreStatus_checkCallInitialization()) {
-// 					redirect('/initialization');
-//					return;
-					header('Location: /initialization');
-					exit;
+				if (CoreStatus_checkCallInitialization($url_redirect)) {
+					return; // we are calling the right page
 				}
 			}
 			else if (CoreStatus_checkCallInitialization()) {
-// 				redirect('/');
-// 				return;
-				header('Location: /');
-				exit;
+				$url_redirect = '/';
 			}
-			
 			// check connection issue
-			if (CoreStatus_checkInConnection()) {
-				if (!CoreStatus_checkCallConnection()) {
-// 					redirect('/connection');
-// 					return;
-					header('Location: /connection');
-					exit;
+			else if (CoreStatus_checkInConnection()) {
+				if (CoreStatus_checkCallConnection($url_redirect)) {
+					return; // we are calling the right page
 				}
 			}
 			else if (CoreStatus_checkCallConnection()) {
-// 				redirect('/');
-// 				return;
-				header('Location: /');
-				exit;
+				$url_redirect = '/';
+			}
+			// check working issue
+			else if (!CoreStatus_checkInIdle($status_current)) {
+				switch($status_current) {
+					case CORESTATUS_VALUE_PRINT:
+						if (CoreStatus_checkCallPrinting($url_redirect)) {
+							return; // we are calling the right page
+						}
+						break;
+						
+					default:
+						$url_redirect = '/'; // internal error, never reach here normally
+						break;
+				}
+			}
+			else {
+				return; // continue to generate the current page
 			}
 			
-			// check working issue
-			if (!CoreStatus_checkInIdle($url_redirect) && $url_redirect
-					&& $this->router->uri->uri_string != $url_redirect) {
-// 				redirect($url_redirect);
-// 				return;
-				header('Location: ' . $url_redirect);
-				exit;
-			}
+// 			redirect($url_redirect);
+// 			return;
+			header('Location: ' . $url_redirect);
+			exit;
 		}
 
 	}

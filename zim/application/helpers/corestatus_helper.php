@@ -14,14 +14,15 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 // 	define('CORESTATUS_TITLE_CMD_CANCEL',	'Cancel');
 // 	define('CORESTATUS_TITLE_CMD_PAUSE',	'PauseOrResume');
 // 	define('CORESTATUS_TITLE_URL_REDIRECT',	'CallBackURL');
-	define('CORESTATUS_TITLE_URL_REDIRECT',	'RedirectURL');
+// 	define('CORESTATUS_TITLE_URL_REDIRECT',	'RedirectURL');
 	define('CORESTATUS_TITLE_MESSAGE',		'Message');
 	
 	define('CORESTATUS_VALUE_IDLE',		'idle');
+	define('CORESTATUS_VALUE_PRINT',	'printing');
 // 	define('CORESTATUS_VALUE_UPGRADE',	'upgrading');
 }
 
-function CoreStatus_checkInIdle($RedirectURL = '') {
+function CoreStatus_checkInIdle(&$status_current = '') {
 	global $CFG;
 	$state_file = $CFG->config['conf'] . CORESTATUS_FILENAME_WORK;
 	$tmp_array = array();
@@ -41,9 +42,9 @@ function CoreStatus_checkInIdle($RedirectURL = '') {
 	
 	// check status
 	if ($tmp_array['json'][CORESTATUS_TITLE_STATUS] == CORESTATUS_VALUE_IDLE) {
-		$RedirectURL = $tmp_array['json'][CORESTATUS_TITLE_URL_REDIRECT];
 		return TRUE;
 	}
+	$status_current = $tmp_array['json'][CORESTATUS_TITLE_STATUS];
 	
 	return FALSE;
 }
@@ -75,8 +76,43 @@ function CoreStatus_checkInConnection() {
 }
 
 function CoreStatus_checkCallREST() {
+	return CoreStatus__checkCallController('rest');
+}
+
+function CoreStatus_checkCallInitialization(&$url_redirect = '') {
+	$url_redirect = '/initialization';
+	
+	return CoreStatus__checkCallController('initialization');
+}
+
+function CoreStatus_checkCallConnection(&$url_redirect = '') {
+	$url_redirect = '/connection';
+	
+	return CoreStatus__checkCallController('connection');
+}
+
+function CoreStatus_checkCallPrinting(&$url_redirect) {
+	$url_redirect = '/printdetail/status';
+	
+	return CoreStatus__checkCallURI(array(
+			'/printdetail/status',
+			'/printdetail/status_ajax',
+	));
+}
+
+function CoreStatus_setInIdle() {
+	return CoreStatus__setInStatus(CORESTATUS_VALUE_IDLE);
+}
+
+
+function CoreStatus_setInPrinting() {
+	return CoreStatus__setInStatus(CORESTATUS_VALUE_PRINT);
+}
+
+// internal function
+function CoreStatus__checkCallController($name_controller) {
 	$CI = &get_instance();
-	if ($CI->router->class == 'rest') {
+	if ($CI->router->class == $name_controller) {
 		return TRUE;
 	}
 	else {
@@ -84,9 +120,10 @@ function CoreStatus_checkCallREST() {
 	}
 }
 
-function CoreStatus_checkCallInitialization() {
+
+function CoreStatus__checkCallURI($array_URI) {
 	$CI = &get_instance();
-	if ($CI->router->class == 'initialization') {
+	if (in_array($CI->router->uri->uri_string, $array_URI)) {
 		return TRUE;
 	}
 	else {
@@ -94,12 +131,38 @@ function CoreStatus_checkCallInitialization() {
 	}
 }
 
-function CoreStatus_checkCallConnection() {
+
+function CoreStatus__setInStatus($value_status, $data_array = array()) {
+	global $CFG;
+	$state_file = $CFG->config['conf'] . CORESTATUS_FILENAME_WORK;
+	$tmp_array = array();
+	$data_json = array();
+	$fp = NULL;
+	
 	$CI = &get_instance();
-	if ($CI->router->class == 'connection') {
-		return TRUE;
+	$CI->load->helper('json');
+	
+	// read json file
+	try {
+		$tmp_array = json_read($state_file);
+		if ($tmp_array['error']) {
+			throw new Exception('read json error');
+		}
+	} catch (Exception $e) {
+		return FALSE; //TODO generate a way to return internal error
 	}
-	else {
-		return FALSE;
+	$data_json = $tmp_array['json'];
+	
+	// change status
+	$data_json[CORESTATUS_TITLE_STATUS] = $value_status;
+	foreach ($data_array as $key => $value) {
+		$data_json[$key] = $value;
 	}
+	
+	// write json file
+	$fp = fopen($CFG->config['conf'] . CORESTATUS_FILENAME_WORK, 'w');
+	fwrite($fp, json_encode($data_json));
+	fclose($fp);
+	
+	return TRUE;
 }

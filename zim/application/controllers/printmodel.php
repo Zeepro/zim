@@ -2,7 +2,7 @@
 if (! defined ( 'BASEPATH' ))
 	exit ( 'No direct script access allowed' );
 
-class Printmodel extends CI_Controller {
+class Printmodel extends MY_Controller {
 	function __construct() {
 		parent::__construct ();
 		$this->load->helper( array(

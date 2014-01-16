@@ -7,13 +7,51 @@ if (!defined('RETURN_CONTENT_TYPE')) {
 }
 
 class Rest extends MY_Controller {
+	private $finish_config = FALSE;
+	
 	function __construct() {
 		parent::__construct ();
-		$this->load->helper ( array (
+		$this->load->helper( array(
 				'form',
 				'url',
-				'json' 
+				'json',
+				'errorcode',
+				'corestatus',
 		) );
+		
+		if (CoreStatus_checkInInitialization()) {
+			// we haven't finished initialization yet
+			$cr = ERROR_BUSY_PRINTER; //TODO create a new error code
+			$display = $cr . " " . t(MyERRMSG($cr));
+			$this->output->set_status_header($cr, $display);
+// 			$this->output->set_content_type(RETURN_CONTENT_TYPE);
+			header('Content-type: ' . RETURN_CONTENT_TYPE);
+			echo $display; //optional
+			exit;
+		}
+		else if (CoreStatus_checkInConnection()) {
+			// we haven't finished configuration of network yet
+			$cr = ERROR_BUSY_PRINTER; //TODO create a new error code
+			$display = $cr . " " . t(MyERRMSG($cr));
+			$this->output->set_status_header($cr, $display);
+// 			$this->output->set_content_type(RETURN_CONTENT_TYPE);
+			header('Content-type: ' . RETURN_CONTENT_TYPE);
+			echo $display; //optional
+			exit;
+		}
+		else {
+			$this->finish_config = TRUE;
+		}
+	}
+	
+	private function _return_cr($cr) {
+		$display = $cr . " " . t(MyERRMSG($cr));
+		$this->output->set_status_header($cr, $display);
+// 		http_response_code($cr);
+		$this->output->set_content_type(RETURN_CONTENT_TYPE);
+		echo $display; //optional
+		
+		return;
 	}
 	
 	//==========================================================
@@ -33,7 +71,7 @@ class Rest extends MY_Controller {
 		global $CFG;
 		
 		$arr = json_read ( $CFG->config ['conf'] . 'Work.json' );
-		if (! $arr ["error"] and $arr ["json"] ["State"] == "Working") {
+		if (! $arr ["error"] and $arr ["json"] ["State"] == "Working") { //FIXME we have no "working" state in json now
 			// Work in progress
 // 			http_response_code ( 446 );
 			$this->output->set_status_header(ERROR_BUSY_PRINTER, "Printer busy");
@@ -63,9 +101,8 @@ class Rest extends MY_Controller {
 		$upload_config = NULL;
 		$api_data = array();
 		$cr = 0; //return code
-		$display = '';
 	
-		$this->load->helper(array('printlist', 'errorcode'));
+		$this->load->helper('printlist');
 	
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			//validation (not file check included)
@@ -126,7 +163,6 @@ class Rest extends MY_Controller {
 					$cr = ModelList_add($api_data);
 				} else {
 					//treat error - missing gcode file
-//					$display .= $this->upload->display_errors(); //test
 					$cr = ERROR_MISS_PRM;
 				}
 			}
@@ -135,21 +171,16 @@ class Rest extends MY_Controller {
 			return;
 		}
 		
-		$display = $cr . " " . t(MyERRMSG($cr));
-		$this->output->set_status_header($cr, $display);
-// 		http_response_code($cr);
-		$this->output->set_content_type(RETURN_CONTENT_TYPE);
-		echo $display; //optional
+		$this->_return_cr($cr);
 		
 		return;
 	}
 	
 	public function deletemodel() {
 		$mid = '';
-		$display = '';
 		$cr = 0; //return code
 		
-		$this->load->helper(array('errorcode', 'printlist'));
+		$this->load->helper('printlist');
 		
 		$mid = $this->input->get('id'); //return false if missing
 		
@@ -160,12 +191,8 @@ class Rest extends MY_Controller {
 		} else {
 			$cr = ERROR_MISS_PRM;
 		}
-		$display = $cr . " " . t(MyERRMSG($cr));
-
-		$this->output->set_status_header($cr, $display);
-// 		http_response_code($cr);
-		$this->output->set_content_type(RETURN_CONTENT_TYPE);
-		echo $display; //optional
+		
+		$this->_return_cr($cr);
 		
 		return;
 	}
@@ -186,10 +213,9 @@ class Rest extends MY_Controller {
 		$mid = '';
 		$pid = 0;
 		$url_pid = '';
-		$display = '';
 		$cr = 0; //return code
 		
-		$this->load->helper(array('errorcode', 'printlist', 'file'));
+		$this->load->helper(array('printlist', 'file'));
 		
 		$mid = $this->input->get('id'); //return false if missing
 		$pid = (int)$this->input->get('p'); //return false if missing
@@ -209,21 +235,18 @@ class Rest extends MY_Controller {
 		} else {
 			$cr = ERROR_MISS_PRM;
 		}
-
-		$display = $cr . " " . t(MyERRMSG($cr));
-		$this->output->set_status_header($cr, $display);
-// 		http_response_code($cr);
-		$this->output->set_content_type(RETURN_CONTENT_TYPE);
- 		echo $display; //optional
+		
+		$this->_return_cr($cr);
 		
 		return;
 	}
 	
 	public function preslicedprint() {
+		//FIXME no changing back status json file
 		$mid = '';
 		$cr = 0; //return code
 		
-		$this->load->helper(array('errorcode', 'printlist'));
+		$this->load->helper('printlist');
 		
 		$mid = $this->input->get('id'); //return false if missing
 		
@@ -245,12 +268,8 @@ class Rest extends MY_Controller {
 			// that means we force the client only accessing check print status page when we are in printing.
 			// in that way, we can know when the printing is finished, and then change the status in json file
 		}
-
-		$display = $cr . " " . t(MyERRMSG($cr));
-		$this->output->set_status_header($cr, $display);
-// 		http_response_code($cr);
-		$this->output->set_content_type(RETURN_CONTENT_TYPE);
- 		echo $display; //optional
+		
+		$this->_return_cr($cr);
 		
 		return;
 	}
@@ -262,7 +281,7 @@ class Rest extends MY_Controller {
 	public function status() {
 		$display = NULL;
 		
-		$this->load->helper(array('errorcode', 'printerstate'));
+		$this->load->helper('printerstate');
 		
 		$display = PrinterState_checkStatus();
 		$this->output->set_content_type(RETURN_CONTENT_TYPE);
@@ -277,7 +296,7 @@ class Rest extends MY_Controller {
 		$display = NULL;
 		$api_prm = NULL;
 		
-		$this->load->helper(array('errorcode', 'printerstate'));
+		$this->load->helper('printerstate');
 		
 		$parameter = $this->input->get('p'); //return false if missing
 		
@@ -330,10 +349,9 @@ class Rest extends MY_Controller {
 	public function set() {
 		$parameter = NULL;
 		$cr = 0;
-		$display = NULL;
 		$api_prm = NULL;
 		
-		$this->load->helper(array('errorcode', 'printerstate'));
+		$this->load->helper('printerstate');
 		
 		$parameter = $this->input->get('p'); //return false if missing
 		
@@ -375,14 +393,7 @@ class Rest extends MY_Controller {
 			$cr = ERROR_MISS_PRM;
 		}
 		
-
-		$display = $cr . " " . t(MyERRMSG($cr));
-		$this->output->set_status_header($cr, $display);
-// 		http_response_code($cr);
-		$this->output->set_content_type(RETURN_CONTENT_TYPE);
-		echo $display; //optional
-		
-		return;
+		$this->_return_cr($cr);
 		
 	}
 	
