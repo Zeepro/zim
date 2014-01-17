@@ -20,6 +20,9 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_VALUE_IDLE',		'idle');
 	define('CORESTATUS_VALUE_PRINT',	'printing');
 // 	define('CORESTATUS_VALUE_UPGRADE',	'upgrading');
+
+	define('CORESTATUS_PRM_CAMERA_START',	' -start ');
+	define('CORESTATUS_PRM_CAMERA_STOP',	' -stop ');
 }
 
 function CoreStatus_checkInIdle(&$status_current = '') {
@@ -101,11 +104,41 @@ function CoreStatus_checkCallPrinting(&$url_redirect) {
 }
 
 function CoreStatus_setInIdle() {
+	$status_previous = '';
+	$ret_val = CoreStatus_checkInIdle($status_previous);
+	if ($ret_val == TRUE) {
+		return TRUE; // we are already in idle
+	}
+	else if ($status_previous == CORESTATUS_VALUE_PRINT) {
+		// stop camera http live streaming
+		global $CFG;
+		$output = NULL;
+		$ret_val = 0;
+		$command = $CFG->config['camera'] . CORESTATUS_PRM_CAMERA_STOP;
+		
+		exec($command, $output, $ret_val);
+		if ($ret_val != ERROR_NORMAL_RC_OK) {
+			//TODO treat internal error
+			return FALSE;
+		}
+	}
+	
 	return CoreStatus__setInStatus(CORESTATUS_VALUE_IDLE);
 }
 
-
 function CoreStatus_setInPrinting() {
+	// start camera http live streaming
+	global $CFG;
+	$output = NULL;
+	$ret_val = 0;
+	$command = $CFG->config['camera'] . CORESTATUS_PRM_CAMERA_START;
+	
+	exec($command, $output, $ret_val);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		//TODO treat internal error
+		return FALSE;
+	}
+	
 	return CoreStatus__setInStatus(CORESTATUS_VALUE_PRINT);
 }
 
@@ -120,7 +153,6 @@ function CoreStatus__checkCallController($name_controller) {
 	}
 }
 
-
 function CoreStatus__checkCallURI($array_URI) {
 	$CI = &get_instance();
 	if (in_array($CI->router->uri->uri_string, $array_URI)) {
@@ -130,7 +162,6 @@ function CoreStatus__checkCallURI($array_URI) {
 		return FALSE;
 	}
 }
-
 
 function CoreStatus__setInStatus($value_status, $data_array = array()) {
 	global $CFG;

@@ -310,62 +310,6 @@ function ModelList_print($id_model) {
 	return $ret_val;
 }
 
-// function ModelList_print($id_model) {
-// 	$gcode_path = NULL;
-// 	$model_path = NULL;
-
-// 	$model_cr = ModelList__find($id_model, $model_path);
-// 	if (($model_cr == ERROR_OK) && $model_path) {
-// 		$command = '';
-// 		$output = array();
-// 		$ret_val = 0;
-		
-// 		$CI = &get_instance();
-// 		$CI->load->helper('printerstate');
-// //		//if we don't fix the filename of gcode
-// // 		try {
-// // 			$json_data = json_read($model_path . PRINTLIST_FILE_JSON);
-// // 			if ($json_data['error']) {
-// // 				throw new Exception('read json error');
-// // 			}
-// // 		} catch (Exception $e) {
-// // 			return ERROR_INTERNAL;
-// // 		}
-// // 		$gcode_path = $json_data['json'][PRINTLIST_TITLE_GCODE];
-// 		$gcode_path = $model_path . PRINTLIST_FILE_GCODE;
-		
-// 		// check if in printing
-// 		$ret_val = PrinterState__checkInPrint();
-// 		if ($ret_val == TRUE) {
-// 			return ERROR_IN_PRINT;
-// 		}
-		
-// 		// check if having enough filament
-// 		$ret_val = PrinterState__checkFilament();
-// 		if ($ret_val != ERROR_OK) {
-// 			return $ret_val;
-// 		}
-		
-// 		// pass gcode to printer
-// 		$command = PrinterState__getPrintCommand() . $gcode_path;
-// // 		exec($command, $output, $ret_val);
-// // 		if ($ret_val != ERROR_NORMAL_RC_OK) {
-// // 			return ERROR_INTERNAL;
-// // 		}
-// 		pclose(popen($command, 'r')); // only for windows arcontrol client
-		
-// 		//TODO reduce the quantity of filament here
-// 		$ret_val = PrinterState__changeFilament();
-// 		if ($ret_val != ERROR_OK) {
-// 			return $ret_val;
-// 		}
-		
-// 		return ERROR_OK;
-// 	} else {
-// 		return ERROR_UNKNOWN_MODEL;
-// 	}
-// }
-
 //internal function
 function ModelList__find($id_model_find, &$model_path) {
 	global $CFG;

@@ -7,7 +7,7 @@ if (!defined('RETURN_CONTENT_TYPE')) {
 }
 
 class Rest extends MY_Controller {
-	private $finish_config = FALSE;
+// 	private $finish_config = FALSE;
 	
 	function __construct() {
 		parent::__construct ();
@@ -19,6 +19,7 @@ class Rest extends MY_Controller {
 				'corestatus',
 		) );
 		
+		$status_current = '';
 		if (CoreStatus_checkInInitialization()) {
 			// we haven't finished initialization yet
 			$cr = ERROR_BUSY_PRINTER; //TODO create a new error code
@@ -39,9 +40,40 @@ class Rest extends MY_Controller {
 			echo $display; //optional
 			exit;
 		}
-		else {
-			$this->finish_config = TRUE;
+		else if (!CoreStatus_checkInIdle($status_current)) {
+			//TODO check if the status is changing
+			$ret_val = 0;
+			
+			switch ($status_current) {
+				case CORESTATUS_VALUE_PRINT:
+					$this->load->helper('printerstate');
+					$ret_val = PrinterState__checkInPrint();
+					if ($ret_val == FALSE) {
+						$ret_val = CoreStatus_setInIdle();
+						if ($ret_val == TRUE) {
+							return; // continue to generate if we are now in idle
+						}
+						//TODO treat internal error
+					}
+					break;
+					
+				default:
+					//TODO treat internal error
+					break;
+			}
+			
+			// return that printer is busy
+			$cr = ERROR_BUSY_PRINTER;
+			$display = $cr . " " . t(MyERRMSG($cr));
+			$this->output->set_status_header($cr, $display);
+// 			$this->output->set_content_type(RETURN_CONTENT_TYPE);
+			header('Content-type: ' . RETURN_CONTENT_TYPE);
+			echo $display; //optional
+			exit;
 		}
+// 		else {
+// 			$this->finish_config = TRUE;
+// 		}
 	}
 	
 	private function _return_cr($cr) {
