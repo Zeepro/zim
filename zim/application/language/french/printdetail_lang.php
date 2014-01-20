@@ -1,26 +1,26 @@
 <?php
 // printdetail status()
 $lang['ZeePro Personal Printer 21 - Printing details']
-	= 'Zim - Détail de l\'impression';
+	= 'Zim - Détails de l\'impression';
 $lang['Time remaining: ']
-	= 'Temps resté: ';
+	= 'Temps restant: ';
 $lang['Unknown']
 	= 'Inconnu';
 $lang['Under calculating']
-	= 'En cours de calculation';
-$lang['Control your creation']
-	= 'Contrôler votre création';
+	= 'Estimation en cours';
+$lang['Control your printing']
+	= 'Contrôler votre impression';
 $lang['Printing details']
 	= 'Détail de l\'impression';
 $lang['Percentage: %d%%']
 	= 'Pourcentage: %d%%';
 $lang['Stop']
 	= 'Arrêter';
-$lang['Temperature of left extruder: %d °C']
+$lang['Temperature of the left extruder: %d °C']
 	= 'Température de l\'extrudeur gauche: %d °C';
-$lang['Temperature of right extruder: %d °C']
+$lang['Temperature of the right extruder: %d °C']
 	= 'Température de l\'extrudeur droit: %d °C';
 $lang['Waiting for starting...']
-	= 'En attente à commencer...';
+	= 'En attente de démarrage...';
 
 ?>

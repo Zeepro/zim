@@ -214,7 +214,7 @@ function ModelList_add($data_array) {
 			PRINTLIST_TITLE_LENG_F2		=> $model_filament2,
 			PRINTLIST_TITLE_COLOR_F1	=> $model_color1,
 			PRINTLIST_TITLE_COLOR_F2	=> $model_color2,
-	// 		PRINTLIST_TITLE_GCODE		=> NULL,
+// 			PRINTLIST_TITLE_GCODE		=> NULL,
 			PRINTLIST_TITLE_PIC			=> array(),
 	);
 	$model_path = $printlist_basepath . $model_name . '/';
@@ -341,7 +341,7 @@ function ModelList__find($id_model_find, &$model_path) {
 	return ERROR_OK;
 }
 
-function ModelList__listAsArray() {
+function ModelList__listAsArray($set_localization = FALSE) {
 	global $CFG;
 	$printlist_basepath	= $CFG->config['printlist'];
 	$json_data = array();
@@ -374,6 +374,9 @@ function ModelList__listAsArray() {
 // 					. '&' . PRINTLIST_GETPIC_PRM_PIC . '=' . ($i + 1);
 // 			}
 // 		}
+		if ($set_localization) {
+			ModelList__setLocalization($tmp_array['json']);
+		}
 		
 		$json_data[PRINTLIST_TITLE_MODELS][] = $tmp_array['json']; //asign final data
 	}
@@ -398,7 +401,17 @@ function ModelList__blindUrl(&$array_json) {
 	return;
 }
 
-function ModelList__getDetailAsArray($id_model, &$array_data) {
+function ModelList__setLocalization(&$array_json) {
+	$CI = &get_instance();
+	$lang_current = $CI->config->item('language_abbr');
+	
+	$array_json[PRINTLIST_TITLE_NAME] = $array_json[PRINTLIST_TITLE_NAME][$lang_current];
+	$array_json[PRINTLIST_TITLE_DESP] = $array_json[PRINTLIST_TITLE_DESP][$lang_current];
+	
+	return;
+}
+
+function ModelList__getDetailAsArray($id_model, &$array_data, $set_localization = FALSE) {
 	//TODO add it to spec file if necessary
 	// but for web service, it's better to return json,
 	// so we need ModelList_getDetail() for web service
@@ -416,6 +429,9 @@ function ModelList__getDetailAsArray($id_model, &$array_data) {
 		}
 		$array_data = $tmp_array['json'];
 		ModelList__blindUrl($array_data);
+		if ($set_localization) {
+			ModelList__setLocalization($array_data);
+		}
 		
 		return ERROR_OK;
 	} else {

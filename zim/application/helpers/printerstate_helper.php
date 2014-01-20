@@ -63,6 +63,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_DESP_MATERIAL_ABS',		'abs');
 	define('PRINTERSTATE_OFFSET_TEMPER',			100);
 	define('PRINTERSTATE_OFFSET_YEAR_SETUP_DATE',	2014);
+	define('PRINTERSTATE_VALUE_DEFAULT_COLOR',		'transparent');
 	
 	define('PRINTERSTATE_PRM_EXTRUDER',				'extruder');
 	define('PRINTERSTATE_PRM_TEMPER',				'temp');
@@ -104,7 +105,8 @@ function PrinterState_getExtruder(&$abb_extruder) {
 			return ERROR_INTERNAL;
 		}
 	} else {
-		return ERROR_IN_PRINT;
+// 		return ERROR_IN_PRINT;
+		return ERROR_BUSY_PRINTER;
 	}
 	
 	return ERROR_OK;
@@ -139,7 +141,8 @@ function PrinterState_setExtruder($abb_extruder = 'r') {
 			return ERROR_INTERNAL;
 		}
 	} else {
-		return ERROR_IN_PRINT;
+// 		return ERROR_IN_PRINT;
+		return ERROR_BUSY_PRINTER;
 	}
 	
 	return ERROR_OK;
@@ -159,7 +162,7 @@ function PrinterState_getTemperature(&$val_temperature, $type = 'e') {
 			// get current extruder
 			$ret_val = PrinterState_getExtruder($abb_extruder);
 			if ($ret_val != ERROR_OK) {
-				return ERROR_INTERNAL;
+				return $ret_val;
 			}
 			if ($abb_extruder == 'l') {
 				$command = $arcontrol_fullpath . PRINTERSTATE_GET_TEMPEREXT_L;
@@ -218,7 +221,8 @@ function PrinterState_setTemperature($val_temperature, $type = 'e') {
 // 		}
 		pclose(popen($command, 'r')); // only for windows arcontrol client
 	} else {
-		return ERROR_IN_PRINT;
+// 		return ERROR_IN_PRINT;
+		return ERROR_BUSY_PRINTER;
 	}
 	
 	return ERROR_OK;
@@ -249,6 +253,33 @@ function PrinterState_getInfo() {
 	$data_json = PrinterState__getInfoAsArray();
 	
 	return json_encode($data_json);
+}
+
+function PrinterState_getExtruderTemperaturesAsArray() {
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol'];
+	$command = '';
+	$ret_val = 0;
+	$data_array = array();
+
+	foreach (array(
+			PRINTERSTATE_GET_TEMPEREXT_L => PRINTERSTATE_LEFT_EXTRUD,
+			PRINTERSTATE_GET_TEMPEREXT_R => PRINTERSTATE_RIGHT_EXTRUD,
+	) as $parameter_cmd => $data_key ) {
+		$output = array();
+
+		$command = $arcontrol_fullpath . $parameter_cmd;
+		exec($command, $output, $ret_val);
+		if ($ret_val != ERROR_NORMAL_RC_OK) {
+			return ERROR_INTERNAL;
+		}
+		else {
+			$last_output = $output[0];
+			$data_array[$data_key] = (int)$last_output;
+		}
+	}
+
+	return $data_array;
 }
 
 //internal function
@@ -320,10 +351,11 @@ function PrinterState__getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 			return ERROR_INTERNAL;
 		}
 		else {
-			$last_output = $output[0];
+			$last_output = $output ? $output[0] : NULL;
 		}
 	} else {
-		return ERROR_IN_PRINT;
+// 		return ERROR_IN_PRINT;
+		return ERROR_BUSY_PRINTER;
 	}
 	
 	// check and treat output data
@@ -479,33 +511,6 @@ function PrinterState__checkStatusAsArray() {
 	}
 	
 	return $data_json;	
-}
-
-function PrinterState__getExtruderTemperaturesAsArray() {
-	global $CFG;
-	$arcontrol_fullpath = $CFG->config['arcontrol'];
-	$command = '';
-	$ret_val = 0;
-	$data_array = array();
-	
-	foreach (array(
-					PRINTERSTATE_GET_TEMPEREXT_L => PRINTERSTATE_LEFT_EXTRUD,
-					PRINTERSTATE_GET_TEMPEREXT_R => PRINTERSTATE_RIGHT_EXTRUD,
-			) as $parameter_cmd => $data_key ) {
-		$output = array();
-		
-		$command = $arcontrol_fullpath . $parameter_cmd;
-		exec($command, $output, $ret_val);
-		if ($ret_val != ERROR_NORMAL_RC_OK) {
-			return ERROR_INTERNAL;
-		}
-		else {
-			$last_output = $output[0];
-			$data_array[$data_key] = (int)$last_output;
-		}
-	}
-	
-	return $data_array;
 }
 
 function PrinterState__changeFilament($left_filament = 0, $right_filament = 0) {

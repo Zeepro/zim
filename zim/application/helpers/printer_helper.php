@@ -51,7 +51,8 @@ function Printer_printFromFile($gcode_path) {
 	// check if in printing
 	$ret_val = PrinterState__checkInPrint();
 	if ($ret_val == TRUE) {
-		return ERROR_IN_PRINT;
+// 		return ERROR_IN_PRINT;
+		return ERROR_BUSY_PRINTER;
 	}
 
 	// check if having enough filament
@@ -166,7 +167,7 @@ function Printer_printFromFile($gcode_path) {
 // 		return FALSE;
 // 	}
 	
-// 	$temper_status = PrinterState__getExtruderTemperaturesAsArray();
+// 	$temper_status = PrinterState_getExtruderTemperaturesAsArray();
 	
 // 	// generate return data array
 // 	$return_data = array(
@@ -222,7 +223,7 @@ function Printer_checkPrint(&$return_data) {
 	}
 	
 	// get temperatures of extruders
-	$temper_status = PrinterState__getExtruderTemperaturesAsArray();
+	$temper_status = PrinterState_getExtruderTemperaturesAsArray();
 	if (!is_array($temper_status)) {
 		return FALSE; //TODO treat the internal error when getting temperatures of extruders
 	}

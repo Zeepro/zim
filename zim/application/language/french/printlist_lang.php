@@ -4,30 +4,34 @@ $lang['back']
 	= 'retour';
 
 // printmodel listmodel()
-$lang['ZeePro Personal Printer 21 - Quick print list']
-	= 'Zim - Liste des impressions instantes';
-$lang['Quick Print']
-	= 'Impression instante';
+$lang['ZeePro Personal Printer 21 - Quick printing list']
+	= 'Zim - Liste des fichiers imprimables';
+$lang['Select a model']
+	= 'Sélection d\'un modèle';
 
 // printmodel detail()
-$lang['ZeePro Personal Printer 21 - Quick print detail']
-	= 'Zim - Détail de l\'impression instante';
+$lang['ZeePro Personal Printer 21 - Printing details']
+	= 'Zim - Détails de l\'impression';
 $lang['Time estimation: ']
-	= 'Temps d\'estimation: ';
+	= 'Temps estimé: ';
 $lang['Unknown']
 	= 'Inconnu';
 $lang['ok']
-	= 'okay';
+	= 'ok';
 $lang['not enough']
-	= 'non suffisamment';
-$lang['Current material']
-	= 'Matériel actuel';
+	= 'insuffisant';
+$lang['Filament loaded']
+	= 'Filament chargé';
 $lang['Change']
 	= 'Changer';
 $lang['Print']
-	= 'Imprimier';
+	= 'Imprimer';
 $lang['Preview']
-	= 'Avant-première';
+	= 'Aperçu';
+$lang['empty']
+	= 'vide';
+$lang['Load']
+	= 'Charger';
 
 
 ?>

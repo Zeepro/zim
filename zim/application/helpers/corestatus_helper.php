@@ -98,8 +98,20 @@ function CoreStatus_checkCallPrinting(&$url_redirect) {
 	$url_redirect = '/printdetail/status';
 	
 	return CoreStatus__checkCallURI(array(
-			'/printdetail/status',
-			'/printdetail/status_ajax',
+			'/printdetail/status'		=> NULL,
+			'/printdetail/status_ajax'	=> NULL,
+	));
+}
+
+function CoreStatus_checkCallNoBlockREST() {
+	$CI = &get_instance();
+	$CI->load->helper('printerstate');
+	
+	return CoreStatus__checkCallURI(array(
+			'/rest/status'	=> NULL,
+			'/rest/get'		=> array(
+					'p'	=> array(PRINTERSTATE_PRM_TEMPER, PRINTERSTATE_PRM_INFO),
+			),
 	));
 }
 
@@ -153,14 +165,45 @@ function CoreStatus__checkCallController($name_controller) {
 	}
 }
 
+// function CoreStatus__checkCallURI($array_URI) {
+// 	$CI = &get_instance();
+// 	if (in_array($CI->router->uri->uri_string, $array_URI)) {
+// 		return TRUE;
+// 	}
+// 	else {
+// 		return FALSE;
+// 	}
+// }
+
 function CoreStatus__checkCallURI($array_URI) {
 	$CI = &get_instance();
-	if (in_array($CI->router->uri->uri_string, $array_URI)) {
-		return TRUE;
+	if (array_key_exists($CI->router->uri->uri_string, $array_URI)) {
+		if (is_null($array_URI[$CI->router->uri->uri_string])) {
+			return TRUE;
+		}
+		else if (!is_array($array_URI[$CI->router->uri->uri_string])) {
+			return FALSE; //TODO treat internal error
+		}
+		else {
+			foreach ($array_URI[$CI->router->uri->uri_string] as $key => $value) {
+				$real_value = $CI->input->get($key);
+				if (is_array($value) && in_array($real_value, $value)) {
+					continue; // compare with a data array
+				} else if ($real_value == $value) {
+					continue; // compare with an alone data
+				}
+				else {
+					return FALSE;
+					break; // never reach here
+				}
+			}
+		}
 	}
 	else {
 		return FALSE;
 	}
+	
+	return TRUE;
 }
 
 function CoreStatus__setInStatus($value_status, $data_array = array()) {

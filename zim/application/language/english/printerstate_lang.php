@@ -10,19 +10,19 @@ $lang['Left cartridge change']
 	= 'Left cartridge change';
 $lang['Right cartridge change']
 	= 'Right cartridge change';
-$lang['Step one: Clear out the filament']
-	= 'Step one: Clear out the filament';
-$lang['Clear out']
-	= 'Clear out';
-$lang['Pull out the cartridge']
-	= 'Pull out the cartridge';
+$lang['Step one: Unload the filament']
+	= 'Step one: Unload the filament';
+$lang['Unload']
+	= 'Unload';
+$lang['Remove the cartridge']
+	= 'Remove the cartridge';
 $lang['Step two: Pull on the cartridge']
 	= 'Step two: Pull on the cartridge';
 $lang['Pull on']
 	= 'Pull on';
 $lang['Filament charging']
 	= 'Filament charging';
-$lang['Running']
-	= 'Running';
+$lang['In progress']
+	= 'In progress';
 
 ?>

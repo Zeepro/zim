@@ -55,7 +55,7 @@ class Printdetail extends MY_Controller {
 		
 		// parse the main body
 		$template_data = array(
-				'title'			=> t('Control your creation'),
+				'title'			=> t('Control your printing'),
 				'print_detail'	=> 'Printing details',
 				'print_stop'	=> t('Stop'),
  				'wait_info'		=> t('Waiting for starting...'),
@@ -133,8 +133,8 @@ class Printdetail extends MY_Controller {
 				$template_data = array(
 						'print_percent'	=> t('Percentage: %d%%', array($data_status['print_percent'])),
 						'print_remain'	=> $time_remain,
-						'print_temperL'	=> t('Temperature of left extruder: %d °C', array($data_status['print_temperL'])),
-						'print_temperR'	=> t('Temperature of right extruder: %d °C', array($data_status['print_temperR'])),
+						'print_temperL'	=> t('Temperature of the left extruder: %d °C', array($data_status['print_temperL'])),
+						'print_temperR'	=> t('Temperature of the right extruder: %d °C', array($data_status['print_temperR'])),
 						'value_temperL'	=> $data_status['print_temperL'],
 						'value_temperR'	=> $data_status['print_temperR'],
 				);
@@ -170,7 +170,7 @@ class Printdetail extends MY_Controller {
 // 		}
 		
 // 		// get temperatures of extruders
-// 		$temper_status = PrinterState__getExtruderTemperaturesAsArray();
+// 		$temper_status = PrinterState_getExtruderTemperaturesAsArray();
 // 		if (!is_array($temper_status)) {
 // 			//TODO treat the internal error when getting temperatures of extruders
 // 		}

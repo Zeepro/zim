@@ -40,13 +40,13 @@ class Printerstate extends MY_Controller {
 		// parse the main body
 		$template_data = array(
 				'title'			=> ($abb_cartridge == 'l') ? t('Left cartridge change') : t('Right cartridge change'),
-				'step1_title'	=> t('Step one: Clear out the filament'),
-				'step1_action'	=> t('Clear out'),
-				'step1_message'	=> t('Pull out the cartridge'),
+				'step1_title'	=> t('Step one: Unload the filament'),
+				'step1_action'	=> t('Unload'),
+				'step1_message'	=> t('Remove the cartridge'),
 				'step2_title'	=> t('Step two: Pull on the cartridge'),
 				'step2_action'	=> t('Pull on'),
 				'step2_message'	=> t('Filament charging'),
-				'step_process'	=> t('Running'),
+				'step_process'	=> t('In progress'),
 				'back'			=> t('back'),
 		);
 		

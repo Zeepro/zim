@@ -40,9 +40,9 @@ class Rest extends MY_Controller {
 			echo $display; //optional
 			exit;
 		}
-		else if (!CoreStatus_checkInIdle($status_current)) {
+		else if (!CoreStatus_checkInIdle($status_current) && !CoreStatus_checkCallNoBlockREST()) {
 			//TODO check if the status is changing
-			//TODO let getting temperatures always pass
+			//TODO let getting temperatures / info always pass
 			$ret_val = 0;
 			
 			switch ($status_current) {
@@ -342,11 +342,24 @@ class Rest extends MY_Controller {
 					// check which temperature we want
 					$has_e = $this->input->get('e');
 					$has_h = $this->input->get('h');
+					$has_v = $this->input->get('v');
 					if (($has_e === FALSE) && ($has_h === FALSE)) {
 						$cr = ERROR_MISS_PRM;
 					}
 					else if (!($has_e === FALSE) && !($has_h === FALSE)) {
 						$cr = ERROR_WRONG_PRM;
+					}
+					else if (!($has_e === FALSE) && !($has_v === FALSE)) {
+						if (in_array($has_v, array('l', 'r'))) {
+							$tmp_array = PrinterState_getExtruderTemperaturesAsArray();
+							$cr = ERROR_OK;
+							$display = ($has_v == 'l')
+									? $tmp_array[PRINTERSTATE_LEFT_EXTRUD]
+									: $tmp_array[PRINTERSTATE_RIGHT_EXTRUD];
+						}
+						else {
+							$cr = ERROR_WRONG_PRM;
+						}
 					}
 					else {
 						$api_prm = ($has_e === FALSE) ? 'h' : 'e';

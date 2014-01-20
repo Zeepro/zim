@@ -9,10 +9,10 @@ if (!defined("ERROR_OK")) {
 	define("ERROR_MISS_PRM",		432);
 	define("ERROR_WRONG_PRM",		433);
 	define("ERROR_LOADED_UNLOAD",	434);
-	define("ERROR_IN_PRINT",		435);
+// 	define("ERROR_IN_PRINT",		435);
 	define("ERROR_WRONG_PWD",		436);
 	define("ERROR_NO_PRINT",		437);
-	define("ERROR_MISS_CARTRIDGE",	438);
+// 	define("ERROR_MISS_CARTRIDGE",	438);
 	define("ERROR_MISS_FILAMENT",	439);
 	define("ERROR_PRES_FILAMENT",	440);
 	define("ERROR_EMPTY_PLATFORM",	441);
@@ -40,10 +40,10 @@ if (!defined("ERROR_OK")) {
 		ERROR_MISS_PRM			=> "Missing parameter",
 		ERROR_WRONG_PRM			=> "Incorrect parameter",
 		ERROR_LOADED_UNLOAD		=> "Already loaded / unloaded",
-		ERROR_IN_PRINT			=> "Printing in progress",
+// 		ERROR_IN_PRINT			=> "Printing in progress",
 		ERROR_WRONG_PWD			=> "Missing / Incorrect password",
 		ERROR_NO_PRINT			=> "No current printing",
-		ERROR_MISS_CARTRIDGE	=> "Cartridge missing",
+// 		ERROR_MISS_CARTRIDGE	=> "Cartridge missing",
 		ERROR_MISS_FILAMENT		=> "Filament missing",
 		ERROR_PRES_FILAMENT		=> "Filament present",
 		ERROR_EMPTY_PLATFORM	=> "Platform empty",

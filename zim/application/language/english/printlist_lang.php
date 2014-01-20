@@ -4,13 +4,13 @@ $lang['back']
 	= 'back';
 
 // printmodel listmodel()
-$lang['ZeePro Personal Printer 21 - Quick print list']
-	= 'Zim - Quick print list';
-$lang['Quick Print']
-	= 'Quick Print';
+$lang['ZeePro Personal Printer 21 - Quick printing list']
+	= 'Zim - Printing list';
+$lang['Select a model']
+	= 'Select a model';
 
 // printmodel detail()
-$lang['ZeePro Personal Printer 21 - Quick print detail']
+$lang['ZeePro Personal Printer 21 - Printing details']
 	= 'Zim - Quick print detail';
 $lang['Time estimation: ']
 	= 'Time estimation: ';
@@ -20,14 +20,18 @@ $lang['ok']
 	= 'ok';
 $lang['not enough']
 	= 'not enough';
-$lang['Current material']
-	= 'Current material';
+$lang['Filament loaded']
+	= 'Filament loaded';
 $lang['Change']
 	= 'Change';
 $lang['Print']
 	= 'Print';
 $lang['Preview']
 	= 'Preview';
+$lang['empty']
+	= 'empty';
+$lang['Load']
+	= 'Load';
 
 
 ?>

@@ -8,18 +8,18 @@ $lang['Unknown']
 	= 'Unknown';
 $lang['Under calculating']
 	= 'Under calculating';
-$lang['Control your creation']
-	= 'Control your creation';
+$lang['Control your printing']
+	= 'Control your printing';
 $lang['Printing details']
 	= 'Printing details';
 $lang['Percentage: %d%%']
 	= 'Percentage: %d%%';
 $lang['Stop']
 	= 'Stop';
-$lang['Temperature of left extruder: %d °C']
-	= 'Temperature of left extruder: %d °C';
-$lang['Temperature of right extruder: %d °C']
-	= 'Temperature of right extruder: %d °C';
+$lang['Temperature of the left extruder: %d °C']
+	= 'Temperature of the left extruder: %d °C';
+$lang['Temperature of the right extruder: %d °C']
+	= 'Temperature of the right extruder: %d °C';
 $lang['Waiting for starting...']
 	= 'Waiting for starting...';
 

@@ -6,9 +6,17 @@
 		<div id="container" style="text-align: center;">
 			<h2>{title}</h2>
 			<video width="320" height="240" autoplay controls>
-				<source src="/zim.m3u8" type="application/x-mpegURL" />
+				<source src="http://88.175.62.75/zim.m3u8" type="application/x-mpegURL" />
 				Your browser does not support HTML5 streaming!
 			</video>
+<!--			<script type="text/javascript" src="/assets/jwplayer/jwplayer.js"></script>
+ 			<script type="text/javascript">jwplayer.key="Jh6aqwb1m2vKLCoBtS7BJxRWHnF/Qs3LMjnt13P9D6A=";</script>
+			<div id="myElement">Loading the player...</div>
+			<script type="text/javascript">
+				jwplayer("myElement").setup({
+					file: "http://88.175.62.75/zim.m3u8"
+				});
+			</script> -->
 			<div data-role="collapsible" data-collapsed="false" style="align: center;">
 				<h4>{print_detail}</h4>
 				<div id="print_detail_info">
@@ -35,7 +43,7 @@ function checkPrintStatus() {
 		})
 		.fail(function() {
 //			alert("done");
-			window.location.replace("/menu_home");
+			window.location.replace("/");
 		});
 	}
  	var var_refreshPrintStatus = setInterval(refreshPrintStatus, 1000);

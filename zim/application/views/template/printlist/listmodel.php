@@ -5,8 +5,8 @@
 	<div class="logo"></div>
 	<div data-role="content">
 		<div id="container">
-			<h2>{title}</h2>
-			<ul data-role="listview" id="listview" class="shadowBox" data-inset="true" data-filter="true" data-filter-theme="d">
+<!-- 			<h2>{title}</h2> -->
+			<ul data-role="listview" id="listview" class="shadowBox" data-inset="true" data-filter="true" data-filter-placeholder="{search_hint}" data-filter-theme="d">
 				{model_lists}
 				<li><a href="{baseurl_detail}?id={id}">
 					<img src="{image}">

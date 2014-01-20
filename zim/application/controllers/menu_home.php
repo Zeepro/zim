@@ -21,9 +21,9 @@ class Menu_home extends MY_Controller {
 		
 		// parse the main body
 		$template_data = array(
-				'title'				=> t('Home'),
+// 				'title'				=> t('Home'),
 				'menu_printlist'	=> t('Quick print'),
-				'menu_printerstate'	=> t('Printer details'),
+				'menu_printerstate'	=> t('Configuration'),
 		);
 		
 		$body_page = $this->parser->parse('template/menu_home', $template_data, TRUE);
@@ -31,7 +31,7 @@ class Menu_home extends MY_Controller {
 		// parse all page
 		$template_data = array(
 				'lang'			=> $CFG->config ['language_abbr'],
-				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Menu Home') . '</title>',
+				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Home') . '</title>',
 				'contents'		=> $body_page,
 		);
 		

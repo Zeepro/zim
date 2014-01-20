@@ -4,7 +4,7 @@
 	<div class="logo"></div>
 	<div data-role="content">
 		<div id="container">
-			<h2>{title}</h2>
+<!-- 			<h2>{title}</h2> -->
 			<ul data-role="listview" id="listview" class="shadowBox" data-inset="true">
 				<li><a href="/printmodel/listmodel">
 					<h2>{menu_printlist}</h2></a>
