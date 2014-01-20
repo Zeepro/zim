@@ -28,6 +28,12 @@ if (!defined('PRINTLIST_MAX_PIC_SIZE')) {
 	define('PRINTLIST_TITLE_COLOR_F2',	'c2');
 	define('PRINTLIST_TITLE_PIC',		'picture');
 // 	define('PRINTLIST_TITLE_GCODE',		'gcode');
+	define('PRINTLIST_TITLE_LANG_EN',	'en');
+	define('PRINTLIST_TITLE_LANG_FR',	'fr');
+	define('PRINTLIST_TITLE_MODELS',	'models');
+	define('PRINTLIST_TITLE_VERSION',	'ver');
+
+	define('PRINTLIST_VALUE_VERSION',	2);
 	
 	define('PRINTLIST_FILE_GCODE',		'model.gcode');
 	define('PRINTLIST_FILE_JSON',		'model.json');
@@ -369,8 +375,9 @@ function ModelList__listAsArray() {
 // 			}
 // 		}
 		
-		$json_data[] = $tmp_array['json']; //asign final data
+		$json_data[PRINTLIST_TITLE_MODELS][] = $tmp_array['json']; //asign final data
 	}
+	$json_data[PRINTLIST_TITLE_VERSION] = PRINTLIST_VALUE_VERSION;
 	
 	return $json_data;
 }
