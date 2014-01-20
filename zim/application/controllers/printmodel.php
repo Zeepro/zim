@@ -75,8 +75,8 @@ class Printmodel extends MY_Controller {
 		$check_right_filament = '';
 		$color_left_filament = '';
 		$color_right_filament = '';
-		$change_left_filament = t('Change');
-		$change_right_filament = t('Change');
+		$change_left_filament = '';
+		$change_right_filament = '';
 		$time_estimation = '';
 		$body_page = NULL;
 		
@@ -107,6 +107,8 @@ class Printmodel extends MY_Controller {
 		$cr = PrinterState__checkFilament($model_data[PRINTLIST_TITLE_LENG_F2], $model_data[PRINTLIST_TITLE_LENG_F1]);
 		$check_left_filament = t('ok');
 		$check_right_filament = t('ok');
+		$change_left_filament = t('Change');
+		$change_right_filament = t('Change');
 		switch ($cr) {
 			case ERROR_LOW_RIGT_FILA:
 				$check_left_filament = t('not enough');

@@ -63,9 +63,9 @@ function Printer_printFromFile($gcode_path) {
 	
 	//FIXME just set temperature for simulation
 	PrinterState_setExtruder('r');
-	PrinterState_setTemperature(200);
-	PrinterState_setExtruder('l');
 	PrinterState_setTemperature(210);
+	PrinterState_setExtruder('l');
+	PrinterState_setTemperature(200);
 	PrinterState_setExtruder('r');
 
 	// change status json file

@@ -22,8 +22,9 @@
 				<div id="print_detail_info">
 					<p>{wait_info}</p>
 				</div>
-				<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete">{print_stop}</button>
+<!-- 				<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete">{print_stop}</button> -->
 			</div>
+			<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete">{print_stop}</button>
 		</div>
 	</div>
 </div>
