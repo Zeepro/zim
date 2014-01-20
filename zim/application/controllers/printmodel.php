@@ -177,6 +177,7 @@ class Printmodel extends MY_Controller {
 				'print_model'		=> t('Print'),
 				'back'				=> t('back'),
 				'preview_title'		=> t('Preview'),
+				'desp_title'		=> t('Description'),
 		);
 		
 		$body_page = $this->parser->parse('template/printlist/detail_2extrud', $template_data, TRUE);

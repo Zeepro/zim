@@ -6,8 +6,12 @@
 	<div data-role="content">
 		<div id="container">
 			<h2 style="text-align: center;">{title}</h2>
+			<div data-role="collapsible" data-collapsed="false">
+				<h4>{desp_title}</h4>
+				<p>{desp}</p>
+			</div>
 			<div data-role="collapsible" data-collapsed="false" style="text-align: center;">
-				<h4>{preview_title}</h4><br>
+				<h4>{preview_title}</h4>
 				<img src="{image}" style="max-width: 100%;"><br>
 				<div style="width: 50%; float: left; text-align: center;">
 					<div style="width: 32px; height: 32px; background-color: {model_c_l}; margin: 0 auto;">
@@ -20,10 +24,9 @@
 					</div>
 				</div><br>
 				<p>{time}</p>
-				<p>{desp}</p>
 			</div>
 			<div data-role="collapsible" data-collapsed="false" style="align: center;">
-				<h4>{title_current}</h4><br>
+				<h4>{title_current}</h4>
 				<div style="width: 50%; float: left; text-align: center;">
 					<div style="width: 32px; height: 32px; background-color: {state_c_l}; margin: 0 auto;">
 						<img src="/images/cartridge.png" style="width: 100%">

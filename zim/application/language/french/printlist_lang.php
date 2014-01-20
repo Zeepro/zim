@@ -32,6 +32,7 @@ $lang['empty']
 	= 'vide';
 $lang['Load']
 	= 'Charger';
-
+$lang['Description']
+	= 'Description';
 
 ?>

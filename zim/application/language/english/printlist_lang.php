@@ -32,6 +32,7 @@ $lang['empty']
 	= 'empty';
 $lang['Load']
 	= 'Load';
-
+$lang['Description']
+	= 'Description';
 
 ?>
