@@ -42,6 +42,7 @@ class Rest extends MY_Controller {
 		}
 		else if (!CoreStatus_checkInIdle($status_current)) {
 			//TODO check if the status is changing
+			//TODO let getting temperatures always pass
 			$ret_val = 0;
 			
 			switch ($status_current) {
@@ -274,7 +275,6 @@ class Rest extends MY_Controller {
 	}
 	
 	public function preslicedprint() {
-		//FIXME no changing back status json file
 		$mid = '';
 		$cr = 0; //return code
 		
@@ -357,6 +357,11 @@ class Rest extends MY_Controller {
 				case PRINTERSTATE_PRM_CARTRIDGE:
 					$api_prm = $this->input->get('v');
 					$cr = PrinterState_getCartridge($display, $api_prm);
+					break;
+					
+				case PRINTERSTATE_PRM_INFO:
+					$cr = ERROR_OK;
+					$display = PrinterState_getInfo();
 					break;
 					
 				default:

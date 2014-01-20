@@ -44,6 +44,10 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_TITLE_STATUS',		'status');
 	define('PRINTERSTATE_TITLE_PERCENT',	'percentage');
 	define('PRINTERSTATE_TITLE_DURATION',	'duration');
+	define('PRINTERSTATE_TITLE_VERSION',	'ver');
+	define('PRINTERSTATE_TITLE_TYPE',		'type');
+	define('PRINTERSTATE_TITLE_SERIAL',		'sn');
+	define('PRINTERSTATE_TITLE_NB_EXTRUD',	'extruder');
 
 	define('PRINTERSTATE_VALUE_IDLE',				'idle');
 	define('PRINTERSTATE_VALUE_IN_SLICE',			'slicing');
@@ -63,6 +67,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_PRM_EXTRUDER',				'extruder');
 	define('PRINTERSTATE_PRM_TEMPER',				'temp');
 	define('PRINTERSTATE_PRM_CARTRIDGE',			'cartridgeinfo');
+	define('PRINTERSTATE_PRM_INFO',					'info');
 }
 
 function PrinterState_getExtruder(&$abb_extruder) {
@@ -240,6 +245,12 @@ function PrinterState_checkStatus() {
 	return json_encode($data_json);
 }
 
+function PrinterState_getInfo() {
+	$data_json = PrinterState__getInfoAsArray();
+	
+	return json_encode($data_json);
+}
+
 //internal function
 function PrinterState__checkInPrint() {
 	global $CFG;
@@ -256,6 +267,20 @@ function PrinterState__checkInPrint() {
 		return TRUE;
 	}
 	
+}
+
+function PrinterState__getInfoAsArray() {
+	$json_info = array();
+	
+	//TODO make me depend on config file
+	$json_info = array(
+			PRINTERSTATE_TITLE_VERSION		=> 1,
+			PRINTERSTATE_TITLE_TYPE			=> 'zim',
+			PRINTERSTATE_TITLE_SERIAL		=> 1,
+			PRINTERSTATE_TITLE_NB_EXTRUD	=> 2,
+	);
+	
+	return $json_info;
 }
 
 function PrinterState__getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
@@ -382,6 +407,12 @@ function PrinterState__getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 		$json_cartridge = $data_json;
 	} else {
 		$json_cartridge = array();
+		if ($abb_cartridge == 'l') {
+			return ERROR_MISS_LEFT_FILA;
+		}
+		else {
+			return ERROR_MISS_RIGT_FILA;
+		}
 	}
 	
 	return ERROR_OK;
