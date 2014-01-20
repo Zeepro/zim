@@ -116,6 +116,14 @@ class Printdetail extends MY_Controller {
 						//TODO treat internal error here
 					}
 					
+					//FIXME just set temperature for simulation
+					$this->load->helper('printerstate');
+					PrinterState_setExtruder('r');
+					PrinterState_setTemperature(20);
+					PrinterState_setExtruder('l');
+					PrinterState_setTemperature(20);
+					PrinterState_setExtruder('r');
+					
 					$this->output->set_status_header(403);
 					return;
 				}
