@@ -151,6 +151,9 @@ class Rest extends MY_Controller {
 				if ($this->input->post('d')) {
 					$api_data['d'] = $this->input->post('d');
 				}
+				else {
+					$api_data['d'] = '{}'; // add default value
+				}
 				if ($this->input->post('t')) {
 					$api_data['t'] = (int)$this->input->post('t');
 				}
@@ -200,7 +203,7 @@ class Rest extends MY_Controller {
 				}
 			}
 		} else {
-			$this->load->view('test/printlist_form');
+			$this->load->view('template/rest/printlist_form');
 			return;
 		}
 		

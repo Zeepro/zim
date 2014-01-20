@@ -55,15 +55,17 @@ function ModelList_add($data_array) {
 	$printlist_basepath	= $CFG->config['printlist'];
 	$model_path			= '';
 	$model_pictures		= array();
+	$model_names		= array();
+	$model_desps		= array();
 	$json_data			= NULL;
 	
-	$model_name			= '';	// string by $data_array['n'], string
-	$model_desp			= '';	// string by $data_array['d'], string
+	$model_name			= NULL;	// string by $data_array['n'], string, 1th in the json structure
+// 	$model_desp			= '';	// string by $data_array['d'], string
 	$model_printtime	= 0;	// int by $data_array['t'], int
 	$model_filament1	= 0;	// int by $data_array['l1'], int
 	$model_filament2	= 0;	// int by $data_array['l2'], int
-	$model_color1		= '';	// string by $data_array['c1'], string
-	$model_color2		= '';	// string by $data_array['c2'], string
+	$model_color1		= NULL;	// string by $data_array['c1'], string
+	$model_color2		= NULL;	// string by $data_array['c2'], string
 	$model_gcode		= NULL;	// file array by $data_array['f'], array
 	//other parameters
 	//$data_array['p1'] ~ $data_array['p5']: file array which contain images
@@ -75,10 +77,21 @@ function ModelList_add($data_array) {
 		if (!isset($data_array['n']) || !isset($data_array['f'])) {
 			return ERROR_MISS_PRM;
 		} else {
+			$tmp_array = array();
+			
 			//model name
-			$model_name = $data_array['n'];
-			if (strlen($model_name) > 50 || strlen($model_name) == 0) {
+			$tmp_array = json_decode($data_array['n']);
+			if (is_null($tmp_array)) {
 				return ERROR_WRONG_PRM;
+			}
+			$model_names = $tmp_array;
+			foreach ($tmp_array as $lang => $name_lang) {
+				if (is_null($model_name)) {
+					$model_name = $name_lang;
+				}
+				if (strlen($name_lang) > 50 || strlen($name_lang) == 0) {
+					return ERROR_WRONG_PRM;
+				}
 			}
 			
 			//model gcode
@@ -97,12 +110,18 @@ function ModelList_add($data_array) {
 			}
 			
 			//model description
-			if (isset($data_array['d'])) {
-				$model_desp = $data_array['d'];
+			$tmp_array = json_decode($data_array['d']);
+			if (is_null($tmp_array)) {
+				return ERROR_WRONG_PRM;
+			}
+			$model_desps = $tmp_array;
+// 			if (isset($data_array['d'])) {
+			foreach($tmp_array as $lang => $model_desp) {
+// 				$model_desp = $data_array['d'];
 				if (strlen($model_desp) > 255) { // || strlen($model_name) == 0 //already check isset()
 					return ERROR_WRONG_PRM;
 				}
-			}
+ 			}
 			
 			//model print time
 			if (isset($data_array['t'])) {
@@ -207,8 +226,8 @@ function ModelList_add($data_array) {
 	//model name, description, duration, filament1+2
 	$json_data = array(
 			PRINTLIST_TITLE_ID			=> md5(utf8_decode($model_name)),
-			PRINTLIST_TITLE_NAME		=> $model_name,
-			PRINTLIST_TITLE_DESP		=> $model_desp,
+			PRINTLIST_TITLE_NAME		=> $model_names,
+			PRINTLIST_TITLE_DESP		=> $model_desps,
 			PRINTLIST_TITLE_TIME		=> $model_printtime,
 			PRINTLIST_TITLE_LENG_F1		=> $model_filament1,
 			PRINTLIST_TITLE_LENG_F2		=> $model_filament2,
