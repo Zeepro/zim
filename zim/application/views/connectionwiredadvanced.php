@@ -3,7 +3,7 @@
 		<a data-icon="arrow-l" data-role="button" data-direction="reverse"
 			data-rel="back"><?= t('Back') ?></a>
 	</header>
-	<div class="logo"></div>
+	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
 			<h2><?= t('Advanced wired network connection') ?></h2>

@@ -1,7 +1,7 @@
 <div data-role="page" data-url="/menu_home">
 	<header data-role="header" class="page-header">
 	</header>
-	<div class="logo"></div>
+	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
 <!-- 			<h2>{title}</h2> -->

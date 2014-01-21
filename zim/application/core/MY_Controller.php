@@ -56,6 +56,22 @@ class MY_Controller extends CI_Controller {
 				}
 			}
 			else {
+				if (CoreStatus_checkCallPrintingAjax()) {
+					// let ajax request failed when we finishing printing
+					$protocol = (isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0');
+					header($protocol . ' 403');
+					header('Content-type: text/plain; charset=UTF-8');
+					echo 'Not in printing';
+					exit;
+				}
+				else if (CoreStatus_checkCallPrinting()) {
+					$url_redirect = '/';
+				}
+				
+				if ($url_redirect) {
+					header('Location: ' . $url_redirect);
+					exit;
+				}
 				return; // continue to generate the current page
 			}
 			

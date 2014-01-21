@@ -94,11 +94,19 @@ function CoreStatus_checkCallConnection(&$url_redirect = '') {
 	return CoreStatus__checkCallController('connection');
 }
 
-function CoreStatus_checkCallPrinting(&$url_redirect) {
+function CoreStatus_checkCallPrinting(&$url_redirect = '') {
 	$url_redirect = '/printdetail/status';
 	
 	return CoreStatus__checkCallURI(array(
 			'/printdetail/status'		=> NULL,
+			'/printdetail/status_ajax'	=> NULL,
+	));
+}
+
+function CoreStatus_checkCallPrintingAjax() {
+	$url_redirect = '/printdetail/status';
+	
+	return CoreStatus__checkCallURI(array(
 			'/printdetail/status_ajax'	=> NULL,
 	));
 }

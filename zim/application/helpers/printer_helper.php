@@ -224,8 +224,8 @@ function Printer_checkPrint(&$return_data) {
 	$data_status = PrinterState__checkStatusAsArray();
 	if ($data_status[PRINTERSTATE_TITLE_STATUS] != PRINTERSTATE_VALUE_IN_PRINT) {
 		// delete printing status json file when we are not in printing
-		unlink($CFG->config ['conf'] . PRINTER_PRINTING_JSON);
-		echo 'finish'; // test
+// 		unlink($CFG->config ['conf'] . PRINTER_PRINTING_JSON);
+// 		echo 'finish'; // test
 		return FALSE;
 	}
 	

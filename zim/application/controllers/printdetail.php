@@ -56,9 +56,11 @@ class Printdetail extends MY_Controller {
 		// parse the main body
 		$template_data = array(
 				'title'			=> t('Control your printing'),
-				'print_detail'	=> 'Printing details',
+				'print_detail'	=> t('Printing details'),
 				'print_stop'	=> t('Stop'),
  				'wait_info'		=> t('Waiting for starting...'),
+				'finish_info'	=> t('Congratulation, your printing is complete!'),
+				'return_button'	=> t('Home'),
 		);
 		
 		$body_page = $this->parser->parse('template/printdetail/status', $template_data, TRUE);
@@ -124,7 +126,7 @@ class Printdetail extends MY_Controller {
 					PrinterState_setTemperature(20);
 					PrinterState_setExtruder('r');
 					
-					$this->output->set_status_header(403);
+					$this->output->set_status_header(204);
 					return;
 				}
 				
@@ -136,7 +138,7 @@ class Printdetail extends MY_Controller {
 				else {
 					$time_remain = t('Time remaining: ') . t('Unknown');
 				}
-		
+				
 				// parse the ajax part
 				$template_data = array(
 						'print_percent'	=> t('Percentage: %d%%', array($data_status['print_percent'])),

@@ -1,7 +1,7 @@
-					<p>{print_percent}</p>
-					<p>{print_remain}</p>
 					<div id="print_detail_info_temper_l">{print_temperL}<br></div><br>
 					<div id="print_detail_info_temper_r">{print_temperR}<br></div><br>
+					<p>{print_percent}</p>
+					<p>{print_remain}</p>
 					
 <script type="text/javascript">
 <!--

@@ -12,6 +12,8 @@ $lang['Control your printing']
 	= 'Contrôler votre impression';
 $lang['Printing details']
 	= 'Détail de l\'impression';
+
+//printdetail status_ajax()
 $lang['Percentage: %d%%']
 	= 'Pourcentage: %d%%';
 $lang['Stop']
@@ -22,5 +24,11 @@ $lang['Temperature of the right extruder: %d °C']
 	= 'Température de l\'extrudeur droit: %d °C';
 $lang['Waiting for starting...']
 	= 'En attente de démarrage...';
+$lang['Printing details']
+	= 'Details de l\'impression';
+$lang['Congratulation, your printing is complete!']
+	= 'Félicitation, votre impression est terminée!';
+$lang['Home']
+	= 'Accueil';
 
 ?>

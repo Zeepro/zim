@@ -16,6 +16,19 @@
 <link rel="stylesheet" href="/assets/css/4.css">
 <link rel="stylesheet" href="/assets/css/style.css">
 <link rel="stylesheet" href="/styles/flag.css" />
+<style type="text/css">
+	div#link_logo {
+		margin: 0 auto;
+		width: 97px;
+		height: 100px;
+		cursor: pointer;
+	}
+</style>
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('div#link_logo').click(function(){window.location.href='/'; return false;});
+	});
+</script>
 
 </head>
 <body>
