@@ -57,7 +57,7 @@ class Printdetail extends MY_Controller {
 		$template_data = array(
 				'title'			=> t('Control your printing'),
 				'print_detail'	=> t('Printing details'),
-				'print_stop'	=> t('Stop'),
+				'print_stop'	=> t('Cancel'),
  				'wait_info'		=> t('Waiting for starting...'),
 				'finish_info'	=> t('Congratulation, your printing is complete!'),
 				'return_button'	=> t('Home'),
@@ -133,10 +133,10 @@ class Printdetail extends MY_Controller {
 				// treat time remaining for display
 				if (isset($data_status['print_remain'])) {
 					$time_remain = TimeDisplay__convertsecond(
-							$data_status['print_remain'], t('Time remaining: '), t('Under calculating'));
+							$data_status['print_remain'], t('Time remaining: '), t('under calculating'));
 				}
 				else {
-					$time_remain = t('Time remaining: ') . t('Unknown');
+					$time_remain = t('Time remaining: ') . t('unknown');
 				}
 				
 				// parse the ajax part

@@ -4,9 +4,9 @@ $lang['ZeePro Personal Printer 21 - Printing details']
 	= 'Zim - 打印详情';
 $lang['Time remaining: ']
 	= '剩余时间：';
-$lang['Unknown']
+$lang['unknown']
 	= '未知';
-$lang['Under calculating']
+$lang['under calculating']
 	= '正在计算中';
 $lang['Control your printing']
 	= '控制您的打印';
@@ -16,7 +16,7 @@ $lang['Printing details']
 //printdetail status_ajax()
 $lang['Percentage: %d%%']
 	= '百分比：%d%%';
-$lang['Stop']
+$lang['Cancel']
 	= '停止';
 $lang['Temperature of the left extruder: %d °C']
 	= '左喷头温度：%d °C';

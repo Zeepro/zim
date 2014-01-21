@@ -4,10 +4,10 @@ $lang['ZeePro Personal Printer 21 - Printing details']
 	= 'Zim - Printing details';
 $lang['Time remaining: ']
 	= 'Time remaining: ';
-$lang['Unknown']
-	= 'Unknown';
-$lang['Under calculating']
-	= 'Under calculating';
+$lang['unknown']
+	= 'unknown';
+$lang['under calculating']
+	= 'under calculating';
 $lang['Control your printing']
 	= 'Control your printing';
 $lang['Printing details']
@@ -16,8 +16,8 @@ $lang['Printing details']
 //printdetail status_ajax()
 $lang['Percentage: %d%%']
 	= 'Percentage: %d%%';
-$lang['Stop']
-	= 'Stop';
+$lang['Cancel']
+	= 'Cancel';
 $lang['Temperature of the left extruder: %d °C']
 	= 'Temperature of the left extruder: %d °C';
 $lang['Temperature of the right extruder: %d °C']

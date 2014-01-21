@@ -157,7 +157,7 @@ class Printmodel extends MY_Controller {
 		
 		// get a more legible time of estimation
 		$time_estimation = TimeDisplay__convertsecond(
-				$model_data[PRINTLIST_TITLE_TIME], t('Time estimation: '), t('Unknown'));
+				$model_data[PRINTLIST_TITLE_TIME], t('Time estimation: '), t('unknown'));
 		
 		// show detail page if valid, parse the body of page
 		$template_data = array(
@@ -173,7 +173,7 @@ class Printmodel extends MY_Controller {
 				'state_f_l'			=> $check_left_filament,
 				'state_f_r'			=> $check_right_filament,
 				'model_id'			=> $mid,
-				'title_current' 	=> t('Filament loaded'),
+				'title_current' 	=> t('Filament'),
 				'change_filament_l'	=> $change_left_filament,
 				'change_filament_r'	=> $change_right_filament,
 				'print_model'		=> t('Print'),

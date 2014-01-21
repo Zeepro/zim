@@ -14,14 +14,14 @@ $lang['ZeePro Personal Printer 21 - Printing details']
 	= 'Zim - 打印模型详情';
 $lang['Time estimation: ']
 	= '估计时间：';
-$lang['Unknown']
+$lang['unknown']
 	= '未知';
 $lang['ok']
 	= 'ok';
 $lang['not enough']
 	= '不足';
-$lang['Filament loaded']
-	= '已装载的打印丝';
+$lang['Filament']
+	= '打印丝';
 $lang['Change']
 	= '更换';
 $lang['Print']

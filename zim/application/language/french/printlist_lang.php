@@ -13,15 +13,15 @@ $lang['Select a model']
 $lang['ZeePro Personal Printer 21 - Printing details']
 	= 'Zim - Détails de l\'impression';
 $lang['Time estimation: ']
-	= 'Temps estimé: ';
-$lang['Unknown']
-	= 'Inconnu';
+	= 'Temps estimé : ';
+$lang['unknown']
+	= 'inconnu';
 $lang['ok']
 	= 'ok';
 $lang['not enough']
 	= 'insuffisant';
-$lang['Filament loaded']
-	= 'Filament chargé';
+$lang['Filament']
+	= 'Filament';
 $lang['Change']
 	= 'Changer';
 $lang['Print']
