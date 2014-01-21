@@ -16,6 +16,7 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 // 	define('CORESTATUS_TITLE_URL_REDIRECT',	'CallBackURL');
 // 	define('CORESTATUS_TITLE_URL_REDIRECT',	'RedirectURL');
 	define('CORESTATUS_TITLE_MESSAGE',		'Message');
+	define('CORESTATUS_TITLE_STARTTIME',	'StartDate');
 	
 	define('CORESTATUS_VALUE_IDLE',		'idle');
 	define('CORESTATUS_VALUE_PRINT',	'printing');
@@ -143,7 +144,9 @@ function CoreStatus_setInIdle() {
 		}
 	}
 	
-	return CoreStatus__setInStatus(CORESTATUS_VALUE_IDLE);
+	return CoreStatus__setInStatus(CORESTATUS_VALUE_IDLE,
+			array(CORESTATUS_TITLE_STARTTIME => NULL)
+	);
 }
 
 function CoreStatus_setInPrinting() {
@@ -159,7 +162,41 @@ function CoreStatus_setInPrinting() {
 		return FALSE;
 	}
 	
-	return CoreStatus__setInStatus(CORESTATUS_VALUE_PRINT);
+	return CoreStatus__setInStatus(CORESTATUS_VALUE_PRINT,
+			array(CORESTATUS_TITLE_STARTTIME => time())
+	);
+}
+
+function CoreStatus_getStartPrintTime(&$time_start) {
+	global $CFG;
+	$state_file = $CFG->config['conf'] . CORESTATUS_FILENAME_WORK;
+	$tmp_array = array();
+	$data_json = array();
+	$time_start = NULL;
+	
+	$CI = &get_instance();
+	$CI->load->helper('json');
+	
+	// read json file
+	try {
+		$tmp_array = json_read($state_file);
+		if ($tmp_array['error']) {
+			throw new Exception('read json error');
+		}
+	} catch (Exception $e) {
+		return FALSE;
+	}
+	$data_json = $tmp_array['json'];
+	
+	// check status
+	if ($data_json[CORESTATUS_TITLE_STATUS] == CORESTATUS_VALUE_PRINT) {
+		if (!isset($data_json[CORESTATUS_TITLE_STARTTIME])) {
+			return FALSE;
+		}
+		$time_start = $data_json[CORESTATUS_TITLE_STARTTIME];
+	}
+	
+	return TRUE;
 }
 
 // internal function
@@ -231,7 +268,7 @@ function CoreStatus__setInStatus($value_status, $data_array = array()) {
 			throw new Exception('read json error');
 		}
 	} catch (Exception $e) {
-		return FALSE; //TODO generate a way to return internal error
+		return FALSE;
 	}
 	$data_json = $tmp_array['json'];
 	

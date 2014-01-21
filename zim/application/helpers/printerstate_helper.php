@@ -64,6 +64,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_OFFSET_TEMPER',			100);
 	define('PRINTERSTATE_OFFSET_YEAR_SETUP_DATE',	2014);
 	define('PRINTERSTATE_VALUE_DEFAULT_COLOR',		'transparent');
+	define('PRINTERSTATE_VALUE_OFFSET_TO_CAL_TIME',	10);
 	
 	define('PRINTERSTATE_PRM_EXTRUDER',				'extruder');
 	define('PRINTERSTATE_PRM_TEMPER',				'temp');
@@ -492,6 +493,7 @@ function PrinterState__checkStatusAsArray() {
 	$output = array();
 	$ret_val = 0;
 	$data_json = array();
+	$time_start = NULL;
 	
 	// if we need duration, the function that get duration by id is necessary
 	// and we must stock print list id somewhere in json file
@@ -508,6 +510,17 @@ function PrinterState__checkStatusAsArray() {
 		$data_json[PRINTERSTATE_TITLE_STATUS] = PRINTERSTATE_VALUE_IN_PRINT;
 		$data_json[PRINTERSTATE_TITLE_PERCENT] = $output[0];
 		// we can calculate duration by mid(to get total duration) and percentage
+	}
+	
+	// try to calculate time remained when percentage is passed offset
+	$ret_val = CoreStatus_getStartPrintTime($time_start);
+	if ($ret_val == ERROR_NORMAL_RC_OK || $time_start) {
+		if ($data_json[PRINTERSTATE_TITLE_PERCENT] >= PRINTERSTATE_VALUE_OFFSET_TO_CAL_TIME) {
+			$percentage_finish = $data_json[PRINTERSTATE_TITLE_PERCENT];
+			$time_pass = time() - $time_start;
+			
+			$data_json[PRINTERSTATE_TITLE_DURATION] = (int)($time_pass / $percentage_finish * (100 - $percentage_finish));
+		}
 	}
 	
 	return $data_json;	

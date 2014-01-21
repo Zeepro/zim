@@ -83,7 +83,7 @@ class Printdetail extends MY_Controller {
 		$ret_val = 0;
 		$data_status = array();
 		
-		$this->load->helper('printer');
+		$this->load->helper(array('printer', 'timedisplay'));
 		$this->load->library('parser');
 		$this->lang->load('printdetail', $this->config->item('language'));
 		$this->lang->load('timedisplay', $this->config->item('language'));
