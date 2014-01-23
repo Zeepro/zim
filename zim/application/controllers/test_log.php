@@ -7,6 +7,9 @@ class Test_log extends CI_Controller {
 
 	public function index() {
 		global $CFG;
+
+// 		$this->output->set_content_type('text/plain; charset=UTF-8');
+		header('Content-type: text/plain; charset=UTF-8');
 		echo 'Log level: ' . $CFG->config['log_level'] . "\n";
 		if (file_exists($CFG->config['log_file'])) {
 			$array_log = file($CFG->config['log_file']);
@@ -17,7 +20,6 @@ class Test_log extends CI_Controller {
 		else {
 			echo "no log file\n";
 		}
-		$this->output->set_content_type('text/plain; charset=UTF-8');
 		
 		return;
 	}

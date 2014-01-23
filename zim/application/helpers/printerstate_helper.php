@@ -83,15 +83,18 @@ function PrinterState_getExtruder(&$abb_extruder) {
 	$ret_val = 0;
 	
 	$abb_extruder = NULL;
+	PrinterLog_logMessage('PrinterState_getExtruder()');
 	
 	// check if we are in printing
 	$ret_val = PrinterState_checkInPrint();
 	if ($ret_val == FALSE) {
 		$command = $arcontrol_fullpath . PRINTERSTATE_GET_EXTRUD;
+		PrinterLog_logDebug('command => ' . $command);
 // 		$last_output = system($command, $ret_val);
 		exec($command, $output, $ret_val);
 		if ($ret_val == ERROR_NORMAL_RC_OK) {
 			$last_output = $output[0];
+			PrinterLog_logDebug('output => ' . $last_output);
 			switch ($last_output) {
 				case PRINTERSTATE_LEFT_EXTRUD:
 					$abb_extruder = 'l';
@@ -103,12 +106,15 @@ function PrinterState_getExtruder(&$abb_extruder) {
 					
 				default:
 					return ERROR_INTERNAL;
+					break;
 			}
 		} else {
+			PrinterLog_logError('get extruder command error');
 			return ERROR_INTERNAL;
 		}
 	} else {
 // 		return ERROR_IN_PRINT;
+		PrinterLog_logError('can not get extruder in printing');
 		return ERROR_BUSY_PRINTER;
 	}
 	
@@ -122,6 +128,7 @@ function PrinterState_setExtruder($abb_extruder = 'r') {
 	$command = '';
 	$ret_val = 0;
 	
+	PrinterLog_logMessage('PrinterState_setExtruder()');
 	switch ($abb_extruder) {
 		case 'l':
 			$command = $arcontrol_fullpath . PRINTERSTATE_SET_EXTRUDL;
@@ -132,19 +139,24 @@ function PrinterState_setExtruder($abb_extruder = 'r') {
 			break;
 			
 		default:
+			PrinterLog_logError('set extruder type error');
 			return ERROR_WRONG_PRM;
 			break;
 	}
+	PrinterLog_logDebug('$abb_extruder: ' . $abb_extruder);
 	
 	// check if we are in printing
 	$ret_val = PrinterState_checkInPrint();
 	if ($ret_val == FALSE) {
+		PrinterLog_logDebug('command => ' . $command);
 		exec($command, $output, $ret_val);
 		if ($ret_val != ERROR_NORMAL_RC_OK) {
+			PrinterLog_logError('set extruder command error');
 			return ERROR_INTERNAL;
 		}
 	} else {
 // 		return ERROR_IN_PRINT;
+		PrinterLog_logError('can not set extruder in printing');
 		return ERROR_BUSY_PRINTER;
 	}
 	
@@ -160,9 +172,11 @@ function PrinterState_getTemperature(&$val_temperature, $type = 'e') {
 	$ret_val = 0;
 	$abb_extruder = '';
 	
+	PrinterLog_logMessage('PrinterState_getTemperature()');
 	switch ($type) {
 		case 'e':
 			// get current extruder
+			PrinterLog_logDebug('temper type: e');
 			$ret_val = PrinterState_getExtruder($abb_extruder);
 			if ($ret_val != ERROR_OK) {
 				return $ret_val;
@@ -174,26 +188,32 @@ function PrinterState_getTemperature(&$val_temperature, $type = 'e') {
 				$command = $arcontrol_fullpath . PRINTERSTATE_GET_TEMPEREXT_R;
 			}
 			else {
+				PrinterLog_logError('extruder type error');
 				return ERROR_INTERNAL;
 			}
 			break;
 			
 		case 'h':
+			PrinterLog_logDebug('temper type: h');
 			//TODO finish this case in future when functions of platform are finished
 			$command = 'echo -1'; // let default temperature of platform to be 20 CD
 			break;
 			
 		default:
+			PrinterLog_logError('temper type error');
 			return ERROR_WRONG_PRM;
 			break;
 	}
 	
+	PrinterLog_logDebug('command => ' . $command);
 	exec($command, $output, $ret_val);
 	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		PrinterLog_logError('get temper command error');
 		return ERROR_INTERNAL;
 	}
 	else {
 		$last_output = $output[0];
+		PrinterLog_logDebug('output => ' . $last_output);
 		$val_temperature = (int)$last_output;
 	}
 	
@@ -207,13 +227,16 @@ function PrinterState_setTemperature($val_temperature, $type = 'e') {
 	$command = '';
 	$ret_val = 0;
 	
+	PrinterLog_logMessage('PrinterState_setTemperature()');
 	if ($type == 'e' && $val_temperature >= PRINTERSTATE_TEMPER_MIN_E && $val_temperature <= PRINTERSTATE_TEMPER_MAX_E) {
 		$command = $arcontrol_fullpath . PRINTERSTATE_SET_TEMPEREXT . $val_temperature;
 	} elseif ($type == 'h' && $val_temperature >= PRINTERSTATE_TEMPER_MIN_H && $val_temperature <= PRINTERSTATE_TEMPER_MAX_H) {
 		$command = 'echo ok';
 	} else {
+		PrinterLog_logError('input parameter error');
 		return ERROR_WRONG_PRM;
 	}
+	PrinterLog_logDebug('command => ' . $command);
 	
 	// check if we are in printing
 	$ret_val = PrinterState_checkInPrint();
@@ -225,6 +248,7 @@ function PrinterState_setTemperature($val_temperature, $type = 'e') {
 		pclose(popen($command, 'r')); // only for windows arcontrol client
 	} else {
 // 		return ERROR_IN_PRINT;
+		PrinterLog_logError('can not set temperature in printing');
 		return ERROR_BUSY_PRINTER;
 	}
 	
@@ -235,6 +259,7 @@ function PrinterState_getCartridge(&$json_cartridge, $abb_cartridge = 'r') { //T
 	$array_data = array();
 	$cr = 0;
 	
+	PrinterLog_logMessage('PrinterState_getCartridge()');
 	$cr = PrinterState_getCartridgeAsArray($array_data, $abb_cartridge);
 	if ($cr == ERROR_OK) {
 		$json_cartridge = json_encode($array_data);
@@ -247,12 +272,14 @@ function PrinterState_getCartridge(&$json_cartridge, $abb_cartridge = 'r') { //T
 }
 
 function PrinterState_checkStatus() {
+	PrinterLog_logMessage('PrinterState_checkStatus()');
 	$data_json = PrinterState_checkStatusAsArray();
 	
 	return json_encode($data_json);
 }
 
 function PrinterState_getInfo() {
+	PrinterLog_logMessage('PrinterState_getInfo()');
 	$data_json = PrinterState__getInfoAsArray();
 	
 	return json_encode($data_json);
@@ -264,20 +291,24 @@ function PrinterState_getExtruderTemperaturesAsArray() {
 	$command = '';
 	$ret_val = 0;
 	$data_array = array();
-
+	
+	PrinterLog_logMessage('PrinterState_getExtruderTemperaturesAsArray()');
 	foreach (array(
 			PRINTERSTATE_GET_TEMPEREXT_L => PRINTERSTATE_LEFT_EXTRUD,
 			PRINTERSTATE_GET_TEMPEREXT_R => PRINTERSTATE_RIGHT_EXTRUD,
 	) as $parameter_cmd => $data_key ) {
 		$output = array();
-
+		
 		$command = $arcontrol_fullpath . $parameter_cmd;
+		PrinterLog_logDebug('command => ' . $command);
 		exec($command, $output, $ret_val);
 		if ($ret_val != ERROR_NORMAL_RC_OK) {
+			PrinterLog_logError('get extruder temper (special) command error');
 			return ERROR_INTERNAL;
 		}
 		else {
 			$last_output = $output[0];
+			PrinterLog_logDebug('output => ' . $last_output);
 			$data_array[$data_key] = (int)$last_output;
 		}
 	}
@@ -467,6 +498,7 @@ function PrinterState_checkFilament($left_filament = 0, $right_filament = 0) {
 	$has_filament = 0;
 	$data_json = array();
 	
+	PrinterLog_logMessage('PrinterState_checkFilament()');
 	foreach(array('l', 'r') as $abb_cartridge) {
 		$ret_val = PrinterState_getCartridgeAsArray($data_json, $abb_cartridge);
 		if ($ret_val == ERROR_OK) {
@@ -481,6 +513,8 @@ function PrinterState_checkFilament($left_filament = 0, $right_filament = 0) {
 			$need_filament = ($abb_cartridge == 'r') ? $right_filament : $left_filament;
 			$has_filament = $data_json[PRINTERSTATE_TITLE_INITIAL] - $data_json[PRINTERSTATE_TITLE_USED];
 			if ($need_filament < $has_filament) {
+				PrinterLog_logError('low filament error');
+				PrinterLog_logDebug("\$need_filament: $need_filament, \$has_filament: $has_filament");
 				$cr = ($abb_cartridge == 'r') ? ERROR_LOW_RIGT_FILA : ERROR_LOW_LEFT_FILA;
 				return $cr;
 			}
@@ -496,6 +530,7 @@ function PrinterState_checkFilament($left_filament = 0, $right_filament = 0) {
 function PrinterState_getPrintCommand() {
 	global $CFG;
 	$command = $CFG->config['arcontrol'] . PRINTERSTATE_PRINT_FILE;
+	PrinterLog_logDebug('command => ' . $command . ' ...'); //TODO need to import to printer_helper
 	
 	return $command;
 }
@@ -546,6 +581,8 @@ function PrinterState_changeFilament($left_filament = 0, $right_filament = 0) {
 	//TODO we need this function to reduce the quantity of filament (add used value)
 	// so we also need a function to change the cartridge info
 	// in the other hand, when we stop a printing task, how can we get the quantity that was used
+	PrinterLog_logMessage('PrinterState_changeFilament()');
+	
 	return ERROR_OK;
 }
 
@@ -558,6 +595,7 @@ function PrinterState_getFilamentStatus($abb_filament) {
 	$output = array();
 	$last_output = '';
 	
+	PrinterLog_logMessage('PrinterState_getFilamentStatus()');
 	switch ($abb_filament) {
 		case 'l':
 			$command = $arcontrol_fullpath . PRINTERSTATE_GET_FILAMENT_L;
@@ -568,23 +606,29 @@ function PrinterState_getFilamentStatus($abb_filament) {
 			break;
 			
 		default:
-			return FALSE; //TODO generate a way to indicate internal error
+			PrinterLog_logError('input filament type error');
+			return FALSE;
 			break; // never reach here
 	}
+	PrinterLog_logDebug('command => ' . $command);
 	
 	exec($command, $output, $ret_val);
 	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		PrinterLog_logError('get filament status command error');
 		return FALSE;
 	}
 	else {
 		$last_output = $output[0];
 		if ($last_output == 'ok') {
+			PrinterLog_logDebug('have filament');
 			return TRUE;
 		}
 		else if ($last_output == 'no filament') {
+			PrinterLog_logDebug('no filament');
 			return FALSE;
 		}
 		else {
+			PrinterLog_logDebug('api error');
 			return FALSE;
 		}
 	}
@@ -594,6 +638,7 @@ function PrinterState_getFilamentStatus($abb_filament) {
 function PrinterState__getInfoAsArray() {
 	$json_info = array();
 	
+	PrinterLog_logMessage('PrinterState__getInfoAsArray()');
 	//TODO make me depend on config file
 	$json_info = array(
 			PRINTERSTATE_TITLE_VERSION		=> 1,
