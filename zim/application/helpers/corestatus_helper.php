@@ -280,8 +280,13 @@ function CoreStatus__setInStatus($value_status, $data_array = array()) {
 	
 	// write json file
 	$fp = fopen($CFG->config['conf'] . CORESTATUS_FILENAME_WORK, 'w');
-	fwrite($fp, json_encode($data_json));
-	fclose($fp);
+	if ($fp) {
+		fwrite($fp, json_encode($data_json));
+		fclose($fp);
+	}
+	else {
+		return FALSE;
+	}
 	
 	return TRUE;
 }

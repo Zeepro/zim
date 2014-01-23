@@ -48,7 +48,7 @@ class Rest extends MY_Controller {
 			switch ($status_current) {
 				case CORESTATUS_VALUE_PRINT:
 					$this->load->helper('printerstate');
-					$ret_val = PrinterState__checkInPrint();
+					$ret_val = PrinterState_checkInPrint();
 					if ($ret_val == FALSE) {
 						$ret_val = CoreStatus_setInIdle();
 						if ($ret_val == TRUE) {

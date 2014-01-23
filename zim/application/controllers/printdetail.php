@@ -161,48 +161,4 @@ class Printdetail extends MY_Controller {
 		
 		return;
 	}
-	
-// 	public function status_ajax() {
-// 		$template_data = array();
-// 		$data_status = array();
-// 		$temper_status = array();
-		
-// 		$this->load->helper('printerstate');
-// 		$this->load->library('parser');
-// 		$this->lang->load('printdetail', $this->config->item('language'));
-// 		$this->lang->load('timedisplay', $this->config->item('language'));
-		
-// 		// check status, if we are not in printing, send users to menu home
-// 		$data_status = PrinterState__checkStatusAsArray();
-// 		if ($data_status[PRINTERSTATE_TITLE_STATUS] != PRINTERSTATE_VALUE_IN_PRINT) {
-// 			$this->output->set_status_header(404);
-// 			return;
-// 		}
-		
-// 		// get temperatures of extruders
-// 		$temper_status = PrinterState_getExtruderTemperaturesAsArray();
-// 		if (!is_array($temper_status)) {
-// 			//TODO treat the internal error when getting temperatures of extruders
-// 		}
-		
-// 		// get time remaining
-// 		if (isset($data_status[PRINTERSTATE_TITLE_DURATION])) {
-// 			$time_remain = TimeDisplay__convertsecond(
-// 					$data_status[PRINTERSTATE_TITLE_DURATION], t('Time remaining: '), t('Under calculating'));
-// 		}
-// 		else {
-// 			$time_remain = t('Time remaining: ') . t('Unknown');
-// 		}
-		
-// 		// parse the ajax part
-// 		$template_data = array(
-// 				'print_percent'	=> t('Percentage: %d%%', array($data_status[PRINTERSTATE_TITLE_PERCENT])),
-// 				'print_remain'	=> $time_remain,
-// 				'print_temperL'	=> t('Temperature of left extruder: %d °C', array($temper_status[PRINTERSTATE_LEFT_EXTRUD])),
-// 				'print_temperR'	=> t('Temperature of right extruder: %d °C', array($temper_status[PRINTERSTATE_RIGHT_EXTRUD])),
-// 		);
-		
-// 		$this->parser->parse('template/printdetail/status_ajax_print', $template_data);
-// 		$this->output->set_content_type('text/plain; charset=UTF-8');
-// 	}
 }

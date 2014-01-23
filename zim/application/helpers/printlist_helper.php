@@ -87,7 +87,7 @@ function ModelList_add($data_array) {
 			$model_names = $tmp_array;
 			foreach ($tmp_array as $lang => $name_lang) {
 				if (is_null($model_name)) {
-					$model_name = $name_lang;
+					$model_name = ModelList__codeModelName($name_lang);
 				}
 				if (strlen($name_lang) > 50 || strlen($name_lang) == 0) {
 					return ERROR_WRONG_PRM;
@@ -225,7 +225,7 @@ function ModelList_add($data_array) {
 	//==========================================================
 	//model name, description, duration, filament1+2
 	$json_data = array(
-			PRINTLIST_TITLE_ID			=> md5(utf8_decode($model_name)),
+			PRINTLIST_TITLE_ID			=> ModelList__codeModelHash($model_name),
 			PRINTLIST_TITLE_NAME		=> $model_names,
 			PRINTLIST_TITLE_DESP		=> $model_desps,
 			PRINTLIST_TITLE_TIME		=> $model_printtime,
@@ -237,7 +237,7 @@ function ModelList_add($data_array) {
 			PRINTLIST_TITLE_PIC			=> array(),
 	);
 	$model_path = $printlist_basepath . $model_name . '/';
-	$model_path = utf8_decode($model_path); //decode path for accent and special character
+// 	$model_path = utf8_decode($model_path); //decode path for accent and special character
 	//always create a new folder to overwrite the old one
 	if (file_exists($model_path)) {
 		delete_files($model_path, TRUE); //there are no folders inside normally, but we delete all
@@ -264,9 +264,14 @@ function ModelList_add($data_array) {
 	//write model json info
 	try {
 		$fp = fopen($model_path . PRINTLIST_FILE_JSON, 'w');
-		fwrite($fp, json_unicode_decode(json_encode($json_data)));
-// 		fwrite($fp, json_encode($json_data));
-		fclose($fp);
+		if ($fp) {
+			fwrite($fp, json_encode_unicode($json_data));
+// 			fwrite($fp, json_encode($json_data));
+			fclose($fp);
+		}
+		else {
+			return ERROR_INTERNAL;
+		}
 	} catch (Exception $e) {
 		return ERROR_INTERNAL;
 	}
@@ -288,7 +293,7 @@ function ModelList_delete($id_model) {
 function ModelList_list() {
 	$array_data = ModelList__listAsArray();
 	
-	return json_unicode_decode(json_encode($array_data));
+	return json_encode_unicode($array_data);
 }
 
 function ModelList_getPic($id_model, $id_picture, &$path_pid) {
@@ -341,23 +346,31 @@ function ModelList__find($id_model_find, &$model_path) {
 	$printlist_basepath	= $CFG->config['printlist'];
 	$model_path = NULL;
 	
+	$CI = &get_instance();
+	$CI->load->helper(array (
+			'printerlog',
+	));
+	
 	if (strlen($id_model_find) != 32) { //default length of md5
 		return ERROR_UNKNOWN_MODEL;
 	}
+	PrinterLog_logDebug('id to find: ' . $id_model_find);
 
 	$model_array = directory_map($printlist_basepath, 1);
 	foreach ($model_array as $model_name) {
 		if (!is_dir($printlist_basepath . $model_name)) { //check whether it is a folder or not
 			continue;
 		}
-		$id_model_cal = md5($model_name);
+		$id_model_cal = ModelList__codeModelHash($model_name);
+		PrinterLog_logDebug('model name: ' . $model_name . ', model id: ' . $id_model_cal);
 		if ($id_model_cal == $id_model_find) {
 			$model_path = $printlist_basepath . $model_name . '/';
-			break; //leave directly the loop when finding the correct folder
+			return ERROR_OK; //leave directly the loop when finding the correct folder
+			break; // never reach here
 		}
 	}
 	
-	return ERROR_OK;
+	return ERROR_UNKNOWN_MODEL;
 }
 
 function ModelList__listAsArray($set_localization = FALSE) {
@@ -380,19 +393,10 @@ function ModelList__listAsArray($set_localization = FALSE) {
 			continue; // just jump through the wrong data file
 // 			return json_encode($json_data); //TODO how about return ERROR_INTERNAL here?
 		}
-// 		$tmp_array['json'][PRINTLIST_TITLE_ID] = md5($model_name); //add model id to data array
+// 		$tmp_array['json'][PRINTLIST_TITLE_ID] = ModelList__codeModelHash($model_name); //add model id to data array
 		
 		//blind picture url
 		ModelList__blindUrl($tmp_array['json']);
-// 		if (isset($tmp_array['json'][PRINTLIST_TITLE_PIC])
-// 				&& count($tmp_array['json'][PRINTLIST_TITLE_PIC])) {
-// 			$nb_pic = count($tmp_array['json'][PRINTLIST_TITLE_PIC]);
-// 			for ($i=0; $i < $nb_pic; $i++) { //we cannot use foreach to change value
-// 				$tmp_array['json'][PRINTLIST_TITLE_PIC][$i] = PRINTLIST_GETPIC_BASE_WEB
-// 					. '?' . PRINTLIST_GETPIC_PRM_MID . '=' . md5($model_name)
-// 					. '&' . PRINTLIST_GETPIC_PRM_PIC . '=' . ($i + 1);
-// 			}
-// 		}
 		if ($set_localization) {
 			ModelList__setLocalization($tmp_array['json']);
 		}
@@ -475,6 +479,30 @@ function ModelList__getDuration($id_model, &$duration) {
 	}
 	
 	return;
+}
+
+function ModelList__codeModelName($raw_name) {
+	$CI = &get_instance();
+	$CI->load->helper(array('detectos'));
+	
+	if (DectectOS_checkWindows()) {
+		return utf8_decode($raw_name);
+	}
+	else {
+		return $raw_name;
+	}
+}
+
+function ModelList__codeModelHash($raw_name) {
+	$CI = &get_instance();
+	$CI->load->helper(array('detectos'));
+	
+	if (DectectOS_checkWindows()) {
+		return md5(utf8_encode($raw_name));
+	}
+	else {
+		return md5($raw_name);
+	}
 }
 
 function ModelList__changeColorName(&$color_code) {

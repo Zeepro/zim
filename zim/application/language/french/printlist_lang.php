@@ -34,5 +34,7 @@ $lang['Load']
 	= 'Charger';
 $lang['Description']
 	= 'Description';
+$lang['error']
+	= 'erreur';
 
 ?>

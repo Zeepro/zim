@@ -34,5 +34,7 @@ $lang['Load']
 	= '装载';
 $lang['Description']
 	= '简介';
+$lang['error']
+	= '错误';
 
 ?>

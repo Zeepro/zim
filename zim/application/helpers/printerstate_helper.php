@@ -7,6 +7,7 @@ if (!defined('BASEPATH'))
 $CI = &get_instance();
 $CI->load->helper(array (
 		'errorcode',
+		'printerlog', // test
 ));
 
 if (!defined('PRINTERSTATE_CHECK_STATE')) {
@@ -26,6 +27,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_UNIN_FILAMENT_L',	' M1607');
 	define('PRINTERSTATE_GET_FILAMENT_R',	' M1608');
 	define('PRINTERSTATE_GET_FILAMENT_L',	' M1609');
+	define('PRINTERSTATE_PRINT_FILE',		' -f '); // add space in the last
 
 	define('PRINTERSTATE_RIGHT_EXTRUD',	0);
 	define('PRINTERSTATE_LEFT_EXTRUD',	1);
@@ -83,7 +85,7 @@ function PrinterState_getExtruder(&$abb_extruder) {
 	$abb_extruder = NULL;
 	
 	// check if we are in printing
-	$ret_val = PrinterState__checkInPrint();
+	$ret_val = PrinterState_checkInPrint();
 	if ($ret_val == FALSE) {
 		$command = $arcontrol_fullpath . PRINTERSTATE_GET_EXTRUD;
 // 		$last_output = system($command, $ret_val);
@@ -135,7 +137,7 @@ function PrinterState_setExtruder($abb_extruder = 'r') {
 	}
 	
 	// check if we are in printing
-	$ret_val = PrinterState__checkInPrint();
+	$ret_val = PrinterState_checkInPrint();
 	if ($ret_val == FALSE) {
 		exec($command, $output, $ret_val);
 		if ($ret_val != ERROR_NORMAL_RC_OK) {
@@ -214,7 +216,7 @@ function PrinterState_setTemperature($val_temperature, $type = 'e') {
 	}
 	
 	// check if we are in printing
-	$ret_val = PrinterState__checkInPrint();
+	$ret_val = PrinterState_checkInPrint();
 	if ($ret_val == FALSE) {
 // 		exec($command, $output, $ret_val);
 // 		if ($ret_val != ERROR_NORMAL_RC_OK) {
@@ -233,7 +235,7 @@ function PrinterState_getCartridge(&$json_cartridge, $abb_cartridge = 'r') { //T
 	$array_data = array();
 	$cr = 0;
 	
-	$cr = PrinterState__getCartridgeAsArray($array_data, $abb_cartridge);
+	$cr = PrinterState_getCartridgeAsArray($array_data, $abb_cartridge);
 	if ($cr == ERROR_OK) {
 		$json_cartridge = json_encode($array_data);
 	}
@@ -245,7 +247,7 @@ function PrinterState_getCartridge(&$json_cartridge, $abb_cartridge = 'r') { //T
 }
 
 function PrinterState_checkStatus() {
-	$data_json = PrinterState__checkStatusAsArray();
+	$data_json = PrinterState_checkStatusAsArray();
 	
 	return json_encode($data_json);
 }
@@ -283,39 +285,31 @@ function PrinterState_getExtruderTemperaturesAsArray() {
 	return $data_array;
 }
 
-//internal function
-function PrinterState__checkInPrint() {
+function PrinterState_checkInPrint() {
 	global $CFG;
 	$arcontrol_fullpath = $CFG->config['arcontrol'];
 	$command = '';
 	$output = array();
 	$ret_val = 0;
 
+	PrinterLog_logMessage('PrinterState_checkInPrint()');
 	$command = $arcontrol_fullpath . PRINTERSTATE_CHECK_STATE;
+	PrinterLog_logDebug('Command => ' . $command);
 	exec($command, $output, $ret_val);
+	PrinterLog_logDebug('Return => ' . $ret_val);
 	if ($ret_val == ERROR_NORMAL_RC_OK && count($output) == 0) {
+		PrinterLog_logMessage('not in printing');
 		return FALSE;
 	} else {
+		PrinterLog_logMessage('in printing');
+		PrinterLog_logDebug('Output => ' . $output[0]);
 		return TRUE;
 	}
-	
+
+	return FALSE;
 }
 
-function PrinterState__getInfoAsArray() {
-	$json_info = array();
-	
-	//TODO make me depend on config file
-	$json_info = array(
-			PRINTERSTATE_TITLE_VERSION		=> 1,
-			PRINTERSTATE_TITLE_TYPE			=> 'zim',
-			PRINTERSTATE_TITLE_SERIAL		=> 1,
-			PRINTERSTATE_TITLE_NB_EXTRUD	=> 2,
-	);
-	
-	return $json_info;
-}
-
-function PrinterState__getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
+function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 	global $CFG;
 	$arcontrol_fullpath = $CFG->config['arcontrol'];
 	$command = '';
@@ -330,6 +324,7 @@ function PrinterState__getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 	$hex_checksum = 0;
 	$hex_cal = 0;
 	
+	PrinterLog_logMessage('PrinterState_getCartridgeAsArray()');
 	switch ($abb_cartridge) {
 		case 'l':
 			$command = $arcontrol_fullpath . PRINTERSTATE_GET_CARTRIDGEL;
@@ -340,22 +335,28 @@ function PrinterState__getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 			break;
 			
 		default:
+			PrinterLog_logError('input parameter error, $abb_cartridge: "' . $abb_cartridge . '"');
 			return ERROR_WRONG_PRM;
 			break;
 	}
+	PrinterLog_logDebug('input parameter $abb_cartridge: "' . $abb_cartridge . '"');
 	
 	// check if we are in printing
-	$ret_val = PrinterState__checkInPrint();
+	$ret_val = PrinterState_checkInPrint();
 	if ($ret_val == FALSE) {
+		PrinterLog_logDebug('Command => ' . $command);
 		exec($command, $output, $ret_val);
+		PrinterLog_logDebug('Return => ' . $ret_val);
 		if ($ret_val != ERROR_NORMAL_RC_OK) {
 			return ERROR_INTERNAL;
 		}
 		else {
 			$last_output = $output ? $output[0] : NULL;
+			PrinterLog_logDebug('Output => ' . $last_output);
 		}
 	} else {
 // 		return ERROR_IN_PRINT;
+		PrinterLog_logMessage('can not get info in printing');
 		return ERROR_BUSY_PRINTER;
 	}
 	
@@ -368,7 +369,9 @@ function PrinterState__getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 			$hex_cal = $hex_cal ^ $hex_tmp;
 		}
 		$hex_checksum = hexdec(substr($last_output, 30, 2));
-		if ($hex_cal == $hex_checksum) {
+		PrinterLog_logDebug('checksum, $hex_cal: ' . $hex_cal . ', $hex_data: ' . $hex_checksum);
+		if ($hex_cal != $hex_checksum) {
+			PrinterLog_logError('checksum error, $hex_cal: ' . $hex_cal . ', $hex_data: ' . $hex_checksum);
 			return ERROR_INTERNAL; // checksum failed
 		}
 		
@@ -451,7 +454,8 @@ function PrinterState__getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 	return ERROR_OK;
 }
 
-function PrinterState__checkFilament($left_filament = 0, $right_filament = 0) {
+//TODO perhaps we will change the input parameters
+function PrinterState_checkFilament($left_filament = 0, $right_filament = 0) {
 	$ret_val = 0;
 	$need_filament = 0;
 	$cr = 0;
@@ -459,7 +463,7 @@ function PrinterState__checkFilament($left_filament = 0, $right_filament = 0) {
 	$data_json = array();
 	
 	foreach(array('l', 'r') as $abb_cartridge) {
-		$ret_val = PrinterState__getCartridgeAsArray($data_json, $abb_cartridge);
+		$ret_val = PrinterState_getCartridgeAsArray($data_json, $abb_cartridge);
 		if ($ret_val == ERROR_OK) {
 			//TODO check if cartridge is missing
 			
@@ -479,14 +483,14 @@ function PrinterState__checkFilament($left_filament = 0, $right_filament = 0) {
 	return ERROR_OK;
 }
 
-function PrinterState__getPrintCommand() {
+function PrinterState_getPrintCommand() {
 	global $CFG;
-	$command = $CFG->config['arcontrol'] . ' -f ';
+	$command = $CFG->config['arcontrol'] . PRINTERSTATE_PRINT_FILE;
 	
 	return $command;
 }
 
-function PrinterState__checkStatusAsArray() {
+function PrinterState_checkStatusAsArray() {
 	global $CFG;
 	$arcontrol_fullpath = $CFG->config['arcontrol'];
 	$command = '';
@@ -523,14 +527,29 @@ function PrinterState__checkStatusAsArray() {
 		}
 	}
 	
-	return $data_json;	
+	return $data_json;
 }
 
-function PrinterState__changeFilament($left_filament = 0, $right_filament = 0) {
+function PrinterState_changeFilament($left_filament = 0, $right_filament = 0) {
 	//TODO we need this function to reduce the quantity of filament (add used value)
 	// so we also need a function to change the cartridge info
 	// in the other hand, when we stop a printing task, how can we get the quantity that was used
 	return ERROR_OK;
+}
+
+//internal function
+function PrinterState__getInfoAsArray() {
+	$json_info = array();
+	
+	//TODO make me depend on config file
+	$json_info = array(
+			PRINTERSTATE_TITLE_VERSION		=> 1,
+			PRINTERSTATE_TITLE_TYPE			=> 'zim',
+			PRINTERSTATE_TITLE_SERIAL		=> 1,
+			PRINTERSTATE_TITLE_NB_EXTRUD	=> 2,
+	);
+	
+	return $json_info;
 }
 
 function PrinterState__getFilamentStatus($abb_filament) {

@@ -234,7 +234,7 @@ class Connection extends MY_Controller {
 	}
     
 	public function wifip2p() {
-        global $CFG;
+		global $CFG;
 
         // To be managed by API...
         

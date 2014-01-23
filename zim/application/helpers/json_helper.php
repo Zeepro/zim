@@ -46,13 +46,20 @@ function json_read($source, $normal = FALSE) {
     }
 }
 
-function json_unicode_decode($str){
-	return preg_replace("/\\\u([0-9A-F]{4})/ie", "iconv('utf-16', 'utf-8', json__hex2str(\"$1\"))", $str);
-}
+// function json_unicode_decode($str){
+// 	return preg_replace("/\\\u([0-9A-F]{4})/ie", "iconv('utf-16', 'utf-8', json__hex2str(\"$1\"))", $str);
+// }
 
-function json__hex2str($hex) {
-	$r = '';
-	for ($i = 0; $i < strlen($hex) - 1; $i += 2)
-		$r .= chr(hexdec($hex[$i] . $hex[$i + 1]));
-	return $r;
+// function json__hex2str($hex) {
+// 	$r = '';
+// 	for ($i = 0; $i < strlen($hex) - 1; $i += 2)
+// 		$r .= chr(hexdec($hex[$i] . $hex[$i + 1]));
+// 	return $r;
+// }
+
+function json_encode_unicode($struct) {
+	if (defined('JSON_UNESCAPED_UNICODE')) { // for PHP 5.4+
+		return json_encode($struct, JSON_UNESCAPED_UNICODE);
+	}
+	return preg_replace("/\\\\u([a-f0-9]{4})/e", "iconv('UCS-4LE','UTF-8',pack('V', hexdec('U$1')))", json_encode($struct));
 }

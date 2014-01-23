@@ -49,14 +49,14 @@ function Printer_printFromFile($gcode_path) {
 	}
 
 	// check if in printing
-	$ret_val = PrinterState__checkInPrint();
+	$ret_val = PrinterState_checkInPrint();
 	if ($ret_val == TRUE) {
 // 		return ERROR_IN_PRINT;
 		return ERROR_BUSY_PRINTER;
 	}
 
 	// check if having enough filament
-	$ret_val = PrinterState__checkFilament();
+	$ret_val = PrinterState_checkFilament();
 	if ($ret_val != ERROR_OK) {
 		return $ret_val;
 	}
@@ -75,7 +75,7 @@ function Printer_printFromFile($gcode_path) {
 	}
 
 	// pass gcode to printer
-	$command = PrinterState__getPrintCommand() . $gcode_path;
+	$command = PrinterState_getPrintCommand() . $gcode_path;
 	// 		exec($command, $output, $ret_val);
 	// 		if ($ret_val != ERROR_NORMAL_RC_OK) {
 	// 			return ERROR_INTERNAL;
@@ -83,7 +83,7 @@ function Printer_printFromFile($gcode_path) {
 	pclose(popen($command, 'r')); // only for windows arcontrol client
 
 	//TODO reduce the quantity of filament here
-	$ret_val = PrinterState__changeFilament();
+	$ret_val = PrinterState_changeFilament();
 	if ($ret_val != ERROR_OK) {
 		return $ret_val;
 	}
@@ -114,6 +114,7 @@ function Printer_printFromFile($gcode_path) {
 // 	$CI = NULL;
 	
 // 	// get start temperature
+// 	// need update because of Printer__getStartTemperature
 // 	$ret_val = Printer__getStartTemperatureFromFile($gcode_path, $start_temper_l, $start_temper_r);
 // 	if ($ret_val != ERROR_OK) {
 // 		return $ret_val;
@@ -221,7 +222,7 @@ function Printer_checkPrint(&$return_data) {
 // 	}
 	
 	// check status if we are not in printing
-	$data_status = PrinterState__checkStatusAsArray();
+	$data_status = PrinterState_checkStatusAsArray();
 	if ($data_status[PRINTERSTATE_TITLE_STATUS] != PRINTERSTATE_VALUE_IN_PRINT) {
 		// delete printing status json file when we are not in printing
 // 		unlink($CFG->config ['conf'] . PRINTER_PRINTING_JSON);
@@ -274,29 +275,36 @@ function Printer_checkPrint(&$return_data) {
 // }
 
 // internal function
-// function Printer__getStartTemperatureFromModel($id_model, &$temper_l, &$temper_r) {
-// 	$gcode_path = NULL;
+function Printer__getStartTemperatureFromModel($id_model, &$array_temper) {
+	$gcode_path = NULL;
+	$ret_val = 0;
+	
+	$ret_val = Printer__getFileFromModel($id_model, $gcode_path);
+	if (($ret_val == ERROR_OK) && $gcode_path) {
+		$ret_val = Printer__getStartTemperatureFromFile($gcode_path, $temper_l, $temper_r);
+	}
+	
+	return $ret_val;
+}
+
+function Printer__getStartTemperatureFromFile($gcode_path, &$array_temper) {
+// 	$command = '';
+// 	$output = array();
 // 	$ret_val = 0;
 	
-// 	$ret_val = Printer__getFileFromModel($id_model, $gcode_path);
-// 	if (($ret_val == ERROR_OK) && $gcode_path) {
-// 		$ret_val = Printer__getStartTemperatureFromFile($gcode_path, $temper_l, $temper_r);
-// 	}
+	//TODO get the right start temperature here
+	$lines = file($gcode_path, FILE_SKIP_EMPTY_LINES);
+	if (count($lines) == 0) {
+		return ERROR_INTERNAL; // file not found
+	}
 	
-// 	return $ret_val;
-// }
-
-// function Printer__getStartTemperatureFromFile($gcode_path, &$temper_l, &$temper_r) {
-// // 	$command = '';
-// // 	$output = array();
-// // 	$ret_val = 0;
 	
-// 	//TODO get the right start temperature here
-// 	$temper_l = 200;
-// 	$temper_r = 210;
 	
-// 	return ERROR_OK;
-// }
+	$temper_l = 200;
+	$temper_r = 210;
+	
+	return ERROR_OK;
+}
 
 function Printer__getFileFromModel($id_model, &$gcode_path) {
 	$model_path = NULL;
