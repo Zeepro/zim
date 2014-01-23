@@ -346,15 +346,9 @@ function ModelList__find($id_model_find, &$model_path) {
 	$printlist_basepath	= $CFG->config['printlist'];
 	$model_path = NULL;
 	
-	$CI = &get_instance();
-	$CI->load->helper(array (
-			'printerlog',
-	));
-	
 	if (strlen($id_model_find) != 32) { //default length of md5
 		return ERROR_UNKNOWN_MODEL;
 	}
-	PrinterLog_logDebug('id to find: ' . $id_model_find);
 
 	$model_array = directory_map($printlist_basepath, 1);
 	foreach ($model_array as $model_name) {
@@ -362,7 +356,6 @@ function ModelList__find($id_model_find, &$model_path) {
 			continue;
 		}
 		$id_model_cal = ModelList__codeModelHash($model_name);
-		PrinterLog_logDebug('model name: ' . $model_name . ', model id: ' . $id_model_cal);
 		if ($id_model_cal == $id_model_find) {
 			$model_path = $printlist_basepath . $model_name . '/';
 			return ERROR_OK; //leave directly the loop when finding the correct folder
