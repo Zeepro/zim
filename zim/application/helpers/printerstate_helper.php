@@ -294,15 +294,15 @@ function PrinterState_checkInPrint() {
 
 	PrinterLog_logMessage('PrinterState_checkInPrint()');
 	$command = $arcontrol_fullpath . PRINTERSTATE_CHECK_STATE;
-	PrinterLog_logDebug('Command => ' . $command);
+	PrinterLog_logDebug('command => ' . $command);
 	exec($command, $output, $ret_val);
-	PrinterLog_logDebug('Return => ' . $ret_val);
+	PrinterLog_logDebug('return => ' . $ret_val);
 	if ($ret_val == ERROR_NORMAL_RC_OK && count($output) == 0) {
 		PrinterLog_logMessage('not in printing');
 		return FALSE;
 	} else {
 		PrinterLog_logMessage('in printing');
-		PrinterLog_logDebug('Output => ' . $output[0]);
+		PrinterLog_logDebug('output => ' . $output[0]);
 		return TRUE;
 	}
 
@@ -344,19 +344,19 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 	// check if we are in printing
 	$ret_val = PrinterState_checkInPrint();
 	if ($ret_val == FALSE) {
-		PrinterLog_logDebug('Command => ' . $command);
+		PrinterLog_logDebug('command => ' . $command);
 		exec($command, $output, $ret_val);
-		PrinterLog_logDebug('Return => ' . $ret_val);
+		PrinterLog_logDebug('return => ' . $ret_val);
 		if ($ret_val != ERROR_NORMAL_RC_OK) {
 			return ERROR_INTERNAL;
 		}
 		else {
 			$last_output = $output ? $output[0] : NULL;
-			PrinterLog_logDebug('Output => ' . $last_output);
+			PrinterLog_logDebug('output => ' . $last_output);
 		}
 	} else {
 // 		return ERROR_IN_PRINT;
-		PrinterLog_logMessage('can not get info in printing');
+		PrinterLog_logError('can not get info in printing');
 		return ERROR_BUSY_PRINTER;
 	}
 	
@@ -378,6 +378,7 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 		// magic number
 		$string_tmp = substr($last_output, 0, 4);
 		if (hexdec($string_tmp) != PRINTERSTATE_MAGIC_NUMBER) {
+			PrinterLog_logError('magic number error');
 			return ERROR_INTERNAL;
 		}
 		
@@ -394,6 +395,7 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 				break;
 				
 			default:
+				PrinterLog_logError('cartridge type error');
 				return ERROR_INTERNAL;
 		}
 		
@@ -410,6 +412,7 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 				break;
 				
 			default:
+				PrinterLog_logError('filament type error');
 				return ERROR_INTERNAL;
 		}
 		
@@ -441,7 +444,9 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 		$data_json[PRINTERSTATE_TITLE_SETUP_DATE] = date("Y-m-d\TH:i:s\Z", $time_pack);
 		
 		$json_cartridge = $data_json;
+		PrinterLog_logMessage('read catridge finished');
 	} else {
+		PrinterLog_logError('missing catridge');
 		$json_cartridge = array();
 		if ($abb_cartridge == 'l') {
 			return ERROR_MISS_LEFT_FILA;
@@ -465,7 +470,12 @@ function PrinterState_checkFilament($left_filament = 0, $right_filament = 0) {
 	foreach(array('l', 'r') as $abb_cartridge) {
 		$ret_val = PrinterState_getCartridgeAsArray($data_json, $abb_cartridge);
 		if ($ret_val == ERROR_OK) {
-			//TODO check if cartridge is missing
+			// check if filament is missing
+			$ret_val = PrinterState_getFilamentStatus($abb_cartridge);
+			if ($ret_val == FALSE) {
+				$cr = ($abb_cartridge == 'r') ? ERROR_MISS_RIGT_FILA : ERROR_MISS_LEFT_FILA;
+				return $cr;
+			}
 			
 			// check if cartridge is not enough
 			$need_filament = ($abb_cartridge == 'r') ? $right_filament : $left_filament;
@@ -503,8 +513,10 @@ function PrinterState_checkStatusAsArray() {
 	// and we must stock print list id somewhere in json file
 // 	$CI = &get_instance();
 // 	$CI->load->helper('printlist');
-
+	
+	PrinterLog_logMessage('PrinterState_checkStatusAsArray()');
 	$command = $arcontrol_fullpath . PRINTERSTATE_CHECK_STATE;
+	PrinterLog_logDebug('command => ' . $command);
 	exec($command, $output, $ret_val);
 	if ($ret_val == ERROR_NORMAL_RC_OK && count($output) == 0) {
 		// not in printing(?), now we consider it is just idle (no slicing)
@@ -537,22 +549,7 @@ function PrinterState_changeFilament($left_filament = 0, $right_filament = 0) {
 	return ERROR_OK;
 }
 
-//internal function
-function PrinterState__getInfoAsArray() {
-	$json_info = array();
-	
-	//TODO make me depend on config file
-	$json_info = array(
-			PRINTERSTATE_TITLE_VERSION		=> 1,
-			PRINTERSTATE_TITLE_TYPE			=> 'zim',
-			PRINTERSTATE_TITLE_SERIAL		=> 1,
-			PRINTERSTATE_TITLE_NB_EXTRUD	=> 2,
-	);
-	
-	return $json_info;
-}
-
-function PrinterState__getFilamentStatus($abb_filament) {
+function PrinterState_getFilamentStatus($abb_filament) {
 	// return TRUE only when filament is loaded
 	global $CFG;
 	$arcontrol_fullpath = $CFG->config['arcontrol'];
@@ -591,4 +588,19 @@ function PrinterState__getFilamentStatus($abb_filament) {
 			return FALSE;
 		}
 	}
+}
+
+//internal function
+function PrinterState__getInfoAsArray() {
+	$json_info = array();
+	
+	//TODO make me depend on config file
+	$json_info = array(
+			PRINTERSTATE_TITLE_VERSION		=> 1,
+			PRINTERSTATE_TITLE_TYPE			=> 'zim',
+			PRINTERSTATE_TITLE_SERIAL		=> 1,
+			PRINTERSTATE_TITLE_NB_EXTRUD	=> 2,
+	);
+	
+	return $json_info;
 }
