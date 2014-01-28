@@ -101,60 +101,60 @@ class Printmodel extends MY_Controller {
 			return;
 		}
 		
-		// check quantity of filament
+		// check quantity of filament and get cartridge information (color)
 		// color1 => right, color2 => left
-// 		$cr = PrinterState_checkFilament($model_data[PRINTLIST_TITLE_LENG_F1], $model_data[PRINTLIST_TITLE_LENG_F2]);
-		$cr = PrinterState_checkFilament($model_data[PRINTLIST_TITLE_LENG_F2], $model_data[PRINTLIST_TITLE_LENG_F1]);
-		$check_left_filament = t('ok');
+		$cr = PrinterState_checkFilament('r', $model_data[PRINTLIST_TITLE_LENG_F1], $cartridge_data);
 		$check_right_filament = t('ok');
-		$change_left_filament = t('Change');
 		$change_right_filament = t('Change');
 		switch ($cr) {
-			case ERROR_LOW_RIGT_FILA:
-				$check_left_filament = t('not enough');
-				break;
+			case ERROR_OK:
+				break; // break directly if no error
 				
 			case ERROR_LOW_RIGT_FILA:
 				$check_right_filament = t('not enough');
 				break;
+				
+			case ERROR_MISS_RIGT_CART:
+				$color_right_filament = PRINTERSTATE_VALUE_DEFAULT_COLOR;
+				
+			case ERROR_MISS_RIGT_FILA:
+				$check_right_filament = t('empty');
+				$change_right_filament = t('Load');
+				break;
+				
+			default:
+				//TODO treat error here
+				break;
+		}
+		if ($cr != ERROR_MISS_RIGT_CART) {
+			$color_right_filament = $cartridge_data[PRINTERSTATE_TITLE_COLOR];
+		}
+		
+		$cr = PrinterState_checkFilament('l', $model_data[PRINTLIST_TITLE_LENG_F2], $cartridge_data);
+		$check_left_filament = t('ok');
+		$change_left_filament = t('Change');
+		switch ($cr) {
+			case ERROR_OK:
+				break; // break directly if no error
+				
+			case ERROR_LOW_LEFT_FILA:
+				$check_left_filament = t('not enough');
+				break;
+				
+			case ERROR_MISS_LEFT_CART:
+				$color_left_filament = PRINTERSTATE_VALUE_DEFAULT_COLOR;
 				
 			case ERROR_MISS_LEFT_FILA:
 				$check_left_filament = t('empty');
 				$change_left_filament = t('Load');
 				break;
 				
-			case ERROR_MISS_RIGT_FILA:
-				$check_right_filament = t('empty');
-				$change_right_filament = t('Load');
-				break;
-			
 			default:
 				//TODO treat error here
 				break;
 		}
-		
-		// get color of cartridge
-		foreach(array('l', 'r') as $abb_cartridge) {
-			$ret_val = PrinterState_getCartridgeAsArray($cartridge_data, $abb_cartridge);
-			if ($ret_val == ERROR_OK) {
-				if($abb_cartridge == 'l') {
-					$color_left_filament = $cartridge_data[PRINTERSTATE_TITLE_COLOR];
-				}
-				else {
-					$color_right_filament = $cartridge_data[PRINTERSTATE_TITLE_COLOR];
-				}
-			}
-			else {
-				if($abb_cartridge == 'l') {
-					$color_left_filament = PRINTERSTATE_VALUE_DEFAULT_COLOR;
-					$check_left_filament = t('error');
-				}
-				else {
-					$color_right_filament = PRINTERSTATE_VALUE_DEFAULT_COLOR;
-					$check_right_filament = t('error');
-				}
-// 				return; //TODO treat error here
-			}
+		if ($cr != ERROR_MISS_RIGT_CART) {
+			$color_left_filament = $cartridge_data[PRINTERSTATE_TITLE_COLOR];
 		}
 		
 		// get a more legible time of estimation
@@ -167,7 +167,6 @@ class Printmodel extends MY_Controller {
 				'image'				=> $model_data[PRINTLIST_TITLE_PIC][0],
 				'model_c_r'			=> $model_data[PRINTLIST_TITLE_COLOR_F1],
 				'model_c_l'			=> $model_data[PRINTLIST_TITLE_COLOR_F2],
-// 				'time'				=> 'Time estimation: ' . $model_data[PRINTLIST_TITLE_TIME],
 				'time'				=> $time_estimation,
 				'desp'				=> $model_data[PRINTLIST_TITLE_DESP],
 				'state_c_l'			=> $color_left_filament,
@@ -178,6 +177,8 @@ class Printmodel extends MY_Controller {
 				'title_current' 	=> t('Filament'),
 				'change_filament_l'	=> $change_left_filament,
 				'change_filament_r'	=> $change_right_filament,
+				'need_filament_l'	=> $model_data[PRINTLIST_TITLE_LENG_F2],
+				'need_filament_r'	=> $model_data[PRINTLIST_TITLE_LENG_F1],
 				'print_model'		=> t('Print'),
 				'back'				=> t('back'),
 				'preview_title'		=> t('Preview'),

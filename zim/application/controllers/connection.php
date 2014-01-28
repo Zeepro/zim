@@ -34,7 +34,7 @@ class Connection extends MY_Controller {
 		$this->template->set ( 'header', "<title>" . t ( 'ZeePro Personal Printer 21 - Connection configuration' ) . "</title>" );
 		
 		if ($this->form_validation->run () == FALSE) {
-			$data['listSSID'] = ListSSID();
+			$data['listSSID'] = ZimAPI_listSSID();
 			
 			$this->template->load ( 'connectionmaster', 'connectionwifissid', $data );
 		} else {
@@ -234,22 +234,71 @@ class Connection extends MY_Controller {
 	}
     
 	public function wifip2p() {
-		global $CFG;
+		$ret_val = 0;
+		$error = '';
+		$template_data = array();
+		$body_page = NULL;
+		
+		$this->load->helper(array('zimapi'));
+		$this->lang->load('connection/wifip2p', $this->config->item('language'));
+		
+		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+			
+			$this->load->library('form_validation');
+			
+			$this->form_validation->set_rules('ssid', 'SSID', 'required');
+			
+			if ($this->form_validation->run() == FALSE) {
+				// Here is where you do stuff when the submitted form is invalid.
+				$error = t('invalid SSID');
+			}
+			else {
+				$ssid = $this->input->post('ssid');
+				$passwd = $this->input->post('pwd');
+				
+				if (!ctype_print($ssid) || ($passwd && !ctype_print($passwd))) {
+					$error = t('invalid data (special character)');
+				}
+				else {
+					$ret_val = ZimAPI_setsWifi($ssid, $passwd);
+					if ($ret_val != TRUE) {
+						$error = t('invalid data');
+					}
+					else {
+// 						$this->output->set_header("Location:/connection/confirmation");
+						$this->confirmation();
+						return; // end generating if successed
+					}
+				}
+			}
+		}
+		
+		// generate form to submit when not in post method
+		$this->load->library('parser');
 
-        // To be managed by API...
-        
-//         $arr = array("Connection.Topology" => "P2P",
-//             "Connection.Support" => "WiFi",
-//             "IP.addresses.V4" => array(array("Address" => "0.0.0.0")),
-//             "IP.lease" => standard_date("DATE_ISO8601", local_to_gmt(time()))
-//         );
-
-//         $fh = fopen($CFG->config['conf'] . 'Connection.json', 'w');
-//         fwrite($fh, json_encode($arr));
-//         fclose($fh);
-
-		header ( "Location:/connection/confirmation" );
-    }
+		// parse the main body
+		$template_data = array(
+				'title'			=> t('Personalize your network of printer'),
+				'ssid_title'	=> t('Input your network name'),
+				'pwd_title'		=> t('Input your password'),
+				'error'			=> $error,
+				'ok'			=> t('OK'),
+				'back'			=> t('back'),
+		);
+		
+		$body_page = $this->parser->parse('template/connection/wifip2p', $template_data, TRUE);
+		
+		// parse all page
+		$template_data = array(
+				'lang'			=> $CFG->config ['language_abbr'],
+				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Connection setting') . '</title>',
+				'contents'		=> $body_page,
+		);
+		
+		$this->parser->parse('template/basetemplate', $template_data);
+		
+		return;
+	}
     
 	public function confirmation() {
         global $CFG;

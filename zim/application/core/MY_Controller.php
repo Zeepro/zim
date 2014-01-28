@@ -50,6 +50,13 @@ class MY_Controller extends CI_Controller {
 						}
 						break;
 						
+					case CORESTATUS_VALUE_LOAD_FILA_L:
+					case CORESTATUS_VALUE_LOAD_FILA_R:
+					case CORESTATUS_VALUE_UNLOAD_FILA_L:
+					case CORESTATUS_VALUE_UNLOAD_FILA_R:
+						return; // we do not block users when charging / uncharging filament
+						break;
+						
 					default:
 						$url_redirect = '/'; // internal error, never reach here normally
 						break;

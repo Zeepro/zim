@@ -33,8 +33,7 @@
 	</div>
 </div>
 
-<script>
-// $(document).ready(refreshPrintStatus());
+<script type="text/javascript">
 var var_refreshPrintStatus;
 var var_ajax;
 $(document).ready(checkPrintStatus());
@@ -47,7 +46,7 @@ function checkPrintStatus() {
 			cache: false,
 		})
 		.done(function(html) {
-			if (var_ajax.status == 204) { // finished printing
+			if (var_ajax.status == 202) { // finished printing
 				clearInterval(var_refreshPrintStatus);
 				$("#print_detail_info").html('<p>{finish_info}</p>');
 				$('button#print_action').click(function(){window.location.href='/'; return false;});

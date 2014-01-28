@@ -34,8 +34,8 @@ if (!defined('PRINTLIST_MAX_PIC_SIZE')) {
 	define('PRINTLIST_TITLE_VERSION',	'ver');
 
 	define('PRINTLIST_VALUE_VERSION',	2);
-	define('PRINTLIST_MID_PRIME_L',		'_prime_left');
-	define('PRINTLIST_MID_PRIME_R',		'_prime_right');
+	define('PRINTLIST_MODEL_PRIME_L',	'_prime_left');
+	define('PRINTLIST_MODEL_PRIME_R',		'_prime_right');
 	
 	define('PRINTLIST_FILE_GCODE',		'model.gcode');
 	define('PRINTLIST_FILE_JSON',		'model.json');
@@ -227,7 +227,7 @@ function ModelList_add($data_array) {
 	//==========================================================
 	//model name, description, duration, filament1+2
 	$json_data = array(
-			PRINTLIST_TITLE_ID			=> ModelList__codeModelHash($model_name),
+			PRINTLIST_TITLE_ID			=> ModelList_codeModelHash($model_name),
 			PRINTLIST_TITLE_NAME		=> $model_names,
 			PRINTLIST_TITLE_DESP		=> $model_desps,
 			PRINTLIST_TITLE_TIME		=> $model_printtime,
@@ -342,6 +342,18 @@ function ModelList_print($id_model) {
 	return $ret_val;
 }
 
+function ModelList_codeModelHash($raw_name) {
+	$CI = &get_instance();
+	$CI->load->helper(array('detectos'));
+	
+	if (DectectOS_checkWindows()) {
+		return md5(utf8_encode($raw_name));
+	}
+	else {
+		return md5($raw_name);
+	}
+}
+
 //internal function
 function ModelList__find($id_model_find, &$model_path) {
 	global $CFG;
@@ -357,7 +369,7 @@ function ModelList__find($id_model_find, &$model_path) {
 		if (!is_dir($printlist_basepath . $model_name)) { //check whether it is a folder or not
 			continue;
 		}
-		$id_model_cal = ModelList__codeModelHash($model_name);
+		$id_model_cal = ModelList_codeModelHash($model_name);
 		if ($id_model_cal == $id_model_find) {
 			$model_path = $printlist_basepath . $model_name . '/';
 			return ERROR_OK; //leave directly the loop when finding the correct folder
@@ -380,7 +392,7 @@ function ModelList__listAsArray($set_localization = FALSE) {
 		$nb_pic = 0;
 		
 		// jump through the two prime special models
-		if ($model_name == PRINTLIST_MID_PRIME_L || $model_name == PRINTLIST_MID_PRIME_R) {
+		if ($model_name == PRINTLIST_MODEL_PRIME_L || $model_name == PRINTLIST_MODEL_PRIME_R) {
 			continue;
 		}
 		
@@ -393,7 +405,7 @@ function ModelList__listAsArray($set_localization = FALSE) {
 			continue; // just jump through the wrong data file
 // 			return json_encode($json_data); //TODO how about return ERROR_INTERNAL here?
 		}
-// 		$tmp_array['json'][PRINTLIST_TITLE_ID] = ModelList__codeModelHash($model_name); //add model id to data array
+// 		$tmp_array['json'][PRINTLIST_TITLE_ID] = ModelList_codeModelHash($model_name); //add model id to data array
 		
 		//blind picture url
 		ModelList__blindUrl($tmp_array['json']);
@@ -490,18 +502,6 @@ function ModelList__codeModelName($raw_name) {
 	}
 	else {
 		return $raw_name;
-	}
-}
-
-function ModelList__codeModelHash($raw_name) {
-	$CI = &get_instance();
-	$CI->load->helper(array('detectos'));
-	
-	if (DectectOS_checkWindows()) {
-		return md5(utf8_encode($raw_name));
-	}
-	else {
-		return md5($raw_name);
 	}
 }
 

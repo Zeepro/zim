@@ -41,7 +41,7 @@ function Printer_printFromFile($gcode_path) {
 	$ret_val = 0;
 	
 	$CI = &get_instance();
-	$CI->load->helper(array('printerstate', 'corestatus'));
+	$CI->load->helper(array('printerstate', 'corestatus', 'printerlog'));
 	
 	// check if we have no file
 	if (!file_exists($gcode_path)) {
@@ -56,7 +56,8 @@ function Printer_printFromFile($gcode_path) {
 	}
 
 	// check if having enough filament
-	$ret_val = PrinterState_checkFilament();
+	//TODO get the quantity of filament needed by file
+	$ret_val = PrinterState_checkFilaments();
 	if ($ret_val != ERROR_OK) {
 		return $ret_val;
 	}
@@ -81,6 +82,7 @@ function Printer_printFromFile($gcode_path) {
 	// 			return ERROR_INTERNAL;
 	// 		}
 	pclose(popen($command, 'r')); // only for windows arcontrol client
+	PrinterLog_LogArduino($command);
 
 	//TODO reduce the quantity of filament here
 	$ret_val = PrinterState_changeFilament();
@@ -210,7 +212,7 @@ function Printer_checkPrint(&$return_data) {
 	$temper_status = array();
 	
 	$CI = &get_instance();
-	$CI->load->helper('printerstate');
+	$CI->load->helper(array('printerstate', 'corestatus'));
 	
 // 	// check if we are in printing phase in printing json status file
 // 	$ret_val = Printer_getStatus($printing_status);
@@ -223,7 +225,7 @@ function Printer_checkPrint(&$return_data) {
 	
 	// check status if we are not in printing
 	$data_status = PrinterState_checkStatusAsArray();
-	if ($data_status[PRINTERSTATE_TITLE_STATUS] != PRINTERSTATE_VALUE_IN_PRINT) {
+	if ($data_status[PRINTERSTATE_TITLE_STATUS] != CORESTATUS_VALUE_PRINT) {
 		// delete printing status json file when we are not in printing
 // 		unlink($CFG->config ['conf'] . PRINTER_PRINTING_JSON);
 // 		echo 'finish'; // test

@@ -20,9 +20,9 @@ class Rest extends MY_Controller {
 		) );
 		
 		$status_current = '';
-		if (CoreStatus_checkInInitialization()) {
-			// we haven't finished initialization yet
-			$cr = ERROR_BUSY_PRINTER; //TODO create a new error code
+		if (CoreStatus_checkInInitialization() || CoreStatus_checkInConnection()) {
+			// we haven't finished initialization or connection yet
+			$cr = ERROR_BUSY_PRINTER;
 			$display = $cr . " " . t(MyERRMSG($cr));
 			$this->output->set_status_header($cr, $display);
 // 			$this->output->set_content_type(RETURN_CONTENT_TYPE);
@@ -30,19 +30,8 @@ class Rest extends MY_Controller {
 			echo $display; //optional
 			exit;
 		}
-		else if (CoreStatus_checkInConnection()) {
-			// we haven't finished configuration of network yet
-			$cr = ERROR_BUSY_PRINTER; //TODO create a new error code
-			$display = $cr . " " . t(MyERRMSG($cr));
-			$this->output->set_status_header($cr, $display);
-// 			$this->output->set_content_type(RETURN_CONTENT_TYPE);
-			header('Content-type: ' . RETURN_CONTENT_TYPE);
-			echo $display; //optional
-			exit;
-		}
-		else if (!CoreStatus_checkInIdle($status_current) && !CoreStatus_checkCallNoBlockREST()) {
-			//TODO check if the status is changing
-			//TODO let getting temperatures / info always pass
+		else if (!CoreStatus_checkInIdle($status_current)) {
+			// check if the status is changed
 			$ret_val = 0;
 			
 			switch ($status_current) {
@@ -54,13 +43,46 @@ class Rest extends MY_Controller {
 						if ($ret_val == TRUE) {
 							return; // continue to generate if we are now in idle
 						}
-						//TODO treat internal error
+						$this->load->helper('printerlog');
+						PrinterLog_logError('can not set status in idle');
+					}
+					break;
+					
+				case CORESTATUS_VALUE_LOAD_FILA_L:
+				case CORESTATUS_VALUE_LOAD_FILA_R:
+				case CORESTATUS_VALUE_UNLOAD_FILA_L:
+				case CORESTATUS_VALUE_UNLOAD_FILA_R:
+					// generate parameters by different status
+					$abb_filament =
+							(($status_current == CORESTATUS_VALUE_LOAD_FILA_L)
+									|| ($status_current == CORESTATUS_VALUE_UNLOAD_FILA_L))
+							? 'l' : 'r';
+					$status_fin_filament =
+							($status_current == CORESTATUS_VALUE_LOAD_FILA_L || $status_current == CORESTATUS_VALUE_LOAD_FILA_R)
+							? TRUE : FALSE;
+					
+					$this->load->helper('printerstate');
+					$ret_val = PrinterState_getFilamentStatus($abb_filament);
+					if ($ret_val == $status_fin_filament) {
+						$ret_val = CoreStatus_setInIdle();
+						if ($ret_val == TRUE) {
+							return; // continue to generate if we are now in idle
+						}
+						$this->load->helper('printerlog');
+						PrinterLog_logError('can not set status into idle');
 					}
 					break;
 					
 				default:
-					//TODO treat internal error
+					// log internal API error
+					$this->load->helper('printerlog');
+					PrinterLog_logError('unknown status in work json');
 					break;
+			}
+			
+			// do not block some special REST
+			if (CoreStatus_checkCallNoBlockREST()) {
+				return;
 			}
 			
 			// return that printer is busy
@@ -88,40 +110,33 @@ class Rest extends MY_Controller {
 	}
 	
 	//==========================================================
-	//index test view
+	//index for status
 	//==========================================================
-// 	public function index()
-// 	{
-// 		$this->load->helper('form');
-// 		$this->load->view('test/printlist_form');
-// 	}
+	public function index()
+	{
+		$this->status();
+		return;
+	}
 	
 	
 	//==========================================================
 	//network web service
 	//==========================================================
 	public function resetnetwork() {
-		global $CFG;
+		$ret_val = 0;
+		$cr = ERROR_OK;
 		
-		$arr = json_read ( $CFG->config ['conf'] . 'Work.json' );
-		if (! $arr ["error"] and $arr ["json"] ["State"] == "Working") { //FIXME we have no "working" state in json now
-			// Work in progress
-// 			http_response_code ( 446 );
-			$this->output->set_status_header(ERROR_BUSY_PRINTER, "Printer busy");
- 			echo("Printer busy"); //optional
-			exit ();
+		$this->load->helper('zimapi');
+		$ret_val = ZimAPI_resetNetwork();
+		if ($ret_val != TRUE) {
+			$this->load->helper('printerlog');
+			PrinterLog_logError('reset network error by REST');
+			$cr = ERROR_INTERNAL;
 		}
 		
-		$arr = array (
-				"Version" => "1.0",
-				"Message" => array (
-						"Context" => "BootMessage",
-						"Id" => "Boot.Test" 
-				) 
-		);
-		$fh = fopen ( $CFG->config ['conf'] . 'Boot.json', 'w' );
-		fwrite ( $fh, json_encode ( $arr ) );
-		fclose ( $fh );
+		$this->_return_cr($cr);
+		
+		return;
 	}
 	
 	

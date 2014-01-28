@@ -126,7 +126,7 @@ class Printdetail extends MY_Controller {
 					PrinterState_setTemperature(20);
 					PrinterState_setExtruder('r');
 					
-					$this->output->set_status_header(204);
+					$this->output->set_status_header(202);
 					return;
 				}
 				
@@ -148,7 +148,7 @@ class Printdetail extends MY_Controller {
 						'value_temperL'	=> $data_status['print_temperL'],
 						'value_temperR'	=> $data_status['print_temperR'],
 				);
-				$this->parser->parse('template/printdetail/status_ajax_print', $template_data);
+				$this->parser->parse('template/printdetail/status_ajax', $template_data);
 // 				break;
 				
 // 			default:

@@ -18,12 +18,17 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_TITLE_MESSAGE',		'Message');
 	define('CORESTATUS_TITLE_STARTTIME',	'StartDate');
 	
-	define('CORESTATUS_VALUE_IDLE',		'idle');
-	define('CORESTATUS_VALUE_PRINT',	'printing');
-// 	define('CORESTATUS_VALUE_UPGRADE',	'upgrading');
+	define('CORESTATUS_VALUE_IDLE',				'idle');
+	define('CORESTATUS_VALUE_PRINT',			'printing');
+	define('CORESTATUS_VALUE_LOAD_FILA_L',		'loading_left');
+	define('CORESTATUS_VALUE_LOAD_FILA_R',		'loading_right');
+	define('CORESTATUS_VALUE_UNLOAD_FILA_L',	'unloading_left');
+	define('CORESTATUS_VALUE_UNLOAD_FILA_R',	'unloading_right');
+// 	define('CORESTATUS_VALUE_UPGRADE',			'upgrading');
 
-	define('CORESTATUS_PRM_CAMERA_START',	' -start ');
-	define('CORESTATUS_PRM_CAMERA_STOP',	' -stop ');
+	define('CORESTATUS_PRM_CAMERA_START',
+			' -v verbose -r 10 -s 320x240 -f video4linux2 -i /dev/video0 -c:v libx264 -crf 18 -profile:v baseline -b:v 1024k -pix_fmt yuv420p -flags -global_header -hls_time 1 -hls_wrap 5 /var/www/tmp/zim.m3u8');
+	define('CORESTATUS_PRM_CAMERA_STOP',	' stop ');
 }
 
 function CoreStatus_checkInIdle(&$status_current = '') {
@@ -41,7 +46,9 @@ function CoreStatus_checkInIdle(&$status_current = '') {
 			throw new Exception('read json error');
 		}
 	} catch (Exception $e) {
-		return FALSE; //TODO generate a way to return internal error
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('read work json error');
+		return FALSE;
 	}
 	
 	// check status
@@ -139,7 +146,9 @@ function CoreStatus_setInIdle() {
 		
 		exec($command, $output, $ret_val);
 		if ($ret_val != ERROR_NORMAL_RC_OK) {
-			//TODO treat internal error
+			$CI = &get_instance();
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('camera stop command error');
 			return FALSE;
 		}
 	}
@@ -158,13 +167,35 @@ function CoreStatus_setInPrinting() {
 	
 	exec($command, $output, $ret_val);
 	if ($ret_val != ERROR_NORMAL_RC_OK) {
-		//TODO treat internal error
+		$CI = &get_instance();
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('camera start command error');
 		return FALSE;
 	}
 	
 	return CoreStatus__setInStatus(CORESTATUS_VALUE_PRINT,
 			array(CORESTATUS_TITLE_STARTTIME => time())
 	);
+}
+
+function CoreStatus_setInLoading($abb_filament) {
+	if (!in_array($abb_filament, array('l', 'r'))) {
+		return FALSE;
+	}
+	$value_status = ($abb_filament == 'r')
+			? CORESTATUS_VALUE_LOAD_FILA_R : CORESTATUS_VALUE_LOAD_FILA_L;
+	
+	return CoreStatus__setInStatus($value_status, array());
+}
+
+function CoreStatus_setInUnloading($abb_filament) {
+	if (!in_array($abb_filament, array('l', 'r'))) {
+		return FALSE;
+	}
+	$value_status = ($abb_filament == 'r')
+			? CORESTATUS_VALUE_UNLOAD_FILA_R : CORESTATUS_VALUE_UNLOAD_FILA_L;
+	
+	return CoreStatus__setInStatus($value_status, array());
 }
 
 function CoreStatus_getStartPrintTime(&$time_start) {
@@ -199,6 +230,37 @@ function CoreStatus_getStartPrintTime(&$time_start) {
 	return TRUE;
 }
 
+function CoreStatus_wantConnection() {
+	global $CFG;
+	$state_file = $CFG->config['conf'] . CORESTATUS_FILENAME_CONNECT;
+	
+	if (file_exists($state_file)) {
+		$ret_val = unlink($state_file);
+		return $ret_val;
+	}
+	else {
+		return FALSE;
+	}
+	
+	return FALSE;
+}
+
+function CoreStatus_finishConnection($data_json = array()) {
+	global $CFG;
+	$state_file = $CFG->config['conf'] . CORESTATUS_FILENAME_CONNECT;
+	
+	$fp = fopen($state_file, 'w');
+	if ($fp) {
+		fwrite($fp, json_encode($data_json));
+		fclose($fp);
+	}
+	else {
+		return FALSE;
+	}
+	
+	return TRUE;
+}
+
 // internal function
 function CoreStatus__checkCallController($name_controller) {
 	$CI = &get_instance();
@@ -227,7 +289,9 @@ function CoreStatus__checkCallURI($array_URI) {
 			return TRUE;
 		}
 		else if (!is_array($array_URI[$CI->router->uri->uri_string])) {
-			return FALSE; //TODO treat internal error
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('check call URI internal API error');
+			return FALSE;
 		}
 		else {
 			foreach ($array_URI[$CI->router->uri->uri_string] as $key => $value) {
