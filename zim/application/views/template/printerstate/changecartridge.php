@@ -42,14 +42,14 @@ function checkChangeStatus() {
 				$("#cartridge_detail_info").html(html);
 			}
 		})
-		.fail(function() { // not in printing
-// 			window.location.replace("/");
+		.fail(function() { // not allowed
+			window.location.replace("/");
 // 			clearInterval(var_refreshChangeStatus);
 // 			$("#print_detail_info").html('<p>{finish_info}</p>');
 // 			$('button#print_action').click(function(){window.location.href='/'; return false;});
 // 			$('button#print_action').parent().find('span.ui-btn-text').text('{return_button}');
 // 			$('button#print_action').html('{return_button}');
-			alert("failed");
+// 			alert("failed");
 		});
 	}
 }
@@ -82,7 +82,7 @@ function inputUserChoice(action) {
 			break;
 
 		default:
-			alert("unknown action");
+// 			alert("unknown action");
 			return false;
 			break;
 	}
@@ -92,7 +92,7 @@ function inputUserChoice(action) {
 // 			alert("done choice");
 			checkChangeStatus();
 		}).fail(function() {
-			alert("failed choice");
+// 			alert("failed choice");
 		});
 	}
 

@@ -287,7 +287,7 @@ class Printerstate extends MY_Controller {
 					$status_changed = ($abb_cartridge == 'r') ? CORESTATUS_VALUE_UNLOAD_FILA_R : CORESTATUS_VALUE_UNLOAD_FILA_L;
 					
 					if (CoreStatus_checkInIdle($status_current)) {
-						$ret_val = PrinterState_checkFilament($abb_cartridge);
+						$ret_val = PrinterState_checkFilament($abb_cartridge, $need_filament);
 						if ($ret_val == $code_miss_filament) {
 							// have cartridge, enough filament
 							$this->_display_changecartridge_wait_load_filament();
@@ -354,20 +354,30 @@ class Printerstate extends MY_Controller {
 				
 			case PRINTERSTATE_CHANGECART_INSERT_C:
 				// we call the page: remove / reinsert cartridge
-				$ret_val = PrinterState_checkFilament($abb_cartridge);
+				$ret_val = PrinterState_checkFilament($abb_cartridge, $need_filament);
 				if ($ret_val == $code_miss_cartridge) {
 					// no cartridge
 					$this->_display_changecartridge_insert_cartridge();
 				}
-				else {
-					// have cartridge (all ok include)
+				else if ($ret_val == $code_low_filament) {
+					// have cartridge, low filament
+					$this->_display_changecartridge_remove_cartridge(TRUE);
+				}
+				else if ($ret_val == $code_miss_filament) {
+					// have cartridge, no filemant
 					$this->_display_changecartridge_remove_cartridge($low_hint);
+				}
+				else {
+					// error status
+					$this->load->helper('printerlog');
+					PrinterLog_logError('error checkfilament return status when changing filament (in removing)');
+					$this->_display_changecartridge_remove_cartridge();
 				}
 				break;
 				
 			case PRINTERSTATE_CHANGECART_LOAD_F:
 				// we call the page: insert cartridge
-				$ret_val = PrinterState_checkFilament($abb_cartridge);
+				$ret_val = PrinterState_checkFilament($abb_cartridge, $need_filament);
 				if ($ret_val == $code_miss_filament) {
 					$this->_display_changecartridge_wait_load_filament(FALSE);
 				}

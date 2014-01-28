@@ -508,7 +508,7 @@ function PrinterState_checkFilament($abb_cartridge, $need_filament = 0, &$data_j
 	if ($ret_val == ERROR_OK) {
 		// check if cartridge is not enough
 		$has_filament = $data_json[PRINTERSTATE_TITLE_INITIAL] - $data_json[PRINTERSTATE_TITLE_USED];
-		if ($need_filament < $has_filament) {
+		if ($need_filament > $has_filament) {
 			PrinterLog_logError('low filament error');
 			$cr = ($abb_cartridge == 'r') ? ERROR_LOW_RIGT_FILA : ERROR_LOW_LEFT_FILA;
 			return $cr;

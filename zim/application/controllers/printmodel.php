@@ -153,7 +153,7 @@ class Printmodel extends MY_Controller {
 				//TODO treat error here
 				break;
 		}
-		if ($cr != ERROR_MISS_RIGT_CART) {
+		if ($cr != ERROR_MISS_LEFT_CART) {
 			$color_left_filament = $cartridge_data[PRINTERSTATE_TITLE_COLOR];
 		}
 		
