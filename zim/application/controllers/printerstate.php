@@ -256,7 +256,7 @@ class Printerstate extends MY_Controller {
 					$status_correct = ($abb_cartridge == 'r') ? CORESTATUS_VALUE_UNLOAD_FILA_R : CORESTATUS_VALUE_UNLOAD_FILA_L;
 					$status_changed = ($abb_cartridge == 'r') ? CORESTATUS_VALUE_LOAD_FILA_R : CORESTATUS_VALUE_LOAD_FILA_L;
 					
-					if (CoreStatus_checkInIdle()) {
+					if (CoreStatus_checkInIdle($status_current)) {
 						// in idle
 						$this->_display_changecartridge_wait_unload_filament();
 					}
@@ -269,13 +269,13 @@ class Printerstate extends MY_Controller {
 						$ret_val = CoreStatus_setInIdle();
 						if ($ret_val == FALSE) {
 							//TODO log error here
-							$this->output->set_status_header(202); // disable checking
+							$this->output->set_status_header(203); // disable checking
 						}
 					}
 					else {
 						// in other busy status
 						//TODO log error here
-						$this->output->set_status_header(202); // disable checking
+						$this->output->set_status_header(204); // disable checking
 					}
 				}
 				else {
