@@ -268,14 +268,16 @@ class Printerstate extends MY_Controller {
 						// in busy (but in idle, status is changed in real)
 						$ret_val = CoreStatus_setInIdle();
 						if ($ret_val == FALSE) {
-							//TODO log error here
-							$this->output->set_status_header(203); // disable checking
+							$this->load->helper('printerlog');
+							PrinterLog_logError('can not set idle after unloading filament');
+							$this->output->set_status_header(202); // disable checking
 						}
 					}
 					else {
 						// in other busy status
-						//TODO log error here
-						$this->output->set_status_header(204); // disable checking
+						$this->load->helper('printerlog');
+						PrinterLog_logError('error status when changing filament');
+						$this->output->set_status_header(202); // disable checking
 					}
 				}
 				else {
@@ -300,7 +302,8 @@ class Printerstate extends MY_Controller {
 						}
 						else {
 							// error status
-							//TODO log error here
+							$this->load->helper('printerlog');
+							PrinterLog_logError('error checkfilament return status when changing filament (in starting)');
 							$this->_display_changecartridge_remove_cartridge();
 						}
 					}
@@ -312,13 +315,15 @@ class Printerstate extends MY_Controller {
 						// in busy (but in idle, status is changed in real)
 						$ret_val = CoreStatus_setInIdle();
 						if ($ret_val == FALSE) {
-							//TODO log error here
+							$this->load->helper('printerlog');
+							PrinterLog_logError('can not set idle after loading filament');
 							$this->output->set_status_header(202); // disable checking
 						}
 					}
 					else {
 						// in other busy status
-						//TODO log error here
+						$this->load->helper('printerlog');
+						PrinterLog_logError('error status when changing filament');
 						$this->output->set_status_header(202); // disable checking
 					}
 					
@@ -335,7 +340,8 @@ class Printerstate extends MY_Controller {
 					// no filament
 					$ret_val = CoreStatus_setInIdle();
 					if ($ret_val == FALSE) {
-						//TODO log error here
+						$this->load->helper('printerlog');
+						PrinterLog_logError('can not set idle after unloading filament');
 						$this->output->set_status_header(202); // disable checking
 					}
 					$this->_display_changecartridge_remove_cartridge();
@@ -374,7 +380,8 @@ class Printerstate extends MY_Controller {
 				}
 				else {
 					// error status
-					//TODO log error here
+					$this->load->helper('printerlog');
+					PrinterLog_logError('error checkfilament return status when changing filament (in inserting)');
 					$this->_display_changecartridge_remove_cartridge();
 				}
 				break;
@@ -401,7 +408,8 @@ class Printerstate extends MY_Controller {
 					// have filament
 					$ret_val = CoreStatus_setInIdle();
 					if ($ret_val == FALSE) {
-						//TODO log error here
+						$this->load->helper('printerlog');
+						PrinterLog_logError('can not set idle after loading filament');
 						$this->output->set_status_header(202); // disable checking
 					}
 					$this->_display_changecartridge_need_prime($abb_cartridge, $id_model);
