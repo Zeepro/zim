@@ -30,5 +30,11 @@ $lang['Congratulation, your printing is complete!']
 	= 'Félicitation, votre impression est terminée !';
 $lang['Home']
 	= 'Accueil';
+$lang['Restart?']
+	= 'Recommencer ?';
+$lang['Yes']
+	= 'Oui';
+$lang['No']
+	= 'Non';
 
 ?>

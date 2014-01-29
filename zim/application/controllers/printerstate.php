@@ -14,7 +14,7 @@ class Printerstate extends MY_Controller {
 	
 	private function _display_changecartridge_base($template_name, $template_data) {
 		$this->load->library('parser');
-		$this->lang->load('printerstate', $this->config->item('language'));
+		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
 		
 		$this->parser->parse($template_name, $template_data);
 		
@@ -142,7 +142,7 @@ class Printerstate extends MY_Controller {
 		
 // 		$this->changecartridge();
 		$this->load->library('parser');
-		$this->lang->load('printerstate', $this->config->item('language'));
+		$this->lang->load('printerstate/index', $this->config->item('language'));
 
 		// parse the main body
 		$template_data = array(
@@ -184,7 +184,7 @@ class Printerstate extends MY_Controller {
 		}
 		
 		$this->load->library('parser');
-		$this->lang->load('printerstate', $this->config->item('language'));
+		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
 		
 		// parse the main body
 		$template_data = array(
@@ -482,7 +482,7 @@ class Printerstate extends MY_Controller {
 		$error = '';
 
 		$this->load->library('parser');
-		$this->lang->load('printerstate', $this->config->item('language'));
+		$this->lang->load('printerstate/resetnetwork', $this->config->item('language'));
 		
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$this->load->helper('zimapi');
@@ -511,7 +511,7 @@ class Printerstate extends MY_Controller {
 				return;
 			}
 			else {
-				$error = t('reset error');
+				$error = t('Reset error');
 			}
 			
 		}

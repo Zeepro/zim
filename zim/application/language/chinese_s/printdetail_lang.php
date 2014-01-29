@@ -30,5 +30,11 @@ $lang['Congratulation, your printing is complete!']
 	= '恭喜，您的打印完成了！';
 $lang['Home']
 	= '首页';
+$lang['Restart?']
+	= '是否再打印？';
+$lang['Yes']
+	= '是';
+$lang['No']
+	= '否';
 
 ?>
