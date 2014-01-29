@@ -463,7 +463,7 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 		
 		$json_cartridge = $data_json;
 	} else {
-		PrinterLog_logError('missing cartridge');
+		PrinterLog_logMessage('missing cartridge');
 		$json_cartridge = array();
 		if ($abb_cartridge == 'l') {
 			return ERROR_MISS_LEFT_CART;
@@ -509,7 +509,7 @@ function PrinterState_checkFilament($abb_cartridge, $need_filament = 0, &$data_j
 		// check if cartridge is not enough
 		$has_filament = $data_json[PRINTERSTATE_TITLE_INITIAL] - $data_json[PRINTERSTATE_TITLE_USED];
 		if ($need_filament > $has_filament) {
-			PrinterLog_logError('low filament error');
+			PrinterLog_logMessage('low filament error');
 			$cr = ($abb_cartridge == 'r') ? ERROR_LOW_RIGT_FILA : ERROR_LOW_LEFT_FILA;
 			return $cr;
 		}

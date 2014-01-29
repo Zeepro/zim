@@ -23,6 +23,7 @@ class Printdetail extends MY_Controller {
 		// check model id, and then send it to print command
 		$this->load->helper('printer');
 		$mid = $this->input->get('id');
+		$callback = $this->input->get('cb');
 		
 		if ($mid) {
 			$cr = Printer_printFromModel($mid);
@@ -36,7 +37,12 @@ class Printdetail extends MY_Controller {
 			return;
 		}
 		
-		$this->output->set_header('Location: /printdetail/status');
+		if ($callback) {
+			$this->output->set_header('Location: /printdetail/status?id=' . $mid . '&cb=' . $callback);
+		}
+		else {
+			$this->output->set_header('Location: /printdetail/status');
+		}
 		
 		return;
 	}
@@ -53,6 +59,9 @@ class Printdetail extends MY_Controller {
 		$this->load->library('parser');
 		$this->lang->load('printdetail', $this->config->item('language'));
 		
+		$callback = $this->input->get('cb');
+		$mid = $this->input->get('id');
+		
 		// parse the main body
 		$template_data = array(
 				'title'			=> t('Control your printing'),
@@ -61,7 +70,18 @@ class Printdetail extends MY_Controller {
  				'wait_info'		=> t('Waiting for starting...'),
 				'finish_info'	=> t('Congratulation, your printing is complete!'),
 				'return_button'	=> t('Home'),
+				'return_url'	=> '/',
+				'restart_url'	=> '/printdetail/printmodel?id=' . $mid . '&cb=' . $callback,
+				'var_prime'		=> 'false',
+				'prime_button'	=> t('Yes'),
 		);
+		
+		if ($callback && $mid) {
+			$template_data['finish_info']	= t('Restart?');
+			$template_data['return_url']	= '/printmodel/detail?id=' . $callback;
+			$template_data['return_button']	= t('No');
+			$template_data['var_prime']		= 'true';
+		}
 		
 		$body_page = $this->parser->parse('template/printdetail/status', $template_data, TRUE);
 		

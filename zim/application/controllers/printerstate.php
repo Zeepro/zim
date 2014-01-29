@@ -114,6 +114,7 @@ class Printerstate extends MY_Controller {
 		}
 		if ($id_model) {
 			$no_url = '/printmodel/detail?id=' . $id_model;
+			$yes_url .= '&cb=' . $id_model;
 		}
 		else {
 			$no_url = '/';

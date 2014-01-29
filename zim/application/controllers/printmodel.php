@@ -115,7 +115,9 @@ class Printmodel extends MY_Controller {
 				break;
 				
 			case ERROR_MISS_RIGT_CART:
-				$color_right_filament = PRINTERSTATE_VALUE_DEFAULT_COLOR;
+				$check_right_filament = t('unloaded');
+				$change_right_filament = t('Load');
+				break;
 				
 			case ERROR_MISS_RIGT_FILA:
 				$check_right_filament = t('empty');
@@ -124,10 +126,15 @@ class Printmodel extends MY_Controller {
 				
 			default:
 				//TODO treat error here
+				$check_right_filament = t('error');
+				$change_right_filament = t('Load');
 				break;
 		}
-		if ($cr != ERROR_MISS_RIGT_CART) {
+		if (($cr != ERROR_MISS_RIGT_CART) && ($cr != ERROR_INTERNAL)) {
 			$color_right_filament = $cartridge_data[PRINTERSTATE_TITLE_COLOR];
+		}
+		else {
+			$color_right_filament = PRINTERSTATE_VALUE_DEFAULT_COLOR;
 		}
 		
 		$cr = PrinterState_checkFilament('l', $model_data[PRINTLIST_TITLE_LENG_F2], $cartridge_data);
@@ -142,7 +149,9 @@ class Printmodel extends MY_Controller {
 				break;
 				
 			case ERROR_MISS_LEFT_CART:
-				$color_left_filament = PRINTERSTATE_VALUE_DEFAULT_COLOR;
+				$check_left_filament = t('unloaded');
+				$change_left_filament = t('Load');
+				break;
 				
 			case ERROR_MISS_LEFT_FILA:
 				$check_left_filament = t('empty');
@@ -151,10 +160,15 @@ class Printmodel extends MY_Controller {
 				
 			default:
 				//TODO treat error here
+				$check_left_filament = t('error');
+				$change_left_filament = t('Load');
 				break;
 		}
-		if ($cr != ERROR_MISS_LEFT_CART) {
+		if (($cr != ERROR_MISS_LEFT_CART) && ($cr != ERROR_INTERNAL)) {
 			$color_left_filament = $cartridge_data[PRINTERSTATE_TITLE_COLOR];
+		}
+		else {
+			$color_left_filament = PRINTERSTATE_VALUE_DEFAULT_COLOR;
 		}
 		
 		// get a more legible time of estimation

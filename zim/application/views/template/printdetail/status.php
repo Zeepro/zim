@@ -36,6 +36,7 @@
 <script type="text/javascript">
 var var_refreshPrintStatus;
 var var_ajax;
+var var_prime = {var_prime};
 $(document).ready(checkPrintStatus());
 
 function checkPrintStatus() {
@@ -47,11 +48,7 @@ function checkPrintStatus() {
 		})
 		.done(function(html) {
 			if (var_ajax.status == 202) { // finished printing
-				clearInterval(var_refreshPrintStatus);
-				$("#print_detail_info").html('<p>{finish_info}</p>');
-				$('button#print_action').click(function(){window.location.href='/'; return false;});
-				$('button#print_action').parent().find('span.ui-btn-text').text('{return_button}');
-				$('button#print_action').html('{return_button}');
+				finishAction();
 			}
 			else if (var_ajax.status == 200) { // in printing
 				$("#print_detail_info").html(html);
@@ -59,14 +56,44 @@ function checkPrintStatus() {
 		})
 		.fail(function() { // not in printing
 // 			window.location.replace("/");
-			clearInterval(var_refreshPrintStatus);
-			$("#print_detail_info").html('<p>{finish_info}</p>');
-			$('button#print_action').click(function(){window.location.href='/'; return false;});
-			$('button#print_action').parent().find('span.ui-btn-text').text('{return_button}');
-			$('button#print_action').html('{return_button}');
+			finishAction();
 <!--	//	<?php //FIXME just disable redirection and do same as finished for simulation ?> -->
 		});
 	}
+}
+
+function finishAction() {
+	if (var_prime == true) {
+		finishPrime();
+	}
+	else {
+		finishPrint();
+	}
+
+	return;
+}
+
+function finishPrint() {
+	clearInterval(var_refreshPrintStatus);
+	// display info
+	$("#print_detail_info").html('<p>{finish_info}</p>');
+	// change return button
+	$('button#print_action').click(function(){window.location.href='{return_url}'; return false;});
+	$('button#print_action').parent().find('span.ui-btn-text').text('{return_button}');
+	$('button#print_action').html('{return_button}');
+
+	return;
+}
+
+function finishPrime() {
+	// do the same thing as printing
+	finishPrint();
+	// add yes button for re-prime
+	$('<button>').appendTo('#container')
+	.attr({'id': 'yes_button', 'onclick': 'javascript: window.location.href="{restart_url}";'}).html('{prime_button}')
+	.button().button('refresh');
+
+	return;
 }
 </script>
 
