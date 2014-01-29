@@ -9,7 +9,7 @@ class Connection extends MY_Controller {
         global $CFG;
 
         $this->lang->load('connectionmaster', $this->config->item('language'));
-        $this->lang->load('connection', $this->config->item('language'));
+        $this->lang->load('connection/index', $this->config->item('language'));
 
         $this->template->set('lang', $CFG->config['language_abbr']);
         $this->template->set('header', "<title>" . t('ZeePro Personal Printer 21 - Connection configuration') . "</title>");
@@ -28,7 +28,7 @@ class Connection extends MY_Controller {
 		$this->load->library ( 'form_validation' );
 
 		$this->lang->load ( 'connectionmaster', $this->config->item ( 'language' ) );
-		$this->lang->load ( 'connectionwifissid', $this->config->item ( 'language' ) );
+		$this->lang->load ( 'connection/wifissid', $this->config->item ( 'language' ) );
 		
 		$this->template->set ( 'lang', $CFG->config ['language_abbr'] );
 		$this->template->set ( 'header', "<title>" . t ( 'ZeePro Personal Printer 21 - Connection configuration' ) . "</title>" );
@@ -46,7 +46,7 @@ class Connection extends MY_Controller {
         global $CFG;
     	
 		$this->lang->load ( 'connectionmaster', $this->config->item ( 'language' ) );
-		$this->lang->load ( 'connectionwifinotvisiblessid', $this->config->item ( 'language' ) );
+		$this->lang->load ( 'connection/wifinotvisiblessid', $this->config->item ( 'language' ) );
 		
         $this->load->helper ( array (
 				'form',
@@ -83,7 +83,7 @@ class Connection extends MY_Controller {
 		$this->form_validation->set_rules('password', 'password', '');
 		
 		$this->lang->load ( 'connectionmaster', $this->config->item ( 'language' ) );
-		$this->lang->load ( 'connectionwifipswd', $this->config->item ( 'language' ) );
+		$this->lang->load ( 'connection/wifipswd', $this->config->item ( 'language' ) );
 		
 		$this->template->set ( 'lang', $CFG->config ['language_abbr'] );
 		$this->template->set ( 'header', "<title>" . t ( 'ZeePro Personal Printer 21 - Connection configuration' ) . "</title>" );
@@ -120,7 +120,7 @@ class Connection extends MY_Controller {
 		$this->load->library ( 'form_validation' );
 				
 		$this->lang->load ( 'connectionmaster', $this->config->item ( 'language' ) );
-		$this->lang->load ( 'connectionwired', $this->config->item ( 'language' ) );
+		$this->lang->load ( 'connection/wired', $this->config->item ( 'language' ) );
 		
 		$this->template->set ( 'lang', $CFG->config ['language_abbr'] );
 		$this->template->set ( 'header', "<title>" . t ( 'ZeePro Personal Printer 21 - Connection configuration' ) . "</title>" );
@@ -169,7 +169,7 @@ class Connection extends MY_Controller {
 		$this->load->library ( 'form_validation' );
 				
 		$this->lang->load ( 'connectionmaster', $this->config->item ( 'language' ) );
-		$this->lang->load ( 'connectionwiredadvanced', $this->config->item ( 'language' ) );
+		$this->lang->load ( 'connection/wiredadvanced', $this->config->item ( 'language' ) );
 		
 		$this->template->set ( 'lang', $CFG->config ['language_abbr'] );
 		$this->template->set ( 'header', "<title>" . t ( 'ZeePro Personal Printer 21 - Connection configuration' ) . "</title>" );
@@ -304,7 +304,7 @@ class Connection extends MY_Controller {
         global $CFG;
 
         $this->lang->load('connectionmaster', $this->config->item('language'));
-        $this->lang->load('confirmation', $this->config->item('language'));
+        $this->lang->load('connection/confirmation', $this->config->item('language'));
 
         $this->template->set('lang', $CFG->config['language_abbr']);
         $this->template->set('header', "<title>" . t('ZeePro Personal Printer 21 - Connection configuration') . "</title>");
