@@ -14,7 +14,6 @@ class Printerstate extends MY_Controller {
 	
 	private function _display_changecartridge_base($template_name, $template_data) {
 		$this->load->library('parser');
-		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
 		
 		$this->parser->parse($template_name, $template_data);
 		
@@ -22,6 +21,7 @@ class Printerstate extends MY_Controller {
 	}
 	
 	private function _display_changecartridge_wait_unload_filament() {
+		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
 		$template_data = array (
 				'next_phase'	=> PRINTERSTATE_CHANGECART_UNLOAD_F,
 				'unload_button'	=> t('Unload'),
@@ -35,6 +35,7 @@ class Printerstate extends MY_Controller {
 	}
 	
 	private function _display_changecartridge_in_unload_filament() {
+		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
 		$template_data = array (
 				'next_phase'	=> PRINTERSTATE_CHANGECART_REMOVE_C,
 				'unload_info'	=> t('Wait for unloading...'),
@@ -46,6 +47,7 @@ class Printerstate extends MY_Controller {
 	}
 	
 	private function _display_changecartridge_remove_cartridge($low_hint = FALSE) {
+		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
 		$template_data = array (
 				'next_phase'	=> ($low_hint) ? PRINTERSTATE_CHANGECART_REINST_C : PRINTERSTATE_CHANGECART_INSERT_C,
 				'low_hint'		=> ($low_hint) ? t('Not enough filament') : '',
@@ -67,6 +69,7 @@ class Printerstate extends MY_Controller {
 	}
 	
 	private function _display_changecartridge_wait_load_filament($change_able = TRUE) {
+		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
 		if ($change_able == TRUE) {
 			$template_data = array (
 					'next_phase'	=> PRINTERSTATE_CHANGECART_WAIT_F_C,
@@ -91,6 +94,7 @@ class Printerstate extends MY_Controller {
 	}
 	
 	private function _display_changecartridge_in_load_filament() {
+		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
 		$template_data = array (
 				'next_phase'	=> PRINTERSTATE_CHANGECART_NEED_P,
 				'load_info'		=> t('Waiting for loading...'),
@@ -102,6 +106,7 @@ class Printerstate extends MY_Controller {
 	}
 	
 	private function _display_changecartridge_need_prime($abb_cartridge, $id_model) {
+		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
 		$yes_url = '/printdetail/printmodel?id=';
 		$no_url = '';
 		
