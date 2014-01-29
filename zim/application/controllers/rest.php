@@ -308,7 +308,8 @@ class Rest extends MY_Controller {
 		}
 		
 		if ($cr == ERROR_OK) {
-			//TODO change status file to indicate we are in printing now,
+			// ALREADY FIXED BY CORESTATUS HELPER
+			// change status file to indicate we are in printing now,
 			// but think another condition:
 			// when we have finished printing, how can we know that?
 			// arcontrol client return directly, and will not infect file system with json file.

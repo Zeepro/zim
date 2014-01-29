@@ -90,7 +90,6 @@ class Printmodel extends MY_Controller {
 		// check model id, resend user to if not valid
 		if ($mid) {
 			$cr = ModelList__getDetailAsArray($mid, $model_data, TRUE);
-			//TODO fix dé folder
 			if (($cr != ERROR_OK) || is_null($model_data)) {
 				$this->output->set_header('Location: /printmodel/listmodel');
 				return;
@@ -125,7 +124,9 @@ class Printmodel extends MY_Controller {
 				break;
 				
 			default:
-				//TODO treat error here
+				// treat error here, usually happened when checksum failed
+				$this->load->helper('printerlog');
+				PrinterLog_logError('not previewed return code for checking right filament');
 				$check_right_filament = t('error');
 				$change_right_filament = t('Load');
 				break;
@@ -159,7 +160,9 @@ class Printmodel extends MY_Controller {
 				break;
 				
 			default:
-				//TODO treat error here
+				// treat error here, usually happened when checksum failed
+				$this->load->helper('printerlog');
+				PrinterLog_logError('not previewed return code for checking left filament');
 				$check_left_filament = t('error');
 				$change_left_filament = t('Load');
 				break;

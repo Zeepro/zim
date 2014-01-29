@@ -402,8 +402,11 @@ function ModelList__listAsArray($set_localization = FALSE) {
 				throw new Exception('read json error');
 			}
 		} catch (Exception $e) {
+			// log internal error
+			$this->load->helper('printerlog');
+			PrinterLog_logError('catch exception when getting print model ' . $model_name);
 			continue; // just jump through the wrong data file
-// 			return json_encode($json_data); //TODO how about return ERROR_INTERNAL here?
+// 			return json_encode($json_data);
 		}
 // 		$tmp_array['json'][PRINTLIST_TITLE_ID] = ModelList_codeModelHash($model_name); //add model id to data array
 		
@@ -447,9 +450,6 @@ function ModelList__setLocalization(&$array_json) {
 }
 
 function ModelList__getDetailAsArray($id_model, &$array_data, $set_localization = FALSE) {
-	//TODO add it to spec file if necessary
-	// but for web service, it's better to return json,
-	// so we need ModelList_getDetail() for web service
 	$array_data = NULL;
 	$tmp_array = NULL;
 	$json_path = NULL;

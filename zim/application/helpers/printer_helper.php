@@ -84,7 +84,7 @@ function Printer_printFromFile($gcode_path) {
 	pclose(popen($command, 'r')); // only for windows arcontrol client
 	PrinterLog_LogArduino($command);
 
-	//TODO reduce the quantity of filament here
+	// reduce the quantity of filament here
 	$ret_val = PrinterState_changeFilament();
 	if ($ret_val != ERROR_OK) {
 		return $ret_val;
@@ -235,7 +235,10 @@ function Printer_checkPrint(&$return_data) {
 	// get temperatures of extruders
 	$temper_status = PrinterState_getExtruderTemperaturesAsArray();
 	if (!is_array($temper_status)) {
-		return FALSE; //TODO treat the internal error when getting temperatures of extruders
+		// log internal error
+		$this->load->helper('printerlog');
+		PrinterLog_logError('API error when getting temperatures in printing');
+		return FALSE;
 	}
 	
 	$return_data = array(
@@ -251,30 +254,6 @@ function Printer_checkPrint(&$return_data) {
 	
 	return TRUE;
 }
-
-// function Printer_getStatus(&$status, &$json_data = array()) {
-// 	global $CFG;
-// 	$tmp_array = array();
-	
-// 	// check if we have no file
-// 	if (!file_exists($CFG->config ['conf'] . PRINTER_PRINTING_JSON)) {
-// 		return FALSE; //TODO generate a way to return internal error
-// 	}
-
-// 	// read json data file
-// 	try {
-// 		$tmp_array = json_read($model_path . PRINTLIST_FILE_JSON);
-// 		if ($tmp_array['error']) {
-// 			throw new Exception('read json error');
-// 		}
-// 	} catch (Exception $e) {
-// 		return FALSE;
-// 	}
-// 	$json_data = $tmp_array['json'];
-// 	$status = $json_data[PRINTER_TITLE_STATUS];
-	
-// 	return TRUE;
-// }
 
 // internal function
 function Printer__getStartTemperatureFromModel($id_model, &$array_temper) {

@@ -102,80 +102,54 @@ class Printdetail extends MY_Controller {
 		$printing_status = '';
 		$ret_val = 0;
 		$data_status = array();
+		$time_remain = 0;
 		
 		$this->load->helper(array('printer', 'timedisplay'));
 		$this->load->library('parser');
 		$this->lang->load('printdetail', $this->config->item('language'));
 		$this->lang->load('timedisplay', $this->config->item('language'));
 		
-// 		// get phase of printing (heat / print)
-// 		$ret_val = Printer_getStatus($printing_status);
-// 		if ($ret_val == FALSE) { // we are not in printing
-// 			$this->output->set_status_header(403);
-// 			return;
-// 		}
+		$ret_val = Printer_checkPrint($data_status);
+		if ($ret_val == FALSE) {
+			$this->load->helper('corestatus');
+			$ret_val = CoreStatus_setInIdle();
+			if ($ret_val == FALSE) {
+				// log internal error
+				$this->load->helper('printerlog');
+				PrinterLog_logError('can not set idle after printing');
+			}
+			
+			//FIXME just set temperature for simulation
+			$this->load->helper('printerstate');
+			PrinterState_setExtruder('r');
+			PrinterState_setTemperature(20);
+			PrinterState_setExtruder('l');
+			PrinterState_setTemperature(20);
+			PrinterState_setExtruder('r');
+			
+			$this->output->set_status_header(202);
+			return;
+		}
 		
-// 		switch ($printing_status) {
-// 			case PRINTER_VALUE_STATUS_HEAT:
-// 				$ret_val = Printer_checkStartTemperature($data_status);
-// 				if ($ret_val == TRUE) {
-// 					echo 'reach temperature';
-// 					//TODO delete the checktemperature status
-// 				}
-// 				else {
-// 					echo var_dump($data_status);
-// 				}
-// 				break;
-				
-// 			case PRINTER_VALUE_STATUS_PRINT:
-				$time_remain = 0;
-				
-				$ret_val = Printer_checkPrint($data_status);
-				if ($ret_val == FALSE) {
-					$this->load->helper('corestatus');
-					$ret_val = CoreStatus_setInIdle();
-					if ($ret_val == FALSE) {
-						//TODO treat internal error here
-					}
-					
-					//FIXME just set temperature for simulation
-					$this->load->helper('printerstate');
-					PrinterState_setExtruder('r');
-					PrinterState_setTemperature(20);
-					PrinterState_setExtruder('l');
-					PrinterState_setTemperature(20);
-					PrinterState_setExtruder('r');
-					
-					$this->output->set_status_header(202);
-					return;
-				}
-				
-				// treat time remaining for display
-				if (isset($data_status['print_remain'])) {
-					$time_remain = TimeDisplay__convertsecond(
-							$data_status['print_remain'], t('Time remaining: '), t('under calculating'));
-				}
-				else {
-					$time_remain = t('Time remaining: ') . t('unknown');
-				}
-				
-				// parse the ajax part
-				$template_data = array(
-						'print_percent'	=> t('Percentage: %d%%', array($data_status['print_percent'])),
-						'print_remain'	=> $time_remain,
-						'print_temperL'	=> t('Temperature of the left extruder: %d °C', array($data_status['print_temperL'])),
-						'print_temperR'	=> t('Temperature of the right extruder: %d °C', array($data_status['print_temperR'])),
-						'value_temperL'	=> $data_status['print_temperL'],
-						'value_temperR'	=> $data_status['print_temperR'],
-				);
-				$this->parser->parse('template/printdetail/status_ajax', $template_data);
-// 				break;
-				
-// 			default:
-// 				$this->output->set_status_header(403);
-// 				return;
-// 				break; // never reach here
-// 		}
+		// treat time remaining for display
+		if (isset($data_status['print_remain'])) {
+			$time_remain = TimeDisplay__convertsecond(
+					$data_status['print_remain'], t('Time remaining: '), t('under calculating'));
+		}
+		else {
+			$time_remain = t('Time remaining: ') . t('unknown');
+		}
+		
+		// parse the ajax part
+		$template_data = array(
+				'print_percent'	=> t('Percentage: %d%%', array($data_status['print_percent'])),
+				'print_remain'	=> $time_remain,
+				'print_temperL'	=> t('Temperature of the left extruder: %d °C', array($data_status['print_temperL'])),
+				'print_temperR'	=> t('Temperature of the right extruder: %d °C', array($data_status['print_temperR'])),
+				'value_temperL'	=> $data_status['print_temperL'],
+				'value_temperR'	=> $data_status['print_temperR'],
+		);
+		$this->parser->parse('template/printdetail/status_ajax', $template_data);
 		
 		$this->output->set_content_type('text/plain; charset=UTF-8');
 		

@@ -29,7 +29,7 @@ if (!defined("ERROR_OK")) {
 	define("ERROR_IN_UPDATE",		452);
  	define("ERROR_WRONG_FORMAT",	453);
 	
-	define("ERROR_INTERNAL",		499);
+	define("ERROR_INTERNAL",		500);
 	
 	// normal program return code
 	define('ERROR_NORMAL_RC_OK',	0);

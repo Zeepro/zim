@@ -257,7 +257,8 @@ function PrinterState_setTemperature($val_temperature, $type = 'e') {
 	return ERROR_OK;
 }
 
-function PrinterState_getCartridge(&$json_cartridge, $abb_cartridge = 'r') { //TODO verify in spec: no default value here
+function PrinterState_getCartridge(&$json_cartridge, $abb_cartridge = 'r') {
+	// normally, no default value here, but we set it to right as default
 	$array_data = array();
 	$cr = 0;
 	
@@ -476,7 +477,6 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 	return ERROR_OK;
 }
 
-//TODO perhaps we will change the input parameters
 function PrinterState_checkFilaments($array_filament = array(
 		PRINTERSTATE_RIGHT_EXTRUD => 0, PRINTERSTATE_LEFT_EXTRUD => 0),
 		&$data_json_array = array()) {
