@@ -18,17 +18,27 @@ $lang['Wait for unloading...']
 	= '等待卸载中…';
 $lang['Not enough filament']
 	= '没有足够的打印丝';
-$lang['Load']
-	= '装载';
-$lang['Change']
-	= '更换';
+$lang['OK']
+	= '确认';
+$lang['Your cartridge is loaded']
+	= '您的墨盒已装载';
+$lang['Change the cartridge']
+	= '更换墨盒';
 $lang['Waiting for loading...']
 	= '等待装载中…';
 $lang['Need prime?']
-	= '是否需要打印起弧（用于更换颜色的情况）？';
+	= '是否需要打印校正（用于更换颜色的情况）？';
 $lang['Yes']
 	= '是';
 $lang['No']
 	= '否';
+$lang['Model']
+	= '模型';
+$lang['Cartridge']
+	= '墨盒';
+$lang['No model']
+	= '没有模型';
+$lang['Error']
+	= '错误';
 
 ?>

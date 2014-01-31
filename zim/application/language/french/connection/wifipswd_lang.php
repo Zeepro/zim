@@ -1,8 +1,8 @@
 <?php
 $lang['network'] =
-        "Réseau wifi %s";
+        "Réseau Wifi %s";
 $lang['network password'] =
-        "Saisissez le mot de passe";
+        "Saisissez le mot de passe de votre réseau";
 $lang['OK'] =
         "Valider";
 ?>

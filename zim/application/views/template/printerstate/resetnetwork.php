@@ -5,7 +5,7 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
-			<h2 style="text-align: center;">{hint}</h2>
+	<!-- 		<h2 style="text-align: center;">{hint}</h2> -->
 			<form method="post" accept-charset="utf-8">
 				<div>
 					<input type="submit" value="{reset_button}" />

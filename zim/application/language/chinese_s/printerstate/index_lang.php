@@ -5,5 +5,5 @@ $lang['back']
 
 $lang['ZeePro Personal Printer 21 - Configuration']
 	= 'Zim - 设置';
-$lang['Reset network']
+$lang['Reset printer\'s network']
 	= '重置网络';

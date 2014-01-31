@@ -9,5 +9,5 @@ $lang['confirmation text'] =
 		<a href=\"http://zim\">http://zim</a></br>
 		</br>
 		</br>
-		如果已有Zim打印机连接在您的网络中，您新的打印机地址将会是第一个可用的 http://zimXXX 链接，例如： http://zim1 http://zim2 …</i>";
+		如果已有Zim打印机连接在您的网络中，您新的打印机地址将会是第一个可用的链接 http://zimXXX，例如： http://zim1 http://zim2 …</i>";
 ?>

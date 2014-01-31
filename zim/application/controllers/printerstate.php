@@ -68,20 +68,24 @@ class Printerstate extends MY_Controller {
 		return;
 	}
 	
-	private function _display_changecartridge_wait_load_filament($change_able = TRUE) {
+	private function _display_changecartridge_wait_load_filament($change_able = FALSE, $id_model = NULL, $abb_cartridge = NULL) {
 		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
 		if ($change_able == TRUE) {
 			$template_data = array (
 					'next_phase'	=> PRINTERSTATE_CHANGECART_WAIT_F_C,
-					'load_button'	=> t('Load'),
-					'change_button'	=> t('Change'),
+					'load_button'	=> t('OK'),
+					'change_button'	=> t('Change the cartridge'),
+					'wait_info'		=> t('Waiting for getting information...'),
+					'abb_cartridge'	=> $abb_cartridge,
+					'id_model'		=> $id_model,
 			);
 			$template_name = 'template/printerstate/changecartridge_ajax/wait_load_change_filament';
 		}
 		else {
 			$template_data = array (
 					'next_phase'	=> PRINTERSTATE_CHANGECART_WAIT_F,
-					'load_button'	=> t('Load'),
+					'load_button'	=> t('OK'),
+					'hint'			=> t('Your cartridge is loaded'),
 			);
 			$template_name = 'template/printerstate/changecartridge_ajax/wait_load_filament';
 			
@@ -89,6 +93,55 @@ class Printerstate extends MY_Controller {
 		$this->_display_changecartridge_base($template_name, $template_data);
 		
 		$this->output->set_status_header(202); // disable checking
+		
+		return;
+	}
+	
+	private function _display_changecartridge_cartridge_detail($abb_cartridge, $id_model) {
+		$this->load->helper(array('printlist', 'printerstate'));
+		$this->load->library('parser');
+		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
+		
+		$color_model = PRINTERSTATE_VALUE_DEFAULT_COLOR;
+		$color_cart = PRINTERSTATE_VALUE_DEFAULT_COLOR;
+		$model_title = t('Model');
+		$cartridge_title = t('Cartridge');
+		$template_data = array();
+		
+		if ($id_model) {
+			$cr = 0;
+			$model_data = array();
+			$cartridge_data = array();
+		
+			$cr = ModelList__getDetailAsArray($id_model, $model_data, TRUE);
+			if (($cr != ERROR_OK) || is_null($model_data)) {
+				//TODO log error here
+				$id_model = NULL;
+				$model_title = t('No model');
+			}
+			else {
+				$color_model = ($abb_cartridge == 'r')
+				? $model_data[PRINTLIST_TITLE_COLOR_F1] : $model_data[PRINTLIST_TITLE_COLOR_F2];
+			}
+		
+			$cr = PrinterState_getCartridgeAsArray($cartridge_data, $abb_cartridge);
+			if (($cr != ERROR_OK) && is_null($cartridge_data)) {
+				//TODO log error here
+				$cartridge_title = t('Error');
+			}
+			else {
+				$color_cart = $cartridge_data[PRINTERSTATE_TITLE_COLOR];
+			}
+		}
+		
+		$template_data = array (
+				'cart_title'	=> $cartridge_title,
+				'model_title'	=> $model_title,
+				'model_color'	=> $color_model,
+				'cart_color'	=> $color_cart,
+		);
+		
+		$this->parser->parse('template/printerstate/changecartridge_ajax/detail_cartridge', $template_data);
 		
 		return;
 	}
@@ -151,7 +204,7 @@ class Printerstate extends MY_Controller {
 
 		// parse the main body
 		$template_data = array(
-				'reset_network'	=> t('Reset network'),
+				'reset_network'	=> t('Reset printer\'s network'),
 				'back'			=> t('back'),
 		);
 		
@@ -296,7 +349,7 @@ class Printerstate extends MY_Controller {
 						$ret_val = PrinterState_checkFilament($abb_cartridge, $need_filament);
 						if ($ret_val == $code_miss_filament) {
 							// have cartridge, enough filament
-							$this->_display_changecartridge_wait_load_filament();
+							$this->_display_changecartridge_wait_load_filament(TRUE, $id_model, $abb_cartridge);
 						}
 						else if ($ret_val == $code_low_filament) {
 							// have cartridge, low filament
@@ -410,7 +463,7 @@ class Printerstate extends MY_Controller {
 				// we call the page: wait load filament / change cartridge
 				if (CoreStatus_checkInIdle()) {
 					// in idle
-					$this->_display_changecartridge_wait_load_filament($change_able);
+					$this->_display_changecartridge_wait_load_filament($change_able, $id_model, $abb_cartridge);
 				}
 				else {
 					// in busy (normally only loading is possible)
@@ -473,6 +526,11 @@ class Printerstate extends MY_Controller {
 				}
 				break;
 				
+			case 'detail':
+				$id_model = $this->input->get('id');
+				$this->_display_changecartridge_cartridge_detail($abb_cartridge, $id_model);
+				break;
+				
 			default:
 				$this->output->set_status_header(403); // unknown request
 				break;
@@ -498,7 +556,7 @@ class Printerstate extends MY_Controller {
 		
 				// parse the main body
 				$template_data = array(
-						'hint'		=> t('Connect to the new network of printer, then press OK'),
+						'hint'		=> t('Connect to the new printer\'s network, then press OK'),
 						'ok_button'	=> t('OK'),
 				);
 				
@@ -523,8 +581,8 @@ class Printerstate extends MY_Controller {
 		
 		// parse the main body
 		$template_data = array(
-				'hint'			=> t('Press to reset network'),
-				'reset_button'	=> t('Reset'),
+// 				'hint'			=> t('Press to reset network'),
+				'reset_button'	=> t('Reset the printer\'s network'),
 				'error'			=> $error,
 				'back'			=> t('back'),
 		);

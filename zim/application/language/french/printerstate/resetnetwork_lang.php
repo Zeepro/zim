@@ -4,14 +4,14 @@ $lang['back']
 	= 'retour';
 
 $lang['ZeePro Personal Printer 21 - Reset connection']
-	= 'Zim - Remettre réseau';
-$lang['Reset']
-	= 'Remettre';
+	= 'Zim - Réinitialiser le réseau';
+$lang['Reset the printer\'s network']
+	= 'Réinitialiser le réseau de l\'imprimante';
 $lang['Press to reset network']
-	= 'Appuyez pour remettre réseau';
+	= 'Appuyez pour réinitialiser le réseau';
 $lang['Reset error']
-	= 'Erreur de remise';
-$lang['Connect to the new network of printer, then press OK']
-	= 'Connectez au nouveau réseau de l\'imprimant, et appuyez OK ensuite';
+	= 'Erreur de réinitialisation';
+$lang['Connect to the new printer\'s network, then press OK']
+	= 'Connectez-vous au nouveau réseau de l\'imprimante, et appuyez OK';
 $lang['OK']
 	= 'OK';

@@ -20,6 +20,8 @@ $lang['ok']
 	= 'ok';
 $lang['not enough']
 	= '不足';
+$lang['unloaded']
+	= '未装载';
 $lang['Filament']
 	= '打印丝';
 $lang['Change']

@@ -207,25 +207,25 @@ class Connection extends MY_Controller {
 			header ( "Location:/connection/confirmation" );
         }
     }
-    
-	public function ip_check($ip) {
+	
+	private function ip_check($ip) {
 		if (filter_var ( $ip, FILTER_VALIDATE_IP )) {
 			return TRUE;
 		} else {
 			return FALSE;
 		}
 	}
-    
-	public function mask_check($mask) {
+	
+	private function mask_check($mask) {
 		if (! $m = ip2long ( $mask ))
 			return false;
 		
 		$m = ~ $m;
 		return $m && ~ $m && ! ($m & ($m + 1));
 	}
-    
-	public function gateway_check($ip) {
-    // @todo The gateway should be within the mask
+	
+	private function gateway_check($ip) {
+	// @todo The gateway should be within the mask
 		if (filter_var ( $ip, FILTER_VALIDATE_IP )) {
 			return TRUE;
 		} else {
@@ -278,9 +278,9 @@ class Connection extends MY_Controller {
 
 		// parse the main body
 		$template_data = array(
-				'title'			=> t('Personalize your network of printer'),
-				'ssid_title'	=> t('Input your network name'),
-				'pwd_title'		=> t('Input your password'),
+				'title'			=> t('Personalize the printer\'s network'),
+				'ssid_title'	=> t('Write your network\'s name'),
+				'pwd_title'		=> t('Write your password'),
 				'error'			=> $error,
 				'ok'			=> t('OK'),
 				'back'			=> t('back'),

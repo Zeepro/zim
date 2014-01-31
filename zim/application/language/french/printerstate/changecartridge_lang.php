@@ -13,22 +13,32 @@ $lang['Right cartridge change']
 $lang['Unload']
 	= 'Retirer';
 $lang['Waiting for getting information...']
-	= 'En cours d\'obtenir des informations ...';
+	= 'Récupération des informations ...';
 $lang['Wait for unloading...']
-	= 'En cours de retirement ...';
+	= 'Retrait en cours...';
 $lang['Not enough filament']
 	= 'Filament insuffisant';
-$lang['Load']
-	= 'Charger';
-$lang['Change']
-	= 'Changer';
+$lang['OK']
+	= 'Valider';
+$lang['Your cartridge is loaded']
+	= 'Votre cartouche est chargée';
+$lang['Change the cartridge']
+	= 'Changer la cartouche';
 $lang['Waiting for loading...']
-	= 'En cours de chargement ...';
+	= 'Chargement en cours...';
 $lang['Need prime?']
 	= 'Besoin d\'amorçage ?';
 $lang['Yes']
 	= 'Oui';
 $lang['No']
 	= 'Non';
+$lang['Model']
+	= 'Modèle';
+$lang['Cartridge']
+	= 'Cartouche';
+$lang['No model']
+	= 'Pas de modèle';
+$lang['Error']
+	= 'Erreur';
 
 ?>

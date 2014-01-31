@@ -2,7 +2,7 @@
 $lang['ZeePro Personal Printer 21 - Connection configuration'] =
         "Zim - Connection configuration";
 $lang['Connection configuration'] =
-        "Welcome!";
+        "Welcome to your Zim configuration!";
 $lang['Welcome...'] =
         "Choose your printer connection:";
 $lang['Option 1'] =
@@ -10,5 +10,5 @@ $lang['Option 1'] =
 $lang['Option 2'] =
         "Wired network connection";
 $lang['Option 3'] =
-        "WiFi Access Point mode (peer to peer)";
+        "WiFi Peer to Peer";
 ?>

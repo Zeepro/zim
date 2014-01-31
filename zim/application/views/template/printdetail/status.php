@@ -28,7 +28,7 @@
 				</div>
 <!-- 				<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete">{print_stop}</button> -->
 			</div>
-			<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete" id="print_action">{print_stop}</button>
+			<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete" id="print_action" onclick='javascript: stopPrint();'>{print_stop}</button>
 		</div>
 	</div>
 </div>
@@ -62,19 +62,28 @@ function checkPrintStatus() {
 	}
 }
 
-function finishAction() {
-	if (var_prime == true) {
-		finishPrime();
-	}
-	else {
-		finishPrint();
+function finishLoop() {
+	clearInterval(var_refreshPrintStatus);
+
+	return;
+}
+
+function stopPrint() {
+	finishLoop();
+	setTimeout(redirect_cancel, 1000);
+
+	function redirect_cancel() {
+// 		window.location.href="/printdetail/cancel?_=" + Math.round(+new Date / 1e3);
+		window.location.href="/printdetail/cancel";
+
+		return;
 	}
 
 	return;
 }
 
 function finishPrint() {
-	clearInterval(var_refreshPrintStatus);
+	finishLoop();
 	// display info
 	$("#print_detail_info").html('<p>{finish_info}</p>');
 	// change return button
@@ -92,6 +101,17 @@ function finishPrime() {
 	$('<button>').appendTo('#container')
 	.attr({'id': 'yes_button', 'onclick': 'javascript: window.location.href="{restart_url}";'}).html('{prime_button}')
 	.button().button('refresh');
+
+	return;
+}
+
+function finishAction() {
+	if (var_prime == true) {
+		finishPrime();
+	}
+	else {
+		finishPrint();
+	}
 
 	return;
 }

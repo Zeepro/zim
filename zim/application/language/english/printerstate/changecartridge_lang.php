@@ -18,10 +18,12 @@ $lang['Wait for unloading...']
 	= 'Wait for unloading...';
 $lang['Not enough filament']
 	= 'Not enough filament';
-$lang['Load']
-	= 'Load';
-$lang['Change']
-	= 'Change';
+$lang['OK']
+	= 'OK';
+$lang['Your cartridge is loaded']
+	= 'Your cartridge is loaded';
+$lang['Change the cartridge']
+	= 'Change the cartridge';
 $lang['Waiting for loading...']
 	= 'Waiting for loading...';
 $lang['Need prime?']
@@ -30,5 +32,13 @@ $lang['Yes']
 	= 'Yes';
 $lang['No']
 	= 'No';
+$lang['Model']
+	= 'Model';
+$lang['Cartridge']
+	= 'Cartridge';
+$lang['No model']
+	= 'No model';
+$lang['Error']
+	= 'Error';
 
 ?>

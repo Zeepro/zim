@@ -114,12 +114,12 @@ class Printmodel extends MY_Controller {
 				break;
 				
 			case ERROR_MISS_RIGT_CART:
-				$check_right_filament = t('unloaded');
+				$check_right_filament = t('empty');
 				$change_right_filament = t('Load');
 				break;
 				
 			case ERROR_MISS_RIGT_FILA:
-				$check_right_filament = t('empty');
+				$check_right_filament = t('unloaded');
 				$change_right_filament = t('Load');
 				break;
 				
@@ -150,12 +150,12 @@ class Printmodel extends MY_Controller {
 				break;
 				
 			case ERROR_MISS_LEFT_CART:
-				$check_left_filament = t('unloaded');
+				$check_left_filament = t('empty');
 				$change_left_filament = t('Load');
 				break;
 				
 			case ERROR_MISS_LEFT_FILA:
-				$check_left_filament = t('empty');
+				$check_left_filament = t('unloaded');
 				$change_left_filament = t('Load');
 				break;
 				

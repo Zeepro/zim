@@ -2,7 +2,7 @@
 $lang['ZeePro Personal Printer 21'] =
         "Zim";
 $lang['Back'] =
-		"Précédent";
+		"Retour"; // Précédent
 $lang['Home'] =
         "Accueil";
 $lang['Menu'] =

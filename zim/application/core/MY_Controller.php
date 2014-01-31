@@ -41,11 +41,23 @@ class MY_Controller extends CI_Controller {
 			else if (CoreStatus_checkCallConnection()) {
 				$url_redirect = '/';
 			}
+			// check we are in runGcode debug interface
+			else if (CoreStatus_checkCallRunGcode()) {
+				// we always let this interface go to debug
+				return;
+			}
 			// check working issue
 			else if (!CoreStatus_checkInIdle($status_current)) {
 				switch($status_current) {
 					case CORESTATUS_VALUE_PRINT:
 						if (CoreStatus_checkCallPrinting($url_redirect)) {
+							return; // we are calling the right page
+						}
+						break;
+						
+					case CORESTATUS_VALUE_CANCEL:
+						//TODO test here for canceling
+						if (CoreStatus_checkCallCanceling($url_redirect)) {
 							return; // we are calling the right page
 						}
 						break;
@@ -63,12 +75,12 @@ class MY_Controller extends CI_Controller {
 				}
 			}
 			else {
-				if (CoreStatus_checkCallPrintingAjax()) {
-					// let ajax request failed when we finishing printing
+				if (CoreStatus_checkCallPrintingAjax() || CoreStatus_checkCallCancelingAjax()) {
+					// let ajax request failed when we finishing printing / canceling
 					$protocol = (isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0');
 					header($protocol . ' 403');
 					header('Content-type: text/plain; charset=UTF-8');
-					echo 'Not in printing';
+					echo 'Not in printing / canceling';
 					exit;
 				}
 				else if (CoreStatus_checkCallPrinting()) {
@@ -82,8 +94,12 @@ class MY_Controller extends CI_Controller {
 				return; // continue to generate the current page
 			}
 			
-// 			redirect($url_redirect);
-// 			return;
+			// log error if we have no redirect url when reaching here
+			if (is_null($url_redirect)) {
+				$this->load->helper('printerlog');
+				PrinterLog_logError('no redirect place when MY_Controller finished');
+			}
+			
 			header('Location: ' . $url_redirect);
 			exit;
 		}

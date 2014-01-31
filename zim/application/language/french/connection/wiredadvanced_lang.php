@@ -6,7 +6,7 @@ $lang['Text'] =
 $lang['ip'] =
         "Adresse IP";
 $lang['ip error'] =
-        "Adresse incorrecte";
+        "Adresse IP incorrecte";
 $lang['mask'] =
         "Masque";
 $lang['mask error'] =
@@ -18,7 +18,7 @@ $lang['gateway error'] =
 $lang['dns'] =
         "Serveur DNS";
 $lang['dns error'] =
-        "Adresse incorrecte";
+        "Adresse DNS incorrecte";
 $lang['ip ex'] =
         "ex : 192.168.0.100";
 $lang['mask ex'] =

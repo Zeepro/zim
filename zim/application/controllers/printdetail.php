@@ -6,7 +6,7 @@ class Printdetail extends MY_Controller {
 	function __construct() {
 		parent::__construct ();
 		$this->load->helper( array(
-				'printerstate',
+// 				'printerstate',
 				'url',
 				'json'
 		) );
@@ -55,7 +55,6 @@ class Printdetail extends MY_Controller {
 		$data_status = array();
 		$temper_status = array();
 		
-		$this->load->helper('printerstate');
 		$this->load->library('parser');
 		$this->lang->load('printdetail', $this->config->item('language'));
 		
@@ -99,7 +98,7 @@ class Printdetail extends MY_Controller {
 	
 	public function status_ajax() {
 		$template_data = array();
-		$printing_status = '';
+// 		$printing_status = '';
 		$ret_val = 0;
 		$data_status = array();
 		$time_remain = 0;
@@ -109,7 +108,7 @@ class Printdetail extends MY_Controller {
 		$this->lang->load('printdetail', $this->config->item('language'));
 		$this->lang->load('timedisplay', $this->config->item('language'));
 		
-		$ret_val = Printer_checkPrint($data_status);
+		$ret_val = Printer_checkPrintStatus($data_status);
 		if ($ret_val == FALSE) {
 			$this->load->helper('corestatus');
 			$ret_val = CoreStatus_setInIdle();
@@ -150,6 +149,105 @@ class Printdetail extends MY_Controller {
 				'value_temperR'	=> $data_status['print_temperR'],
 		);
 		$this->parser->parse('template/printdetail/status_ajax', $template_data);
+		
+		$this->output->set_content_type('text/plain; charset=UTF-8');
+		
+		return;
+	}
+	
+	public function cancel() {
+		global $CFG;
+		$ret_val = NULL;
+		//TODO finish me for canceling
+		$this->load->helper('printer');
+		
+		$ret_val = Printer_stopPrint();
+		if ($ret_val == TRUE) {
+			$template_data = array();
+			$body_page = '';
+			
+			$this->load->library('parser');
+			$this->lang->load('printdetail', $this->config->item('language'));
+			
+			// parse the main body
+			$template_data = array(
+					'title'			=> t('Control your printing'),
+					'wait_info'		=> t('Waiting for canceling...'),
+					'finish_info'	=> t('Congratulation, your printing is canceled!'),
+					'return_button'	=> t('Home'),
+					'return_url'	=> '/',
+			);
+			
+			$body_page = $this->parser->parse('template/printdetail/cancel', $template_data, TRUE);
+			
+			// parse all page
+			$template_data = array(
+					'lang'			=> $CFG->config ['language_abbr'],
+					'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Calceling details') . '</title>',
+					'contents'		=> $body_page,
+			);
+			
+			$this->parser->parse('template/basetemplate', $template_data);
+			
+			return;
+		}
+		else {
+			$this->load->helper('printerlog');
+			PrinterLog_logError('can not stop printing');
+			$this->output->set_status_header(403);
+			return;
+		}
+		
+		return;
+	}
+	
+	public function cancel_ajax() {
+		//TODO finish me for canceling
+		$template_data = array();
+		$ret_val = 0;
+		$data_status = array();
+		
+		$this->load->helper(array('printer', 'timedisplay'));
+		$this->load->library('parser');
+		$this->lang->load('printdetail', $this->config->item('language'));
+		$this->lang->load('timedisplay', $this->config->item('language'));
+		
+		$ret_val = Printer_checkCancelStatus($data_status);
+		if ($ret_val == FALSE) {
+			$this->load->helper('corestatus');
+			$ret_val = CoreStatus_setInIdle();
+			if ($ret_val == FALSE) {
+				// log internal error
+				$this->load->helper('printerlog');
+				PrinterLog_logError('can not set idle after calceling');
+			}
+			
+			//FIXME just set temperature for simulation
+			$this->load->helper('printerstate');
+			PrinterState_setExtruder('r');
+			PrinterState_setTemperature(20);
+			PrinterState_setExtruder('l');
+			PrinterState_setTemperature(20);
+			PrinterState_setExtruder('r');
+			
+			$this->output->set_status_header(202);
+			return;
+		}
+		
+// 		// treat time remaining for display
+// 		if (isset($data_status['print_remain'])) {
+// 			$time_remain = TimeDisplay__convertsecond(
+// 					$data_status['print_remain'], t('Time remaining: '), t('under calculating'));
+// 		}
+// 		else {
+// 			$time_remain = t('Time remaining: ') . t('unknown');
+// 		}
+		
+		// parse the ajax part
+		$template_data = array(
+				'wait_info'	=> t('In canceling'),
+		);
+		$this->parser->parse('template/printdetail/cancel_ajax', $template_data);
 		
 		$this->output->set_content_type('text/plain; charset=UTF-8');
 		

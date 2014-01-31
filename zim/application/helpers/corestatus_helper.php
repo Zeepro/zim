@@ -24,6 +24,7 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_VALUE_LOAD_FILA_R',		'loading_right');
 	define('CORESTATUS_VALUE_UNLOAD_FILA_L',	'unloading_left');
 	define('CORESTATUS_VALUE_UNLOAD_FILA_R',	'unloading_right');
+	define('CORESTATUS_VALUE_CANCEL',			'canceling');
 // 	define('CORESTATUS_VALUE_UPGRADE',			'upgrading');
 
 	define('CORESTATUS_PRM_CAMERA_START',
@@ -108,14 +109,24 @@ function CoreStatus_checkCallPrinting(&$url_redirect = '') {
 	return CoreStatus__checkCallURI(array(
 			'/printdetail/status'		=> NULL,
 			'/printdetail/status_ajax'	=> NULL,
+			'/printdetail/cancel'		=> NULL, // for canceling printing
+			'/printdetail/cancel_ajax'	=> NULL, // for canceling printing
 	));
 }
 
 function CoreStatus_checkCallPrintingAjax() {
-	$url_redirect = '/printdetail/status';
+// 	$url_redirect = '/printdetail/status';
 	
 	return CoreStatus__checkCallURI(array(
 			'/printdetail/status_ajax'	=> NULL,
+	));
+}
+
+function CoreStatus_checkCallCancelingAjax() {
+// 	$url_redirect = '/printdetail/status';
+	
+	return CoreStatus__checkCallURI(array(
+			'/printdetail/cancel_ajax'	=> NULL,
 	));
 }
 
@@ -128,7 +139,22 @@ function CoreStatus_checkCallNoBlockREST() {
 			'/rest/get'		=> array(
 					'p'	=> array(PRINTERSTATE_PRM_TEMPER, PRINTERSTATE_PRM_INFO),
 			),
+			'/rest/cancel'	=> NULL, //TODO make it only for printing, now for all status
+			'/rest/gcode'	=> NULL,
 	));
+}
+
+function CoreStatus_checkCallCanceling(&$url_redirect = '') {
+	$url_redirect = '/printdetail/cancel';
+	
+	return CoreStatus__checkCallURI(array(
+			'/printdetail/cancel'		=> NULL,
+			'/printdetail/cancel_ajax'	=> NULL,
+	));
+}
+
+function CoreStatus_checkCallRunGcode() {
+	return CoreStatus__checkCallController('gcode');
 }
 
 function CoreStatus_setInIdle() {
@@ -158,24 +184,37 @@ function CoreStatus_setInIdle() {
 	);
 }
 
-function CoreStatus_setInPrinting() {
-	// start camera http live streaming
-	global $CFG;
-	$output = NULL;
-	$ret_val = 0;
-	$command = $CFG->config['camera'] . CORESTATUS_PRM_CAMERA_START;
+function CoreStatus_setInPrinting($stop_printing = FALSE) {
+	if ($stop_printing == FALSE) {
+		// start camera http live streaming
+		global $CFG;
+		$output = NULL;
+		$ret_val = 0;
+		$command = $CFG->config['camera'] . CORESTATUS_PRM_CAMERA_START;
+		
+		exec($command, $output, $ret_val);
+		if ($ret_val != ERROR_NORMAL_RC_OK) {
+			$CI = &get_instance();
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('camera start command error');
+			return FALSE;
+		}
 	
-	exec($command, $output, $ret_val);
-	if ($ret_val != ERROR_NORMAL_RC_OK) {
-		$CI = &get_instance();
-		$CI->load->helper('printerlog');
-		PrinterLog_logError('camera start command error');
-		return FALSE;
+		return CoreStatus__setInStatus(CORESTATUS_VALUE_PRINT,
+				array(CORESTATUS_TITLE_STARTTIME => time())
+		);
 	}
-	
-	return CoreStatus__setInStatus(CORESTATUS_VALUE_PRINT,
-			array(CORESTATUS_TITLE_STARTTIME => time())
-	);
+	else {
+		//TODO check if we need remaining time for canceling or not?
+		return CoreStatus__setInStatus(CORESTATUS_VALUE_CANCEL);
+// 		return CoreStatus__setInStatus(CORESTATUS_VALUE_CANCEL,
+// 				array(CORESTATUS_TITLE_STARTTIME => time())
+// 		);
+	}
+}
+
+function CoreStatus_setInCanceling() {
+	return CoreStatus_setInPrinting(TRUE);
 }
 
 function CoreStatus_setInLoading($abb_filament) {

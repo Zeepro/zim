@@ -6,7 +6,7 @@ $lang['Text'] =
 $lang['ip'] =
         "IP address";
 $lang['ip error'] =
-        "Invalid address";
+        "Invalid IP address";
 $lang['mask'] =
         "Mask";
 $lang['mask error'] =
@@ -18,13 +18,13 @@ $lang['gateway error'] =
 $lang['dns'] =
         "DNS server";
 $lang['dns error'] =
-        "Invalid address";
+        "DNS error";
 $lang['ip ex'] =
-        "ex: 192.168.0.100";
+        "IP adress eg. 192.168.0.100";
 $lang['mask ex'] =
-        "ex: 255.255.255.0";
+        "Mask eg. 255.255.255.0";
 $lang['gateway ex'] =
-        "ex: 192.168.0.1";
+        "Gateway eg. 192.168.0.1";
 $lang['dns ex'] =
-        "ex: 192.168.0.1";
+        "DNS eg. 192.168.0.1";
 ?>

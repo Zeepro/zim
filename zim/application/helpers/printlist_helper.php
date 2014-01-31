@@ -35,7 +35,9 @@ if (!defined('PRINTLIST_MAX_PIC_SIZE')) {
 
 	define('PRINTLIST_VALUE_VERSION',	2);
 	define('PRINTLIST_MODEL_PRIME_L',	'_prime_left');
-	define('PRINTLIST_MODEL_PRIME_R',		'_prime_right');
+	define('PRINTLIST_MODEL_PRIME_R',	'_prime_right');
+	define('PRINTLIST_MODEL_CANCEL',	'_cancel');
+	define('PRINTLIST_MODEL_PREFIX_S',	'_');
 	
 	define('PRINTLIST_FILE_GCODE',		'model.gcode');
 	define('PRINTLIST_FILE_JSON',		'model.json');
@@ -391,8 +393,9 @@ function ModelList__listAsArray($set_localization = FALSE) {
 		$model_path = $printlist_basepath . $model_name . '/';
 		$nb_pic = 0;
 		
-		// jump through the two prime special models
-		if ($model_name == PRINTLIST_MODEL_PRIME_L || $model_name == PRINTLIST_MODEL_PRIME_R) {
+		// jump through the special models
+// 		if ($model_name == PRINTLIST_MODEL_PRIME_L || $model_name == PRINTLIST_MODEL_PRIME_R) {
+		if ($model_name[0] == PRINTLIST_MODEL_PREFIX_S) {
 			continue;
 		}
 		

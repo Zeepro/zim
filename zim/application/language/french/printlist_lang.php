@@ -20,6 +20,8 @@ $lang['ok']
 	= 'ok';
 $lang['not enough']
 	= 'insuffisant';
+$lang['unloaded']
+	= 'déchargé';
 $lang['Filament']
 	= 'Filament';
 $lang['Change']

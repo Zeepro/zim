@@ -23,19 +23,19 @@ $CI->load->helper(array (
 	
 // }
 
-function Printer_printFromModel($id_model) {
+function Printer_printFromModel($id_model, $stop_printing = FALSE) {
 	$gcode_path = NULL;
 	$ret_val = 0;
 	
 	$ret_val = Printer__getFileFromModel($id_model, $gcode_path);
 	if (($ret_val == ERROR_OK) && $gcode_path) {
-		$ret_val = Printer_printFromFile($gcode_path);
+		$ret_val = Printer_printFromFile($gcode_path, $stop_printing);
 	}
 	
 	return $ret_val;
 }
 
-function Printer_printFromFile($gcode_path) {
+function Printer_printFromFile($gcode_path, $stop_printing = FALSE) {
 	$command = '';
 	$output = array();
 	$ret_val = 0;
@@ -48,11 +48,15 @@ function Printer_printFromFile($gcode_path) {
 		return ERROR_INTERNAL;
 	}
 
-	// check if in printing
-	$ret_val = PrinterState_checkInPrint();
-	if ($ret_val == TRUE) {
-// 		return ERROR_IN_PRINT;
-		return ERROR_BUSY_PRINTER;
+	// only check if we are in printing when we are not called stopping printing
+	if ($stop_printing == FALSE) {
+		// check if in printing
+		$ret_val = PrinterState_checkInPrint();
+		if ($ret_val == TRUE) {
+// 			return ERROR_IN_PRINT;
+			PrinterLog_logDebug('already in printing');
+			return ERROR_BUSY_PRINTER;
+		}
 	}
 
 	// check if having enough filament
@@ -62,18 +66,23 @@ function Printer_printFromFile($gcode_path) {
 		return $ret_val;
 	}
 	
-	//FIXME just set temperature for simulation
-	PrinterState_setExtruder('r');
-	PrinterState_setTemperature(210);
-	PrinterState_setExtruder('l');
-	PrinterState_setTemperature(200);
-	PrinterState_setExtruder('r');
-
-	// change status json file
-	$ret_val = CoreStatus_setInPrinting();
-	if ($ret_val == FALSE) {
-		return ERROR_INTERNAL;
+	if ($stop_printing == FALSE) {
+		//FIXME just set temperature for simulation
+		PrinterState_setExtruder('r');
+		PrinterState_setTemperature(210);
+		PrinterState_setExtruder('l');
+		PrinterState_setTemperature(200);
+		PrinterState_setExtruder('r');
+	
+		// change status json file
+		$ret_val = CoreStatus_setInPrinting();
 	}
+	else {
+		$ret_val = CoreStatus_setInCanceling();
+	}
+// 	if ($ret_val == FALSE) {
+// 		return ERROR_INTERNAL;
+// 	}
 
 	// pass gcode to printer
 	$command = PrinterState_getPrintCommand() . $gcode_path;
@@ -92,6 +101,59 @@ function Printer_printFromFile($gcode_path) {
 
 	return ERROR_OK;
 	
+}
+
+function Printer_stopPrint() {
+	$CI = &get_instance();
+	$CI->load->helper('corestatus');
+	
+	// check if we are in canceling / printing in json file
+	$cr = CoreStatus_checkInIdle($status_current);
+	if ($cr == FALSE) {
+		if ($status_current == CORESTATUS_VALUE_CANCEL) {
+			// in canceling
+			return TRUE;
+		}
+		else if ($status_current != CORESTATUS_VALUE_PRINT) {
+			// in other status
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('no printing / canceling status when calling canceling');
+			return FALSE;
+		}
+		else {
+			// in printing
+			$CI->load->helper(array('printlist', 'printerstate'));
+			
+			// call stop printing gcode status
+			$cr = PrinterState_stopPrinting();
+			if ($cr != ERROR_OK) {
+				// log error here
+				$CI->load->helper('printerlog');
+				PrinterLog_logError('stop gcode failed');
+				return FALSE;
+			}
+			
+			// start to call printing of a special model to reset printer
+			$cr = Printer_printFromModel(ModelList_codeModelHash(PRINTLIST_MODEL_CANCEL), TRUE);
+			if ($cr == ERROR_OK) {
+				return TRUE;
+			}
+			else {
+				// log error here
+				$CI->load->helper('printerlog');
+				PrinterLog_logError('start printing canceling model failed');
+				return FALSE;
+			}
+		}
+	}
+	else {
+		// in idle
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('in idle when calling canceling');
+		return FALSE;
+	}
+	
+	return FALSE; // never reach here
 }
 
 // function Printer_startPrintingStatusFromModel($id_model) {
@@ -206,7 +268,7 @@ function Printer_printFromFile($gcode_path) {
 // }
 
 // return TRUE only when we are in printing
-function Printer_checkPrint(&$return_data) {
+function Printer_checkPrintStatus(&$return_data) {
 	global $CFG;
 	$data_status = array();
 	$temper_status = array();
@@ -250,6 +312,26 @@ function Printer_checkPrint(&$return_data) {
 	// get time remaining if exists
 	if (isset($data_status[PRINTERSTATE_TITLE_DURATION])) {
 		$return_data['print_remain'] = $data_status[PRINTERSTATE_TITLE_DURATION];
+	}
+	
+	return TRUE;
+}
+
+
+function Printer_checkCancelStatus() {
+	global $CFG;
+	$data_status = array();
+	$temper_status = array();
+
+	$CI = &get_instance();
+	$CI->load->helper(array('printerstate', 'corestatus'));
+
+	// check status if we are not in canceling
+	$data_status = PrinterState_checkStatusAsArray();
+	if ($data_status[PRINTERSTATE_TITLE_STATUS] != CORESTATUS_VALUE_CANCEL) {
+		$CI->load->helper('printerlog');
+		PrinterLog_logMessage('not in canceling when checking cancel status');
+		return FALSE;
 	}
 	
 	return TRUE;

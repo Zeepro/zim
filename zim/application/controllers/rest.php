@@ -36,11 +36,15 @@ class Rest extends MY_Controller {
 			
 			switch ($status_current) {
 				case CORESTATUS_VALUE_PRINT:
+				case CORESTATUS_VALUE_CANCEL: // we treat canceling as printing
+					//TODO test here for canceling
 					$this->load->helper('printerstate');
 					$ret_val = PrinterState_checkInPrint();
 					if ($ret_val == FALSE) {
 						$ret_val = CoreStatus_setInIdle();
 						if ($ret_val == TRUE) {
+							$this->load->helper('printerlog');
+							PrinterLog_logDebug('set idle when call print / cancel');
 							return; // continue to generate if we are now in idle
 						}
 						$this->load->helper('printerlog');
@@ -341,6 +345,24 @@ class Rest extends MY_Controller {
 		return;
 	}
 	
+	public function cancel() {
+		$ret_val = 0;
+		
+		$this->load->helper('printer');
+		
+		$ret_val = Printer_stopPrint();
+		if ($ret_val == TRUE) {
+			$this->_return_cr(ERROR_OK);
+		}
+		else {
+			$this->load->helper('printerlog');
+			PrinterLog_logError('can not stop printing by REST');
+			$this->_return_cr(ERROR_NO_PRINT);
+		}
+		
+		return;
+	}
+	
 	public function get() {
 		$parameter = NULL;
 		$cr = 0;
@@ -464,11 +486,53 @@ class Rest extends MY_Controller {
 		
 		$this->_return_cr($cr);
 		
+		return;
 	}
 	
 	//==========================================================
 	//another part (end of print list)
 	//==========================================================
 	
-	
+	public function gcode() {
+		$cr = 0;
+		$gcodes = '';
+		
+		$CI = &get_instance();
+		$CI->load->helper('printerstate');
+		
+		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+			$gcodes = $this->input->post('gcode');
+			
+			$cr = PrinterState_runGcode($gcodes);
+			if ($cr == TRUE) {
+				$cr = ERROR_OK;
+			}
+			else {
+				$cr = ERROR_INTERNAL;
+			}
+			
+			$this->_return_cr($cr);
+		}
+		else if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+			$array_gcode = array();
+			$gcodes = $this->input->get('gcode');
+			if ($gcodes) {
+				$array_gcode = explode("\t", $gcodes);
+			}
+			else {
+				$array_gcode = array();
+			}
+			$return_data = '';
+			
+			if (PrinterState_runGcode($array_gcode, TRUE, $return_data)) {
+				print $return_data;
+				$this->output->set_content_type(RETURN_CONTENT_TYPE);
+			}
+			else {
+				$this->_return_cr(ERROR_INTERNAL);
+			}
+		}
+		
+		return;
+	}
 }

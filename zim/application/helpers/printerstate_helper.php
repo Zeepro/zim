@@ -28,6 +28,8 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_GET_FILAMENT_R',	' M1608');
 	define('PRINTERSTATE_GET_FILAMENT_L',	' M1609');
 	define('PRINTERSTATE_PRINT_FILE',		' -f '); // add space in the last
+	define('PRINTERSTATE_STOP_PRINT',		' M1000');
+	define('PRINTERSTATE_RESET_PRINTER',	' M1100');
 
 	define('PRINTERSTATE_RIGHT_EXTRUD',	0);
 	define('PRINTERSTATE_LEFT_EXTRUD',	1);
@@ -554,9 +556,16 @@ function PrinterState_checkStatusAsArray() {
 	PrinterLog_LogArduino($command, $output);
 	if ($ret_val == ERROR_NORMAL_RC_OK && count($output) == 0) {
 		// not in printing(?), now we consider it is just idle (no slicing)
+		$CI->load->helper('printerlog');
+		PrinterLog_logDebug('check in idle - checkstatusasarray');
 		$data_json[PRINTERSTATE_TITLE_STATUS] = CORESTATUS_VALUE_IDLE;
 	} else {
-		// in printing
+		// in printing / canceling, then check their difference in json
+		CoreStatus_checkInIdle($status_current);
+		if ($status_current == CORESTATUS_VALUE_CANCEL) {
+			$data_json[PRINTERSTATE_TITLE_STATUS] = CORESTATUS_VALUE_CANCEL;
+			return $data_json;
+		}
 		$data_json[PRINTERSTATE_TITLE_STATUS] = CORESTATUS_VALUE_PRINT;
 		$data_json[PRINTERSTATE_TITLE_PERCENT] = $output[0];
 		// we can calculate duration by mid(to get total duration) and percentage
@@ -725,6 +734,80 @@ function PrinterState_unloadFilament($abb_filament) {
 	}
 	
 	return ERROR_OK;
+}
+
+function PrinterState_stopPrinting() {
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol'];
+	$output = array();
+	$command = '';
+	$ret_val = 0;
+	
+	// check if we are in printing
+	$ret_val = PrinterState_checkInPrint();
+	if ($ret_val == TRUE) {
+		// send stop gcode
+		$command = $arcontrol_fullpath . PRINTERSTATE_STOP_PRINT;
+		exec($command, $output, $ret_val);
+		PrinterLog_LogArduino($command, $output);
+		if ($ret_val != ERROR_NORMAL_RC_OK) {
+			return ERROR_INTERNAL;
+		}
+		
+		// print special gcode model to reset printer's temperatures and position
+		// we leave this printing call function in Printer_stopPrint()
+	} else {
+		PrinterLog_logMessage('we are not in printing when calling stop printing');
+		return ERROR_NO_PRINT;
+	}
+	
+	return TRUE;
+}
+
+function PrinterState_runGcode($gcodes, $need_return = FALSE, &$return_data = '') {
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol'];
+	$tmpfile_fullpath = $CFG->config['temp'] . '_runGcode.gcode';
+	$output = array();
+	$command = '';
+	$ret_val = 0;
+	
+	if ($need_return && is_array($gcodes)) {
+		foreach ($gcodes as $gcode) {
+			$command = $arcontrol_fullpath . ' ' . $gcode;
+			//TODO some gcode will not be responsed directly when using simulator
+			exec($command, $output, $ret_val);
+// 			if (count($output)) {
+// 				$return_data .= $output[0] . "\n";
+// 			}
+// 			else {
+// 				$return_data .= "\n";
+// 			}
+		}
+		foreach ($output as $line) {
+			$return_data .= $line . "\n";
+		}
+	}
+	else if (!$need_return && !is_array($gcodes)) {
+		$fp = fopen($tmpfile_fullpath, 'w');
+		if ($fp) {
+			fwrite($fp, $gcodes);
+			fclose($fp);
+		}
+		
+		$command = PrinterState_getPrintCommand();
+		$command .= $tmpfile_fullpath;
+		pclose(popen($command, 'r')); // no return value for simulator
+		PrinterLog_LogArduino($command);
+// 		if ($ret_val != ERROR_NORMAL_RC_OK) {
+// 			return FALSE;
+// 		}
+	}
+	else {
+		return FALSE;
+	}
+	
+	return TRUE;
 }
 
 //internal function
