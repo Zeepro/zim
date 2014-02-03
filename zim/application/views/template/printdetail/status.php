@@ -16,7 +16,7 @@
 				<div id="myVideo">Loading the player...</div>
 				<script type="text/javascript">
 					jwplayer("myVideo").setup({
-						file: "http://88.175.62.75/zim.m3u8",
+						file: "{video_url}",
 						autostart: true,
 					});
 				</script>
@@ -35,12 +35,15 @@
 
 <script type="text/javascript">
 var var_refreshPrintStatus;
+var var_refreshVideoURL;
+var var_firstRun = true;
 var var_ajax;
 var var_prime = {var_prime};
 $(document).ready(checkPrintStatus());
 
 function checkPrintStatus() {
- 	var_refreshPrintStatus = setInterval(refreshPrintStatus, 1000);
+	var_refreshPrintStatus = setInterval(refreshPrintStatus, 1000);
+	refreshVideoURL();
 	function refreshPrintStatus() {
 		var_ajax = $.ajax({
 			url: "/printdetail/status_ajax",
@@ -60,6 +63,24 @@ function checkPrintStatus() {
 <!--	//	<?php //FIXME just disable redirection and do same as finished for simulation ?> -->
 		});
 	}
+
+	return;
+}
+
+function refreshVideoURL() {
+	if (var_firstRun == true) {
+		var_refreshVideoURL = setInterval(refreshVideo, 1000 * 5);
+		var_firstRun = false;
+	}
+	else {
+		clearInterval(var_refreshVideoURL);
+		var_refreshVideoURL = setInterval(refreshVideo, 1000 * 30 * 4);
+	}
+	function refreshVideo() {
+		jwplayer('myVideo').load({file:'{video_url}'});
+	}
+
+	return;
 }
 
 function finishLoop() {

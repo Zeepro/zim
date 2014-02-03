@@ -16,7 +16,7 @@
 				<div id="myVideo">Loading the player...</div>
 				<script type="text/javascript">
 					jwplayer("myVideo").setup({
-						file: "http://88.175.62.75/zim.m3u8",
+						file: "{video_url}",
 						autostart: true,
 					});
 				</script>
@@ -30,11 +30,13 @@
 
 <script type="text/javascript">
 var var_refreshCancelStatus;
+var var_refreshVideoURL;
 var var_ajax;
 $(document).ready(checkCancelStatus());
 
 function checkCancelStatus() {
  	var_refreshCancelStatus = setInterval(refreshCancelStatus, 1000);
+	refreshVideoURL();
 	function refreshCancelStatus() {
 		var_ajax = $.ajax({
 			url: "/printdetail/cancel_ajax",
@@ -54,6 +56,17 @@ function checkCancelStatus() {
 <!--	//	<?php //FIXME just disable redirection and do same as finished for simulation ?> -->
 		});
 	}
+
+	return;
+}
+
+function refreshVideoURL() {
+	var_refreshVideoURL = setInterval(refreshVideo, 1000 * 30 * 4);
+	function refreshVideo() {
+		jwplayer('myVideo').load({file:'{video_url}'});
+	}
+
+	return;
 }
 
 function finishAction() {

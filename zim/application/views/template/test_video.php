@@ -11,7 +11,7 @@
 	<div id="myVideo">Loading the player...</div>
 	<script type="text/javascript">
 		jwplayer("myVideo").setup({
-			file: "http://88.175.62.75/zim.m3u8",
+			file: "{video_url}",
 			autostart: true,
 		});
 	</script>

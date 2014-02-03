@@ -36,12 +36,13 @@ function Printer_printFromModel($id_model, $stop_printing = FALSE) {
 }
 
 function Printer_printFromFile($gcode_path, $stop_printing = FALSE) {
+	global $CFG;
 	$command = '';
 	$output = array();
 	$ret_val = 0;
 	
 	$CI = &get_instance();
-	$CI->load->helper(array('printerstate', 'corestatus', 'printerlog'));
+	$CI->load->helper(array('printerstate', 'corestatus', 'printerlog', 'detectos'));
 	
 	// check if we have no file
 	if (!file_exists($gcode_path)) {
@@ -67,12 +68,14 @@ function Printer_printFromFile($gcode_path, $stop_printing = FALSE) {
 	}
 	
 	if ($stop_printing == FALSE) {
-		//FIXME just set temperature for simulation
-		PrinterState_setExtruder('r');
-		PrinterState_setTemperature(210);
-		PrinterState_setExtruder('l');
-		PrinterState_setTemperature(200);
-		PrinterState_setExtruder('r');
+		if ($CFG->config['simulator']) {
+			// just set temperature for simulation
+			PrinterState_setExtruder('r');
+			PrinterState_setTemperature(210);
+			PrinterState_setExtruder('l');
+			PrinterState_setTemperature(200);
+			PrinterState_setExtruder('r');
+		}
 	
 		// change status json file
 		$ret_val = CoreStatus_setInPrinting();
@@ -90,8 +93,17 @@ function Printer_printFromFile($gcode_path, $stop_printing = FALSE) {
 	// 		if ($ret_val != ERROR_NORMAL_RC_OK) {
 	// 			return ERROR_INTERNAL;
 	// 		}
-	pclose(popen($command, 'r')); // only for windows arcontrol client
-	PrinterLog_LogArduino($command);
+	if ($CFG->config['simulator'] && DectectOS_checkWindows()) {
+		pclose(popen($command, 'r')); // only for windows arcontrol client
+		PrinterLog_LogArduino($command);
+	}
+	else {
+		exec($command, $output, $ret_val);
+		if ($ret_val != ERROR_NORMAL_RC_OK) {
+			return $ret_val;
+		}
+		PrinterLog_LogArduino($command, $output);
+	}
 
 	// reduce the quantity of filament here
 	$ret_val = PrinterState_changeFilament();

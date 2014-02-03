@@ -406,7 +406,8 @@ function ModelList__listAsArray($set_localization = FALSE) {
 			}
 		} catch (Exception $e) {
 			// log internal error
-			$this->load->helper('printerlog');
+			$CI = &get_instance();
+			$CI->load->helper('printerlog');
 			PrinterLog_logError('catch exception when getting print model ' . $model_name);
 			continue; // just jump through the wrong data file
 // 			return json_encode($json_data);
@@ -446,8 +447,19 @@ function ModelList__setLocalization(&$array_json) {
 	$CI = &get_instance();
 	$lang_current = $CI->config->item('language_abbr');
 	
-	$array_json[PRINTLIST_TITLE_NAME] = $array_json[PRINTLIST_TITLE_NAME][$lang_current];
-	$array_json[PRINTLIST_TITLE_DESP] = $array_json[PRINTLIST_TITLE_DESP][$lang_current];
+	if (isset($array_json[PRINTLIST_TITLE_NAME][$lang_current])) {
+		$array_json[PRINTLIST_TITLE_NAME] = $array_json[PRINTLIST_TITLE_NAME][$lang_current];
+	}
+	else {
+		$array_json[PRINTLIST_TITLE_NAME] = $array_json[PRINTLIST_TITLE_NAME]['en'];
+	}
+	
+	if (isset($array_json[PRINTLIST_TITLE_DESP][$lang_current])) {
+		$array_json[PRINTLIST_TITLE_DESP] = $array_json[PRINTLIST_TITLE_DESP][$lang_current];
+	}
+	else {
+		$array_json[PRINTLIST_TITLE_DESP] = $array_json[PRINTLIST_TITLE_DESP]['en'];
+	}
 	
 	return;
 }

@@ -86,6 +86,8 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_CHANGECART_FINISH',	'finish_change');
 }
 
+//TODO make all 4 (or 5) simulator switch into 1 function internal (or DectectOS helper)
+
 function PrinterState_getExtruder(&$abb_extruder) {
 	global $CFG;
 	$arcontrol_fullpath = $CFG->config['arcontrol'];
@@ -243,13 +245,20 @@ function PrinterState_setTemperature($val_temperature, $type = 'e') {
 	// check if we are in printing
 	$ret_val = PrinterState_checkInPrint();
 	if ($ret_val == FALSE) {
-// 		exec($command, $output, $ret_val);
-// 		PrinterLog_LogArduino($command, $output);
-// 		if ($ret_val != ERROR_NORMAL_RC_OK) {
-// 			return ERROR_INTERNAL;
-// 		}
-		pclose(popen($command, 'r')); // only for windows arcontrol client
-		PrinterLog_LogArduino($command);
+		$CI = &get_instance();
+		$CI->load->helper('detectos');
+		
+		if ($CFG->config['simulator'] && DectectOS_checkWindows()) {
+			pclose(popen($command, 'r')); // only for windows arcontrol client
+			PrinterLog_LogArduino($command);
+		}
+		else {
+			exec($command, $output, $ret_val);
+			PrinterLog_LogArduino($command, $output);
+			if ($ret_val != ERROR_NORMAL_RC_OK) {
+				return ERROR_INTERNAL;
+			}
+		}
 	} else {
 // 		return ERROR_IN_PRINT;
 		PrinterLog_logError('can not set temperature in printing');
@@ -675,9 +684,20 @@ function PrinterState_loadFilament($abb_filament) {
 			return ERROR_INTERNAL;
 		}
 		
-		pclose(popen($command, 'r')); // only for windows arcontrol client
-		//FIXME we can't check return output when using simulator
-		PrinterLog_LogArduino($command);
+		$CI = &get_instance();
+		$CI->load->helper('detectos');
+		
+		if ($CFG->config['simulator'] && DectectOS_checkWindows()) {
+			pclose(popen($command, 'r')); // only for windows arcontrol client
+			PrinterLog_LogArduino($command); //FIXME we can't check return output when using simulator
+		}
+		else {
+			exec($command, $output, $ret_val);
+			PrinterLog_LogArduino($command, $output);
+			if ($ret_val != ERROR_NORMAL_RC_OK) {
+				return ERROR_INTERNAL;
+			}
+		}
 	} else {
 // 		return ERROR_IN_PRINT;
 		PrinterLog_logError('can not load filament in printing');
@@ -724,9 +744,20 @@ function PrinterState_unloadFilament($abb_filament) {
 			return ERROR_INTERNAL;
 		}
 		
-		pclose(popen($command, 'r')); // only for windows arcontrol client
-		//FIXME we can't check return output when using simulator
-		PrinterLog_LogArduino($command);
+		$CI = &get_instance();
+		$CI->load->helper('detectos');
+		
+		if ($CFG->config['simulator'] && DectectOS_checkWindows()) {
+			pclose(popen($command, 'r')); // only for windows arcontrol client
+			PrinterLog_LogArduino($command); //FIXME we can't check return output when using simulator
+		}
+		else {
+			exec($command, $output, $ret_val);
+			PrinterLog_LogArduino($command, $output);
+			if ($ret_val != ERROR_NORMAL_RC_OK) {
+				return ERROR_INTERNAL;
+			}
+		}
 	} else {
 // 		return ERROR_IN_PRINT;
 		PrinterLog_logError('can not unload filament in printing');
@@ -797,11 +828,21 @@ function PrinterState_runGcode($gcodes, $need_return = FALSE, &$return_data = ''
 		
 		$command = PrinterState_getPrintCommand();
 		$command .= $tmpfile_fullpath;
-		pclose(popen($command, 'r')); // no return value for simulator
-		PrinterLog_LogArduino($command);
-// 		if ($ret_val != ERROR_NORMAL_RC_OK) {
-// 			return FALSE;
-// 		}
+		
+		$CI = &get_instance();
+		$CI->load->helper('detectos');
+		
+		if ($CFG->config['simulator'] && DectectOS_checkWindows()) {
+			pclose(popen($command, 'r')); // only for windows arcontrol client
+			PrinterLog_LogArduino($command); //FIXME we can't check return output when using simulator
+		}
+		else {
+			exec($command, $output, $ret_val);
+			PrinterLog_LogArduino($command, $output);
+			if ($ret_val != ERROR_NORMAL_RC_OK) {
+				return ERROR_INTERNAL;
+			}
+		}
 	}
 	else {
 		return FALSE;

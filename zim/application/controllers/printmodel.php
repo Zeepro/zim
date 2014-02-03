@@ -36,11 +36,12 @@ class Printmodel extends MY_Controller {
 			$nb_image = count($model_data[PRINTLIST_TITLE_PIC]);
 			
 			$display_printlist[] = array(
-					'id'	=> $model_data[PRINTLIST_TITLE_ID],
 					'name'	=> $model_data[PRINTLIST_TITLE_NAME],
+					'id'	=> $model_data[PRINTLIST_TITLE_ID],
 					'image'	=> $model_data[PRINTLIST_TITLE_PIC][0],
 			);
 		}
+		sort($display_printlist);
 		
 		// parse the main body
 		$template_data = array(
@@ -79,6 +80,7 @@ class Printmodel extends MY_Controller {
 		$change_right_filament = '';
 		$time_estimation = '';
 		$body_page = NULL;
+		$mono_color = FALSE;
 		
 		$this->load->helper(array('printlist', 'printerstate', 'timedisplay'));
 		$this->load->library('parser');
@@ -98,6 +100,14 @@ class Printmodel extends MY_Controller {
 		else {
 			$this->output->set_header('Location: /printmodel/listmodel');
 			return;
+		}
+		
+		// check the model is mono-color or 2 colors
+		if (isset($model_data[PRINTLIST_TITLE_LENG_F2]) && $model_data[PRINTLIST_TITLE_LENG_F2] != 0) {
+			$mono_color = FALSE;
+		}
+		else {
+			$mono_color = TRUE;
 		}
 		
 		// check quantity of filament and get cartridge information (color)
@@ -138,7 +148,12 @@ class Printmodel extends MY_Controller {
 			$color_right_filament = PRINTERSTATE_VALUE_DEFAULT_COLOR;
 		}
 		
-		$cr = PrinterState_checkFilament('l', $model_data[PRINTLIST_TITLE_LENG_F2], $cartridge_data);
+		if ($mono_color == FALSE) {
+			$cr = PrinterState_checkFilament('l', $model_data[PRINTLIST_TITLE_LENG_F2], $cartridge_data);
+		}
+		else {
+			$cr = PrinterState_getCartridgeAsArray($cartridge_data, 'l');
+		}
 		$check_left_filament = t('ok');
 		$change_left_filament = t('Change');
 		switch ($cr) {
@@ -183,7 +198,7 @@ class Printmodel extends MY_Controller {
 				'title'				=> $model_data[PRINTLIST_TITLE_NAME],
 				'image'				=> $model_data[PRINTLIST_TITLE_PIC][0],
 				'model_c_r'			=> $model_data[PRINTLIST_TITLE_COLOR_F1],
-				'model_c_l'			=> $model_data[PRINTLIST_TITLE_COLOR_F2],
+// 				'model_c_l'			=> $model_data[PRINTLIST_TITLE_COLOR_F2],
 				'time'				=> $time_estimation,
 				'desp'				=> $model_data[PRINTLIST_TITLE_DESP],
 				'state_c_l'			=> $color_left_filament,
@@ -194,15 +209,23 @@ class Printmodel extends MY_Controller {
 				'title_current' 	=> t('Filament'),
 				'change_filament_l'	=> $change_left_filament,
 				'change_filament_r'	=> $change_right_filament,
-				'need_filament_l'	=> $model_data[PRINTLIST_TITLE_LENG_F2],
+// 				'need_filament_l'	=> $model_data[PRINTLIST_TITLE_LENG_F2],
+				'need_filament_l'	=> 0,
 				'need_filament_r'	=> $model_data[PRINTLIST_TITLE_LENG_F1],
 				'print_model'		=> t('Print'),
 				'back'				=> t('back'),
 				'preview_title'		=> t('Preview'),
 				'desp_title'		=> t('Description'),
 		);
+		if ($mono_color == FALSE) {
+			$template_data['model_c_l'] = $model_data[PRINTLIST_TITLE_COLOR_F2];
+			$template_data['need_filament_l'] = $model_data[PRINTLIST_TITLE_LENG_F2];
+			$body_page = $this->parser->parse('template/printlist/detail_2extrud', $template_data, TRUE);
+		}
+		else {
+			$body_page = $this->parser->parse('template/printlist/detail_1extrud', $template_data, TRUE);
+		}
 		
-		$body_page = $this->parser->parse('template/printlist/detail_2extrud', $template_data, TRUE);
 		
 		// parse all page
 		$template_data = array(

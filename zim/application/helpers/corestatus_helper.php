@@ -28,7 +28,7 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 // 	define('CORESTATUS_VALUE_UPGRADE',			'upgrading');
 
 	define('CORESTATUS_PRM_CAMERA_START',
-			' -v verbose -r 10 -s 320x240 -f video4linux2 -i /dev/video0 -c:v libx264 -crf 18 -profile:v baseline -b:v 1024k -pix_fmt yuv420p -flags -global_header -hls_time 1 -hls_wrap 5 /var/www/tmp/zim.m3u8');
+			' -v quiet -r 6 -s 320x240 -f video4linux2 -i /dev/video0 -map 0 -force_key_frames \'expr:gte(t,n_forced*6)\' -c:v libx264 -crf 18 -profile:v baseline -b:v 1024k -pix_fmt yuv420p -flags -global_header -f segment -segment_list /var/www/tmp/zim.m3u8 -segment_time 1 -segment_format mpeg_ts -segment_list_type m3u8 -segment_list_flags live -segment_list_size 5 -segment_wrap 5 /var/www/tmp/zim%d.ts');
 	define('CORESTATUS_PRM_CAMERA_STOP',	' stop ');
 }
 

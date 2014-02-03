@@ -73,6 +73,7 @@ class Printdetail extends MY_Controller {
 				'restart_url'	=> '/printdetail/printmodel?id=' . $mid . '&cb=' . $callback,
 				'var_prime'		=> 'false',
 				'prime_button'	=> t('Yes'),
+				'video_url'		=> $CFG->config['video_url'],
 		);
 		
 		if ($callback && $mid) {
@@ -117,14 +118,16 @@ class Printdetail extends MY_Controller {
 				$this->load->helper('printerlog');
 				PrinterLog_logError('can not set idle after printing');
 			}
-			
-			//FIXME just set temperature for simulation
-			$this->load->helper('printerstate');
-			PrinterState_setExtruder('r');
-			PrinterState_setTemperature(20);
-			PrinterState_setExtruder('l');
-			PrinterState_setTemperature(20);
-			PrinterState_setExtruder('r');
+
+			if ($this->config->item('simulator')) {
+				// just set temperature for simulation
+				$this->load->helper('printerstate');
+				PrinterState_setExtruder('r');
+				PrinterState_setTemperature(20);
+				PrinterState_setExtruder('l');
+				PrinterState_setTemperature(20);
+				PrinterState_setExtruder('r');
+			}
 			
 			$this->output->set_status_header(202);
 			return;
@@ -176,6 +179,7 @@ class Printdetail extends MY_Controller {
 					'finish_info'	=> t('Congratulation, your printing is canceled!'),
 					'return_button'	=> t('Home'),
 					'return_url'	=> '/',
+					'video_url'		=> $CFG->config['video_url'],
 			);
 			
 			$body_page = $this->parser->parse('template/printdetail/cancel', $template_data, TRUE);
@@ -222,13 +226,15 @@ class Printdetail extends MY_Controller {
 				PrinterLog_logError('can not set idle after calceling');
 			}
 			
-			//FIXME just set temperature for simulation
-			$this->load->helper('printerstate');
-			PrinterState_setExtruder('r');
-			PrinterState_setTemperature(20);
-			PrinterState_setExtruder('l');
-			PrinterState_setTemperature(20);
-			PrinterState_setExtruder('r');
+			if ($this->config->item('simulator')) {
+				// just set temperature for simulation
+				$this->load->helper('printerstate');
+				PrinterState_setExtruder('r');
+				PrinterState_setTemperature(20);
+				PrinterState_setExtruder('l');
+				PrinterState_setTemperature(20);
+				PrinterState_setExtruder('r');
+			}
 			
 			$this->output->set_status_header(202);
 			return;
