@@ -11,7 +11,7 @@ function TimeDisplay__convertsecond($second, $prefix, $unknown = 'N/A') {
 	if ($second >= (60*60)) {
 		$display = $prefix . t('%dh %dm %ds',
 				array($second / (60*60), //h
-						$second / 60, //m
+						($second / 60) % 60, //m
 						$second % 60, //s
 				)
 		);
