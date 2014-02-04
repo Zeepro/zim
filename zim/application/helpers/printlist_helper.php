@@ -256,7 +256,7 @@ function ModelList_add($data_array) {
 	mkdir($model_path);
 	
 	//model gcode
-	rename($model_gcode['full_path'], $model_path . PRINTLIST_FILE_GCODE);
+// 	rename($model_gcode['full_path'], $model_path . PRINTLIST_FILE_GCODE);
 	$command = 'bzip2 -zcf ' . $model_gcode['full_path'] . ' > ' . $model_path . PRINTLIST_FILE_GCODE_BZ2;
 	exec($command, $output, $ret_val);
 	if ($ret_val != ERROR_NORMAL_RC_OK) {

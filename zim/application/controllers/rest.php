@@ -181,12 +181,18 @@ class Rest extends MY_Controller {
 				}
 				if ($this->input->post('l2')) {
 					$api_data['l2'] = (int)$this->input->post('l2');
+					if ($api_data['l2'] == 0) {
+						unset($api_data['l2']);
+					}
 				}
 				if ($this->input->post('c1')) {
 					$api_data['c1'] = $this->input->post('c1');
 				}
 				if ($this->input->post('c2')) {
 					$api_data['c2'] = $this->input->post('c2');
+					if ($api_data['c2'] == NULL) {
+						unset($api_data['c2']);
+					}
 				}
 				
 				$upload_config = array (
