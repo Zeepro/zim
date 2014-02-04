@@ -40,6 +40,7 @@ if (!defined('PRINTLIST_MAX_PIC_SIZE')) {
 	define('PRINTLIST_MODEL_PREFIX_S',	'_');
 	
 	define('PRINTLIST_FILE_GCODE',		'model.gcode');
+	define('PRINTLIST_FILE_GCODE_BZ2',	'model.gcode.bz2');
 	define('PRINTLIST_FILE_JSON',		'model.json');
 	
 // 	define('PRINTLIST_GETPIC_BASE_WEB',	base_url() . 'getpicture');
@@ -62,6 +63,10 @@ function ModelList_add($data_array) {
 	$model_names		= array();
 	$model_desps		= array();
 	$json_data			= NULL;
+	
+	$command	= '';
+	$output		= array();
+	$ret_val	= 0;
 	
 	$model_name			= NULL;	// string by $data_array['n'], string, 1th in the json structure
 // 	$model_desp			= '';	// string by $data_array['d'], string
@@ -252,6 +257,11 @@ function ModelList_add($data_array) {
 	
 	//model gcode
 	rename($model_gcode['full_path'], $model_path . PRINTLIST_FILE_GCODE);
+	$command = 'bzip2 -zcf ' . $model_gcode['full_path'] . ' > ' . $model_path . PRINTLIST_FILE_GCODE_BZ2;
+	exec($command, $output, $ret_val);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		return ERROR_INTERNAL;
+	}
 // 	//if we don't want to fix the filename of gcode, and then store it in json info
 // 	$tmp_string = 'gcode' . time() . $model_gcode['file_ext']; //new gcode name
 // 	rename($model_gcode['full_path'], $model_path . $tmp_string);

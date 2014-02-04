@@ -383,7 +383,10 @@ function Printer__getStartTemperatureFromFile($gcode_path, &$array_temper) {
 
 function Printer__getFileFromModel($id_model, &$gcode_path) {
 	$model_path = NULL;
-	$gcode_path = NULL;
+	$bz2_path = NULL;
+	$command = '';
+	$output = array();
+	$ret_val = 0;
 	
 	$CI = &get_instance();
 	$CI->load->helper('printlist');
@@ -402,7 +405,13 @@ function Printer__getFileFromModel($id_model, &$gcode_path) {
 // 			return ERROR_INTERNAL;
 // 		}
 // 		$gcode_path = $json_data['json'][PRINTLIST_TITLE_GCODE];
-		$gcode_path = $model_path . PRINTLIST_FILE_GCODE;
+		$bz2_path = $model_path . PRINTLIST_FILE_GCODE_BZ2;
+		$gcode_path = $CI->config->item('temp') . PRINTLIST_FILE_GCODE;
+		$command = 'bzip2 -dkcf ' . $bz2_path . ' > ' . $gcode_path;
+		exec($command, $output, $ret_val);
+		if ($ret_val != ERROR_NORMAL_RC_OK) {
+			return ERROR_INTERNAL;
+		}
 		
 		return ERROR_OK;
 	} else {
