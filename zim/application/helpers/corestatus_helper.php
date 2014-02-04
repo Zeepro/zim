@@ -32,6 +32,35 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_PRM_CAMERA_STOP',	' stop ');
 }
 
+function CoreStatus_initialFile() {
+	global $CFG;
+	$state_file = $CFG->config['conf'] . CORESTATUS_FILENAME_WORK;
+	
+	if (file_exists($state_file)) {
+		return TRUE;
+	}
+	else {
+		// prepare data array
+		$data_json = array(
+				CORESTATUS_TITLE_VERSION	=> '1.0',
+				CORESTATUS_TITLE_STATUS		=> CORESTATUS_VALUE_IDLE,
+				CORESTATUS_TITLE_MESSAGE	=> NULL,
+		);
+		
+		// write json file
+		$fp = fopen($state_file, 'w');
+		if ($fp) {
+			fwrite($fp, json_encode($data_json));
+			fclose($fp);
+		}
+		else {
+			return FALSE;
+		}
+	}
+	
+	return TRUE;
+}
+
 function CoreStatus_checkInIdle(&$status_current = '') {
 	global $CFG;
 	$state_file = $CFG->config['conf'] . CORESTATUS_FILENAME_WORK;

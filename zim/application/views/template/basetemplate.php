@@ -26,7 +26,7 @@
 </style>
 <script type="text/javascript">
 	$(document).ready(function() {
-		$('#link_logo').click(function(){window.location.href='/'; return false;});
+		$('div#link_logo').click(function(){window.location.href='/'; return false;});
 	});
 </script>
 

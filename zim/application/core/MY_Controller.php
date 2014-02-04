@@ -12,6 +12,19 @@ class MY_Controller extends CI_Controller {
 // 		$this->load->helper(array('corestatus', 'url'));
 		$this->load->helper('corestatus');
 		
+		// initialisation status files
+		if (!CoreStatus_initialFile()) {
+			$this->load->helper('printerlog');
+			PrinterLog_logError('status files initialisation error when MY_Controller started');
+			
+			// let ajax request failed when we finishing printing / canceling
+			$protocol = (isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0');
+			header($protocol . ' 500');
+			header('Content-type: text/plain; charset=UTF-8');
+			echo 'status file initialisation error';
+			exit;
+		}
+		
 		// Workflow management
 		if (CoreStatus_checkCallREST()) {
 			// we place the control for REST web service in his own class
