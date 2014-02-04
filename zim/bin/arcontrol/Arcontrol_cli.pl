@@ -79,6 +79,12 @@ use constant CMD_GET_ETAT_LEFT_FILA  => 'M1609';
 use constant CMD_STOP_PRINT    => 'M1000';
 use constant CMD_RESET_PRINTER => 'M1100';
 
+use constant CMD_START_SD_WRITE => 'M28';
+use constant CMD_STOP_SD_WRITE  => 'M29';
+use constant CMD_SELECT_SD_FILE => 'M23';
+use constant CMD_START_SD_FILE  => 'M24';
+use constant CMD_DELETE_SD_FILE => 'M30';
+
 # general return code
 use constant RC_OK => 0;
 
@@ -848,6 +854,16 @@ else {
 
 		#cmd: reset printer
 		reset_printer();
+	}
+	elsif ( $command eq CMD_START_SD_WRITE
+		|| $command eq CMD_STOP_SD_WRITE
+		|| $command eq CMD_SELECT_SD_FILE
+		|| $command eq CMD_START_SD_FILE
+		|| $command eq CMD_DELETE_SD_FILE )
+	{
+
+		#cmd: sd card
+		exit(RC_OK);
 	}
 	else {    #default, wrong cmd, send help
 		usage(EXIT_ERROR_PRM);

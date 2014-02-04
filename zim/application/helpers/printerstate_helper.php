@@ -30,6 +30,12 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_PRINT_FILE',		' -f '); // add space in the last
 	define('PRINTERSTATE_STOP_PRINT',		' M1000');
 	define('PRINTERSTATE_RESET_PRINTER',	' M1100');
+	define('PRINTERSTATE_START_SD_WRITE',	' M28 '); // add space in the last
+	define('PRINTERSTATE_STOP_SD_WRITE',	' M29');
+	define('PRINTERSTATE_SELECT_SD_FILE',	' M23 '); // add space in the last
+	define('PRINTERSTATE_START_SD_FILE',	' M24');
+	define('PRINTERSTATE_DELETE_SD_FILE',	' M30 '); // add space in the last
+	define('PRINTERSTATE_SD_FILENAME',		'test.g'); // fix the name on SD card
 
 	define('PRINTERSTATE_RIGHT_EXTRUD',	0);
 	define('PRINTERSTATE_LEFT_EXTRUD',	1);
@@ -90,7 +96,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 
 function PrinterState_getExtruder(&$abb_extruder) {
 	global $CFG;
-	$arcontrol_fullpath = $CFG->config['arcontrol'];
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
 	$command = '';
 	$output = array();
 	$last_output = NULL;
@@ -135,7 +141,7 @@ function PrinterState_getExtruder(&$abb_extruder) {
 
 function PrinterState_setExtruder($abb_extruder = 'r') {
 	global $CFG;
-	$arcontrol_fullpath = $CFG->config['arcontrol'];
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
 	$output = array();
 	$command = '';
 	$ret_val = 0;
@@ -175,7 +181,7 @@ function PrinterState_setExtruder($abb_extruder = 'r') {
 
 function PrinterState_getTemperature(&$val_temperature, $type = 'e') {
 	global $CFG;
-	$arcontrol_fullpath = $CFG->config['arcontrol'];
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
 	$command = '';
 	$output = array();
 	$last_output = NULL;
@@ -228,7 +234,7 @@ function PrinterState_getTemperature(&$val_temperature, $type = 'e') {
 
 function PrinterState_setTemperature($val_temperature, $type = 'e') {
 	global $CFG;
-	$arcontrol_fullpath = $CFG->config['arcontrol'];
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
 	$output = array();
 	$command = '';
 	$ret_val = 0;
@@ -298,7 +304,7 @@ function PrinterState_getInfo() {
 
 function PrinterState_getExtruderTemperaturesAsArray() {
 	global $CFG;
-	$arcontrol_fullpath = $CFG->config['arcontrol'];
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
 	$command = '';
 	$ret_val = 0;
 	$data_array = array();
@@ -327,7 +333,7 @@ function PrinterState_getExtruderTemperaturesAsArray() {
 
 function PrinterState_checkInPrint() {
 	global $CFG;
-	$arcontrol_fullpath = $CFG->config['arcontrol'];
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
 	$command = '';
 	$output = array();
 	$ret_val = 0;
@@ -346,7 +352,7 @@ function PrinterState_checkInPrint() {
 
 function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 	global $CFG;
-	$arcontrol_fullpath = $CFG->config['arcontrol'];
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
 	$command = '';
 	$output = array();
 	$last_output = NULL;
@@ -546,9 +552,58 @@ function PrinterState_getPrintCommand() {
 	return $command;
 }
 
+function PrinterState_beforeFileCommand() {
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$command = '';
+	$output = array();
+	$ret_val = 0;
+	
+	$command = $arcontrol_fullpath . PRINTERSTATE_START_SD_WRITE . PRINTERSTATE_SD_FILENAME;
+	exec($command, $output, $ret_val);
+	PrinterLog_LogArduino($command, $output);
+	
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		$CI = &get_instance();
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('before gcode file command error');
+		return FALSE;
+	}
+	
+	return TRUE;
+}
+
+function PrinterState_afterFileCommand() {
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$command = '';
+	$output = array();
+	$ret_val = 0;
+	$array_command = array(
+			PRINTERSTATE_STOP_SD_WRITE,
+			PRINTERSTATE_SELECT_SD_FILE . PRINTERSTATE_SD_FILENAME,
+			PRINTERSTATE_START_SD_FILE,
+	);
+	
+	foreach($array_command as $parameter) {
+		$command = $arcontrol_fullpath . $parameter;
+		exec($command, $output, $ret_val);
+		PrinterLog_LogArduino($command, $output);
+		
+		if ($ret_val != ERROR_NORMAL_RC_OK) {
+			$CI = &get_instance();
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('after gcode file command error, command: ' . $parameter);
+			return FALSE;
+		}
+	}
+	
+	return TRUE;
+}
+
 function PrinterState_checkStatusAsArray() {
 	global $CFG;
-	$arcontrol_fullpath = $CFG->config['arcontrol'];
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
 	$command = '';
 	$output = array();
 	$ret_val = 0;
@@ -605,7 +660,7 @@ function PrinterState_changeFilament($left_filament = 0, $right_filament = 0) {
 function PrinterState_getFilamentStatus($abb_filament) {
 	// return TRUE only when filament is loaded
 	global $CFG;
-	$arcontrol_fullpath = $CFG->config['arcontrol'];
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
 	$command = '';
 	$ret_val = 0;
 	$output = array();
@@ -649,7 +704,7 @@ function PrinterState_getFilamentStatus($abb_filament) {
 
 function PrinterState_loadFilament($abb_filament) {
 	global $CFG;
-	$arcontrol_fullpath = $CFG->config['arcontrol'];
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
 	$output = array();
 	$command = '';
 	$ret_val = 0;
@@ -709,7 +764,7 @@ function PrinterState_loadFilament($abb_filament) {
 
 function PrinterState_unloadFilament($abb_filament) {
 	global $CFG;
-	$arcontrol_fullpath = $CFG->config['arcontrol'];
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
 	$output = array();
 	$command = '';
 	$ret_val = 0;
@@ -769,7 +824,7 @@ function PrinterState_unloadFilament($abb_filament) {
 
 function PrinterState_stopPrinting() {
 	global $CFG;
-	$arcontrol_fullpath = $CFG->config['arcontrol'];
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
 	$output = array();
 	$command = '';
 	$ret_val = 0;
@@ -797,7 +852,7 @@ function PrinterState_stopPrinting() {
 
 function PrinterState_runGcode($gcodes, $need_return = FALSE, &$return_data = '') {
 	global $CFG;
-	$arcontrol_fullpath = $CFG->config['arcontrol'];
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
 	$tmpfile_fullpath = $CFG->config['temp'] . '_runGcode.gcode';
 	$output = array();
 	$command = '';
@@ -826,6 +881,10 @@ function PrinterState_runGcode($gcodes, $need_return = FALSE, &$return_data = ''
 			fclose($fp);
 		}
 		
+		if (!PrinterState_beforeFileCommand()) {
+			return ERROR_INTERNAL;
+		}
+		
 		$command = PrinterState_getPrintCommand();
 		$command .= $tmpfile_fullpath;
 		
@@ -842,6 +901,10 @@ function PrinterState_runGcode($gcodes, $need_return = FALSE, &$return_data = ''
 			if ($ret_val != ERROR_NORMAL_RC_OK) {
 				return ERROR_INTERNAL;
 			}
+		}
+		
+		if (!PrinterState_afterFileCommand()) {
+			return ERROR_INTERNAL;
 		}
 	}
 	else {

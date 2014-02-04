@@ -88,6 +88,9 @@ function Printer_printFromFile($gcode_path, $stop_printing = FALSE) {
 // 	}
 
 	// pass gcode to printer
+	if (!PrinterState_beforeFileCommand()) {
+		return ERROR_INTERNAL;
+	}
 	$command = PrinterState_getPrintCommand() . $gcode_path;
 	// 		exec($command, $output, $ret_val);
 	// 		if ($ret_val != ERROR_NORMAL_RC_OK) {
@@ -103,6 +106,9 @@ function Printer_printFromFile($gcode_path, $stop_printing = FALSE) {
 			return $ret_val;
 		}
 		PrinterLog_LogArduino($command, $output);
+	}
+	if (!PrinterState_afterFileCommand()) {
+		return ERROR_INTERNAL;
 	}
 
 	// reduce the quantity of filament here
