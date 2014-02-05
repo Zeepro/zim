@@ -507,7 +507,7 @@ class Rest extends MY_Controller {
 		$CI->load->helper('printerstate');
 		
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-			$gcodes = $this->input->post('gcode');
+			$gcodes = $this->input->post('v');
 			
 			$cr = PrinterState_runGcode($gcodes);
 			if ($cr == TRUE) {
@@ -521,7 +521,7 @@ class Rest extends MY_Controller {
 		}
 		else if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 			$array_gcode = array();
-			$gcodes = $this->input->get('gcode');
+			$gcodes = $this->input->get('v');
 			if ($gcodes) {
 				$array_gcode = explode("\t", $gcodes);
 			}

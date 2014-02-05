@@ -29,7 +29,7 @@ function runGcodeGet() {
 		url: "/rest/gcode",
 		type: "GET",
 		data: {
-			gcode: var_gcode,
+			v: var_gcode,
 		},
 		cache: false,
 	})
@@ -47,7 +47,7 @@ function runGcodePOST() {
 		url: "/rest/gcode",
 		type: "POST",
 		data: {
-			gcode: var_gcode,
+			v: var_gcode,
 		},
 		cache: false,
 	})
