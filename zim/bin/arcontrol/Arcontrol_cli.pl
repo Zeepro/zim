@@ -148,7 +148,7 @@ sub _start_print() {
 
 		# write status file
 		open( $fp, '>', $mypath . FILENAME_PRINT );
-		print $fp '0';
+		print $fp '1';
 		close($fp);
 
 		#		usleep(TIME_CMD_PREPRINT);
@@ -179,6 +179,9 @@ sub _start_print() {
 	{
 		usleep(TIME_PRECISION);
 		$progress = int( $time_pass / $cmd_time * 100 );
+		if ($progress == 0) {
+			$progress = 1;
+		}
 
 		# check if we want to stop
 		if ( -e ( $mypath . FILENAME_PRINT_STOP ) ) {
@@ -226,6 +229,7 @@ sub check_status {
 
 	# check if we are in printing or not
 	if ( $print_on == STATUS_OFF ) {
+		print '0';
 		return RC_IDLE;
 	}
 	else {
@@ -869,6 +873,8 @@ else {
 		usage(EXIT_ERROR_PRM);
 	}
 }
+
+print "\n\n[<-] ok\n";
 
 exit(RC_OK);
 

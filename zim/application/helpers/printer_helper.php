@@ -102,6 +102,10 @@ function Printer_printFromFile($gcode_path, $stop_printing = FALSE) {
 	}
 	else {
 		exec($command, $output, $ret_val);
+		if (!PrinterState_filterOutput($output)) {
+			PrinterLog_logError('filter arduino output error');
+			return ERROR_INTERNAL;
+		}
 		if ($ret_val != ERROR_NORMAL_RC_OK) {
 			return $ret_val;
 		}

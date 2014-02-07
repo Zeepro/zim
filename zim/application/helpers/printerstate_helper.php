@@ -110,6 +110,10 @@ function PrinterState_getExtruder(&$abb_extruder) {
 		$command = $arcontrol_fullpath . PRINTERSTATE_GET_EXTRUD;
 // 		$last_output = system($command, $ret_val);
 		exec($command, $output, $ret_val);
+		if (!PrinterState_filterOutput($output)) {
+			PrinterLog_logError('filter arduino output error');
+			return ERROR_INTERNAL;
+		}
 		PrinterLog_LogArduino($command, $output);
 		if ($ret_val == ERROR_NORMAL_RC_OK) {
 			$last_output = $output[0];
@@ -165,6 +169,10 @@ function PrinterState_setExtruder($abb_extruder = 'r') {
 	$ret_val = PrinterState_checkInPrint();
 	if ($ret_val == FALSE) {
 		exec($command, $output, $ret_val);
+		if (!PrinterState_filterOutput($output)) {
+			PrinterLog_logError('filter arduino output error');
+			return ERROR_INTERNAL;
+		}
 		PrinterLog_LogArduino($command, $output);
 		if ($ret_val != ERROR_NORMAL_RC_OK) {
 			PrinterLog_logError('set extruder command error');
@@ -219,6 +227,10 @@ function PrinterState_getTemperature(&$val_temperature, $type = 'e') {
 	}
 	
 	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output)) {
+		PrinterLog_logError('filter arduino output error');
+		return ERROR_INTERNAL;
+	}
 	PrinterLog_LogArduino($command, $output);
 	if ($ret_val != ERROR_NORMAL_RC_OK) {
 		PrinterLog_logError('get temper command error');
@@ -260,6 +272,10 @@ function PrinterState_setTemperature($val_temperature, $type = 'e') {
 		}
 		else {
 			exec($command, $output, $ret_val);
+			if (!PrinterState_filterOutput($output)) {
+				PrinterLog_logError('filter arduino output error');
+				return ERROR_INTERNAL;
+			}
 			PrinterLog_LogArduino($command, $output);
 			if ($ret_val != ERROR_NORMAL_RC_OK) {
 				return ERROR_INTERNAL;
@@ -317,6 +333,10 @@ function PrinterState_getExtruderTemperaturesAsArray() {
 		
 		$command = $arcontrol_fullpath . $parameter_cmd;
 		exec($command, $output, $ret_val);
+		if (!PrinterState_filterOutput($output)) {
+			PrinterLog_logError('filter arduino output error');
+			return ERROR_INTERNAL;
+		}
 		PrinterLog_LogArduino($command, $output);
 		if ($ret_val != ERROR_NORMAL_RC_OK) {
 			PrinterLog_logError('get extruder temper (special) command error');
@@ -340,8 +360,12 @@ function PrinterState_checkInPrint() {
 
 	$command = $arcontrol_fullpath . PRINTERSTATE_CHECK_STATE;
 	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output)) {
+		PrinterLog_logError('filter arduino output error');
+		return ERROR_INTERNAL;
+	}
 	PrinterLog_LogArduino($command, $output);
-	if ($ret_val == ERROR_NORMAL_RC_OK && count($output) == 0) {
+	if ($ret_val == ERROR_NORMAL_RC_OK && $output && (int)$output[0] == 0) {
 		return FALSE;
 	} else {
 		return TRUE;
@@ -384,6 +408,10 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 	$ret_val = PrinterState_checkInPrint();
 	if ($ret_val == FALSE) {
 		exec($command, $output, $ret_val);
+		if (!PrinterState_filterOutput($output)) {
+			PrinterLog_logError('filter arduino output error');
+			return ERROR_INTERNAL;
+		}
 		PrinterLog_LogArduino($command, $output);
 		if ($ret_val != ERROR_NORMAL_RC_OK) {
 			return ERROR_INTERNAL;
@@ -547,7 +575,7 @@ function PrinterState_checkFilament($abb_cartridge, $need_filament = 0, &$data_j
 
 function PrinterState_getPrintCommand() {
 	global $CFG;
-	$command = $CFG->config['arcontrol'] . PRINTERSTATE_PRINT_FILE;
+	$command = $CFG->config['arcontrol_c'] . PRINTERSTATE_PRINT_FILE;
 	
 	return $command;
 }
@@ -561,6 +589,10 @@ function PrinterState_beforeFileCommand() {
 	
 	$command = $arcontrol_fullpath . PRINTERSTATE_START_SD_WRITE . PRINTERSTATE_SD_FILENAME;
 	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output)) {
+		PrinterLog_logError('filter arduino output error');
+		return ERROR_INTERNAL;
+	}
 	PrinterLog_LogArduino($command, $output);
 	
 	if ($ret_val != ERROR_NORMAL_RC_OK) {
@@ -588,6 +620,10 @@ function PrinterState_afterFileCommand() {
 	foreach($array_command as $parameter) {
 		$command = $arcontrol_fullpath . $parameter;
 		exec($command, $output, $ret_val);
+		if (!PrinterState_filterOutput($output)) {
+			PrinterLog_logError('filter arduino output error');
+			return ERROR_INTERNAL;
+		}
 		PrinterLog_LogArduino($command, $output);
 		
 		if ($ret_val != ERROR_NORMAL_RC_OK) {
@@ -617,22 +653,35 @@ function PrinterState_checkStatusAsArray() {
 	
 	$command = $arcontrol_fullpath . PRINTERSTATE_CHECK_STATE;
 	exec($command, $output, $ret_val);
-	PrinterLog_LogArduino($command, $output);
-	if ($ret_val == ERROR_NORMAL_RC_OK && count($output) == 0) {
-		// not in printing(?), now we consider it is just idle (no slicing)
+	if (!PrinterState_filterOutput($output)) {
 		$CI->load->helper('printerlog');
-		PrinterLog_logDebug('check in idle - checkstatusasarray');
-		$data_json[PRINTERSTATE_TITLE_STATUS] = CORESTATUS_VALUE_IDLE;
-	} else {
-		// in printing / canceling, then check their difference in json
-		CoreStatus_checkInIdle($status_current);
-		if ($status_current == CORESTATUS_VALUE_CANCEL) {
-			$data_json[PRINTERSTATE_TITLE_STATUS] = CORESTATUS_VALUE_CANCEL;
-			return $data_json;
+		PrinterLog_logError('filter arduino output error');
+		return ERROR_INTERNAL;
+	}
+	PrinterLog_LogArduino($command, $output);
+	if ($ret_val == ERROR_NORMAL_RC_OK && $output) {
+		// we have right return
+		if ((int)$output[0] == 0) {
+			// not in printing(?), now we consider it is just idle (no slicing)
+			$CI->load->helper('printerlog');
+			PrinterLog_logDebug('check in idle - checkstatusasarray');
+			$data_json[PRINTERSTATE_TITLE_STATUS] = CORESTATUS_VALUE_IDLE;
+		} else {
+			// in printing / canceling, then check their difference in json
+			CoreStatus_checkInIdle($status_current);
+			if ($status_current == CORESTATUS_VALUE_CANCEL) {
+				$data_json[PRINTERSTATE_TITLE_STATUS] = CORESTATUS_VALUE_CANCEL;
+				return $data_json;
+			}
+			$data_json[PRINTERSTATE_TITLE_STATUS] = CORESTATUS_VALUE_PRINT;
+			$data_json[PRINTERSTATE_TITLE_PERCENT] = $output[0];
+			// we can calculate duration by mid(to get total duration) and percentage
 		}
-		$data_json[PRINTERSTATE_TITLE_STATUS] = CORESTATUS_VALUE_PRINT;
-		$data_json[PRINTERSTATE_TITLE_PERCENT] = $output[0];
-		// we can calculate duration by mid(to get total duration) and percentage
+	}
+	else {
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('print check status command error');
+		return ERROR_INTERNAL;
 	}
 	
 	// try to calculate time remained when percentage is passed offset
@@ -682,6 +731,10 @@ function PrinterState_getFilamentStatus($abb_filament) {
 	}
 	
 	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output)) {
+		PrinterLog_logError('filter arduino output error');
+		return ERROR_INTERNAL;
+	}
 	PrinterLog_LogArduino($command, $output);
 	if ($ret_val != ERROR_NORMAL_RC_OK) {
 		PrinterLog_logError('get filament status command error');
@@ -748,6 +801,10 @@ function PrinterState_loadFilament($abb_filament) {
 		}
 		else {
 			exec($command, $output, $ret_val);
+			if (!PrinterState_filterOutput($output)) {
+				PrinterLog_logError('filter arduino output error');
+				return ERROR_INTERNAL;
+			}
 			PrinterLog_LogArduino($command, $output);
 			if ($ret_val != ERROR_NORMAL_RC_OK) {
 				return ERROR_INTERNAL;
@@ -808,6 +865,10 @@ function PrinterState_unloadFilament($abb_filament) {
 		}
 		else {
 			exec($command, $output, $ret_val);
+			if (!PrinterState_filterOutput($output)) {
+				PrinterLog_logError('filter arduino output error');
+				return ERROR_INTERNAL;
+			}
 			PrinterLog_LogArduino($command, $output);
 			if ($ret_val != ERROR_NORMAL_RC_OK) {
 				return ERROR_INTERNAL;
@@ -835,6 +896,10 @@ function PrinterState_stopPrinting() {
 		// send stop gcode
 		$command = $arcontrol_fullpath . PRINTERSTATE_STOP_PRINT;
 		exec($command, $output, $ret_val);
+		if (!PrinterState_filterOutput($output)) {
+			PrinterLog_logError('filter arduino output error');
+			return ERROR_INTERNAL;
+		}
 		PrinterLog_LogArduino($command, $output);
 		if ($ret_val != ERROR_NORMAL_RC_OK) {
 			return ERROR_INTERNAL;
@@ -863,6 +928,10 @@ function PrinterState_runGcode($gcodes, $need_return = FALSE, &$return_data = ''
 			$command = $arcontrol_fullpath . ' ' . $gcode;
 			//TODO some gcode will not be responsed directly when using simulator
 			exec($command, $output, $ret_val);
+			if (!PrinterState_filterOutput($output)) {
+				PrinterLog_logError('filter arduino output error');
+				return ERROR_INTERNAL;
+			}
 // 			if (count($output)) {
 // 				$return_data .= $output[0] . "\n";
 // 			}
@@ -897,6 +966,10 @@ function PrinterState_runGcode($gcodes, $need_return = FALSE, &$return_data = ''
 		}
 		else {
 			exec($command, $output, $ret_val);
+			if (!PrinterState_filterOutput($output)) {
+				PrinterLog_logError('filter arduino output error');
+				return ERROR_INTERNAL;
+			}
 			PrinterLog_LogArduino($command, $output);
 			if ($ret_val != ERROR_NORMAL_RC_OK) {
 				return ERROR_INTERNAL;
@@ -909,6 +982,45 @@ function PrinterState_runGcode($gcodes, $need_return = FALSE, &$return_data = ''
 	}
 	else {
 		return FALSE;
+	}
+	
+	return TRUE;
+}
+
+function PrinterState_filterOutput(&$output) {
+	if (!is_array($output)) {
+		return FALSE;
+	}
+	else if (empty($output)) {
+		return TRUE;
+	}
+	else {
+		// assign output to temp and empty output array
+		$array_tmp = $output;
+		$output = array();
+		
+		// filter empty line
+// 		$array_tmp = array_filter($array_tmp, "PrinterState__checkLine");
+		
+		// filter the output not necessary
+		foreach($array_tmp as $line) {
+			// jump the empty line
+			$line = trim($line, " \t\n\r\0\x0B");
+			if ($line == '') {
+				continue;
+			}
+			
+			//TODO check it start with [<-] or [->], then filter it
+			$line = preg_replace('[\[<-\]]', '', $line, 1);
+			$line = preg_replace('[\[->\]]', '', $line, 1);
+			$line = trim($line, " \t\n\r\0\x0B");
+			$output[] = $line;
+		}
+		
+		// filter the ok message in the end of array
+		if (strtolower($output[count($output) - 1]) == 'ok') {
+			unset($output[count($output) - 1]);
+		}
 	}
 	
 	return TRUE;
@@ -928,3 +1040,13 @@ function PrinterState__getInfoAsArray() {
 	
 	return $json_info;
 }
+
+// function PrinterState__checkLine($line) {
+// 	$line = str_replace(array("\n", "\r"), '', $line);
+// 	if ($line == '') {
+// 		return FALSE;
+// 	}
+// 	else {
+// 		return TRUE;
+// 	}
+// }
