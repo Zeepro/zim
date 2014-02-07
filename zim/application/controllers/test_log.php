@@ -9,7 +9,7 @@ class Test_log extends CI_Controller {
 		global $CFG;
 
 // 		$this->output->set_content_type('text/plain; charset=UTF-8');
-		header('Content-type: text/plain; charset=UTF-8');
+		$this->output->set_content_type('txt_u');
 		echo 'Log level: ' . $CFG->config['log_level'] . "\n";
 		if (file_exists($CFG->config['log_file'])) {
 			$array_log = file($CFG->config['log_file']);

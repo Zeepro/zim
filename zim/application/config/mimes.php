@@ -100,6 +100,7 @@ $mimes = array(	'hqx'	=>	'application/mac-binhex40',
 				'eml'	=>	'message/rfc822',
 				'json'	=>	array('application/json', 'text/json'),
 				'gcode'	=>	array('application/octet-stream', 'text/plain'),
+				'txt_u'	=>	'text/plain; charset=UTF-8', // special for text/plain utf8
 			);
 
 

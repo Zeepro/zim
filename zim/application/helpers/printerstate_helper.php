@@ -18,7 +18,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 // 	define('PRINTERSTATE_GET_TEMPEREXT',	' M1300');
 	define('PRINTERSTATE_GET_TEMPEREXT_R',	' M1300');
 	define('PRINTERSTATE_GET_TEMPEREXT_L',	' M1301');
-	define('PRINTERSTATE_SET_TEMPEREXT',	' M104 '); // add space in the last
+	define('PRINTERSTATE_SET_TEMPEREXT',	' M104\ '); // add space in the last
 	define('PRINTERSTATE_GET_CARTRIDGER',	' M1602');
 	define('PRINTERSTATE_GET_CARTRIDGEL',	' M1603');
 	define('PRINTERSTATE_LOAD_FILAMENT_R',	' M1604');
@@ -30,11 +30,11 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_PRINT_FILE',		' -f '); // add space in the last
 	define('PRINTERSTATE_STOP_PRINT',		' M1000');
 	define('PRINTERSTATE_RESET_PRINTER',	' M1100');
-	define('PRINTERSTATE_START_SD_WRITE',	' M28 '); // add space in the last
+	define('PRINTERSTATE_START_SD_WRITE',	' M28\ '); // add space in the last
 	define('PRINTERSTATE_STOP_SD_WRITE',	' M29');
-	define('PRINTERSTATE_SELECT_SD_FILE',	' M23 '); // add space in the last
+	define('PRINTERSTATE_SELECT_SD_FILE',	' M23\ '); // add space in the last
 	define('PRINTERSTATE_START_SD_FILE',	' M24');
-	define('PRINTERSTATE_DELETE_SD_FILE',	' M30 '); // add space in the last
+	define('PRINTERSTATE_DELETE_SD_FILE',	' M30\ '); // add space in the last
 	define('PRINTERSTATE_SD_FILENAME',		'test.g'); // fix the name on SD card
 
 	define('PRINTERSTATE_RIGHT_EXTRUD',	0);

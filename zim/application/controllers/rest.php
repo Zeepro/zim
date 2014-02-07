@@ -264,7 +264,8 @@ class Rest extends MY_Controller {
 		$this->load->helper('printlist');
 		
 		$display = ModelList_list();
-		$this->output->set_content_type(RETURN_CONTENT_TYPE);
+// 		$this->output->set_content_type(RETURN_CONTENT_TYPE);
+		header('Content-type: text/plain; charset=UTF-8');
 		echo $display;
 		
 		return;
