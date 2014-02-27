@@ -13,6 +13,7 @@
 				<h4>{button_post}</h4>
 				<textarea cols="40" rows="8" name="post_gcode" id="post_gcode"></textarea>
 				<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete" onclick="javascript: runGcodePOST();">{button_post}</button>
+				<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete" onclick="javascript: window.location.href='/gcode/stop';">{button_stop}</button>
 			</div>
 			<div id="gcode_detail_info"></div>
 		</div>

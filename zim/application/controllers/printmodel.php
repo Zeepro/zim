@@ -81,6 +81,7 @@ class Printmodel extends MY_Controller {
 		$time_estimation = '';
 		$body_page = NULL;
 		$mono_color = FALSE;
+		$nb_extruder = 0;
 		
 		$this->load->helper(array('printlist', 'printerstate', 'timedisplay'));
 		$this->load->library('parser');
@@ -109,6 +110,9 @@ class Printmodel extends MY_Controller {
 		else {
 			$mono_color = TRUE;
 		}
+		
+		// get number of extruder
+		$nb_extruder = PrinterState_getNbExtruder();
 		
 		// check quantity of filament and get cartridge information (color)
 		// color1 => right, color2 => left
@@ -148,45 +152,47 @@ class Printmodel extends MY_Controller {
 			$color_right_filament = PRINTERSTATE_VALUE_DEFAULT_COLOR;
 		}
 		
-		if ($mono_color == FALSE) {
-			$cr = PrinterState_checkFilament('l', $model_data[PRINTLIST_TITLE_LENG_F2], $cartridge_data);
-		}
-		else {
-			$cr = PrinterState_getCartridgeAsArray($cartridge_data, 'l');
-		}
-		$check_left_filament = t('ok');
-		$change_left_filament = t('Change');
-		switch ($cr) {
-			case ERROR_OK:
-				break; // break directly if no error
-				
-			case ERROR_LOW_LEFT_FILA:
-				$check_left_filament = t('not enough');
-				break;
-				
-			case ERROR_MISS_LEFT_CART:
-				$check_left_filament = t('empty');
-				$change_left_filament = t('Load');
-				break;
-				
-			case ERROR_MISS_LEFT_FILA:
-				$check_left_filament = t('unloaded');
-				$change_left_filament = t('Load');
-				break;
-				
-			default:
-				// treat error here, usually happened when checksum failed
-				$this->load->helper('printerlog');
-				PrinterLog_logError('not previewed return code for checking left filament');
-				$check_left_filament = t('error');
-				$change_left_filament = t('Load');
-				break;
-		}
-		if (($cr != ERROR_MISS_LEFT_CART) && ($cr != ERROR_INTERNAL)) {
-			$color_left_filament = $cartridge_data[PRINTERSTATE_TITLE_COLOR];
-		}
-		else {
-			$color_left_filament = PRINTERSTATE_VALUE_DEFAULT_COLOR;
+		if ($nb_extruder >= 2) {
+			if ($mono_color == FALSE) {
+				$cr = PrinterState_checkFilament('l', $model_data[PRINTLIST_TITLE_LENG_F2], $cartridge_data);
+			}
+			else {
+				$cr = PrinterState_getCartridgeAsArray($cartridge_data, 'l');
+			}
+			$check_left_filament = t('ok');
+			$change_left_filament = t('Change');
+			switch ($cr) {
+				case ERROR_OK:
+					break; // break directly if no error
+					
+				case ERROR_LOW_LEFT_FILA:
+					$check_left_filament = t('not enough');
+					break;
+					
+				case ERROR_MISS_LEFT_CART:
+					$check_left_filament = t('empty');
+					$change_left_filament = t('Load');
+					break;
+					
+				case ERROR_MISS_LEFT_FILA:
+					$check_left_filament = t('unloaded');
+					$change_left_filament = t('Load');
+					break;
+					
+				default:
+					// treat error here, usually happened when checksum failed
+					$this->load->helper('printerlog');
+					PrinterLog_logError('not previewed return code for checking left filament');
+					$check_left_filament = t('error');
+					$change_left_filament = t('Load');
+					break;
+			}
+			if (($cr != ERROR_MISS_LEFT_CART) && ($cr != ERROR_INTERNAL)) {
+				$color_left_filament = $cartridge_data[PRINTERSTATE_TITLE_COLOR];
+			}
+			else {
+				$color_left_filament = PRINTERSTATE_VALUE_DEFAULT_COLOR;
+			}
 		}
 		
 		// get a more legible time of estimation
@@ -201,31 +207,47 @@ class Printmodel extends MY_Controller {
 // 				'model_c_l'			=> $model_data[PRINTLIST_TITLE_COLOR_F2],
 				'time'				=> $time_estimation,
 				'desp'				=> $model_data[PRINTLIST_TITLE_DESP],
-				'state_c_l'			=> $color_left_filament,
+// 				'state_c_l'			=> $color_left_filament,
 				'state_c_r'			=> $color_right_filament,
-				'state_f_l'			=> $check_left_filament,
+// 				'state_f_l'			=> $check_left_filament,
 				'state_f_r'			=> $check_right_filament,
 				'model_id'			=> $mid,
 				'title_current' 	=> t('Filament'),
-				'change_filament_l'	=> $change_left_filament,
+// 				'change_filament_l'	=> $change_left_filament,
 				'change_filament_r'	=> $change_right_filament,
 // 				'need_filament_l'	=> $model_data[PRINTLIST_TITLE_LENG_F2],
-				'need_filament_l'	=> 0,
+// 				'need_filament_l'	=> 0,
 				'need_filament_r'	=> $model_data[PRINTLIST_TITLE_LENG_F1],
 				'print_model'		=> t('Print'),
 				'back'				=> t('back'),
 				'preview_title'		=> t('Preview'),
 				'desp_title'		=> t('Description'),
 		);
-		if ($mono_color == FALSE) {
-			$template_data['model_c_l'] = $model_data[PRINTLIST_TITLE_COLOR_F2];
-			$template_data['need_filament_l'] = $model_data[PRINTLIST_TITLE_LENG_F2];
-			$body_page = $this->parser->parse('template/printlist/detail_2extrud', $template_data, TRUE);
+		if ($nb_extruder >= 2) {
+			$template_data['state_c_l'] = $color_left_filament;
+			$template_data['state_f_l'] = $check_left_filament;
+			$template_data['change_filament_l'] = $change_left_filament;
+			
+			if ($mono_color == FALSE) {
+				$template_data['model_c_l'] = $model_data[PRINTLIST_TITLE_COLOR_F2];
+				$template_data['need_filament_l'] = $model_data[PRINTLIST_TITLE_LENG_F2];
+				$body_page = $this->parser->parse('template/printlist/detail_2extrud_2color', $template_data, TRUE);
+			}
+			else {
+				$template_data['need_filament_l'] = 0;
+				$body_page = $this->parser->parse('template/printlist/detail_2extrud_1color', $template_data, TRUE);
+			}
 		}
-		else {
-			$body_page = $this->parser->parse('template/printlist/detail_1extrud', $template_data, TRUE);
+		else if ($nb_extruder == 1) {
+			if ($mono_color == FALSE) {
+				$template_data['model_c_l'] = $model_data[PRINTLIST_TITLE_COLOR_F2];
+				$template_data['need_filament_l'] = $model_data[PRINTLIST_TITLE_LENG_F2];
+				$body_page = $this->parser->parse('template/printlist/detail_1extrud_2color', $template_data, TRUE);
+			}
+			else {
+				$body_page = $this->parser->parse('template/printlist/detail_1extrud_1color', $template_data, TRUE);
+			}
 		}
-		
 		
 		// parse all page
 		$template_data = array(

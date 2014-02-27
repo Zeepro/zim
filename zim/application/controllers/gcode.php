@@ -21,6 +21,7 @@ class Gcode extends MY_Controller {
 		$template_data = array(
 				'button_get'	=> 'GET',
 				'button_post'	=> 'POST',
+				'button_stop'	=> 'STOP',
 		);
 
 		$body_page = $this->parser->parse('template/gcode', $template_data, TRUE);
@@ -37,4 +38,11 @@ class Gcode extends MY_Controller {
 		return;
 	}
 
+	public function stop() {
+		$this->load->helper('printerstate');
+		PrinterState_stopPrinting();
+		$this->output->set_header('Location: /gcode');
+
+		return;
+	}
 }

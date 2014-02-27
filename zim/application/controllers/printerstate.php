@@ -550,7 +550,7 @@ class Printerstate extends MY_Controller {
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$this->load->helper('zimapi');
 			
-			if (ZimAPI_resetNetwork()) {
+			if (ZimAPI_resetNetwork() == ERROR_OK) {
 // 				$error = t('wait a moment');
 // 				$this->output->set_header("Location:/connection");
 		

@@ -43,6 +43,8 @@ use constant JSON_TEMPER_EXT1 => 'Temperature Extruder1';
 use constant JSON_TEMPER_EXT2 => 'Temperature Extruder2';
 use constant JSON_TEMPER_EXTX => 'Temperature Extruder';
 use constant JSON_LABEL       => 'Label';
+use constant JSON_LED_STRIP   => 'Strip Led';
+use constant JSON_LED_HEAD    => 'Head Led';
 
 use constant STATUS_ON          => 1;
 use constant STATUS_OFF         => 0;
@@ -75,6 +77,8 @@ use constant CMD_UNIN_RIGHT_FILA     => 'M1606';
 use constant CMD_UNIN_LEFT_FILA      => 'M1607';
 use constant CMD_GET_ETAT_RIGHT_FILA => 'M1608';
 use constant CMD_GET_ETAT_LEFT_FILA  => 'M1609';
+use constant CMD_GET_ETAT_LED_STRIP  => 'M1614';
+use constant CMD_GET_ETAT_LED_HEAD   => 'M1615';
 
 use constant CMD_STOP_PRINT    => 'M1000';
 use constant CMD_RESET_PRINTER => 'M1100';
@@ -631,10 +635,33 @@ sub check_filament_state {
 	}
 
 	if ( -e $filepath ) {
-		print 'ok';
+		print 'filament';
 	}
 	else {
 		print 'no filament';
+	}
+
+	return;
+}
+
+sub check_led_state {
+	my $command = shift;
+	my $data;
+	{
+		my ( $fp, $raw );
+		local $/;    #Enable 'slurp' mode
+		open( $fp, "<", $mypath . FILENAME_CONFIG )
+		  or exit(EXIT_ERROR_INTERNAL);
+		$raw = <$fp>;
+		close($fp);
+		$data = decode_json($raw);
+	}
+
+	if ( $command eq CMD_GET_ETAT_LED_STRIP ) {
+		print $data->{&JSON_LED_STRIP};
+	}
+	elsif ( $command eq CMD_GET_ETAT_LED_HEAD ) {
+		print $data->{&JSON_LED_HEAD};
 	}
 
 	return;
@@ -665,6 +692,8 @@ sub _set_default_config_file {
 	my %default = (
 		&JSON_NB_EXTRUD  => 2,
 		&JSON_CUR_EXTRUD => CURRENT_EXTRUD1,
+		&JSON_LED_STRIP  => 0,
+		&JSON_LED_HEAD   => 0,
 
 		#		&JSON_LEFT_LABEL  => DEFAULT_LEFT_LAB,
 		#		&JSON_RIGHT_LABEL => DEFAULT_RIGHT_LAB,
@@ -858,6 +887,13 @@ else {
 
 		#cmd: reset printer
 		reset_printer();
+	}
+	elsif ( $command eq CMD_GET_ETAT_LED_STRIP
+		|| $command eq CMD_GET_ETAT_LED_HEAD)
+	{
+
+		#cmd: get led state strips / head
+		check_led_state($command);
 	}
 	elsif ( $command eq CMD_START_SD_WRITE
 		|| $command eq CMD_STOP_SD_WRITE

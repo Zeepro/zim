@@ -10,7 +10,7 @@ if (!defined('BASEPATH'))
 // ));
 
 // log for arduino part
-function PrinterLog_LogArduino($command, $output = '') {
+function PrinterLog_logArduino($command, $output = '') {
 	return PrinterLog__logToFile('log_arduino', $command, $output); 
 }
 

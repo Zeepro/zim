@@ -20,7 +20,7 @@
 				</div><br>
 				<p>{time}</p>
 			</div>
-			<div data-role="collapsible" data-collapsed="false" style="align: center;">
+			<div data-role="collapsible" data-collapsed="false" style="text-align: center;">
 				<h4>{title_current}</h4>
 				<div style="width: 50%; float: left; text-align: center;">
 					<div style="width: 75px; height: 75px; background-color: {state_c_l}; margin: 0 auto;">
@@ -35,8 +35,7 @@
 					</div>
 					<p>{state_f_r}</p>
 					<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh" onclick="window.location.href='/printerstate/changecartridge?v=r&f={need_filament_r}&id={model_id}'">{change_filament_r}</button>
-				</div><br>
-				<br><br><br><br>
+				</div>
 <!-- 				<a href="/print?id={model_id}" class="ui-btn ui-btn-inline ui-icon-action ui-btn-icon-left">{print_model}</a> -->
 			</div>
 			<div style="clear: both;">

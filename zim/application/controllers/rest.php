@@ -127,18 +127,83 @@ class Rest extends MY_Controller {
 	//network web service
 	//==========================================================
 	public function resetnetwork() {
-		$ret_val = 0;
 		$cr = ERROR_OK;
 		
 		$this->load->helper('zimapi');
-		$ret_val = ZimAPI_resetNetwork();
-		if ($ret_val != TRUE) {
+		$cr = ZimAPI_resetNetwork();
+		if ($cr != ERROR_OK) {
 			$this->load->helper('printerlog');
 			PrinterLog_logError('reset network error by REST');
-			$cr = ERROR_INTERNAL;
 		}
 		
 		$this->_return_cr($cr);
+		
+		return;
+	}
+	
+	public function getnetwork() {
+		$cr = ERROR_OK;
+		$json_data = '';
+		
+		$this->load->helper('zimapi');
+		$cr = ZimAPI_getNetwork($json_data);
+		
+		if ($cr != ERROR_OK) {
+			$this->_return_cr($cr);
+		}
+		else {
+			$this->output->set_status_header($cr, $json_data);
+			// 		http_response_code($cr);
+			$this->output->set_content_type(RETURN_CONTENT_TYPE);
+			echo $json_data;
+		}
+		
+		return;
+	}
+	
+	public function getnetworkip() {
+		$cr = ERROR_OK;
+		$json_data = '';
+		
+		$this->load->helper('zimapi');
+		$cr = ZimAPI_getNetworkIP($json_data);
+		
+		if ($cr != ERROR_OK) {
+			$this->_return_cr($cr);
+		}
+		else {
+			$this->output->set_status_header($cr, $json_data);
+			// 		http_response_code($cr);
+			$this->output->set_content_type(RETURN_CONTENT_TYPE);
+			echo $json_data;
+		}
+		
+		return;
+	}
+	
+	public function listssid() {
+		$display = '';
+		
+		$this->load->helper('zimapi');
+		$display = ZimAPI_listSSID();
+		
+		$this->output->set_content_type(RETURN_CONTENT_TYPE);
+		echo $display;
+		
+		return;
+	}
+	
+	public function setnetwork() {
+		$cr = ERROR_OK;
+		
+		$string_json = $this->input->get('v');
+		if ($string_json) {
+			$cr = ZimAPI_setNetwork($string_json);
+			$this->_return_cr($cr);
+		}
+		else {
+			$this->_return_cr(ERROR_MISS_PRM);
+		}
 		
 		return;
 	}
@@ -196,7 +261,7 @@ class Rest extends MY_Controller {
 				}
 				
 				$upload_config = array (
-						'upload_path'	=> $CFG->config['temp'],
+						'upload_path'	=> $this->config->item('temp'),
 // 						'allowed_types'	=> 'jpg|png|gcode',
 	 					'allowed_types'	=> '*',
 						'overwrite'		=> TRUE,
@@ -264,8 +329,8 @@ class Rest extends MY_Controller {
 		$this->load->helper('printlist');
 		
 		$display = ModelList_list();
-// 		$this->output->set_content_type(RETURN_CONTENT_TYPE);
-		header('Content-type: text/plain; charset=UTF-8');
+		$this->output->set_content_type(RETURN_CONTENT_TYPE);
+// 		header('Content-type: text/plain; charset=UTF-8');
 		echo $display;
 		
 		return;
@@ -398,7 +463,11 @@ class Rest extends MY_Controller {
 						$cr = ERROR_WRONG_PRM;
 					}
 					else if (!($has_e === FALSE) && !($has_v === FALSE)) {
-						if (in_array($has_v, array('l', 'r'))) {
+						// refuse getting data not existed for mono extruder
+						if ($has_v == 'l' && PrinterState_getNbExtruder() == 1) {
+							$cr = ERROR_WRONG_PRM;
+						}
+						else if (in_array($has_v, array('l', 'r'))) {
 							$tmp_array = PrinterState_getExtruderTemperaturesAsArray();
 							$cr = ERROR_OK;
 							$display = ($has_v == 'l')
@@ -417,7 +486,13 @@ class Rest extends MY_Controller {
 					
 				case PRINTERSTATE_PRM_CARTRIDGE:
 					$api_prm = $this->input->get('v');
-					$cr = PrinterState_getCartridge($display, $api_prm);
+					// refuse getting data not existed for mono extruder
+					if ($api_prm == 'l' && PrinterState_getNbExtruder() == 1) {
+						$cr = ERROR_WRONG_PRM;
+					}
+					else {
+						$cr = PrinterState_getCartridge($display, $api_prm);
+					}
 					break;
 					
 				case PRINTERSTATE_PRM_INFO:
@@ -458,7 +533,13 @@ class Rest extends MY_Controller {
 				case PRINTERSTATE_PRM_EXTRUDER:
 					$api_prm = $this->input->get('v');
 					if ($api_prm) {
-						$cr = PrinterState_setExtruder($api_prm);
+						// refuse getting data not existed for mono extruder
+						if ($api_prm == 'l' && PrinterState_getNbExtruder() == 1) {
+							$cr = ERROR_WRONG_PRM;
+						}
+						else {
+							$cr = PrinterState_setExtruder($api_prm);
+						}
 					} else {
 						$cr = ERROR_MISS_PRM;
 					}
@@ -504,8 +585,7 @@ class Rest extends MY_Controller {
 		$cr = 0;
 		$gcodes = '';
 		
-		$CI = &get_instance();
-		$CI->load->helper('printerstate');
+		$this->load->helper('printerstate');
 		
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$gcodes = $this->input->post('v');
@@ -538,6 +618,47 @@ class Rest extends MY_Controller {
 			else {
 				$this->_return_cr(ERROR_INTERNAL);
 			}
+		}
+		
+		return;
+	}
+	
+	public function gcodefile() {
+		$cr = 0;
+		$gcode = NULL;
+		
+		$this->load->helper('printerstate');
+		
+		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+			$upload_config = array (
+					'upload_path'	=> $this->config->item('temp'),
+					'allowed_types'	=> '*',
+// 					'allowed_types'	=> 'gcode',
+					'overwrite'		=> TRUE,
+					'remove_spaces'	=> TRUE,
+					'encrypt_name'	=> TRUE,
+			);
+			$this->load->library('upload', $upload_config);
+			
+			if ($this->upload->do_upload('f')) {
+				$gcode = $this->upload->data();
+				
+				$cr = PrinterState_runGcodeFile($gcode['full_path']);
+				if ($cr == TRUE) {
+					$cr = ERROR_OK;
+				}
+				else {
+					$cr = ERROR_INTERNAL;
+				}
+			} else {
+				// treat error - missing gcode file
+				$cr = ERROR_MISS_PRM;
+			}
+			
+			$this->_return_cr($cr);
+		}
+		else {
+			$this->load->view('template/rest/gcodefile_form');
 		}
 		
 		return;

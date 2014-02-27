@@ -42,7 +42,7 @@ function Printer_printFromFile($gcode_path, $stop_printing = FALSE) {
 	$ret_val = 0;
 	
 	$CI = &get_instance();
-	$CI->load->helper(array('printerstate', 'corestatus', 'printerlog', 'detectos'));
+	$CI->load->helper(array('printerstate', 'errorcode', 'corestatus', 'printerlog', 'detectos'));
 	
 	// check if we have no file
 	if (!file_exists($gcode_path)) {
@@ -57,6 +57,23 @@ function Printer_printFromFile($gcode_path, $stop_printing = FALSE) {
 // 			return ERROR_IN_PRINT;
 			PrinterLog_logDebug('already in printing');
 			return ERROR_BUSY_PRINTER;
+		}
+	}
+	
+	// check extruder number
+	if (PrinterState_getNbExtruder() < 2) {
+		$tmp_array = array();
+		
+		$command = $CFG->config['gcanalyser'] . $gcode_path;
+		exec($command, $output, $ret_val);
+		if ($ret_val != ERROR_NORMAL_RC_OK) {
+			PrinterLog_logError('gcanalyser error');
+			return ERROR_INTERNAL;
+		}
+		$tmp_array = json_decode($output[0]);
+		if ($tmp_array['N'] > PrinterState_getNbExtruder()) {
+			PrinterLog_logMessage('no enough extruder');
+			return ERROR_INTERNAL;
 		}
 	}
 
@@ -88,9 +105,9 @@ function Printer_printFromFile($gcode_path, $stop_printing = FALSE) {
 // 	}
 
 	// pass gcode to printer
-	if (!PrinterState_beforeFileCommand()) {
-		return ERROR_INTERNAL;
-	}
+//	if (!PrinterState_beforeFileCommand()) {
+//		return ERROR_INTERNAL;
+//	}
 	$command = PrinterState_getPrintCommand() . $gcode_path;
 	// 		exec($command, $output, $ret_val);
 	// 		if ($ret_val != ERROR_NORMAL_RC_OK) {
@@ -98,22 +115,24 @@ function Printer_printFromFile($gcode_path, $stop_printing = FALSE) {
 	// 		}
 	if ($CFG->config['simulator'] && DectectOS_checkWindows()) {
 		pclose(popen($command, 'r')); // only for windows arcontrol client
-		PrinterLog_LogArduino($command);
+		PrinterLog_logArduino($command);
 	}
 	else {
-		exec($command, $output, $ret_val);
-		if (!PrinterState_filterOutput($output)) {
-			PrinterLog_logError('filter arduino output error');
-			return ERROR_INTERNAL;
-		}
-		if ($ret_val != ERROR_NORMAL_RC_OK) {
-			return $ret_val;
-		}
-		PrinterLog_LogArduino($command, $output);
+// 		exec($command, $output, $ret_val);
+		pclose(popen($command . ' > ' . PRINTERSTATE_FILE_PRINTLOG . ' &', 'r'));
+// 		if (!PrinterState_filterOutput($output)) {
+// 			PrinterLog_logError('filter arduino output error');
+// 			return ERROR_INTERNAL;
+// 		}
+// 		if ($ret_val != ERROR_NORMAL_RC_OK) {
+// 			return $ret_val;
+// 		}
+// 		PrinterLog_logArduino($command, $output);
+		PrinterLog_logArduino($command);
 	}
-	if (!PrinterState_afterFileCommand()) {
-		return ERROR_INTERNAL;
-	}
+//	if (!PrinterState_afterFileCommand()) {
+//		return ERROR_INTERNAL;
+//	}
 
 	// reduce the quantity of filament here
 	$ret_val = PrinterState_changeFilament();
@@ -122,7 +141,6 @@ function Printer_printFromFile($gcode_path, $stop_printing = FALSE) {
 	}
 
 	return ERROR_OK;
-	
 }
 
 function Printer_stopPrint() {

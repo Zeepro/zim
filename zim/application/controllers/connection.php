@@ -34,7 +34,7 @@ class Connection extends MY_Controller {
 		$this->template->set ( 'header', "<title>" . t ( 'ZeePro Personal Printer 21 - Connection configuration' ) . "</title>" );
 		
 		if ($this->form_validation->run () == FALSE) {
-			$data['listSSID'] = ZimAPI_listSSID();
+			$data['listSSID'] = ZimAPI_listSSIDAsArray();
 			
 			$this->template->load ( 'connectionmaster', 'connectionwifissid', $data );
 		} else {
@@ -69,17 +69,11 @@ class Connection extends MY_Controller {
     }
     
     public function wifipswd() {
-        global $CFG;
-    	
-        $ssid = $id=$this->input->get('ssid');
-        
-    	$this->load->helper ( array (
-				'form',
-				'url'
-		) );
+		global $CFG;
 		
-		$this->load->library ( 'form_validation' );
-				
+		$this->load->library('form_validation');
+		$this->load->helper(array('zimapi'));
+		
 		$this->form_validation->set_rules('password', 'password', '');
 		
 		$this->lang->load ( 'connectionmaster', $this->config->item ( 'language' ) );
@@ -89,8 +83,23 @@ class Connection extends MY_Controller {
 		$this->template->set ( 'header', "<title>" . t ( 'ZeePro Personal Printer 21 - Connection configuration' ) . "</title>" );
 		
 		if ($this->form_validation->run () == FALSE) {
+			$ssid = $this->input->get('ssid');
 			$this->template->load ('connectionmaster', 'connectionwifipswd', array('ssid' => $ssid));
 		} else {
+			$ssid = $this->input->post('ssid');
+			$passwd = $this->input->post('password');
+			
+			$ret_val = ZimAPI_setcWifi($ssid, $passwd);
+			if ($ret_val != ERROR_OK) {
+// 				$error = t('invalid data');
+				$this->output->set_header("Location:/connection/wifissid");
+				return;
+			}
+			else {
+// 				$this->output->set_header("Location:/connection/confirmation");
+				$this->confirmation();
+				return; // end generating if successed
+			}
 // 			$arr = array (
 // 					"Connection.Topology" => "Network",
 // 					"Connection.Support" => "WiFi",
@@ -105,7 +114,7 @@ class Connection extends MY_Controller {
 // 			fwrite ( $fh, json_encode ( $arr ) );
 // 			fclose ( $fh );
 			
-			header ( "Location:/connection/confirmation" );
+// 			header ( "Location:/connection/confirmation" );
 		}
     }
 
@@ -141,10 +150,10 @@ class Connection extends MY_Controller {
     }
         
 	public function wiredauto() {
-        global $CFG;
+		global $CFG;
 
         // To be managed by API...
-        
+
 //         $arr = array("Connection.Topology" => "P2P",
 //             "Connection.Support" => "WiFi",
 //             "IP.addresses.V4" => array(array("Address" => "0.0.0.0")),
@@ -155,6 +164,7 @@ class Connection extends MY_Controller {
 //         fwrite($fh, json_encode($arr));
 //         fclose($fh);
 
+		CoreStatus_wantConnection();
 		header ( "Location:/connection/confirmation" );
     }
     
@@ -261,7 +271,7 @@ class Connection extends MY_Controller {
 				}
 				else {
 					$ret_val = ZimAPI_setsWifi($ssid, $passwd);
-					if ($ret_val != TRUE) {
+					if ($ret_val != ERROR_OK) {
 						$error = t('invalid data');
 					}
 					else {

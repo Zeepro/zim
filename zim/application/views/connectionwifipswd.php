@@ -12,6 +12,7 @@
 				accept-charset="utf-8">
 
 				<label for="ip"><?= htmlspecialchars(t("network password")) ?></label>
+				<input type="hidden" name="ssid" id="ssid" value="<?= $ssid ?>">
 				<input type="password" name="password" id="password" value=""/>
 
 				<div>
