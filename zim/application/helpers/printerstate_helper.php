@@ -263,7 +263,7 @@ function PrinterState_setTemperature($val_temperature, $type = 'e') {
 	$ret_val = 0;
 	
 	if ($type == 'e' && $val_temperature >= PRINTERSTATE_TEMPER_MIN_E && $val_temperature <= PRINTERSTATE_TEMPER_MAX_E) {
-		$command = $arcontrol_fullpath . PRINTERSTATE_SET_TEMPEREXT . $val_temperature;
+		$command = $arcontrol_fullpath . PRINTERSTATE_SET_TEMPEREXT . 'S' . $val_temperature;
 	} elseif ($type == 'h' && $val_temperature >= PRINTERSTATE_TEMPER_MIN_H && $val_temperature <= PRINTERSTATE_TEMPER_MAX_H) {
 		$command = 'echo ok';
 	} else {
@@ -278,6 +278,9 @@ function PrinterState_setTemperature($val_temperature, $type = 'e') {
 		$CI->load->helper('detectos');
 		
 		if ($CFG->config['simulator'] && DectectOS_checkWindows()) {
+			// remove the symbol "\" for simulator
+			$command = str_replace('\ ', ' ', $command);
+			
 			pclose(popen($command, 'r')); // only for windows arcontrol client
 			PrinterLog_logArduino($command);
 		}

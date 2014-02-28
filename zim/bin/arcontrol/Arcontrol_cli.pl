@@ -296,12 +296,12 @@ sub set_temperature {
 
 	# _set_temperature();
 	if ( $is_windows == TRUE ) {
-		system( 'start /B "" "perl" ' . $myself . ' -st ' . $temper_to_set );
+		system( 'start /B "" "perl" ' . $myself . ' -st ' . substr($temper_to_set, 1) );
 
 		#		system( 'start "" "perl" ' . $myself . ' -st ' . $temper_to_set );
 	}
 	else {
-		system( 'perl ' . $myself . ' -st ' . $temper_to_set . ' &' );
+		system( 'perl ' . $myself . ' -st ' . substr($temper_to_set, 1) . ' &' );
 	}
 
 	exit;
