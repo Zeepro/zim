@@ -541,12 +541,12 @@ sub load_filament {
 	# _start_filament();
 	if ( $is_windows == TRUE ) {
 		system(
-			'start /B "" "perl" ' . $myself . ' -sf ' . "$has_file $no_file" );
+			'start /B "" "perl" ' . $myself . ' -sfila ' . "$has_file $no_file" );
 
 	  #		system( 'start "" "perl" ' . $myself . ' -sf ' . "$has_file $no_file");
 	}
 	else {
-		system( 'perl ' . $myself . ' -sf ' . "$has_file $no_file" . ' &' );
+		system( 'perl ' . $myself . ' -sfila ' . "$has_file $no_file" . ' &' );
 	}
 
 	return;
@@ -584,12 +584,12 @@ sub unload_filament {
 	# _start_filament();
 	if ( $is_windows == TRUE ) {
 		system(
-			'start /B "" "perl" ' . $myself . ' -sf ' . "$has_file $no_file" );
+			'start /B "" "perl" ' . $myself . ' -sfila ' . "$has_file $no_file" );
 
 	  #		system( 'start "" "perl" ' . $myself . ' -sf ' . "$has_file $no_file");
 	}
 	else {
-		system( 'perl ' . $myself . ' -sf ' . "$has_file $no_file" . ' &' );
+		system( 'perl ' . $myself . ' -sfila ' . "$has_file $no_file" . ' &' );
 	}
 
 	return;
@@ -775,9 +775,10 @@ my %opt = ();
 	my %options = (
 		'help|h' => \$opt{help},
 		'f'      => \$opt{openfile},
+		'sf'     => \$opt{stopfile},
 		'st'     => \$opt{settemperature},
 		'sp'     => \$opt{startprint},
-		'sf'     => \$opt{startfilament},
+		'sfila'  => \$opt{startfilament},
 	);
 	GetOptions(%options);
 }
@@ -805,6 +806,14 @@ elsif ( $opt{openfile} ) {
 
 	#run program here
 	start_print();
+
+	exit(RC_OK);
+}
+elsif ( $opt{stopfile} ) {
+	my $filename = shift @ARGV;
+
+	#run program here
+	stop_print();
 
 	exit(RC_OK);
 }
