@@ -56,7 +56,7 @@ class MY_Controller extends CI_Controller {
 			}
 			// check we are in runGcode debug interface
 			else if (CoreStatus_checkCallRunGcode()) {
-				// we always let this interface go to debug
+				// we always let this interface go for debug
 				return;
 			}
 			// check working issue

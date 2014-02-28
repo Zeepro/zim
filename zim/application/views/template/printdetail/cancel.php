@@ -35,7 +35,8 @@ var var_ajax;
 $(document).ready(checkCancelStatus());
 
 function checkCancelStatus() {
- 	var_refreshCancelStatus = setInterval(refreshCancelStatus, 5000);
+	refreshCancelStatus();
+	var_refreshCancelStatus = setInterval(refreshCancelStatus, 5000);
 	refreshVideoURL();
 	function refreshCancelStatus() {
 		var_ajax = $.ajax({

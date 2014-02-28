@@ -21,6 +21,11 @@ class Rest extends MY_Controller {
 		
 		$status_current = '';
 		if (CoreStatus_checkInInitialization() || CoreStatus_checkInConnection()) {
+			// let no block REST web service go for setting network
+			if (CoreStatus_checkCallNoBlockRESTInConnection()) {
+				return;
+			}
+			
 			// we haven't finished initialization or connection yet
 			$cr = ERROR_BUSY_PRINTER;
 			$display = $cr . " " . t(MyERRMSG($cr));
@@ -54,6 +59,18 @@ class Rest extends MY_Controller {
 					
 				case CORESTATUS_VALUE_LOAD_FILA_L:
 				case CORESTATUS_VALUE_LOAD_FILA_R:
+					// wait the time for arduino before checking filament when loading filament
+					//TODO improve this part for more reliable
+					$time_start = 0;
+					$ret_val = CoreStatus_getStartTime($time_start);
+					if ($ret_val != TRUE) {
+						$this->load->helper('printerlog');
+						PrinterLog_logError('get start time error in loading filament');
+					}
+					if (time() - $time_start < 43) {
+						break;
+					}
+					
 				case CORESTATUS_VALUE_UNLOAD_FILA_L:
 				case CORESTATUS_VALUE_UNLOAD_FILA_R:
 					// generate parameters by different status
@@ -147,6 +164,34 @@ class Rest extends MY_Controller {
 		
 		$this->load->helper('zimapi');
 		$cr = ZimAPI_getNetwork($json_data);
+		
+		if ($cr != ERROR_OK) {
+			$this->_return_cr($cr);
+		}
+		else {
+			$this->output->set_status_header($cr, $json_data);
+			// 		http_response_code($cr);
+			$this->output->set_content_type(RETURN_CONTENT_TYPE);
+			echo $json_data;
+		}
+		
+		return;
+	}
+	
+	public function getnetworkp2p() {
+		$cr = ERROR_OK;
+		$json_data = '';
+		$array_json = array();
+		
+		$this->load->helper('zimapi');
+		$cr = ERROR_OK;
+
+		$array_json = array(
+				ZIMAPI_TITLE_TOPOLOGY	=> ZIMAPI_VALUE_P2P,
+				ZIMAPI_TITLE_MEDIUM		=> ZIMAPI_VALUE_WIFI,
+				ZIMAPI_TITLE_SSID		=> 'zim_test_dev',
+		);
+		$json_data = json_encode($array_json);
 		
 		if ($cr != ERROR_OK) {
 			$this->_return_cr($cr);

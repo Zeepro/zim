@@ -56,7 +56,7 @@ use constant CURRENT_EXTRUD2    => 1;
 use constant DEFAULT_TEMPER     => 20;
 use constant DEFAULT_LEFT_LAB   => '5C0F0100FF80FFF0F000F0F00001F0D3';
 use constant DEFAULT_RIGHT_LAB  => '5C0F0001FFFFFF0F0F00000F00020FA0';
-use constant MAX_TIME_CMD_FILA  => 5 * 1000 * 1000;
+use constant MAX_TIME_CMD_FILA  => 30 * 1000 * 1000;
 use constant TIME_CMD_PREPRINT  => 36 * 1000 * 1000;
 
 use constant CMD_CHECK => 'M1600';
@@ -88,6 +88,10 @@ use constant CMD_STOP_SD_WRITE  => 'M29';
 use constant CMD_SELECT_SD_FILE => 'M23';
 use constant CMD_START_SD_FILE  => 'M24';
 use constant CMD_DELETE_SD_FILE => 'M30';
+
+use constant CMD_UNIN_FILA_PLUS => 'G99';
+use constant CMD_RELATIVE_POS   => 'G91';
+use constant CMD_ALLOW_COLD_E   => 'M302';
 
 # general return code
 use constant RC_OK => 0;
@@ -899,7 +903,10 @@ else {
 		|| $command eq CMD_STOP_SD_WRITE
 		|| $command eq CMD_SELECT_SD_FILE
 		|| $command eq CMD_START_SD_FILE
-		|| $command eq CMD_DELETE_SD_FILE )
+		|| $command eq CMD_DELETE_SD_FILE
+		|| $command eq CMD_UNIN_FILA_PLUS
+		|| $command eq CMD_RELATIVE_POS
+		|| $command eq CMD_ALLOW_COLD_E )
 	{
 
 		#cmd: sd card

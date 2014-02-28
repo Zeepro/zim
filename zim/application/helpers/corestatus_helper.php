@@ -173,6 +173,16 @@ function CoreStatus_checkCallNoBlockREST() {
 	));
 }
 
+function CoreStatus_checkCallNoBlockRESTInConnection() {
+	$CI = &get_instance();
+	$CI->load->helper('printerstate');
+	
+	return CoreStatus__checkCallURI(array(
+			'/rest/status'		=> NULL,
+			'/rest/setnetwork'	=> NULL,
+	));
+}
+
 function CoreStatus_checkCallCanceling(&$url_redirect = '') {
 	$url_redirect = '/printdetail/cancel';
 	
@@ -204,6 +214,15 @@ function CoreStatus_setInIdle() {
 			$CI = &get_instance();
 			$CI->load->helper('printerlog');
 			PrinterLog_logError('camera stop command error');
+			return FALSE;
+		}
+	}
+	else if ($status_previous == CORESTATUS_VALUE_UNLOAD_FILA_L
+			|| $status_previous == CORESTATUS_VALUE_UNLOAD_FILA_R) {
+		$CI = &get_instance();
+		$CI->load->helper('printerstate');
+		$ret_val = PrinterState_afterUnloadFilament();
+		if ($ret_val != ERROR_OK) {
 			return FALSE;
 		}
 	}
@@ -259,7 +278,7 @@ function CoreStatus_setInLoading($abb_filament) {
 	$value_status = ($abb_filament == 'r')
 			? CORESTATUS_VALUE_LOAD_FILA_R : CORESTATUS_VALUE_LOAD_FILA_L;
 	
-	return CoreStatus__setInStatus($value_status, array());
+	return CoreStatus__setInStatus($value_status, array(CORESTATUS_TITLE_STARTTIME => time()));
 }
 
 function CoreStatus_setInUnloading($abb_filament) {
@@ -272,7 +291,7 @@ function CoreStatus_setInUnloading($abb_filament) {
 	return CoreStatus__setInStatus($value_status, array());
 }
 
-function CoreStatus_getStartPrintTime(&$time_start) {
+function CoreStatus_getStartTime(&$time_start) {
 	global $CFG;
 	$state_file = $CFG->config['conf'] . CORESTATUS_FILENAME_WORK;
 	$tmp_array = array();
@@ -294,12 +313,12 @@ function CoreStatus_getStartPrintTime(&$time_start) {
 	$data_json = $tmp_array['json'];
 	
 	// check status
-	if ($data_json[CORESTATUS_TITLE_STATUS] == CORESTATUS_VALUE_PRINT) {
-		if (!isset($data_json[CORESTATUS_TITLE_STARTTIME])) {
-			return FALSE;
-		}
-		$time_start = $data_json[CORESTATUS_TITLE_STARTTIME];
+// 	if ($data_json[CORESTATUS_TITLE_STATUS] == CORESTATUS_VALUE_PRINT) {
+	if (!isset($data_json[CORESTATUS_TITLE_STARTTIME])) {
+		return FALSE;
 	}
+	$time_start = $data_json[CORESTATUS_TITLE_STARTTIME];
+// 	}
 	
 	return TRUE;
 }

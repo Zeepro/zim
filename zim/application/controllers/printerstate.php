@@ -473,6 +473,20 @@ class Printerstate extends MY_Controller {
 				
 			case PRINTERSTATE_CHANGECART_NEED_P:
 				// we call the page: in load filament
+				
+				// wait the time for arduino before checking filament when loading filament
+				//TODO improve this part for more reliable
+				$time_start = 0;
+				$ret_val = CoreStatus_getStartTime($time_start);
+				if ($ret_val != TRUE) {
+					$this->load->helper('printerlog');
+					PrinterLog_logError('get start time error in loading filament');
+				}
+				if (time() - $time_start < 43) {
+					$this->_display_changecartridge_in_load_filament();
+					break;
+				}
+				
 				if (PrinterState_getFilamentStatus($abb_cartridge)) {
 					// have filament
 					$ret_val = CoreStatus_setInIdle();

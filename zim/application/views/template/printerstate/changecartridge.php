@@ -20,7 +20,8 @@ var var_next_phase = '{first_status}';
 $(document).ready(checkChangeStatus());
 
 function checkChangeStatus() {
- 	var_refreshChangeStatus = setInterval(refreshChangeStatus, 1000);
+	refreshChangeStatus();
+	var_refreshChangeStatus = setInterval(refreshChangeStatus, 5000);
 	function refreshChangeStatus() {
 		var_ajax = $.ajax({
 			url: "/printerstate/changecartridge_ajax",

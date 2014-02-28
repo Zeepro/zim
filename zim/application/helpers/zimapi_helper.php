@@ -50,12 +50,12 @@ function ZimAPI_getNetworkInfoAsArray(&$array_data) {
 		// detect OS type, if windows, just do simulation
 		if (DectectOS_checkWindows()) {
 			$ret_val = ERROR_NORMAL_RC_OK;
-			$output = array(
-					'MODE: pEth',
-					'IP Config:',
-					'addr:192.168.1.99  Bcast:192.168.1.255  Mask:255.255.255.0',
-					'MAC: 0c:82:68:21:69:57',
-			);
+// 			$output = array(
+// 					'MODE: pEth',
+// 					'IP Config:',
+// 					'addr:192.168.1.99  Bcast:192.168.1.255  Mask:255.255.255.0',
+// 					'MAC: 0c:82:68:21:69:57',
+// 			);
 // 			$output = array(
 // 					'MODE: cEth',
 // 					'IP Config:',
@@ -70,13 +70,13 @@ function ZimAPI_getNetworkInfoAsArray(&$array_data) {
 // 					'addr:10.0.0.1  Bcast:10.255.255.255  Mask:255.0.0.0',
 // 					'MAC: 0c:82:68:21:69:57',
 // 			);
-// 			$output = array(
-// 					'MODE: cWifi',
-// 					'ACCESS POINT: ssid="freebox_zeepro"',
-// 					'IP Config:',
-// 					'addr:192.168.1.41  Bcast:192.168.1.255  Mask:255.255.255.0',
-// 					'MAC: 0c:82:68:21:69:57',
-// 			);
+			$output = array(
+					'MODE: cWifi',
+					'ACCESS POINT: ssid="freebox_zeepro"',
+					'IP Config:',
+					'addr:192.168.1.41  Bcast:192.168.1.255  Mask:255.255.255.0',
+					'MAC: 0c:82:68:21:69:57',
+			);
 		}
 		else {
 			exec(ZIMAPI_CMD_CONFIG_NET, $output, $ret_val);

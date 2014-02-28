@@ -738,7 +738,7 @@ function PrinterState_checkStatusAsArray() {
 	}
 	
 	// try to calculate time remained when percentage is passed offset
-	$ret_val = CoreStatus_getStartPrintTime($time_start);
+	$ret_val = CoreStatus_getStartTime($time_start);
 	if ($ret_val == ERROR_NORMAL_RC_OK || $time_start) {
 		if ($data_json[PRINTERSTATE_TITLE_PERCENT] >= PRINTERSTATE_VALUE_OFFSET_TO_CAL_TIME) {
 			$percentage_finish = $data_json[PRINTERSTATE_TITLE_PERCENT];
@@ -913,7 +913,7 @@ function PrinterState_unloadFilament($abb_filament) {
 				break; // never reach here
 		}
 		$command .= '; ' . $arcontrol_fullpath . ' M302; ' . $arcontrol_fullpath
-				. ' "G1 E-3000 F2000"; ' . $arcontrol_fullpath . ' G99';
+				. ' G91; ' . $arcontrol_fullpath . ' "G1 E-3000 F2000"';
 	}
 	
 	// check if we are in printing
@@ -934,7 +934,7 @@ function PrinterState_unloadFilament($abb_filament) {
 		$CI = &get_instance();
 		$CI->load->helper('detectos');
 		
-		if ($CFG->config['simulator'] && DectectOS_checkWindows()) {
+		if ($CFG->config['simulator'] || DectectOS_checkWindows()) {
 			pclose(popen($command, 'r')); // only for windows arcontrol client
 			PrinterLog_logArduino($command); //FIXME we can't check return output when using simulator
 		}
@@ -954,6 +954,27 @@ function PrinterState_unloadFilament($abb_filament) {
 // 		return ERROR_IN_PRINT;
 		PrinterLog_logError('can not unload filament in printing');
 		return ERROR_BUSY_PRINTER;
+	}
+	
+	return ERROR_OK;
+}
+
+function PrinterState_afterUnloadFilament() {
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$output = array();
+	$command = $arcontrol_fullpath . ' G99';
+	$ret_val = 0;
+	
+	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output)) {
+		PrinterLog_logError('filter arduino output error');
+		return ERROR_INTERNAL;
+	}
+	PrinterLog_logArduino($command, $output);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		PrinterLog_logError('after unload filament error');
+		return ERROR_INTERNAL;
 	}
 	
 	return ERROR_OK;

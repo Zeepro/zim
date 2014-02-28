@@ -42,6 +42,7 @@ var var_prime = {var_prime};
 $(document).ready(checkPrintStatus());
 
 function checkPrintStatus() {
+	refreshPrintStatus();
 	var_refreshPrintStatus = setInterval(refreshPrintStatus, 5000);
 	refreshVideoURL();
 	function refreshPrintStatus() {
