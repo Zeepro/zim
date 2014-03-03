@@ -314,7 +314,7 @@ function CoreStatus_getStartTime(&$time_start) {
 	
 	// check status
 // 	if ($data_json[CORESTATUS_TITLE_STATUS] == CORESTATUS_VALUE_PRINT) {
-	if (!isset($data_json[CORESTATUS_TITLE_STARTTIME])) {
+	if (!isset($data_json[CORESTATUS_TITLE_STARTTIME]) || $data_json[CORESTATUS_TITLE_STARTTIME] == NULL) {
 		return FALSE;
 	}
 	$time_start = $data_json[CORESTATUS_TITLE_STARTTIME];

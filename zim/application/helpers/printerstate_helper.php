@@ -743,7 +743,8 @@ function PrinterState_checkStatusAsArray() {
 	// try to calculate time remained when percentage is passed offset
 	$ret_val = CoreStatus_getStartTime($time_start);
 	if ($ret_val == ERROR_NORMAL_RC_OK || $time_start) {
-		if ($data_json[PRINTERSTATE_TITLE_PERCENT] >= PRINTERSTATE_VALUE_OFFSET_TO_CAL_TIME) {
+		if (isset($data_json[PRINTERSTATE_TITLE_PERCENT]) &&
+				$data_json[PRINTERSTATE_TITLE_PERCENT] >= PRINTERSTATE_VALUE_OFFSET_TO_CAL_TIME) {
 			$percentage_finish = $data_json[PRINTERSTATE_TITLE_PERCENT];
 			$time_pass = time() - $time_start;
 			
