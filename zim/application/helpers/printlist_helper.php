@@ -36,6 +36,8 @@ if (!defined('PRINTLIST_MAX_PIC_SIZE')) {
 	define('PRINTLIST_VALUE_VERSION',	2);
 	define('PRINTLIST_MODEL_PRIME_L',	'_prime_left');
 	define('PRINTLIST_MODEL_PRIME_R',	'_prime_right');
+	define('PRINTLIST_MODEL_REPRIME_L',	'_reprime_left');
+	define('PRINTLIST_MODEL_REPRIME_R',	'_reprime_right');
 	define('PRINTLIST_MODEL_CANCEL',	'_cancel');
 	define('PRINTLIST_MODEL_PREFIX_S',	'_');
 	

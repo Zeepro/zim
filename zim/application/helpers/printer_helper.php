@@ -23,6 +23,49 @@ $CI->load->helper(array (
 	
 // }
 
+function Printer_printFromPrime($abb_extruder, $first_run = TRUE) {
+	$name_prime = '';
+	$gcode_path = NULL;
+	$ret_val = 0;
+	$id_model = '';
+	
+	$CI = &get_instance();
+	$CI->load->helper('printlist');
+	
+	switch ($abb_extruder) {
+		case 'l':
+			if ($first_run == TRUE)
+				$name_prime = PRINTLIST_MODEL_PRIME_L;
+			else
+				$name_prime = PRINTLIST_MODEL_REPRIME_L;
+			break;
+			
+		case 'r':
+			if ($first_run == TRUE)
+				$name_prime = PRINTLIST_MODEL_PRIME_R;
+			else
+				$name_prime = PRINTLIST_MODEL_REPRIME_R;
+			break;
+			
+		default:
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('extruder type error in printing prime');
+			return ERROR_WRONG_PRM;
+			break;
+	}
+	$id_model = ModelList_codeModelHash($name_prime);
+	
+	$ret_val = Printer__getFileFromModel($id_model, $gcode_path);
+	if (($ret_val == ERROR_OK) && $gcode_path) {
+		//TODO modify the temperature of gcode file according to cartridge info
+		;
+		
+		$ret_val = Printer_printFromFile($gcode_path);
+	}
+	
+	return $ret_val;
+}
+
 function Printer_printFromModel($id_model, $stop_printing = FALSE) {
 	$gcode_path = NULL;
 	$ret_val = 0;

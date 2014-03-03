@@ -622,6 +622,104 @@ class Rest extends MY_Controller {
 		return;
 	}
 	
+	public function prime() {
+		$cr = 0;
+		$abb_cartridge = $this->input->get('v');
+		$type = $this->input->get('t');
+		
+		$this->load->helper('printer');
+		
+		if ($abb_cartridge && $type) {
+			$first_run = TRUE;
+			
+			switch ($abb_cartridge) {
+				case 'l':
+				case 'r':
+					switch ($type) {
+						case 's':
+							$first_run = FALSE;
+						case 'f':
+							$cr = ERROR_OK;
+							break;
+							
+						default:
+							$cr = ERROR_WRONG_PRM;
+							break;
+					}
+					break;
+					
+				default:
+					$cr = ERROR_WRONG_PRM;
+					break;
+			}
+			if ($cr == ERROR_OK) {
+				$cr = Printer_printFromPrime($abb_cartridge, $first_run);
+			}
+		}
+		
+		$this->_return_cr($cr);
+		
+		return;
+	}
+	
+	public function load() {
+		$cr = 0;
+		$abb_cartridge = $this->input->get('v');
+		
+		$this->load->helper('printerstate');
+		
+		if ($abb_cartridge) {
+			switch ($abb_cartridge) {
+				case 'l':
+				case 'r':
+					$cr = PrinterState_getCartridgeAsArray($abb_cartridge);
+					if ($cr != ERROR_OK) {
+						break;
+					} 
+					$cr = PrinterState_loadFilament($abb_cartridge);
+					break;
+					
+				default:
+					$cr = ERROR_WRONG_PRM;
+					break;
+			}
+		}
+		else {
+			$cr = ERROR_MISS_PRM;
+		}
+		
+		$this->_return_cr($cr);
+		
+		return;
+	}
+	
+	public function unload() {
+		$cr = 0;
+		$abb_cartridge = $this->input->get('v');
+		
+		$this->load->helper('printerstate');
+		
+		if ($abb_cartridge) {
+			switch ($abb_cartridge) {
+				case 'l':
+				case 'r':
+					$cr = PrinterState_unloadFilament($abb_cartridge);
+					break;
+					
+				default:
+					$cr = ERROR_WRONG_PRM;
+					break;
+			}
+		}
+		else {
+			$cr = ERROR_MISS_PRM;
+		}
+		
+		$this->_return_cr($cr);
+		
+		return;
+	}
+	
 	//==========================================================
 	//another part (end of print list)
 	//==========================================================

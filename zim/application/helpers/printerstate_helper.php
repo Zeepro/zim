@@ -39,7 +39,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_SD_FILENAME',		'test.g'); // fix the name on SD card
 
 // 	define('PRINTERSTATE_TEMP_PRINT_FILENAME',	'/tmp/printer_percentage'); // fix the name on SD card
-	define('PRINTERSTATE_CMD_SERIAL',		'ifconfig -a | grep wlan0 | awk \'{print $5}\')');
+	define('PRINTERSTATE_CMD_SERIAL',		'ifconfig -a | grep wlan0 | awk \'{print $5}\'');
 	define('PRINTERSTATE_FILE_PRINTLOG',	'/tmp/printlog.log');
 
 	define('PRINTERSTATE_RIGHT_EXTRUD',	0);
@@ -842,6 +842,11 @@ function PrinterState_loadFilament($abb_filament) {
 // 			return ERROR_INTERNAL;
 // 		}
 		
+		// check already loaded
+		if (PrinterState_getFilamentStatus($abb_filament) == TRUE) {
+			return ERROR_LOADED_UNLOAD;
+		}
+		
 		// change status json file
 		$ret_val = CoreStatus_setInLoading($abb_filament);
 		if ($ret_val == FALSE) {
@@ -927,6 +932,11 @@ function PrinterState_unloadFilament($abb_filament) {
 // 		if ($ret_val != ERROR_NORMAL_RC_OK) {
 // 			return ERROR_INTERNAL;
 // 		}
+		
+		// check already unloaded
+		if (PrinterState_getFilamentStatus($abb_filament) == FALSE) {
+			return ERROR_LOADED_UNLOAD;
+		}
 		
 		// change status json file
 		$ret_val = CoreStatus_setInUnloading($abb_filament);
