@@ -664,6 +664,7 @@ class Rest extends MY_Controller {
 	
 	public function load() {
 		$cr = 0;
+		$array_cartridge = array();
 		$abb_cartridge = $this->input->get('v');
 		
 		$this->load->helper('printerstate');
@@ -672,7 +673,7 @@ class Rest extends MY_Controller {
 			switch ($abb_cartridge) {
 				case 'l':
 				case 'r':
-					$cr = PrinterState_getCartridgeAsArray($abb_cartridge);
+					$cr = PrinterState_getCartridgeAsArray($array_cartridge, $abb_cartridge);
 					if ($cr != ERROR_OK) {
 						break;
 					} 
