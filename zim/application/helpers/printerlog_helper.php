@@ -72,7 +72,8 @@ function PrinterLog__logToDebugFile($file, $msg, $prefix, $need_trim) {
 	if ($need_trim == TRUE) {
 		$msg = trim($msg, " \t\n\r\0\x0B");
 	}
-	$msg = time() . $prefix . $msg . "\n";
+// 	$msg = time() . $prefix . $msg . "\n";
+	$msg = date("[Y-m-d\TH:i:s\Z]\t", time()) . $prefix . $msg . "\n";
 	$fp = fopen($file, 'a');
 	if ($fp) {
 		fwrite($fp, $msg);

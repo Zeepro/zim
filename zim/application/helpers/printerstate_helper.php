@@ -70,7 +70,8 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 // 	define('PRINTERSTATE_VALUE_IDLE',				'idle');
 // 	define('PRINTERSTATE_VALUE_IN_SLICE',			'slicing');
 // 	define('PRINTERSTATE_VALUE_IN_PRINT',			'printing');
-	define('PRINTERSTATE_MAGIC_NUMBER',				23567);
+	define('PRINTERSTATE_MAGIC_NUMBER_V1',			23567);
+	define('PRINTERSTATE_MAGIC_NUMBER_V2',			23568);
 	define('PRINTERSTATE_VALUE_CARTRIDGE_NORMAL',	0);
 	define('PRINTERSTATE_DESP_CARTRIDGE_NORMAL',	'normal');
 	define('PRINTERSTATE_VALUE_CARTRIDGE_REFILL',	1);
@@ -415,13 +416,6 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 	$output = array();
 	$last_output = NULL;
 	$ret_val = 0;
-	$data_json = array();
-	$string_tmp = NULL;
-	$hex_tmp = 0;
-	$time_start = 0;
-	$time_pack = 0;
-	$hex_checksum = 0;
-	$hex_cal = 0;
 	
 	switch ($abb_cartridge) {
 		case 'l':
@@ -461,6 +455,15 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 	
 	// check and treat output data
 	if ($last_output) {
+		$version_rfid = 0;
+		$string_tmp = NULL;
+		$hex_checksum = 0;
+		$hex_cal = 0;
+		$hex_tmp = 0;
+		$time_start = 0;
+		$time_pack = 0;
+		$data_json = array();
+		
 		// checksum 0 to 13
 		for($i=0; $i<=13; $i++) {
 			$string_tmp = substr($last_output, $i*2, 2);
@@ -475,9 +478,19 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 		
 		// magic number
 		$string_tmp = substr($last_output, 0, 4);
-		if (hexdec($string_tmp) != PRINTERSTATE_MAGIC_NUMBER) {
-			PrinterLog_logError('magic number error');
-			return ERROR_INTERNAL;
+		switch (hexdec($string_tmp)) {
+			case PRINTERSTATE_MAGIC_NUMBER_V1:
+				$version_rfid = 1;
+				break;
+				
+			case PRINTERSTATE_MAGIC_NUMBER_V2:
+				$version_rfid = 2;
+				break;
+				
+			default:
+				PrinterLog_logError('magic number error');
+				return ERROR_INTERNAL;
+				break;
 		}
 		
 		// type of cartridge
@@ -518,28 +531,51 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 		$string_tmp = substr($last_output, 8, 6);
 		$data_json[PRINTERSTATE_TITLE_COLOR] = '#' . $string_tmp;
 		
-		// initial quantity
-		$string_tmp = substr($last_output, 14, 4);
-		$hex_tmp = hexdec($string_tmp);
-		$data_json[PRINTERSTATE_TITLE_INITIAL] = $hex_tmp;
-		
-		// used quantity
-		$string_tmp = substr($last_output, 18, 4);
-		$hex_tmp = hexdec($string_tmp);
-		$data_json[PRINTERSTATE_TITLE_USED] = $hex_tmp;
-		
-		// normal extrusion temperature
-		$string_tmp = substr($last_output, 22, 2);
-		$hex_tmp = hexdec($string_tmp) + PRINTERSTATE_OFFSET_TEMPER;
-		$data_json[PRINTERSTATE_TITLE_EXT_TEMPER] = $hex_tmp;
-		
-		// packing date
-		$string_tmp = substr($last_output, 24, 4);
-		$hex_tmp = hexdec($string_tmp);
-		$time_start = gmmktime(0, 0, 0, 1, 1, PRINTERSTATE_OFFSET_YEAR_SETUP_DATE);
-		$time_pack = $time_start + $hex_tmp * 60 * 60 * 24;
-		// $data_json[PRINTERSTATE_TITLE_SETUP_DATE] = date("Y-m-d\TH:i:sO", $time_pack);
-		$data_json[PRINTERSTATE_TITLE_SETUP_DATE] = date("Y-m-d\TH:i:s\Z", $time_pack);
+		if (in_array($version_rfid, array(1, 2))) {
+			$offset_init = 14;
+			if ($version_rfid == 1) {
+				$length_init = 4;
+				$offset_used = 18;
+				$length_used = 4;
+				$offset_temp = 22;
+				$length_temp = 2;
+				$offset_pack = 24;
+				$length_pack = 4;
+			}
+			else { //$version_rfid == 2
+				$length_init = 5;
+				$offset_used = 19;
+				$length_used = 5;
+				$offset_temp = 24;
+				$length_temp = 2;
+				$offset_pack = 26;
+				$length_pack = 4;
+			}
+			
+			// initial quantity
+			$string_tmp = substr($last_output, $offset_init, $length_init);
+			$hex_tmp = hexdec($string_tmp);
+			$data_json[PRINTERSTATE_TITLE_INITIAL] = $hex_tmp;
+			
+			// used quantity
+			$string_tmp = substr($last_output, $offset_used, $length_used);
+			$hex_tmp = hexdec($string_tmp);
+			$data_json[PRINTERSTATE_TITLE_USED] = $hex_tmp;
+			
+			// normal extrusion temperature
+			$string_tmp = substr($last_output, $offset_temp, $length_temp);
+			$hex_tmp = hexdec($string_tmp) + PRINTERSTATE_OFFSET_TEMPER;
+			$data_json[PRINTERSTATE_TITLE_EXT_TEMPER] = $hex_tmp;
+			
+			// packing date
+			//TODO argument max acceptable date (Unix timestamp, 2038-01-19)
+			$string_tmp = substr($last_output, $offset_pack, $length_pack);
+			$hex_tmp = hexdec($string_tmp);
+			$time_start = gmmktime(0, 0, 0, 1, 1, PRINTERSTATE_OFFSET_YEAR_SETUP_DATE);
+			$time_pack = $time_start + $hex_tmp * 60 * 60 * 24;
+			// $data_json[PRINTERSTATE_TITLE_SETUP_DATE] = date("Y-m-d\TH:i:sO", $time_pack);
+			$data_json[PRINTERSTATE_TITLE_SETUP_DATE] = date("Y-m-d\TH:i:s\Z", $time_pack);
+		}
 		
 		$json_cartridge = $data_json;
 	} else {
