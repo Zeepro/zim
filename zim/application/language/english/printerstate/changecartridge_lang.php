@@ -10,35 +10,39 @@ $lang['Left cartridge change']
 	= 'Left cartridge change';
 $lang['Right cartridge change']
 	= 'Right cartridge change';
-$lang['Unload']
-	= 'Unload';
+$lang['Unload the filament']
+	= 'Unload the filament';
 $lang['Waiting for getting information...']
 	= 'Waiting for getting information...';
 $lang['Wait for unloading...']
 	= 'Wait for unloading...';
 $lang['Not enough filament']
 	= 'Not enough filament';
-$lang['OK']
-	= 'OK';
+$lang['Load the filament']
+	= 'Load the filament';
 $lang['Your cartridge is loaded']
 	= 'Your cartridge is loaded';
 $lang['Change the cartridge']
 	= 'Change the cartridge';
 $lang['Waiting for loading...']
 	= 'Waiting for loading...';
-$lang['Need prime?']
-	= 'Need prime?';
+$lang['Prime?']
+	= 'Prime?';
 $lang['Yes']
 	= 'Yes';
 $lang['No']
 	= 'No';
-$lang['Model']
-	= 'Model';
-$lang['Cartridge']
-	= 'Cartridge';
+$lang['Color of model']
+	= 'Color of model';
+$lang['Color of cartridge']
+	= 'Color of cartridge';
 $lang['No model']
 	= 'No model';
 $lang['Error']
 	= 'Error';
+$lang['Remove the cartridge above']
+	= 'Remove the cartridge above';
+$lang['Insert the cartridge above']
+	= 'Insert the cartridge above';
 
 ?>

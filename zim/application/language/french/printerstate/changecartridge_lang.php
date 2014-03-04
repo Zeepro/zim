@@ -7,38 +7,42 @@ $lang['back']
 $lang['ZeePro Personal Printer 21 - Change cartridge']
 	= 'Zim - Changement de cartouches';
 $lang['Left cartridge change']
-	= 'Changer la cartouche gauche';
+	= 'Changement de la cartouche gauche';
 $lang['Right cartridge change']
-	= 'Changer la cartouche droite';
-$lang['Unload']
-	= 'Retirer';
+	= 'Changement de la cartouche droite';
+$lang['Unload the filament']
+	= 'Rembobiner le filament';
 $lang['Waiting for getting information...']
-	= 'Récupération des informations ...';
+	= 'Lecture des informations ...';
 $lang['Wait for unloading...']
-	= 'Retrait en cours...';
+	= 'Rembobinage en cours...';
 $lang['Not enough filament']
 	= 'Filament insuffisant';
-$lang['OK']
-	= 'Valider';
+$lang['Load the filament']
+	= 'Charger le filament';
 $lang['Your cartridge is loaded']
 	= 'Votre cartouche est chargée';
 $lang['Change the cartridge']
 	= 'Changer la cartouche';
 $lang['Waiting for loading...']
 	= 'Chargement en cours...';
-$lang['Need prime?']
-	= 'Besoin d\'amorçage ?';
+$lang['Prime?']
+	= 'Amorçage ?';
 $lang['Yes']
 	= 'Oui';
 $lang['No']
 	= 'Non';
-$lang['Model']
-	= 'Modèle';
-$lang['Cartridge']
-	= 'Cartouche';
+$lang['Color of model']
+	= 'Couleur de modèle';
+$lang['Color of cartridge']
+	= 'Couleur de cartouche';
 $lang['No model']
 	= 'Pas de modèle';
 $lang['Error']
 	= 'Erreur';
+$lang['Remove the cartridge above']
+	= 'Retirer la cartouche dessus';
+$lang['Insert the cartridge above']
+	= 'Insérer la cartouche dessus';
 
 ?>

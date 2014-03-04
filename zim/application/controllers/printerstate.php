@@ -24,7 +24,7 @@ class Printerstate extends MY_Controller {
 		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
 		$template_data = array (
 				'next_phase'	=> PRINTERSTATE_CHANGECART_UNLOAD_F,
-				'unload_button'	=> t('Unload'),
+				'unload_button'	=> t('Unload the filament'),
 		);
 		$template_name = 'template/printerstate/changecartridge_ajax/wait_unload_filament';
 		$this->_display_changecartridge_base($template_name, $template_data);
@@ -51,6 +51,7 @@ class Printerstate extends MY_Controller {
 		$template_data = array (
 				'next_phase'	=> ($low_hint) ? PRINTERSTATE_CHANGECART_REINST_C : PRINTERSTATE_CHANGECART_INSERT_C,
 				'low_hint'		=> ($low_hint) ? t('Not enough filament') : '',
+				'action_hint'	=> t('Remove the cartridge above'),
 		);
 		$template_name = 'template/printerstate/changecartridge_ajax/remove_cartridge';
 		$this->_display_changecartridge_base($template_name, $template_data);
@@ -59,8 +60,10 @@ class Printerstate extends MY_Controller {
 	}
 	
 	private function _display_changecartridge_insert_cartridge() {
+		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
 		$template_data = array (
 				'next_phase'	=> PRINTERSTATE_CHANGECART_LOAD_F,
+				'action_hint'	=> t('Insert the cartridge above'),
 		);
 		$template_name = 'template/printerstate/changecartridge_ajax/insert_cartridge';
 		$this->_display_changecartridge_base($template_name, $template_data);
@@ -73,7 +76,7 @@ class Printerstate extends MY_Controller {
 		if ($change_able == TRUE) {
 			$template_data = array (
 					'next_phase'	=> PRINTERSTATE_CHANGECART_WAIT_F_C,
-					'load_button'	=> t('OK'),
+					'load_button'	=> t('Load the filament'),
 					'change_button'	=> t('Change the cartridge'),
 					'wait_info'		=> t('Waiting for getting information...'),
 					'abb_cartridge'	=> $abb_cartridge,
@@ -84,7 +87,7 @@ class Printerstate extends MY_Controller {
 		else {
 			$template_data = array (
 					'next_phase'	=> PRINTERSTATE_CHANGECART_WAIT_F,
-					'load_button'	=> t('OK'),
+					'load_button'	=> t('Load the filament'),
 					'hint'			=> t('Your cartridge is loaded'),
 			);
 			$template_name = 'template/printerstate/changecartridge_ajax/wait_load_filament';
@@ -104,8 +107,8 @@ class Printerstate extends MY_Controller {
 		
 		$color_model = PRINTERSTATE_VALUE_DEFAULT_COLOR;
 		$color_cart = PRINTERSTATE_VALUE_DEFAULT_COLOR;
-		$model_title = t('Model');
-		$cartridge_title = t('Cartridge');
+		$model_title = t('Color of model');
+		$cartridge_title = t('Color of cartridge');
 		$template_data = array();
 		
 		if ($id_model) {
@@ -180,7 +183,7 @@ class Printerstate extends MY_Controller {
 		
 		$template_data = array (
 				'next_phase'	=> PRINTERSTATE_CHANGECART_FINISH,
-				'question'		=> t('Need prime?'),
+				'question'		=> t('Prime?'),
 				'yes_button'	=> t('Yes'),
 				'no_button'		=> t('No'),
 				'yes_url'		=> $yes_url,

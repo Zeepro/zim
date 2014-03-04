@@ -37,6 +37,14 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_START_SD_FILE',	' M24');
 	define('PRINTERSTATE_DELETE_SD_FILE',	' M30\ '); // add space in the last
 	define('PRINTERSTATE_SD_FILENAME',		'test.g'); // fix the name on SD card
+	define('PRINTERSTATE_AFTER_UNIN_FILA',	' G99');
+	define('PRINTERSTATE_HOMEING',			' G28');
+	define('PRINTERSTATE_MOVE',				' G1\ '); // add space in the last
+	define('PRINTERSTATE_HEAD_LED_ON',		' M1200');
+	define('PRINTERSTATE_HEAD_LED_OFF',		' M1201');
+	define('PRINTERSTATE_STEPPER_OFF',		' M84');
+	define('PRINTERSTATE_PAUSE_PRINT',		' -pf pause');
+	define('PRINTERSTATE_RESUME_PRINT',		' -rf resume');
 
 // 	define('PRINTERSTATE_TEMP_PRINT_FILENAME',	'/tmp/printer_percentage'); // fix the name on SD card
 	define('PRINTERSTATE_CMD_SERIAL',		'ifconfig -a | grep wlan0 | awk \'{print $5}\'');
@@ -957,6 +965,9 @@ function PrinterState_unloadFilament($abb_filament) {
 				return ERROR_WRONG_PRM;
 				break; // never reach here
 		}
+		// M302 allow cold extrusion
+		// G91 relative movement
+		// G1 E-3000 F2000 unload filament until endstop
 		$command .= '; ' . $arcontrol_fullpath . ' M302; ' . $arcontrol_fullpath
 				. ' G91; ' . $arcontrol_fullpath . ' "G1 E-3000 F2000"';
 	}
@@ -1013,7 +1024,7 @@ function PrinterState_afterUnloadFilament() {
 	global $CFG;
 	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
 	$output = array();
-	$command = $arcontrol_fullpath . ' G99';
+	$command = $arcontrol_fullpath . PRINTERSTATE_AFTER_UNIN_FILA;
 	$ret_val = 0;
 	
 	exec($command, $output, $ret_val);
@@ -1059,7 +1070,7 @@ function PrinterState_stopPrinting() {
 		return ERROR_NO_PRINT;
 	}
 	
-	return TRUE;
+	return ERROR_OK;
 }
 
 function PrinterState_runGcodeFile($gcode_path) {
@@ -1231,6 +1242,194 @@ function PrinterState_getInfoAsArray() {
 	);
 	
 	return $json_info;
+}
+
+function PrinterState_homeing($axis = 'ALL') {
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$output = array();
+	$command = '';
+	$ret_val = 0;
+	
+	$axis = strtoupper($axis);
+	
+	switch($axis) {
+		case 'X':
+		case 'Y':
+		case 'Z':
+			$command = $arcontrol_fullpath . PRINTERSTATE_HOMEING . '\ ' . $axis;
+			break;
+			
+		case 'ALL':
+			$command = $arcontrol_fullpath . PRINTERSTATE_HOMEING;
+			break;
+			
+		default:
+			PrinterLog_logError('axis type error');
+			return ERROR_WRONG_PRM;
+			break;
+	}
+	
+	if ($CFG->config['simulator']) {
+		$command = str_replace('\ ', ' ', $command);
+	}
+	
+	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output)) {
+		PrinterLog_logError('filter arduino output error');
+		return ERROR_INTERNAL;
+	}
+	PrinterLog_logArduino($command, $output);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		PrinterLog_logError('homeing error');
+		return ERROR_INTERNAL;
+	}
+	
+	return ERROR_OK;
+}
+
+function PrinterState_move($axis, $value) {
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$output = array();
+	$command = '';
+	$ret_val = 0;
+	
+	$axis = strtoupper($axis);
+	
+	if ($axis != 'E' && ($value < -150 || $value > 150)) {
+		return ERROR_WRONG_PRM;
+	}
+	
+	switch($axis) {
+		case 'X':
+		case 'Y':
+		case 'Z':
+		case 'E':
+			$command = $arcontrol_fullpath . PRINTERSTATE_MOVE . $axis . $value;
+			break;
+			
+		default:
+			PrinterLog_logError('axis type error');
+			return ERROR_WRONG_PRM;
+			break;
+	}
+	
+	if ($CFG->config['simulator']) {
+		$command = str_replace('\ ', ' ', $command);
+	}
+	
+	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output)) {
+		PrinterLog_logError('filter arduino output error');
+		return ERROR_INTERNAL;
+	}
+	PrinterLog_logArduino($command, $output);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		PrinterLog_logError('homeing error');
+		return ERROR_INTERNAL;
+	}
+	
+	return ERROR_OK;
+}
+
+function PrinterState_extrude($value = 5) {
+	if ($value == 0) {
+		return ERROR_WRONG_PRM;
+	}
+	
+	return PrinterState_move('E', $value);
+}
+
+function PrinterState_setHeadLed($value = 'off') {
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$output = array();
+	$command = '';
+	$ret_val = 0;
+	
+	switch($value) {
+		case 'off':
+			$command = $arcontrol_fullpath . PRINTERSTATE_HEAD_LED_OFF;
+			break;
+			
+		case 'on':
+			$command = $arcontrol_fullpath . PRINTERSTATE_HEAD_LED_ON;
+			break;
+			
+		default:
+			PrinterLog_logError('set head led value error');
+			return ERROR_WRONG_PRM;
+			break;
+	}
+	
+	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output)) {
+		PrinterLog_logError('filter arduino output error');
+		return ERROR_INTERNAL;
+	}
+	PrinterLog_logArduino($command, $output);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		PrinterLog_logError('set head led error');
+		return ERROR_INTERNAL;
+	}
+	
+	return ERROR_OK;
+}
+
+function PrinterState_disableSteppers() {
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$output = array();
+	$command = '';
+	$ret_val = 0;
+	
+	$command = $arcontrol_fullpath . PRINTERSTATE_STEPPER_OFF;
+	
+	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output)) {
+		PrinterLog_logError('filter arduino output error');
+		return ERROR_INTERNAL;
+	}
+	PrinterLog_logArduino($command, $output);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		PrinterLog_logError('set motors off error');
+		return ERROR_INTERNAL;
+	}
+	
+	return ERROR_OK;
+}
+
+function PrintState_pausePrinting() {
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$output = array();
+	$command = '';
+	$ret_val = 0;
+	
+	// check if we are in printing
+	$ret_val = PrinterState_checkInPrint();
+	if ($ret_val == TRUE) {
+		// send stop gcode
+		$command = $arcontrol_fullpath . PRINTERSTATE_STOP_PRINT;
+		exec($command, $output, $ret_val);
+		if (!PrinterState_filterOutput($output)) {
+			PrinterLog_logError('filter arduino output error');
+			return ERROR_INTERNAL;
+		}
+		PrinterLog_logArduino($command, $output);
+		if ($ret_val != ERROR_NORMAL_RC_OK) {
+			return ERROR_INTERNAL;
+		}
+		
+		// print special gcode model to reset printer's temperatures and position
+		// we leave this printing call function in Printer_stopPrint()
+	} else {
+		PrinterLog_logMessage('we are not in printing when calling pause printing');
+		return ERROR_NO_PRINT;
+	}
+	
+	return ERROR_OK;
 }
 
 //internal function
