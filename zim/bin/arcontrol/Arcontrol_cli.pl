@@ -32,7 +32,9 @@ use constant FILENAME_CARTRIDGE_L_UNLOAD => 'left.json';
 use constant FILENAME_CARTRIDGE_R_UNLOAD => 'right.json';
 use constant FILENAME_CARTRIDGE_ETAT     => 'cartridge_e.tmp';
 
-use constant FILENAME_PRINT_STOP => 'print_s.tmp';
+use constant FILENAME_PRINT_STOP   => 'print_s.tmp';
+use constant FILENAME_PRINT_PAUSE  => 'print_p.tmp';
+use constant FILENAME_PRINT_RESUME => 'print_r.tmp';
 
 use constant JSON_NB_EXTRUD  => 'Extruders';
 use constant JSON_CUR_EXTRUD => 'Current extruder';
@@ -177,6 +179,19 @@ sub _start_print() {
 
 				return;
 			}
+
+			# check if we want to pause
+			if ( -e ( $mypath . FILENAME_PRINT_PAUSE ) ) {
+
+				# release pause status file
+				unlink( $mypath . FILENAME_PRINT_PAUSE );
+
+				# wait until resume status file, then release this status file
+				do {
+					usleep(TIME_PRECISION);
+				} until( -e ( $mypath . FILENAME_PRINT_RESUME ) );
+				unlink( $mypath . FILENAME_PRINT_RESUME );
+			}
 		}
 	}
 	for (
@@ -222,6 +237,42 @@ sub stop_print {
 		close($fp);
 		# release the status as soon as possible
 		unlink( $mypath . FILENAME_PRINT );
+	}
+
+	return;
+}
+
+sub pause_print {
+	if ( -e ( $mypath . FILENAME_PRINT ) ) {
+		$print_on = STATUS_ON;
+	}
+	else {
+		$print_on = STATUS_OFF;
+	}
+
+	if ( $print_on == STATUS_ON ) {
+		my $fp;
+		open( $fp, '>', $mypath . FILENAME_PRINT_PAUSE )
+		  or exit(EXIT_ERROR_INTERNAL);
+		close($fp);
+	}
+
+	return;
+}
+
+sub resume_print {
+	if ( -e ( $mypath . FILENAME_PRINT ) ) {
+		$print_on = STATUS_ON;
+	}
+	else {
+		$print_on = STATUS_OFF;
+	}
+
+	if ( $print_on == STATUS_ON ) {
+		my $fp;
+		open( $fp, '>', $mypath . FILENAME_PRINT_RESUME )
+		  or exit(EXIT_ERROR_INTERNAL);
+		close($fp);
 	}
 
 	return;
@@ -776,6 +827,8 @@ my %opt = ();
 		'help|h' => \$opt{help},
 		'f'      => \$opt{openfile},
 		'sf'     => \$opt{stopfile},
+		'pf'     => \$opt{pausefile},
+		'rf'     => \$opt{resumefile},
 		'st'     => \$opt{settemperature},
 		'sp'     => \$opt{startprint},
 		'sfila'  => \$opt{startfilament},
@@ -814,6 +867,22 @@ elsif ( $opt{stopfile} ) {
 
 	#run program here
 	stop_print();
+
+	exit(RC_OK);
+}
+elsif ( $opt{pausefile} ) {
+	my $filename = shift @ARGV;
+
+	#run program here
+	pause_print();
+
+	exit(RC_OK);
+}
+elsif ( $opt{resumefile} ) {
+	my $filename = shift @ARGV;
+
+	#run program here
+	resume_print();
 
 	exit(RC_OK);
 }
