@@ -79,7 +79,7 @@ function CoreStatus_checkInIdle(&$status_current = '') {
 		}
 	} catch (Exception $e) {
 		$CI->load->helper('printerlog');
-		PrinterLog_logError('read work json error');
+		PrinterLog_logError('read work json error', __FILE__, __LINE__);
 		return FALSE;
 	}
 	
@@ -217,7 +217,7 @@ function CoreStatus_setInIdle() {
 		if ($ret_val != ERROR_NORMAL_RC_OK) {
 			$CI = &get_instance();
 			$CI->load->helper('printerlog');
-			PrinterLog_logError('camera stop command error');
+			PrinterLog_logError('camera stop command error', __FILE__, __LINE__);
 			return FALSE;
 		}
 	}
@@ -253,7 +253,7 @@ function CoreStatus_setInPrinting($stop_printing = FALSE) {
 			if ($ret_val != ERROR_NORMAL_RC_OK) {
 				$CI = &get_instance();
 				$CI->load->helper('printerlog');
-				PrinterLog_logError('camera start command error');
+				PrinterLog_logError('camera start command error', __FILE__, __LINE__);
 				return FALSE;
 			}
 		}
@@ -392,7 +392,7 @@ function CoreStatus__checkCallURI($array_URI) {
 		}
 		else if (!is_array($array_URI[$CI->router->uri->uri_string])) {
 			$CI->load->helper('printerlog');
-			PrinterLog_logError('check call URI internal API error');
+			PrinterLog_logError('check call URI internal API error', __FILE__, __LINE__);
 			return FALSE;
 		}
 		else {

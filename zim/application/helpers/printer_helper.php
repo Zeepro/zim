@@ -41,14 +41,14 @@ function Printer_preparePrint($need_prime = TRUE) {
 				$gcode_path, PRINTER_FN_PRINTPRIME_L);
 		if ($cr != ERROR_OK) {
 			$CI->load->helper('printerlog');
-			PrinterLog_logError('prepare print prime left gcode error');
+			PrinterLog_logError('prepare print prime left gcode error', __FILE__, __LINE__);
 			return $cr;
 		}
 		$cr = Printer__getFileFromModel(ModelList_codeModelHash(PRINTLIST_MODEL_PRINTPRIME_R),
 				$gcode_path, PRINTER_FN_PRINTPRIME_R);
 		if ($cr != ERROR_OK) {
 			$CI->load->helper('printerlog');
-			PrinterLog_logError('prepare print prime right gcode error');
+			PrinterLog_logError('prepare print prime right gcode error', __FILE__, __LINE__);
 			return $cr;
 		}
 	}
@@ -61,14 +61,14 @@ function Printer_preparePrint($need_prime = TRUE) {
 			$gcode_path, PRINTER_FN_CHARGE);
 	if ($cr != ERROR_OK) {
 		$CI->load->helper('printerlog');
-		PrinterLog_logError('prepare charge gcode error');
+		PrinterLog_logError('prepare charge gcode error', __FILE__, __LINE__);
 		return $cr;
 	}
 	$cr = Printer__getFileFromModel(ModelList_codeModelHash(PRINTLIST_MODEL_RETRACT),
 			$gcode_path, PRINTER_FN_RETRACT);
 	if ($cr != ERROR_OK) {
 		$CI->load->helper('printerlog');
-		PrinterLog_logError('prepare retract gcode error');
+		PrinterLog_logError('prepare retract gcode error', __FILE__, __LINE__);
 		return $cr;
 	}
 	
@@ -101,7 +101,7 @@ function Printer_printFromPrime($abb_extruder, $first_run = TRUE) {
 			
 		default:
 			$CI->load->helper('printerlog');
-			PrinterLog_logError('extruder type error in printing prime');
+			PrinterLog_logError('extruder type error in printing prime', __FILE__, __LINE__);
 			return ERROR_WRONG_PRM;
 			break;
 	}
@@ -150,7 +150,7 @@ function Printer_printFromFile($gcode_path, $need_prime = TRUE, $stop_printing =
 		$ret_val = PrinterState_checkInPrint();
 		if ($ret_val == TRUE) {
 // 			return ERROR_IN_PRINT;
-			PrinterLog_logMessage('already in printing');
+			PrinterLog_logMessage('already in printing', __FILE__, __LINE__);
 			return ERROR_BUSY_PRINTER;
 		}
 	}
@@ -162,12 +162,12 @@ function Printer_printFromFile($gcode_path, $need_prime = TRUE, $stop_printing =
 		$command = $CFG->config['gcanalyser'] . $gcode_path;
 		exec($command, $output, $ret_val);
 		if ($ret_val != ERROR_NORMAL_RC_OK) {
-			PrinterLog_logError('gcanalyser error');
+			PrinterLog_logError('gcanalyser error', __FILE__, __LINE__);
 			return ERROR_INTERNAL;
 		}
 		$tmp_array = json_decode($output[0]);
 		if ($tmp_array['N'] > PrinterState_getNbExtruder()) {
-			PrinterLog_logMessage('no enough extruder');
+			PrinterLog_logMessage('no enough extruder', __FILE__, __LINE__);
 			return ERROR_INTERNAL;
 		}
 	}
@@ -222,7 +222,7 @@ function Printer_printFromFile($gcode_path, $need_prime = TRUE, $stop_printing =
 // 		exec($command, $output, $ret_val);
 		pclose(popen($command . ' > ' . PRINTERSTATE_FILE_PRINTLOG . ' &', 'r'));
 // 		if (!PrinterState_filterOutput($output)) {
-// 			PrinterLog_logError('filter arduino output error');
+// 			PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 // 			return ERROR_INTERNAL;
 // 		}
 // 		if ($ret_val != ERROR_NORMAL_RC_OK) {
@@ -258,7 +258,7 @@ function Printer_stopPrint() {
 		else if ($status_current != CORESTATUS_VALUE_PRINT) {
 			// in other status
 			$CI->load->helper('printerlog');
-			PrinterLog_logError('no printing / canceling status when calling canceling');
+			PrinterLog_logError('no printing / canceling status when calling canceling', __FILE__, __LINE__);
 			return FALSE;
 		}
 		else {
@@ -270,7 +270,7 @@ function Printer_stopPrint() {
 			if ($cr != ERROR_OK) {
 				// log error here
 				$CI->load->helper('printerlog');
-				PrinterLog_logError('stop gcode failed');
+				PrinterLog_logError('stop gcode failed', __FILE__, __LINE__);
 				return FALSE;
 			}
 			
@@ -282,7 +282,7 @@ function Printer_stopPrint() {
 			else {
 				// log error here
 				$CI->load->helper('printerlog');
-				PrinterLog_logError('start printing canceling model failed');
+				PrinterLog_logError('start printing canceling model failed', __FILE__, __LINE__);
 				return FALSE;
 			}
 		}
@@ -290,7 +290,7 @@ function Printer_stopPrint() {
 	else {
 		// in idle
 		$CI->load->helper('printerlog');
-		PrinterLog_logError('in idle when calling canceling');
+		PrinterLog_logError('in idle when calling canceling', __FILE__, __LINE__);
 		return FALSE;
 	}
 	
@@ -440,7 +440,7 @@ function Printer_checkPrintStatus(&$return_data) {
 	if (!is_array($temper_status)) {
 		// log internal error
 		$this->load->helper('printerlog');
-		PrinterLog_logError('API error when getting temperatures in printing');
+		PrinterLog_logError('API error when getting temperatures in printing', __FILE__, __LINE__);
 		return FALSE;
 	}
 	
@@ -471,7 +471,7 @@ function Printer_checkCancelStatus() {
 	$data_status = PrinterState_checkStatusAsArray();
 	if ($data_status[PRINTERSTATE_TITLE_STATUS] != CORESTATUS_VALUE_CANCEL) {
 		$CI->load->helper('printerlog');
-		PrinterLog_logMessage('not in canceling when checking cancel status');
+		PrinterLog_logMessage('not in canceling when checking cancel status', __FILE__, __LINE__);
 		return FALSE;
 	}
 	

@@ -16,30 +16,45 @@ function PrinterLog_logArduino($command, $output = '') {
 
 // log for debug test
 // debug 3 > message 2 > error 1 > none 0 (anything else)
-function PrinterLog_logDebug($msg, $need_trim = TRUE) {
+function PrinterLog_logDebug($msg, $file = NULL, $line = NULL, $need_trim = TRUE) {
 	global $CFG;
 	if ($CFG->config['log_level'] >= 3) {
-		return PrinterLog__logToDebugFile($CFG->config['log_file'], $msg, "\tDBG: ", $need_trim);
+		$location = '';
+		if (!is_null($file) && !is_null($line)) {
+			$location = "\t(" . PrinterLog__filterAppPath($file) . ' ' . $line . ')';
+		}
+		
+		return PrinterLog__logToDebugFile($CFG->config['log_file'], $msg, "DBG: ", $location, $need_trim);
 	}
 	else {
 		return FALSE;
 	}
 }
 
-function PrinterLog_logMessage($msg, $need_trim = TRUE) {
+function PrinterLog_logMessage($msg, $file = NULL, $line = NULL, $need_trim = TRUE) {
 	global $CFG;
 	if ($CFG->config['log_level'] >= 2) {
-		return PrinterLog__logToDebugFile($CFG->config['log_file'], $msg, "\tMSG: ", $need_trim);
+		$location = '';
+		if (!is_null($file) && !is_null($line)) {
+			$location = "\t(" . PrinterLog__filterAppPath($file) . ' ' . $line . ')';
+		}
+		
+		return PrinterLog__logToDebugFile($CFG->config['log_file'], $msg, "MSG: ", $location, $need_trim);
 	}
 	else {
 		return FALSE;
 	}
 }
 
-function PrinterLog_logError($msg, $need_trim = TRUE) {
+function PrinterLog_logError($msg, $file = NULL, $line = NULL, $need_trim = TRUE) {
 	global $CFG;
 	if ($CFG->config['log_level'] >= 1) {
-		return PrinterLog__logToDebugFile($CFG->config['log_file'], $msg, "\tERR: ", $need_trim);
+		$location = '';
+		if (!is_null($file) && !is_null($line)) {
+			$location = "\t(" . PrinterLog__filterAppPath($file) . ' ' . $line . ')';
+		}
+		
+		return PrinterLog__logToDebugFile($CFG->config['log_file'], $msg, "ERR: ", $location, $need_trim);
 	}
 	else {
 		return FALSE;
@@ -68,12 +83,12 @@ function PrinterLog__logToFile($file_index, $command, $output = '') {
 	}
 }
 
-function PrinterLog__logToDebugFile($file, $msg, $prefix, $need_trim) {
+function PrinterLog__logToDebugFile($file, $msg, $prefix, $suffix, $need_trim) {
 	if ($need_trim == TRUE) {
 		$msg = trim($msg, " \t\n\r\0\x0B");
 	}
 // 	$msg = time() . $prefix . $msg . "\n";
-	$msg = date("[Y-m-d\TH:i:s\Z]\t", time()) . $prefix . $msg . "\n";
+	$msg = date("[Y-m-d\TH:i:s\Z]\t", time()) . $prefix . $msg . $suffix . "\n";
 	$fp = fopen($file, 'a');
 	if ($fp) {
 		fwrite($fp, $msg);
@@ -83,4 +98,9 @@ function PrinterLog__logToDebugFile($file, $msg, $prefix, $need_trim) {
 	else {
 		return FALSE;
 	}
+}
+
+function PrinterLog__filterAppPath($filepath) {
+	$return_path = str_replace(FCPATH, '', $filepath);
+	return $return_path;
 }

@@ -329,14 +329,14 @@ class Printerstate extends MY_Controller {
 						$ret_val = CoreStatus_setInIdle();
 						if ($ret_val == FALSE) {
 							$this->load->helper('printerlog');
-							PrinterLog_logError('can not set idle after unloading filament');
+							PrinterLog_logError('can not set idle after unloading filament', __FILE__, __LINE__);
 							$this->output->set_status_header(202); // disable checking
 						}
 					}
 					else {
 						// in other busy status
 						$this->load->helper('printerlog');
-						PrinterLog_logError('error status when changing filament');
+						PrinterLog_logError('error status when changing filament', __FILE__, __LINE__);
 						$this->output->set_status_header(202); // disable checking
 					}
 				}
@@ -363,7 +363,7 @@ class Printerstate extends MY_Controller {
 						else {
 							// error status
 							$this->load->helper('printerlog');
-							PrinterLog_logError('error checkfilament return status when changing filament (in starting)');
+							PrinterLog_logError('error checkfilament return status when changing filament (in starting)', __FILE__, __LINE__);
 							$this->_display_changecartridge_remove_cartridge();
 						}
 					}
@@ -376,14 +376,14 @@ class Printerstate extends MY_Controller {
 						$ret_val = CoreStatus_setInIdle();
 						if ($ret_val == FALSE) {
 							$this->load->helper('printerlog');
-							PrinterLog_logError('can not set idle after loading filament');
+							PrinterLog_logError('can not set idle after loading filament', __FILE__, __LINE__);
 							$this->output->set_status_header(202); // disable checking
 						}
 					}
 					else {
 						// in other busy status
 						$this->load->helper('printerlog');
-						PrinterLog_logError('error status when changing filament');
+						PrinterLog_logError('error status when changing filament', __FILE__, __LINE__);
 						$this->output->set_status_header(202); // disable checking
 					}
 					
@@ -401,7 +401,7 @@ class Printerstate extends MY_Controller {
 					$ret_val = CoreStatus_setInIdle();
 					if ($ret_val == FALSE) {
 						$this->load->helper('printerlog');
-						PrinterLog_logError('can not set idle after unloading filament');
+						PrinterLog_logError('can not set idle after unloading filament', __FILE__, __LINE__);
 						$this->output->set_status_header(202); // disable checking
 					}
 					$this->_display_changecartridge_remove_cartridge();
@@ -430,7 +430,7 @@ class Printerstate extends MY_Controller {
 				else {
 					// error status
 					$this->load->helper('printerlog');
-					PrinterLog_logError('error checkfilament return status when changing filament (in removing)');
+					PrinterLog_logError('error checkfilament return status when changing filament (in removing)', __FILE__, __LINE__);
 					$this->_display_changecartridge_remove_cartridge();
 				}
 				break;
@@ -451,7 +451,7 @@ class Printerstate extends MY_Controller {
 				else {
 					// error status
 					$this->load->helper('printerlog');
-					PrinterLog_logError('error checkfilament return status when changing filament (in inserting)');
+					PrinterLog_logError('error checkfilament return status when changing filament (in inserting)', __FILE__, __LINE__);
 					$this->_display_changecartridge_remove_cartridge();
 				}
 				break;
@@ -481,7 +481,7 @@ class Printerstate extends MY_Controller {
 				$ret_val = CoreStatus_getStartTime($time_start);
 				if ($ret_val != TRUE) {
 					$this->load->helper('printerlog');
-					PrinterLog_logError('get start time error in loading filament');
+					PrinterLog_logError('get start time error in loading filament', __FILE__, __LINE__);
 				}
 				if (time() - $time_start < 43) {
 					$this->_display_changecartridge_in_load_filament();
@@ -493,7 +493,7 @@ class Printerstate extends MY_Controller {
 					$ret_val = CoreStatus_setInIdle();
 					if ($ret_val == FALSE) {
 						$this->load->helper('printerlog');
-						PrinterLog_logError('can not set idle after loading filament');
+						PrinterLog_logError('can not set idle after loading filament', __FILE__, __LINE__);
 						$this->output->set_status_header(202); // disable checking
 					}
 					$this->_display_changecartridge_need_prime($abb_cartridge, $id_model);

@@ -101,6 +101,7 @@ $mimes = array(	'hqx'	=>	'application/mac-binhex40',
 				'json'	=>	array('application/json', 'text/json'),
 				'gcode'	=>	array('application/octet-stream', 'text/plain'),
 				'txt_u'	=>	'text/plain; charset=UTF-8', // special for text/plain utf8
+				'jsonu'	=>	array('application/json; charset=UTF-8', 'text/json; charset=UTF-8'),
 			);
 
 

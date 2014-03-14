@@ -115,7 +115,7 @@ class Printdetail extends MY_Controller {
 			if ($ret_val == FALSE) {
 				// log internal error
 				$this->load->helper('printerlog');
-				PrinterLog_logError('can not set idle after printing');
+				PrinterLog_logError('can not set idle after printing', __FILE__, __LINE__);
 			}
 
 			if ($this->config->item('simulator')) {
@@ -195,7 +195,7 @@ class Printdetail extends MY_Controller {
 		}
 		else {
 			$this->load->helper('printerlog');
-			PrinterLog_logError('can not stop printing');
+			PrinterLog_logError('can not stop printing', __FILE__, __LINE__);
 			$this->output->set_status_header(403);
 			return;
 		}
@@ -221,7 +221,7 @@ class Printdetail extends MY_Controller {
 			if ($ret_val == FALSE) {
 				// log internal error
 				$this->load->helper('printerlog');
-				PrinterLog_logError('can not set idle after calceling');
+				PrinterLog_logError('can not set idle after calceling', __FILE__, __LINE__);
 			}
 			
 			if ($this->config->item('simulator')) {

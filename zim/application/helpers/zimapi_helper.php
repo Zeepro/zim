@@ -278,7 +278,7 @@ function ZimAPI_setsWifi($nameWifi, $passWifi = '') {
 	$ret_val = CoreStatus_finishConnection(array('type'=>'sWifi', "name"=>$nameWifi, "passwd"=>$passWifi));
 	if ($ret_val == FALSE) {
 		$CI->load->helper('printerlog');
-		PrinterLog_logError('finish connection in sWifi error');
+		PrinterLog_logError('finish connection in sWifi error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
 	
@@ -336,7 +336,7 @@ function ZimAPI_setcWifi($nameWifi, $passWifi = '') {
 	$ret_val = CoreStatus_finishConnection(array('type'=>'cWifi', "name"=>$nameWifi, "passwd"=>$passWifi));
 	if ($ret_val == FALSE) {
 		$CI->load->helper('printerlog');
-		PrinterLog_logError('finish connection in sWifi error');
+		PrinterLog_logError('finish connection in sWifi error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
 	
@@ -382,7 +382,7 @@ function ZimAPI_setcEth($ip = '', $mask = '', $gateWay = '') {
 	$ret_val = CoreStatus_finishConnection(array('type'=>'Eth'));
 	if ($ret_val == FALSE) {
 		$CI->load->helper('printerlog');
-		PrinterLog_logError('finish connection in Eth error');
+		PrinterLog_logError('finish connection in Eth error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
 	
@@ -481,7 +481,7 @@ function ZimAPI_resetNetwork() {
 	$ret_val = CoreStatus_wantConnection();
 	if ($ret_val == FALSE) {
 		$CI->load->helper('printerlog');
-		PrinterLog_logError('want connection in reset error');
+		PrinterLog_logError('want connection in reset error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
 	

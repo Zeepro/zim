@@ -15,7 +15,7 @@ class MY_Controller extends CI_Controller {
 		// initialisation status files
 		if (!CoreStatus_initialFile()) {
 			$this->load->helper('printerlog');
-			PrinterLog_logError('status files initialisation error when MY_Controller started');
+			PrinterLog_logError('status files initialisation error when MY_Controller started', __FILE__, __LINE__);
 			
 			// let ajax request failed when we finishing printing / canceling
 			$protocol = (isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0');
@@ -110,7 +110,7 @@ class MY_Controller extends CI_Controller {
 			// log error if we have no redirect url when reaching here
 			if (is_null($url_redirect)) {
 				$this->load->helper('printerlog');
-				PrinterLog_logError('no redirect place when MY_Controller finished');
+				PrinterLog_logError('no redirect place when MY_Controller finished', __FILE__, __LINE__);
 			}
 			
 			header('Location: ' . $url_redirect);

@@ -138,7 +138,7 @@ class Printmodel extends MY_Controller {
 			default:
 				// treat error here, usually happened when checksum failed
 				$this->load->helper('printerlog');
-				PrinterLog_logError('not previewed return code for checking right filament');
+				PrinterLog_logError('not previewed return code for checking right filament', __FILE__, __LINE__);
 				$check_right_filament = t('error');
 				$change_right_filament = t('Load');
 				break;
@@ -180,7 +180,7 @@ class Printmodel extends MY_Controller {
 				default:
 					// treat error here, usually happened when checksum failed
 					$this->load->helper('printerlog');
-					PrinterLog_logError('not previewed return code for checking left filament');
+					PrinterLog_logError('not previewed return code for checking left filament', __FILE__, __LINE__);
 					$check_left_filament = t('error');
 					$change_left_filament = t('Load');
 					break;

@@ -23,7 +23,7 @@ class Test_video extends CI_Controller {
 //		if ($ret_val != 0) {
 //			$CI = &get_instance();
 //			$CI->load->helper('printerlog');
-//			PrinterLog_logError('camera start command error');
+//			PrinterLog_logError('camera start command error', __FILE__, __LINE__);
 //			return FALSE;
 //		}
 

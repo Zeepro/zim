@@ -832,6 +832,10 @@ my %opt = ();
 		'st'     => \$opt{settemperature},
 		'sp'     => \$opt{startprint},
 		'sfila'  => \$opt{startfilament},
+		'rmctl'  => \$opt{removecartridgeleft},
+		'rmctr'  => \$opt{removecartridgeright},
+		'isctl'  => \$opt{insertcartridgeleft},
+		'isctr'  => \$opt{insertcartridgeright},
 	);
 	GetOptions(%options);
 }
@@ -893,6 +897,42 @@ elsif ( $opt{startfilament} ) {
 	#run program here
 	_start_filament( $has_file, $no_file );
 
+	exit(RC_OK);
+}
+elsif ( $opt{removecartridgeleft} ) {
+	my $file_ori = $mypath . FILENAME_CARTRIDGE_L_UNLOAD;
+	my $file_fin = $mypath . '_' . FILENAME_CARTRIDGE_L_UNLOAD;
+
+	#rename file here
+	rename($file_ori, $file_fin);
+	
+	exit(RC_OK);
+}
+elsif ( $opt{removecartridgeright} ) {
+	my $file_ori = $mypath . FILENAME_CARTRIDGE_R_UNLOAD;
+	my $file_fin = $mypath . '_' . FILENAME_CARTRIDGE_R_UNLOAD;
+	
+	#rename file here
+	rename($file_ori, $file_fin);
+	
+	exit(RC_OK);
+}
+elsif ( $opt{insertcartridgeleft} ) {
+	my $file_ori = $mypath . '_' . FILENAME_CARTRIDGE_L_UNLOAD;
+	my $file_fin = $mypath . FILENAME_CARTRIDGE_L_UNLOAD;
+	
+	#rename file here
+	rename($file_ori, $file_fin);
+	
+	exit(RC_OK);
+}
+elsif ( $opt{insertcartridgeright} ) {
+	my $file_ori = $mypath . '_' . FILENAME_CARTRIDGE_R_UNLOAD;
+	my $file_fin = $mypath . FILENAME_CARTRIDGE_R_UNLOAD;
+	
+	#rename file here
+	rename($file_ori, $file_fin);
+	
 	exit(RC_OK);
 }
 else {

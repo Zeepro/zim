@@ -3,7 +3,8 @@ if (! defined ( 'BASEPATH' ))
 	exit ( 'No direct script access allowed' );
 
 if (!defined('RETURN_CONTENT_TYPE')) {
-	define('RETURN_CONTENT_TYPE', 'text/plain; charset=UTF-8');
+	define('RETURN_CONTENT_TYPE',		'text/plain; charset=UTF-8');
+	define('RETURN_CONTENT_TYPE_JSON',	'application/json; charset=UTF-8');
 }
 
 class Rest extends MY_Controller {
@@ -50,11 +51,11 @@ class Rest extends MY_Controller {
 						$ret_val = CoreStatus_setInIdle();
 						if ($ret_val == TRUE) {
 							$this->load->helper('printerlog');
-							PrinterLog_logDebug('set idle when calling REST');
+							PrinterLog_logDebug('set idle when calling REST', __FILE__, __LINE__);
 							return; // continue to generate if we are now in idle
 						}
 						$this->load->helper('printerlog');
-						PrinterLog_logError('can not set status in idle');
+						PrinterLog_logError('can not set status in idle', __FILE__, __LINE__);
 					}
 					break;
 					
@@ -62,7 +63,7 @@ class Rest extends MY_Controller {
 					$ret_val = PrinterState_checkBusyStatus($status_current);
 					if ($ret_val == TRUE) {
 						$this->load->helper('printerlog');
-						PrinterLog_logDebug('set idle when calling REST');
+						PrinterLog_logDebug('set idle when calling REST', __FILE__, __LINE__);
 						return; // status has changed to idle
 					}
 					break;
@@ -117,7 +118,7 @@ class Rest extends MY_Controller {
 		$cr = ZimAPI_resetNetwork();
 		if ($cr != ERROR_OK) {
 			$this->load->helper('printerlog');
-			PrinterLog_logError('reset network error by REST');
+			PrinterLog_logError('reset network error by REST', __FILE__, __LINE__);
 		}
 		
 		$this->_return_cr($cr);
@@ -138,7 +139,7 @@ class Rest extends MY_Controller {
 		else {
 			$this->output->set_status_header($cr, $json_data);
 			// 		http_response_code($cr);
-			$this->output->set_content_type(RETURN_CONTENT_TYPE);
+			$this->output->set_content_type(RETURN_CONTENT_TYPE_JSON);
 			echo $json_data;
 		}
 		
@@ -166,7 +167,7 @@ class Rest extends MY_Controller {
 		else {
 			$this->output->set_status_header($cr, $json_data);
 			// 		http_response_code($cr);
-			$this->output->set_content_type(RETURN_CONTENT_TYPE);
+			$this->output->set_content_type(RETURN_CONTENT_TYPE_JSON);
 			echo $json_data;
 		}
 		
@@ -186,7 +187,7 @@ class Rest extends MY_Controller {
 		else {
 			$this->output->set_status_header($cr, $json_data);
 			// 		http_response_code($cr);
-			$this->output->set_content_type(RETURN_CONTENT_TYPE);
+			$this->output->set_content_type(RETURN_CONTENT_TYPE_JSON);
 			echo $json_data;
 		}
 		
@@ -199,7 +200,7 @@ class Rest extends MY_Controller {
 		$this->load->helper('zimapi');
 		$display = ZimAPI_listSSID();
 		
-		$this->output->set_content_type(RETURN_CONTENT_TYPE);
+		$this->output->set_content_type(RETURN_CONTENT_TYPE_JSON);
 		echo $display;
 		
 		return;
@@ -340,7 +341,7 @@ class Rest extends MY_Controller {
 		$this->load->helper('printlist');
 		
 		$display = ModelList_list();
-		$this->output->set_content_type(RETURN_CONTENT_TYPE);
+		$this->output->set_content_type(RETURN_CONTENT_TYPE_JSON);
 // 		header('Content-type: text/plain; charset=UTF-8');
 		echo $display;
 		
@@ -422,7 +423,7 @@ class Rest extends MY_Controller {
 		$this->load->helper('printerstate');
 		
 		$display = PrinterState_checkStatus();
-		$this->output->set_content_type(RETURN_CONTENT_TYPE);
+		$this->output->set_content_type(RETURN_CONTENT_TYPE_JSON);
 		echo $display;
 		
 		return;
@@ -439,7 +440,7 @@ class Rest extends MY_Controller {
 		}
 		else {
 			$this->load->helper('printerlog');
-			PrinterLog_logError('can not stop printing by REST');
+			PrinterLog_logError('can not stop printing by REST', __FILE__, __LINE__);
 			$this->_return_cr(ERROR_NO_PRINT);
 		}
 		

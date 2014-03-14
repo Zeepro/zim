@@ -425,7 +425,7 @@ function ModelList__listAsArray($set_localization = FALSE) {
 			// log internal error
 			$CI = &get_instance();
 			$CI->load->helper('printerlog');
-			PrinterLog_logError('catch exception when getting print model ' . $model_name);
+			PrinterLog_logError('catch exception when getting print model ' . $model_name, __FILE__, __LINE__);
 			continue; // just jump through the wrong data file
 // 			return json_encode($json_data);
 		}
