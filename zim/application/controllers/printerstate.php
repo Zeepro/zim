@@ -215,7 +215,7 @@ class Printerstate extends MY_Controller {
 		
 		// parse all page
 		$template_data = array(
-				'lang'			=> $CFG->config ['language_abbr'],
+				'lang'			=> $this->config->item('language_abbr'),
 				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Configuration') . '</title>',
 				'contents'		=> $body_page,
 		);
@@ -226,7 +226,6 @@ class Printerstate extends MY_Controller {
 	}
 	
 	public function changecartridge() {
-		global $CFG;
 		$template_data = array();
 		$body_page = NULL;
 		
@@ -263,7 +262,7 @@ class Printerstate extends MY_Controller {
 		
 		// parse all page
 		$template_data = array(
-				'lang'			=> $CFG->config ['language_abbr'],
+				'lang'			=> $this->config->item('language_abbr'),
 				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Change cartridge') . '</title>',
 				'contents'		=> $body_page,
 		);
@@ -274,7 +273,6 @@ class Printerstate extends MY_Controller {
 	}
 	
 	public function changecartridge_ajax() {
-		global $CFG;
 		$template_data = array();
 		$body_page = NULL;
 		$ret_val = 0;
@@ -581,7 +579,7 @@ class Printerstate extends MY_Controller {
 				
 				// parse all page
 				$template_data = array(
-						'lang'			=> $CFG->config ['language_abbr'],
+						'lang'			=> $this->config->item('language_abbr'),
 						'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Reset connection') . '</title>',
 						'contents'		=> $body_page,
 				);
@@ -608,7 +606,7 @@ class Printerstate extends MY_Controller {
 		
 		// parse all page
 		$template_data = array(
-				'lang'			=> $CFG->config ['language_abbr'],
+				'lang'			=> $this->config->item('language_abbr'),
 				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Reset connection') . '</title>',
 				'contents'		=> $body_page,
 		);

@@ -12,7 +12,6 @@ class Menu_home extends MY_Controller {
 	}
 	
 	public function index() {
-		global $CFG;
 		$template_data = array();
 		$body_page = NULL;
 		
@@ -30,7 +29,7 @@ class Menu_home extends MY_Controller {
 		
 		// parse all page
 		$template_data = array(
-				'lang'			=> $CFG->config ['language_abbr'],
+				'lang'			=> $this->config->item('language_abbr'),
 				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Home') . '</title>',
 				'contents'		=> $body_page,
 		);

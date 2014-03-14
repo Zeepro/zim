@@ -4,13 +4,13 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
-			<h2><?= t('Connection configuration') ?></h2>
-    		<?= t("Welcome...") ?><br> <br>
+			<h2>{title}</h2>
+			{hint}<br><br>
 			<ul data-role="listview" data-inset="true" id="listview"
 				class="shadowBox">
-				<li><a href="/connection/wifissid" data-prefetch><?= htmlspecialchars(t("Option 1")) ?></a></li>
-				<li><a href="/connection/wifip2p" data-prefetch><?= htmlspecialchars(t("Option 3")) ?></a></li>
-				<li><a href="/connection/wired" data-prefetch><?= htmlspecialchars(t("Option 2")) ?></a></li>
+				<li><a href="/connection/wifissid" data-prefetch>{wifissid}</a></li>
+				<li><a href="/connection/wifip2p" data-prefetch>{wifip2p}</a></li>
+				<li><a href="/connection/wired" data-prefetch>{wired}</a></li>
 			</ul>
 			<img src="/assets/images/shadow2.png" class="shadow" alt="shadow">
 		</div>

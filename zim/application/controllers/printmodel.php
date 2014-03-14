@@ -20,7 +20,6 @@ class Printmodel extends MY_Controller {
 	public function listmodel() {
 // 		$json_text = $this->curl->simple_get(base_url('rest/listmodel'));
 // 		curl_init('http://example.com');
-		global $CFG;
 		$display_printlist = array();
 		$template_data = array();
 		$body_page = NULL;
@@ -56,7 +55,7 @@ class Printmodel extends MY_Controller {
 		
 		// parse all page
 		$template_data = array(
-				'lang'			=> $CFG->config ['language_abbr'],
+				'lang'			=> $this->config->item('language_abbr'),
 				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Quick printing list') . '</title>',
 				'contents'		=> $body_page,
 		);
@@ -67,7 +66,6 @@ class Printmodel extends MY_Controller {
 	}
 	
 	public function detail() {
-		global $CFG;
 		$model_data = array();
 		$cartridge_data = array();
 		$template_data = array();
@@ -251,7 +249,7 @@ class Printmodel extends MY_Controller {
 		
 		// parse all page
 		$template_data = array(
-				'lang'			=> $CFG->config ['language_abbr'],
+				'lang'			=> $this->config->item('language_abbr'),
 				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Printing details') . '</title>',
 				'contents'		=> $body_page,
 		);

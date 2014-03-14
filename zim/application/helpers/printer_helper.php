@@ -22,6 +22,58 @@ $CI->load->helper(array (
 // 	define('PRINTER_VALUE_STATUS_PRINT',	'print');
 	
 // }
+if (!defined('PRINTER_FN_CHARGE')) {
+	define('PRINTER_FN_CHARGE',			'_charge.gcode');
+	define('PRINTER_FN_RETRACT',		'_retract.gcode');
+	define('PRINTER_FN_PRINTPRIME_L',	'_print_prime_left.gcode');
+	define('PRINTER_FN_PRINTPRIME_R',	'_print_prime_right.gcode');
+}
+
+function Printer_preparePrint($need_prime = TRUE) {
+	$cr = 0;
+	$gcode_path = '';
+	
+	$CI = &get_instance();
+	$CI->load->helper('printlist');
+	
+	if ($need_prime == TRUE) {
+		$cr = Printer__getFileFromModel(ModelList_codeModelHash(PRINTLIST_MODEL_PRINTPRIME_L),
+				$gcode_path, PRINTER_FN_PRINTPRIME_L);
+		if ($cr != ERROR_OK) {
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('prepare print prime left gcode error');
+			return $cr;
+		}
+		$cr = Printer__getFileFromModel(ModelList_codeModelHash(PRINTLIST_MODEL_PRINTPRIME_R),
+				$gcode_path, PRINTER_FN_PRINTPRIME_R);
+		if ($cr != ERROR_OK) {
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('prepare print prime right gcode error');
+			return $cr;
+		}
+	}
+	else {
+		unlink($CI->config->item('temp') . PRINTLIST_MODEL_PRINTPRIME_L);
+		unlink($CI->config->item('temp') . PRINTLIST_MODEL_PRINTPRIME_R);
+	}
+	
+	$cr = Printer__getFileFromModel(ModelList_codeModelHash(PRINTLIST_MODEL_CHARGE),
+			$gcode_path, PRINTER_FN_CHARGE);
+	if ($cr != ERROR_OK) {
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('prepare charge gcode error');
+		return $cr;
+	}
+	$cr = Printer__getFileFromModel(ModelList_codeModelHash(PRINTLIST_MODEL_RETRACT),
+			$gcode_path, PRINTER_FN_RETRACT);
+	if ($cr != ERROR_OK) {
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('prepare retract gcode error');
+		return $cr;
+	}
+	
+	return ERROR_OK;
+}
 
 function Printer_printFromPrime($abb_extruder, $first_run = TRUE) {
 	$name_prime = '';
@@ -60,7 +112,7 @@ function Printer_printFromPrime($abb_extruder, $first_run = TRUE) {
 		//TODO modify the temperature of gcode file according to cartridge info
 		;
 		
-		$ret_val = Printer_printFromFile($gcode_path);
+		$ret_val = Printer_printFromFile($gcode_path, FALSE);
 	}
 	
 	return $ret_val;
@@ -72,13 +124,13 @@ function Printer_printFromModel($id_model, $stop_printing = FALSE) {
 	
 	$ret_val = Printer__getFileFromModel($id_model, $gcode_path);
 	if (($ret_val == ERROR_OK) && $gcode_path) {
-		$ret_val = Printer_printFromFile($gcode_path, $stop_printing);
+		$ret_val = Printer_printFromFile($gcode_path, TRUE, $stop_printing);
 	}
 	
 	return $ret_val;
 }
 
-function Printer_printFromFile($gcode_path, $stop_printing = FALSE) {
+function Printer_printFromFile($gcode_path, $need_prime = TRUE, $stop_printing = FALSE) {
 	global $CFG;
 	$command = '';
 	$output = array();
@@ -98,7 +150,7 @@ function Printer_printFromFile($gcode_path, $stop_printing = FALSE) {
 		$ret_val = PrinterState_checkInPrint();
 		if ($ret_val == TRUE) {
 // 			return ERROR_IN_PRINT;
-			PrinterLog_logDebug('already in printing');
+			PrinterLog_logMessage('already in printing');
 			return ERROR_BUSY_PRINTER;
 		}
 	}
@@ -123,6 +175,12 @@ function Printer_printFromFile($gcode_path, $stop_printing = FALSE) {
 	// check if having enough filament
 	//TODO get the quantity of filament needed by file
 	$ret_val = PrinterState_checkFilaments();
+	if ($ret_val != ERROR_OK) {
+		return $ret_val;
+	}
+	
+	// prepare subprinting gcode files
+	$ret_val = Printer_preparePrint($need_prime);
 	if ($ret_val != ERROR_OK) {
 		return $ret_val;
 	}
@@ -452,7 +510,7 @@ function Printer__getStartTemperatureFromFile($gcode_path, &$array_temper) {
 	return ERROR_OK;
 }
 
-function Printer__getFileFromModel($id_model, &$gcode_path) {
+function Printer__getFileFromModel($id_model, &$gcode_path, $filename = NULL) {
 	$model_path = NULL;
 	$bz2_path = NULL;
 	$command = '';
@@ -477,7 +535,8 @@ function Printer__getFileFromModel($id_model, &$gcode_path) {
 // 		}
 // 		$gcode_path = $json_data['json'][PRINTLIST_TITLE_GCODE];
 		$bz2_path = $model_path . PRINTLIST_FILE_GCODE_BZ2;
-		$gcode_path = $CI->config->item('temp') . PRINTLIST_FILE_GCODE;
+		$filename = is_null($filename) ? PRINTLIST_FILE_GCODE : $filename;
+		$gcode_path = $CI->config->item('temp') . $filename;
 		$command = 'bzip2 -dkcf ' . $bz2_path . ' > ' . $gcode_path;
 		exec($command, $output, $ret_val);
 		if ($ret_val != ERROR_NORMAL_RC_OK) {
@@ -485,8 +544,10 @@ function Printer__getFileFromModel($id_model, &$gcode_path) {
 		}
 		
 		return ERROR_OK;
-	} else {
+	}
+	else {
 		return ERROR_UNKNOWN_MODEL;
 	}
 	
+	return ERROR_OK; // never reach here
 }

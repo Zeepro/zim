@@ -28,7 +28,7 @@ class Gcode extends MY_Controller {
 
 		// parse all page
 		$template_data = array(
-				'lang'			=> $CFG->config ['language_abbr'],
+				'lang'			=> $this->config->item('language_abbr'),
 				'headers'		=> '<title>Gcode</title>',
 				'contents'		=> $body_page,
 		);

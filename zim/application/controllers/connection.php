@@ -1,88 +1,176 @@
 <?php
 
 if (!defined('BASEPATH'))
-    exit('No direct script access allowed');
+	exit('No direct script access allowed');
 
 class Connection extends MY_Controller {
 
-    public function index() {
-        global $CFG;
-
-        $this->lang->load('connectionmaster', $this->config->item('language'));
-        $this->lang->load('connection/index', $this->config->item('language'));
-
-        $this->template->set('lang', $CFG->config['language_abbr']);
-        $this->template->set('header', "<title>" . t('ZeePro Personal Printer 21 - Connection configuration') . "</title>");
-        $this->template->load('connectionmaster', 'connection');
-    }
-
-    public function wifissid() {
-        global $CFG;
-    	
-    	$this->load->helper ( array (
+	private function _generate_framePage($body_page) {
+		$template_data = array();
+		
+		$template_data = array(
+				'lang'			=> $this->config->item('language_abbr'),
+				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Connection configuration') . '</title>',
+				'contents'		=> $body_page,
+		);
+		
+		$this->parser->parse('template/basetemplate', $template_data);
+		
+		return;
+	}
+	
+	private function ip_check($ip) {
+		if (filter_var ( $ip, FILTER_VALIDATE_IP )) {
+			return TRUE;
+		} else {
+			return FALSE;
+		}
+	}
+	
+	private function mask_check($mask) {
+		if (! $m = ip2long ( $mask ))
+			return false;
+		
+		$m = ~ $m;
+		return $m && ~ $m && ! ($m & ($m + 1));
+	}
+	
+	private function gateway_check($ip) {
+	// @todo The gateway should be within the mask
+		if (filter_var ( $ip, FILTER_VALIDATE_IP )) {
+			return TRUE;
+		} else {
+			return FALSE;
+		}
+	}
+	
+	public function index() {
+		$template_data = array();
+		$body_page = NULL;
+		
+		$this->load->library('parser');
+		
+		$this->lang->load('connection/master', $this->config->item('language'));
+		$this->lang->load('connection/index', $this->config->item('language'));
+		
+		// parse the main body
+		$template_data = array(
+				'title'		=> t('Connection configuration'),
+				'hint'		=> t('Welcome...'),
+				'wifissid'	=> htmlspecialchars(t('Option 1')),
+				'wifip2p'	=> htmlspecialchars(t('Option 3')),
+				'wired'		=> htmlspecialchars(t('Option 2')),
+		);
+		
+		$body_page = $this->parser->parse('template/connection/index', $template_data, TRUE);
+		
+		// parse all page
+		$this->_generate_framePage($body_page);
+		
+		return;
+	}
+	
+	public function wifissid() {
+		$template_data = array();
+		$list_ssid = array();
+		$body_page = NULL;
+		
+		$this->load->helper(array(
 				'form',
 				'url',
-    			'zimapi'
-		) );
+				'zimapi'
+		));
 		
-		$this->load->library ( 'form_validation' );
+		$this->load->library(array('form_validation', 'parser'));
+		
+		$this->lang->load('connection/master', $this->config->item('language'));
+		$this->lang->load('connection/wifissid', $this->config->item('language'));
 
-		$this->lang->load ( 'connectionmaster', $this->config->item ( 'language' ) );
-		$this->lang->load ( 'connection/wifissid', $this->config->item ( 'language' ) );
-		
-		$this->template->set ( 'lang', $CFG->config ['language_abbr'] );
-		$this->template->set ( 'header', "<title>" . t ( 'ZeePro Personal Printer 21 - Connection configuration' ) . "</title>" );
-		
-		if ($this->form_validation->run () == FALSE) {
-			$data['listSSID'] = ZimAPI_listSSIDAsArray();
+		if ($this->form_validation->run() == FALSE) {
+			foreach(ZimAPI_listSSIDAsArray() as $ssid) {
+				$list_ssid[] = array(
+						'name'	=> htmlspecialchars($ssid),
+						'link'	=> htmlspecialchars(rawurlencode($ssid)),
+				);
+			}
 			
-			$this->template->load ( 'connectionmaster', 'connectionwifissid', $data );
+			// parse the main body
+			$template_data = array(
+					'title'			=> t('WiFi network connected to the Internet'),
+					'back'			=> t('Back'),
+					'list_ssid'		=> $list_ssid,
+					'no_visable'	=> htmlspecialchars(t("Not visible...")),
+			);
+			
+			$body_page = $this->parser->parse('template/connection/wifissid', $template_data, TRUE);
+			
+			// parse all page
+			$this->_generate_framePage($body_page);
 		} else {
-			header ( "Location:/connection/wifipswd" );
+// 			header("Location:/connection/wifipswd");
+			$this->output->set_header('Location: /connection/wifipswd');
 		}
-    }
-
-    public function wifinotvisiblessid() {
-        global $CFG;
-    	
-		$this->lang->load ( 'connectionmaster', $this->config->item ( 'language' ) );
-		$this->lang->load ( 'connection/wifinotvisiblessid', $this->config->item ( 'language' ) );
 		
-        $this->load->helper ( array (
+		return;
+	}
+	
+	public function wifinotvisiblessid() {
+		$template_data = array();
+		$body_page = NULL;
+		
+		$this->lang->load('connection/master', $this->config->item('language'));
+		$this->lang->load('connection/wifinotvisiblessid', $this->config->item('language'));
+		
+		$this->load->helper(array(
 				'form',
 				'url'
-		) );
-		
-		$this->load->library ( 'form_validation' );
+		));
+
+		$this->load->library(array('form_validation', 'parser'));
 
 		$this->form_validation->set_rules('ssid', 'SSID', 'required');
-		$this->form_validation->set_message('required', t ('required ssid'));
-				
-		$this->template->set ( 'lang', $CFG->config ['language_abbr'] );
-		$this->template->set ( 'header', "<title>" . t ( 'ZeePro Personal Printer 21 - Connection configuration' ) . "</title>" );
-		
+		$this->form_validation->set_message('required', t('required ssid'));
+
 		if ($this->form_validation->run () == FALSE) {
 			$this->template->load ( 'connectionmaster', 'connectionwifinotvisiblessid');
+			
+			// parse the main body
+			$template_data = array(
+					'title'		=> t('WiFi network connected to the Internet'),
+					'back'		=> t('Back'),
+					'error'		=> form_error('ssid'),
+					'submit'	=> htmlspecialchars(t("OK")),
+			);
+			
+			$body_page = $this->parser->parse('template/connection/wifinotvisiblessid', $template_data, TRUE);
+			
+			// parse all page
+			$this->_generate_framePage($body_page);
 		} else {
-			header ( "Location:/connection/wifipswd?ssid=" . rawurlencode($this->input->post('ssid')));
+// 			header("Location:/connection/wifipswd?ssid=" . rawurlencode($this->input->post('ssid')));
+			$this->output->set_header('Location: /connection/wifipswd?ssid=' . rawurlencode($this->input->post('ssid')));
 		}
-    }
-    
-    public function wifipswd() {
-		global $CFG;
+		
+		return;
+	}
+	
+	public function wifipswd() {
+		$template_data = array();
+		$body_page = NULL;
 		
 		$this->load->library('form_validation');
 		$this->load->helper(array('zimapi'));
 		
 		$this->form_validation->set_rules('password', 'password', '');
 		
-		$this->lang->load ( 'connectionmaster', $this->config->item ( 'language' ) );
-		$this->lang->load ( 'connection/wifipswd', $this->config->item ( 'language' ) );
+		$this->lang->load('connection/master', $this->config->item('language'));
+		$this->lang->load('connection/wifipswd', $this->config->item('language'));
 		
-		$this->template->set ( 'lang', $CFG->config ['language_abbr'] );
-		$this->template->set ( 'header', "<title>" . t ( 'ZeePro Personal Printer 21 - Connection configuration' ) . "</title>" );
+// 		$this->template->set ( 'lang', $this->config->item('language_abbr') );
+// 		$this->template->set ( 'header', "<title>" . t ( 'ZeePro Personal Printer 21 - Connection configuration' ) . "</title>" );
 		
-		if ($this->form_validation->run () == FALSE) {
+		//TODO finish me
+		if ($this->form_validation->run() == FALSE) {
 			$ssid = $this->input->get('ssid');
 			$this->template->load ('connectionmaster', 'connectionwifipswd', array('ssid' => $ssid));
 		} else {
@@ -116,7 +204,7 @@ class Connection extends MY_Controller {
 			
 // 			header ( "Location:/connection/confirmation" );
 		}
-    }
+	}
 
 	public function wired() {
         global $CFG;
@@ -128,10 +216,10 @@ class Connection extends MY_Controller {
 		
 		$this->load->library ( 'form_validation' );
 				
-		$this->lang->load ( 'connectionmaster', $this->config->item ( 'language' ) );
+		$this->lang->load ( 'connection/master', $this->config->item ( 'language' ) );
 		$this->lang->load ( 'connection/wired', $this->config->item ( 'language' ) );
 		
-		$this->template->set ( 'lang', $CFG->config ['language_abbr'] );
+		$this->template->set ( 'lang', $this->config->item('language_abbr') );
 		$this->template->set ( 'header', "<title>" . t ( 'ZeePro Personal Printer 21 - Connection configuration' ) . "</title>" );
 		
 		if ($this->form_validation->run () == FALSE) {
@@ -178,10 +266,10 @@ class Connection extends MY_Controller {
 		
 		$this->load->library ( 'form_validation' );
 				
-		$this->lang->load ( 'connectionmaster', $this->config->item ( 'language' ) );
+		$this->lang->load ( 'connection/master', $this->config->item ( 'language' ) );
 		$this->lang->load ( 'connection/wiredadvanced', $this->config->item ( 'language' ) );
 		
-		$this->template->set ( 'lang', $CFG->config ['language_abbr'] );
+		$this->template->set ( 'lang', $this->config->item('language_abbr') );
 		$this->template->set ( 'header', "<title>" . t ( 'ZeePro Personal Printer 21 - Connection configuration' ) . "</title>" );
 		
  		$this->form_validation->set_rules('ip', 'ip error', 'callback_ip_check');
@@ -217,31 +305,6 @@ class Connection extends MY_Controller {
 			header ( "Location:/connection/confirmation" );
         }
     }
-	
-	private function ip_check($ip) {
-		if (filter_var ( $ip, FILTER_VALIDATE_IP )) {
-			return TRUE;
-		} else {
-			return FALSE;
-		}
-	}
-	
-	private function mask_check($mask) {
-		if (! $m = ip2long ( $mask ))
-			return false;
-		
-		$m = ~ $m;
-		return $m && ~ $m && ! ($m & ($m + 1));
-	}
-	
-	private function gateway_check($ip) {
-	// @todo The gateway should be within the mask
-		if (filter_var ( $ip, FILTER_VALIDATE_IP )) {
-			return TRUE;
-		} else {
-			return FALSE;
-		}
-	}
     
 	public function wifip2p() {
 		$ret_val = 0;
@@ -300,7 +363,7 @@ class Connection extends MY_Controller {
 		
 		// parse all page
 		$template_data = array(
-				'lang'			=> $CFG->config ['language_abbr'],
+				'lang'			=> $this->config->item('language_abbr'),
 				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Connection setting') . '</title>',
 				'contents'		=> $body_page,
 		);
@@ -313,7 +376,7 @@ class Connection extends MY_Controller {
 	public function confirmation() {
         global $CFG;
 
-        $this->lang->load('connectionmaster', $this->config->item('language'));
+        $this->lang->load('connection/master', $this->config->item('language'));
         $this->lang->load('connection/confirmation', $this->config->item('language'));
 
         $this->template->set('lang', $CFG->config['language_abbr']);

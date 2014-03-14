@@ -48,7 +48,6 @@ class Printdetail extends MY_Controller {
 	}
 	
 	public function status() {
-		global $CFG;
 		$time_remain = NULL;
 		$body_page = NULL;
 		$template_data = array();
@@ -73,7 +72,7 @@ class Printdetail extends MY_Controller {
 				'restart_url'	=> '/printdetail/printmodel?id=' . $mid . '&cb=' . $callback,
 				'var_prime'		=> 'false',
 				'prime_button'	=> t('Yes'),
-				'video_url'		=> $CFG->config['video_url'],
+				'video_url'		=> $this->config->item('video_url'),
 		);
 		
 		if ($callback && $mid) {
@@ -87,7 +86,7 @@ class Printdetail extends MY_Controller {
 		
 		// parse all page
 		$template_data = array(
-				'lang'			=> $CFG->config ['language_abbr'],
+				'lang'			=> $this->config->item('language_abbr'),
 				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Printing details') . '</title>',
 				'contents'		=> $body_page,
 		);
@@ -159,7 +158,6 @@ class Printdetail extends MY_Controller {
 	}
 	
 	public function cancel() {
-		global $CFG;
 		$ret_val = NULL;
 		//TODO finish me for canceling
 		$this->load->helper('printer');
@@ -179,14 +177,14 @@ class Printdetail extends MY_Controller {
 					'finish_info'	=> t('Congratulation, your printing is canceled!'),
 					'return_button'	=> t('Home'),
 					'return_url'	=> '/',
-					'video_url'		=> $CFG->config['video_url'],
+					'video_url'		=> $this->config->item('video_url'),
 			);
 			
 			$body_page = $this->parser->parse('template/printdetail/cancel', $template_data, TRUE);
 			
 			// parse all page
 			$template_data = array(
-					'lang'			=> $CFG->config ['language_abbr'],
+					'lang'			=> $this->config->item('language_abbr'),
 					'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Calceling details') . '</title>',
 					'contents'		=> $body_page,
 			);

@@ -28,9 +28,10 @@ class Test_log extends CI_Controller {
 		global $CFG;
 		if (file_exists($CFG->config['log_file'])) {
 			unlink($CFG->config['log_file']);
-			echo "clear log file\n";
+// 			echo "clear log file\n";
 		}
-		$this->index();
+// 		$this->index();
+		$this->output->set_header('Location: /test_log');
 	}
 
 }

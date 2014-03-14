@@ -39,17 +39,18 @@ class Rest extends MY_Controller {
 			// check if the status is changed
 			$ret_val = 0;
 			
+			$this->load->helper('printerstate');
+			
 			switch ($status_current) {
 				case CORESTATUS_VALUE_PRINT:
 				case CORESTATUS_VALUE_CANCEL: // we treat canceling as printing
 					//TODO test here for canceling
-					$this->load->helper('printerstate');
 					$ret_val = PrinterState_checkInPrint();
 					if ($ret_val == FALSE) {
 						$ret_val = CoreStatus_setInIdle();
 						if ($ret_val == TRUE) {
 							$this->load->helper('printerlog');
-							PrinterLog_logDebug('set idle when call print / cancel');
+							PrinterLog_logDebug('set idle when calling REST');
 							return; // continue to generate if we are now in idle
 						}
 						$this->load->helper('printerlog');
@@ -57,47 +58,13 @@ class Rest extends MY_Controller {
 					}
 					break;
 					
-				case CORESTATUS_VALUE_LOAD_FILA_L:
-				case CORESTATUS_VALUE_LOAD_FILA_R:
-					// wait the time for arduino before checking filament when loading filament
-					//TODO improve this part for more reliable
-					$time_start = 0;
-					$ret_val = CoreStatus_getStartTime($time_start);
-					if ($ret_val != TRUE) {
-						$this->load->helper('printerlog');
-						PrinterLog_logError('get start time error in loading filament');
-					}
-					if (time() - $time_start < 43) {
-						break;
-					}
-					
-				case CORESTATUS_VALUE_UNLOAD_FILA_L:
-				case CORESTATUS_VALUE_UNLOAD_FILA_R:
-					// generate parameters by different status
-					$abb_filament =
-							(($status_current == CORESTATUS_VALUE_LOAD_FILA_L)
-									|| ($status_current == CORESTATUS_VALUE_UNLOAD_FILA_L))
-							? 'l' : 'r';
-					$status_fin_filament =
-							($status_current == CORESTATUS_VALUE_LOAD_FILA_L || $status_current == CORESTATUS_VALUE_LOAD_FILA_R)
-							? TRUE : FALSE;
-					
-					$this->load->helper('printerstate');
-					$ret_val = PrinterState_getFilamentStatus($abb_filament);
-					if ($ret_val == $status_fin_filament) {
-						$ret_val = CoreStatus_setInIdle();
-						if ($ret_val == TRUE) {
-							return; // continue to generate if we are now in idle
-						}
-						$this->load->helper('printerlog');
-						PrinterLog_logError('can not set status into idle');
-					}
-					break;
-					
 				default:
-					// log internal API error
-					$this->load->helper('printerlog');
-					PrinterLog_logError('unknown status in work json');
+					$ret_val = PrinterState_checkBusyStatus($status_current);
+					if ($ret_val == TRUE) {
+						$this->load->helper('printerlog');
+						PrinterLog_logDebug('set idle when calling REST');
+						return; // status has changed to idle
+					}
 					break;
 			}
 			
@@ -258,7 +225,6 @@ class Rest extends MY_Controller {
 	//print list web service
 	//==========================================================
 	public function storemodel() {
-		global $CFG;
 		$data = array('error'=> '');
 		$upload_config = NULL;
 		$api_data = array();

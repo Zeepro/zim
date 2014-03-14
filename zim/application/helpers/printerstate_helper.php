@@ -45,6 +45,9 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_STEPPER_OFF',		' M84');
 	define('PRINTERSTATE_PAUSE_PRINT',		' -pf pause');
 	define('PRINTERSTATE_RESUME_PRINT',		' -rf resume');
+	define('PRINTERSTATE_COLDEXTRUDE_E',	' M302');
+	define('PRINTERSTATE_POSITION_RELAT',	' G91');
+	define('PRINTERSTATE_POSITION_ABSOL',	' G90');
 
 // 	define('PRINTERSTATE_TEMP_PRINT_FILENAME',	'/tmp/printer_percentage'); // fix the name on SD card
 	define('PRINTERSTATE_CMD_SERIAL',		'ifconfig -a | grep wlan0 | awk \'{print $5}\'');
@@ -627,6 +630,12 @@ function PrinterState_checkFilaments($array_filament = array(
 		$need_filament = ($abb_cartridge == 'r')
 		? $array_filament[PRINTERSTATE_SET_EXTRUDR] : $array_filament[PRINTERSTATE_SET_EXTRUDL];
 		
+		// jump checking if not needed
+		if ($need_filament == 0) {
+			PrinterLog_logMessage('Do not need filament ' . $abb_cartridge);
+			continue;
+		}
+		
 		$ret_val = PrinterState_checkFilament($abb_cartridge, $need_filament, $data_json);
 		if ($ret_val != ERROR_OK) {
 			return $ret_val;
@@ -732,6 +741,71 @@ function PrinterState_afterFileCommand() {
 	return TRUE;
 }
 
+function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) {
+	$ret_val = 0;
+	
+	switch ($status_current) {
+		case CORESTATUS_VALUE_WAIT_CONNECT:
+			$ret_val = CoreStatus_checkInConnection();
+			if ($ret_val == FALSE) {
+				CoreStatus_setInIdle();
+			}
+			break;
+	
+		case CORESTATUS_VALUE_SLICE:
+			//TODO get percentage and time / check finished or not
+			break;
+	
+		case CORESTATUS_VALUE_LOAD_FILA_L:
+		case CORESTATUS_VALUE_LOAD_FILA_R:
+			// wait the time for arduino before checking filament when loading filament
+			//TODO improve this part for more reliable
+			$time_start = 0;
+			$ret_val = CoreStatus_getStartTime($time_start);
+			if ($ret_val != TRUE) {
+				$CI = &get_instance();
+				$CI->load->helper('printerlog');
+				PrinterLog_logError('get start time error in loading filament');
+			}
+			if (time() - $time_start < 43) {
+				break;
+			}
+				
+		case CORESTATUS_VALUE_UNLOAD_FILA_L:
+		case CORESTATUS_VALUE_UNLOAD_FILA_R:
+			// generate parameters by different status
+			$abb_filament =
+					(($status_current == CORESTATUS_VALUE_LOAD_FILA_L)
+							|| ($status_current == CORESTATUS_VALUE_UNLOAD_FILA_L))
+					? 'l' : 'r';
+			$status_fin_filament =
+					($status_current == CORESTATUS_VALUE_LOAD_FILA_L || $status_current == CORESTATUS_VALUE_LOAD_FILA_R)
+					? TRUE : FALSE;
+			
+			$ret_val = PrinterState_getFilamentStatus($abb_filament);
+			if ($ret_val == $status_fin_filament) {
+				$ret_val = CoreStatus_setInIdle();
+				if ($ret_val == TRUE) {
+					$status_current = CORESTATUS_VALUE_IDLE;
+					return TRUE; // continue to generate if we are now in idle
+				}
+				$CI = &get_instance();
+				$CI->load->helper('printerlog');
+				PrinterLog_logError('can not set status into idle');
+			}
+			break;
+			
+		default:
+			// log internal API error
+			$CI = &get_instance();
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('unknown status in work json');
+			break;
+	}
+	
+	return FALSE; // status has not changed
+}
+
 function PrinterState_checkStatusAsArray() {
 	global $CFG;
 	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
@@ -740,12 +814,22 @@ function PrinterState_checkStatusAsArray() {
 	$ret_val = 0;
 	$data_json = array();
 	$time_start = NULL;
+	$status_current = '';
 	
 	// if we need duration, the function that get duration by id is necessary
 	// and we must stock print list id somewhere in json file
 	$CI = &get_instance();
 	$CI->load->helper('corestatus');
 	
+	$ret_val = CoreStatus_checkInIdle($status_current);
+	if ($ret_val == FALSE && !in_array($status_current, array(CORESTATUS_VALUE_PRINT, CORESTATUS_VALUE_CANCEL))) {
+		PrinterState_checkBusyStatus($status_current, $data_json);
+		$data_json[PRINTERSTATE_TITLE_STATUS] = $status_current;
+		
+		return $data_json;
+	}
+	
+	$ret_val = 0;
 	$command = $arcontrol_fullpath . PRINTERSTATE_CHECK_STATE;
 //	exec($command, $output, $ret_val);
 //	if (!PrinterState_filterOutput($output)) {
@@ -968,8 +1052,9 @@ function PrinterState_unloadFilament($abb_filament) {
 		// M302 allow cold extrusion
 		// G91 relative movement
 		// G1 E-3000 F2000 unload filament until endstop
-		$command .= '; ' . $arcontrol_fullpath . ' M302; ' . $arcontrol_fullpath
-				. ' G91; ' . $arcontrol_fullpath . ' "G1 E-3000 F2000"';
+		$command .= '; ' . $arcontrol_fullpath . PRINTERSTATE_COLDEXTRUDE_E . '; '
+				. $arcontrol_fullpath . PRINTERSTATE_POSITION_RELAT . '; '
+				. $arcontrol_fullpath . ' "G1 E-3000 F2000"';
 	}
 	
 	// check if we are in printing
@@ -1078,11 +1163,12 @@ function PrinterState_runGcodeFile($gcode_path) {
 	$command = '';
 	$CI = &get_instance();
 
-	$CI->load->helper('detectos');
+	$CI->load->helper(array('detectos', 'printer'));
 	
 // 	if (!PrinterState_beforeFileCommand()) {
 // 		return ERROR_INTERNAL;
 // 	}
+	Printer_preparePrint();
 	$command = PrinterState_getPrintCommand() . $gcode_path;
 	
 	if ($CFG->config['simulator'] && DectectOS_checkWindows()) {
@@ -1121,7 +1207,7 @@ function PrinterState_runGcode($gcodes, $need_return = FALSE, &$return_data = ''
 	
 	if ($need_return && is_array($gcodes)) {
 		foreach ($gcodes as $gcode) {
-			$command = $arcontrol_fullpath . ' ' . $gcode;
+			$command = $arcontrol_fullpath . ' "' . $gcode . '"';
 			//TODO some gcode will not be responsed directly when using simulator
 			exec($command, $output, $ret_val);
 			if (!PrinterState_filterOutput($output)) {
@@ -1180,8 +1266,12 @@ function PrinterState_filterOutput(&$output) {
 			}
 			
 			//TODO check it start with [<-] or [->], then filter it
+			//filter the input
+			if (strpos($line, '[->]') === 0) {
+				continue;
+			}
+// 			$line = preg_replace('[\[->\]]', '', $line, 1);
 			$line = preg_replace('[\[<-\]]', '', $line, 1);
-			$line = preg_replace('[\[->\]]', '', $line, 1);
 			$line = trim($line, " \t\n\r\0\x0B");
 			if ($line == '') {
 				continue;
@@ -1422,10 +1512,40 @@ function PrintState_pausePrinting() {
 			return ERROR_INTERNAL;
 		}
 		
-		// print special gcode model to reset printer's temperatures and position
-		// we leave this printing call function in Printer_stopPrint()
+		//TODO print special gcode model to reset printer's temperatures and position
 	} else {
 		PrinterLog_logMessage('we are not in printing when calling pause printing');
+		return ERROR_NO_PRINT;
+	}
+	
+	return ERROR_OK;
+}
+
+function PrintState_resumePrinting() {
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$output = array();
+	$command = '';
+	$ret_val = 0;
+	
+	// check if we are in printing
+	$ret_val = PrinterState_checkInPrint();
+	if ($ret_val == TRUE) {
+		// send stop gcode
+		$command = $arcontrol_fullpath . PRINTERSTATE_RESUME_PRINT;
+		exec($command, $output, $ret_val);
+		if (!PrinterState_filterOutput($output)) {
+			PrinterLog_logError('filter arduino output error');
+			return ERROR_INTERNAL;
+		}
+		PrinterLog_logArduino($command, $output);
+		if ($ret_val != ERROR_NORMAL_RC_OK) {
+			return ERROR_INTERNAL;
+		}
+		
+		//TODO print special gcode model to reset printer's temperatures and position
+	} else {
+		PrinterLog_logMessage('we are not in printing when calling resume printing');
 		return ERROR_NO_PRINT;
 	}
 	

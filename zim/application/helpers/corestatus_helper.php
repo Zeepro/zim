@@ -25,6 +25,8 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_VALUE_UNLOAD_FILA_L',	'unloading_left');
 	define('CORESTATUS_VALUE_UNLOAD_FILA_R',	'unloading_right');
 	define('CORESTATUS_VALUE_CANCEL',			'canceling');
+	define('CORESTATUS_VALUE_WAIT_CONNECT',		'to_be_connected');
+	define('CORESTATUS_VALUE_SLICE',			'slicing');
 // 	define('CORESTATUS_VALUE_UPGRADE',			'upgrading');
 
 	define('CORESTATUS_PRM_CAMERA_START',
@@ -169,6 +171,8 @@ function CoreStatus_checkCallNoBlockREST() {
 					'p'	=> array(PRINTERSTATE_PRM_TEMPER, PRINTERSTATE_PRM_INFO),
 			),
 			'/rest/cancel'	=> NULL, //TODO make it only for printing, now for all status
+			'/rest/suspend'	=> NULL,
+			'/rest/resume'	=> NULL,
 			'/rest/gcode'	=> NULL,
 	));
 }
@@ -328,6 +332,11 @@ function CoreStatus_wantConnection() {
 	$state_file = $CFG->config['conf'] . CORESTATUS_FILENAME_CONNECT;
 	
 	if (file_exists($state_file)) {
+		$ret_val = CoreStatus__setInStatus(CORESTATUS_VALUE_WAIT_CONNECT);
+		if ($ret_val != TRUE) {
+			return FALSE;
+		}
+		
 		$ret_val = unlink($state_file);
 		return $ret_val;
 	}
@@ -351,7 +360,7 @@ function CoreStatus_finishConnection($data_json = array()) {
 		return FALSE;
 	}
 	
-	return TRUE;
+	return CoreStatus_setInIdle();
 }
 
 // internal function
