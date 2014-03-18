@@ -38,10 +38,12 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_DELETE_SD_FILE',	' M30\ '); // add space in the last
 	define('PRINTERSTATE_SD_FILENAME',		'test.g'); // fix the name on SD card
 	define('PRINTERSTATE_AFTER_UNIN_FILA',	' G99');
-	define('PRINTERSTATE_HOMEING',			' G28');
+	define('PRINTERSTATE_HOMING',			' G28');
 	define('PRINTERSTATE_MOVE',				' G1\ '); // add space in the last
 	define('PRINTERSTATE_HEAD_LED_ON',		' M1200');
 	define('PRINTERSTATE_HEAD_LED_OFF',		' M1201');
+	define('PRINTERSTATE_STRIP_LED_ON',		' M1202');
+	define('PRINTERSTATE_STRIP_LED_OFF',	' M1203');
 	define('PRINTERSTATE_STEPPER_OFF',		' M84');
 	define('PRINTERSTATE_PAUSE_PRINT',		' -pf pause');
 	define('PRINTERSTATE_RESUME_PRINT',		' -rf resume');
@@ -96,10 +98,20 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_VALUE_DEFAULT_COLOR',		'transparent');
 	define('PRINTERSTATE_VALUE_OFFSET_TO_CAL_TIME',	10);
 	
-	define('PRINTERSTATE_PRM_EXTRUDER',				'extruder');
-	define('PRINTERSTATE_PRM_TEMPER',				'temp');
-	define('PRINTERSTATE_PRM_CARTRIDGE',			'cartridgeinfo');
-	define('PRINTERSTATE_PRM_INFO',					'info');
+	define('PRINTERSTATE_VALUE_DEFAULT_EXTRUD',		5);
+	
+	define('PRINTERSTATE_PRM_EXTRUDER',			'extruder');
+	define('PRINTERSTATE_PRM_TEMPER',			'temp');
+	define('PRINTERSTATE_PRM_CARTRIDGE',		'cartridgeinfo');
+	define('PRINTERSTATE_PRM_INFO',				'info');
+	define('PRINTERSTATE_PRM_ACCELERATION',		'acceleration');
+	define('PRINTERSTATE_PRM_SPEED_MOVE',		'speed');
+	define('PRINTERSTATE_PRM_SPEED_EXTRUDE',	'extrusionspeed');
+	define('PRINTERSTATE_PRM_COLDEXTRUSION',	'coldextrusion');
+	define('PRINTERSTATE_PRM_STRIPLED',			'stripled');
+	define('PRINTERSTATE_PRM_HEADLED',			'headled');
+	define('PRINTERSTATE_PRM_MOTOR_OFF',		'motor');
+	define('PRINTERSTATE_PRM_ENDSTOP',			'endstop');
 	
 	define('PRINTERSTATE_CHANGECART_UNLOAD_F',	'unload_filament');
 	define('PRINTERSTATE_CHANGECART_REMOVE_C',	'remove_cartridge');
@@ -1334,7 +1346,7 @@ function PrinterState_getInfoAsArray() {
 	return $json_info;
 }
 
-function PrinterState_homeing($axis = 'ALL') {
+function PrinterState_homing($axis = 'ALL') {
 	global $CFG;
 	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
 	$output = array();
@@ -1347,11 +1359,11 @@ function PrinterState_homeing($axis = 'ALL') {
 		case 'X':
 		case 'Y':
 		case 'Z':
-			$command = $arcontrol_fullpath . PRINTERSTATE_HOMEING . '\ ' . $axis;
+			$command = $arcontrol_fullpath . PRINTERSTATE_HOMING . '\ ' . $axis;
 			break;
 			
 		case 'ALL':
-			$command = $arcontrol_fullpath . PRINTERSTATE_HOMEING;
+			$command = $arcontrol_fullpath . PRINTERSTATE_HOMING;
 			break;
 			
 		default:
@@ -1423,12 +1435,48 @@ function PrinterState_move($axis, $value) {
 	return ERROR_OK;
 }
 
-function PrinterState_extrude($value = 5) {
+function PrinterState_extrude($value = PRINTERSTATE_VALUE_DEFAULT_EXTRUD) {
 	if ($value == 0) {
 		return ERROR_WRONG_PRM;
 	}
 	
 	return PrinterState_move('E', $value);
+}
+
+function PrinterState_setStripLed($value = 'off') {
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$output = array();
+	$command = '';
+	$ret_val = 0;
+	
+	switch($value) {
+		case 'off':
+			$command = $arcontrol_fullpath . PRINTERSTATE_STRIP_LED_OFF;
+			break;
+			
+		case 'on':
+			$command = $arcontrol_fullpath . PRINTERSTATE_STRIP_LED_ON;
+			break;
+			
+		default:
+			PrinterLog_logError('set strip led value error', __FILE__, __LINE__);
+			return ERROR_WRONG_PRM;
+			break;
+	}
+	
+	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output)) {
+		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	PrinterLog_logArduino($command, $output);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		PrinterLog_logError('set strip led error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	
+	return ERROR_OK;
 }
 
 function PrinterState_setHeadLed($value = 'off') {

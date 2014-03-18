@@ -99,6 +99,17 @@ class Rest extends MY_Controller {
 		return;
 	}
 	
+	private function _return_under_construction() {
+		$display = 499 . " UNDER CONSTRUCTION";
+		$this->output->set_status_header($cr, $display);
+// 		http_response_code($cr);
+		$this->output->set_content_type(RETURN_CONTENT_TYPE);
+		$this->load->library('parser');
+		$this->parser->parse('template/plaintxt', array('display' => $display)); //optional
+		
+		return;
+	}
+	
 	//==========================================================
 	//index for status
 	//==========================================================
@@ -454,13 +465,23 @@ class Rest extends MY_Controller {
 		return;
 	}
 	
+	public function suspend() {
+		$this->_return_under_construction();
+		return;
+	}
+	
+	public function resume() {
+		$this->_return_under_construction();
+		return;
+	}
+	
 	public function get() {
 		$parameter = NULL;
 		$cr = 0;
 		$display = NULL;
 		$api_prm = NULL;
 		
-		$this->load->helper('printerstate');
+		$this->load->helper(array('printerstate', 'zimapi'));
 		
 		$parameter = $this->input->get('p'); //return false if missing
 		
@@ -519,6 +540,45 @@ class Rest extends MY_Controller {
 					$display = PrinterState_getInfo();
 					break;
 					
+				case PRINTERSTATE_PRM_ACCELERATION:
+				case PRINTERSTATE_PRM_SPEED_MOVE:
+				case PRINTERSTATE_PRM_SPEED_EXTRUDE:
+				case PRINTERSTATE_PRM_COLDEXTRUSION:
+				case PRINTERSTATE_PRM_STRIPLED:
+				case PRINTERSTATE_PRM_HEADLED:
+				case PRINTERSTATE_PRM_ENDSTOP:
+				case 'render':
+					$this->_return_under_construction();
+					return;
+					break;
+					
+				case ZIMAPI_PRM_CAPTURE:
+					$path_capture = '';
+					
+					$this->load->helper('file');
+					if (ZimAPI_cameraCapture($path_capture)) {
+						$this->output->set_content_type(get_mime_by_extension($path_capture))->set_output(file_get_contents($path_capture));
+						return;
+					}
+					else {
+						$cr = ERROR_INTERNAL;
+					}
+					break;
+					
+				case ZIMAPI_PRM_VIDEO_MODE:
+					if (ZimAPI_checkCamera($display)) {
+						$cr = ERROR_OK;
+					}
+					else {
+						$cr = ERROR_INTERNAL;
+					}
+					break;
+					
+				case ZIMAPI_PRM_PRESET:
+					$this->_return_under_construction();
+					return;
+					break;
+					
 				default:
 					$cr = ERROR_WRONG_PRM;
 					break;
@@ -545,7 +605,7 @@ class Rest extends MY_Controller {
 		$cr = 0;
 		$api_prm = NULL;
 		
-		$this->load->helper('printerstate');
+		$this->load->helper(array('printerstate', 'zimapi'));
 		
 		$parameter = $this->input->get('p'); //return false if missing
 		
@@ -585,12 +645,133 @@ class Rest extends MY_Controller {
 					}
 					break;
 					
+				case PRINTERSTATE_PRM_ACCELERATION:
+				case PRINTERSTATE_PRM_SPEED_MOVE:
+				case PRINTERSTATE_PRM_SPEED_EXTRUDE:
+				case PRINTERSTATE_PRM_COLDEXTRUSION:
+					$this->_return_under_construction();
+					return;
+					break;
+					
+				case PRINTERSTATE_PRM_STRIPLED:
+					$status_set = $this->input->get('v');
+					if ($status_set) {
+						$cr = PrinterState_setStripLed($status_set);
+					}
+					else {
+						$cr = ERROR_MISS_PRM;
+					}
+					break;
+					
+				case PRINTERSTATE_PRM_MOTOR_OFF:
+					$status_set = $this->input->get('v');
+					if ($status_set == 'off') {
+						$cr = PrinterState_disableSteppers();
+					}
+					else if ($status_set) {
+						$cr = ERROR_WRONG_PRM;
+					}
+					else {
+						$cr = ERROR_MISS_PRM;
+					}
+					break;
+					
+				case PRINTERSTATE_PRM_HEADLED:
+					$status_set = $this->input->get('v');
+					if ($status_set) {
+						$cr = PrinterState_setHeadLed($status_set);
+					}
+					else {
+						$cr = ERROR_MISS_PRM;
+					}
+					break;
+					
+				case ZIMAPI_PRM_PASSWD:
+					$old_password = $this->input->get('o');
+					$password = $this->input->get('v');
+					
+					if (ZimAPI_checkCameraPassword($old_password)) {
+						if (ZimAPI_setCameraPassword($password)) {
+							$cr = ERROR_OK;
+						}
+						else {
+							$cr = ERROR_INTERNAL;
+						}
+					}
+					else {
+						$cr = ERROR_WRONG_PWD;
+					}
+					break;
+					
+				case ZIMAPI_PRM_VIDEO_MODE:
+				case ZIMAPI_PRM_PRESET:
+					$this->_return_under_construction();
+					return;
+					break;
+					
 				default:
 					$cr = ERROR_WRONG_PRM;
 					break;
 			}
 		} else {
 			$cr = ERROR_MISS_PRM;
+		}
+		
+		$this->_return_cr($cr);
+		
+		return;
+	}
+	
+	public function home() {
+		$cr = 0;
+		$abb_axis = $this->input->get('a');
+		
+		$this->load->helper('printerstate');
+		if ($abb_axis) {
+			$cr = PrinterState_homing($abb_axis);
+		}
+		else {
+			$cr = PrinterState_homing('all');
+		}
+		
+		$this->_return_cr($cr);
+		
+		return;
+	}
+	
+	public function move() {
+		$cr = 0;
+		$abb_axis = $this->input->get('a');
+		$distance_axis = $this->input->get('v');
+		
+		$this->load->helper('printerstate');
+		if ($abb_axis) {
+			if ($distance_axis === FALSE) {
+				$cr = ERROR_MISS_PRM;
+			}
+			else {
+				$cr = PrinterState_move($abb_axis, (float)$distance_axis);
+			}
+		}
+		else {
+			$cr = ERROR_MISS_PRM;
+		}
+		
+		$this->_return_cr($cr);
+		
+		return;
+	}
+	
+	public function extrude() {
+		$cr = 0;
+		$distance = $this->input->get('v');
+		
+		$this->load->helper('printerstate');
+		if ($distance) {
+			$cr = PrinterState_extrude((float)$distance);
+		}
+		else {
+			$cr = PrinterState_extrude();
 		}
 		
 		$this->_return_cr($cr);
@@ -697,10 +878,54 @@ class Rest extends MY_Controller {
 		return;
 	}
 	
-	//==========================================================
-	//another part (end of print list)
-	//==========================================================
 	
+	
+	public function slicerlistpreset() {
+		$this->_return_under_construction();
+		return;
+	}
+	
+	//==========================================================
+	//platform web service
+	//==========================================================
+	public function getmodel() {
+		$this->_return_under_construction();
+		return;
+	}
+	
+	public function level() {
+		$this->_return_under_construction();
+		return;
+	}
+	
+	public function plateformmodel() {
+		$this->_return_under_construction();
+		return;
+	}
+	
+	public function setmodel() {
+		$this->_return_under_construction();
+		return;
+	}
+	
+	public function upload() {
+		$this->_return_under_construction();
+		return;
+	}
+	
+	public function removemodel() {
+		$this->_return_under_construction();
+		return;
+	}
+	
+	public function platformprint() {
+		$this->_return_under_construction();
+		return;
+	}
+	
+	//==========================================================
+	//debug part
+	//==========================================================
 	public function gcode() {
 		$cr = 0;
 		$gcodes = '';
