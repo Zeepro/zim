@@ -37,6 +37,17 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_VALUE_NETWORK',	'network');
 	define('ZIMAPI_VALUE_P2P',		'p2p');
 	define('ZIMAPI_MODE_CETH',		'cEth');
+
+	define('ZIMAPI_FILENAME_CAMERA',	'Camera.json');
+	define('ZIMAPI_PRM_CAMERA_PRINTSTART',
+			' -v quiet -r 25 -s 320x240 -f video4linux2 -i /dev/video0 -vf "crop=240:240:40:0,transpose=2" -minrate 256k -maxrate 256k -bufsize 256k -map 0 -force_key_frames "expr:gte(t,n_forced*2)" -c:v libx264 -crf 35 -profile:v baseline -b:v 256k -pix_fmt yuv420p -flags -global_header -f segment -segment_list /var/www/tmp/zim.m3u8 -segment_time 1 -segment_format mpeg_ts -segment_list_type m3u8 -segment_list_flags live -segment_list_size 5 -segment_wrap 5 /var/www/tmp/zim%d.ts');
+	define('ZIMAPI_PRM_CAMERA_STOP',	' stop ');
+	define('ZIMAPI_PRM_CAMERA_CAPTURE',
+			' -v quiet -f video4linux2 -i /dev/video0 -y -vf "transpose=2" -vframes 1 /var/www/tmp/capture.jpg');
+// 	define('ZIMAPI_TITLE_MODE',			'mode');
+	define('ZIMAPI_TITLE_COMMAND',		'command');
+	define('ZIMAPI_VALUE_MODE_OFF',		'off');
+	define('ZIMAPI_VALUE_MODE_HLS',		'on(hls)');
 }
 
 function ZimAPI_getNetworkInfoAsArray(&$array_data) {
@@ -488,5 +499,162 @@ function ZimAPI_resetNetwork() {
 	return ERROR_OK;
 }
 
+function ZimAPI_checkCamera(&$info_camera = '') {
+	global $CFG;
+	$camera_file = $CFG->config['temp'] . ZIMAPI_FILENAME_CAMERA;
+	$tmp_array = array();
+	
+	$CI = &get_instance();
+	$CI->load->helper('json');
+	
+	if (!file_exists($camera_file)) {
+		$info_camera = ZIMAPI_VALUE_MODE_OFF;
+		return TRUE;
+	}
+	
+	// read json file
+	try {
+		$tmp_array = json_read($camera_file, TRUE);
+		if ($tmp_array['error']) {
+			throw new Exception('read json error');
+		}
+	} catch (Exception $e) {
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('read camera status file error', __FILE__, __LINE__);
+		return FALSE;
+	}
+	$info_camera = $tmp_array['json'][ZIMAPI_TITLE_MODE];
+	
+	return TRUE;
+}
+
+function ZimAPI_checkCameraPassword($password = '') {
+	
+}
+
+function ZimAPI_setCameraPassword($password = '') {
+	
+}
+
+function ZimAPI_cameraCapture() {
+	global $CFG;
+	$output = NULL;
+	$ret_val = 0;
+	$info_camera = '';
+	
+	if (!ZimAPI_checkCamera($info_camera)) {
+		return FALSE;
+	}
+	if ($info_camera != ZIMAPI_VALUE_MODE_OFF) {
+		$CI = &get_instance();
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('capture can not run when camera is on', __FILE__, __LINE__);
+		return FALSE;
+	}
+	
+	$command = $CFG->config['capture'] . ZIMAPI_PRM_CAMERA_CAPTURE;
+		
+	exec($command, $output, $ret_val);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		$CI = &get_instance();
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('capture camera command error', __FILE__, __LINE__);
+		return FALSE;
+	}
+	
+	return TRUE;
+}
+
+function ZimAPI_cameraOn($parameter) {
+	global $CFG;
+	$output = NULL;
+	$ret_val = 0;
+	$info_camera = '';
+	$data_json = array();
+	$fp = 0;
+	
+	$command = $CFG->config['camera'] . $parameter;
+	$status_file = $CFG->config['temp'] . ZIMAPI_FILENAME_CAMERA;
+	
+	$ret_val = ZimAPI_checkCamera($info_camera);
+	if ($info_camera != ZIMAPI_VALUE_MODE_OFF) {
+		$CI = &get_instance();
+		$CI->load->helper('printerlog');
+		PrinterLog_logMessage('camera already open', __FILE__, __LINE__);
+		return TRUE;
+	}
+	
+	exec($command, $output, $ret_val);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		$CI = &get_instance();
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('camera start command error', __FILE__, __LINE__);
+		return FALSE;
+	}
+	$data_json = array(
+			ZIMAPI_TITLE_MODE		=> ZIMAPI_VALUE_MODE_HLS,
+			ZIMAPI_TITLE_COMMAND	=> $parameter,
+	);
+	
+	// write json file
+	$fp = fopen($CFG->config['temp'] . ZIMAPI_FILENAME_CAMERA, 'w');
+	if ($fp) {
+		fwrite($fp, json_encode($data_json));
+		fclose($fp);
+	}
+	else {
+		$CI = &get_instance();
+		$CI->load->helper('printerlog');
+		PrinterLog_logMessage('write camera status error', __FILE__, __LINE__);
+		return FALSE;
+	}
+	
+	return TRUE;
+}
+
+function ZimAPI_cameraOff() {
+	global $CFG;
+	$output = NULL;
+	$ret_val = 0;
+	$command = $CFG->config['camera'] . ZIMAPI_PRM_CAMERA_STOP;
+	$data_json = array();
+	$fp = 0;
+	
+	exec($command, $output, $ret_val);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		$CI = &get_instance();
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('camera stop command error', __FILE__, __LINE__);
+		return FALSE;
+	}
+	
+	$data_json = array(
+			ZIMAPI_TITLE_MODE		=> ZIMAPI_VALUE_MODE_OFF,
+			ZIMAPI_TITLE_COMMAND	=> NULL,
+	);
+	
+	// write json file
+	$fp = fopen($CFG->config['temp'] . ZIMAPI_FILENAME_CAMERA, 'w');
+	if ($fp) {
+		fwrite($fp, json_encode($data_json));
+		fclose($fp);
+	}
+	else {
+		$CI = &get_instance();
+		$CI->load->helper('printerlog');
+		PrinterLog_logMessage('write camera status error', __FILE__, __LINE__);
+		return FALSE;
+	}
+	
+	return TRUE;
+}
+
+//internal function
+function ZimAPI__getModebyParameter($parameter) {
+	switch ($parameter) {
+		case ZIMAPI_PRM_CAMERA_PRINTSTART:
+			
+	}
+}
 
 /* End of file Someclass.php */

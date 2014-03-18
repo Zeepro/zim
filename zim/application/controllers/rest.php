@@ -93,7 +93,8 @@ class Rest extends MY_Controller {
 		$this->output->set_status_header($cr, $display);
 // 		http_response_code($cr);
 		$this->output->set_content_type(RETURN_CONTENT_TYPE);
-		echo $display; //optional
+		$this->load->library('parser');
+		$this->parser->parse('template/plaintxt', array('display' => $display)); //optional
 		
 		return;
 	}
@@ -201,7 +202,9 @@ class Rest extends MY_Controller {
 		$display = ZimAPI_listSSID();
 		
 		$this->output->set_content_type(RETURN_CONTENT_TYPE_JSON);
-		echo $display;
+// 		echo $display;
+		$this->load->library('parser');
+		$this->parser->parse('template/plaintxt', array('display' => $display));
 		
 		return;
 	}
@@ -343,7 +346,9 @@ class Rest extends MY_Controller {
 		$display = ModelList_list();
 		$this->output->set_content_type(RETURN_CONTENT_TYPE_JSON);
 // 		header('Content-type: text/plain; charset=UTF-8');
-		echo $display;
+// 		echo $display;
+		$this->load->library('parser');
+		$this->parser->parse('template/plaintxt', array('display' => $display));
 		
 		return;
 	}
@@ -424,7 +429,9 @@ class Rest extends MY_Controller {
 		
 		$display = PrinterState_checkStatus();
 		$this->output->set_content_type(RETURN_CONTENT_TYPE_JSON);
-		echo $display;
+// 		echo $display;
+		$this->load->library('parser');
+		$this->parser->parse('template/plaintxt', array('display' => $display));
 		
 		return;
 	}
@@ -526,7 +533,9 @@ class Rest extends MY_Controller {
 		$this->output->set_status_header($cr, $display);
 // 		http_response_code($cr);
 		$this->output->set_content_type(RETURN_CONTENT_TYPE);
- 		echo $display;
+// 		echo $display;
+		$this->load->library('parser');
+		$this->parser->parse('template/plaintxt', array('display' => $display));
 		
 		return;
 	}

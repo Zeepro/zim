@@ -28,10 +28,6 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_VALUE_WAIT_CONNECT',		'to_be_connected');
 	define('CORESTATUS_VALUE_SLICE',			'slicing');
 // 	define('CORESTATUS_VALUE_UPGRADE',			'upgrading');
-
-	define('CORESTATUS_PRM_CAMERA_START',
-			' -v quiet -r 25 -s 320x240 -f video4linux2 -i /dev/video0 -vf "crop=240:240:40:0, transpose=2" -minrate 256k -maxrate 256k -bufsize 256k -map 0 -force_key_frames "expr:gte(t,n_forced*2)" -c:v libx264 -crf 35 -profile:v baseline -b:v 256k -pix_fmt yuv420p -flags -global_header -f segment -segment_list /var/www/tmp/zim.m3u8 -segment_time 1 -segment_format mpeg_ts -segment_list_type m3u8 -segment_list_flags live -segment_list_size 5 -segment_wrap 5 /var/www/tmp/zim%d.ts');
-	define('CORESTATUS_PRM_CAMERA_STOP',	' stop ');
 }
 
 function CoreStatus_initialFile() {
@@ -208,16 +204,12 @@ function CoreStatus_setInIdle() {
 	}
 	else if ($status_previous == CORESTATUS_VALUE_PRINT) {
 		// stop camera http live streaming
-		global $CFG;
-		$output = NULL;
 		$ret_val = 0;
-		$command = $CFG->config['camera'] . CORESTATUS_PRM_CAMERA_STOP;
 		
-		exec($command, $output, $ret_val);
-		if ($ret_val != ERROR_NORMAL_RC_OK) {
-			$CI = &get_instance();
-			$CI->load->helper('printerlog');
-			PrinterLog_logError('camera stop command error', __FILE__, __LINE__);
+		$CI = &get_instance();
+		$CI->load->helper('zimapi');
+		$ret_val = ZimAPI_cameraOff();
+		if ($ret_val != TRUE) {
 			return FALSE;
 		}
 	}
@@ -239,23 +231,13 @@ function CoreStatus_setInIdle() {
 function CoreStatus_setInPrinting($stop_printing = FALSE) {
 	if ($stop_printing == FALSE) {
 		// start camera http live streaming
-		global $CFG;
-		$output = NULL;
 		$ret_val = 0;
-		if ($CFG->config['simulator'] == FALSE) {
-			$command = 'sudo nice -n 20 ffmpeg' . CORESTATUS_PRM_CAMERA_START;
-			pclose(popen($command . ' &', 'r'));
-		}
-		else {
-			$command = $CFG->config['camera'] . CORESTATUS_PRM_CAMERA_START;
-			
-			exec($command, $output, $ret_val);
-			if ($ret_val != ERROR_NORMAL_RC_OK) {
-				$CI = &get_instance();
-				$CI->load->helper('printerlog');
-				PrinterLog_logError('camera start command error', __FILE__, __LINE__);
-				return FALSE;
-			}
+		
+		$CI = &get_instance();
+		$CI->load->helper('zimapi');
+		$ret_val = ZimAPI_cameraOn(ZIMAPI_PRM_CAMERA_PRINTSTART);
+		if ($ret_val == FALSE) {
+			return FALSE;
 		}
 	
 		return CoreStatus__setInStatus(CORESTATUS_VALUE_PRINT,
