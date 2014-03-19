@@ -101,7 +101,7 @@ class Rest extends MY_Controller {
 	
 	private function _return_under_construction() {
 		$display = 499 . " UNDER CONSTRUCTION";
-		$this->output->set_status_header($cr, $display);
+		$this->output->set_status_header(499, $display);
 // 		http_response_code($cr);
 		$this->output->set_content_type(RETURN_CONTENT_TYPE);
 		$this->load->library('parser');
@@ -575,8 +575,9 @@ class Rest extends MY_Controller {
 					break;
 					
 				case ZIMAPI_PRM_PRESET:
-					$this->_return_under_construction();
-					return;
+					if (ZimAPI_getPreset($display)) {
+						$cr = ERROR_OK;
+					}
 					break;
 					
 				default:
@@ -704,9 +705,52 @@ class Rest extends MY_Controller {
 					break;
 					
 				case ZIMAPI_PRM_VIDEO_MODE:
+					$set_status = $this->input->get('v');
+					$password = $this->input->get('s');
+					$parameter = $this->input->get('m');
+					
+					if (!ZimAPI_checkCameraPassword($password)) {
+						$cr = ERROR_WRONG_PWD;
+						break;
+					}
+					if ($set_status && $set_status == 'off') {
+						if (ZimAPI_cameraOff()) {
+							$cr = ERROR_OK;
+						}
+						else {
+							$cr = ERROR_INTERNAL;
+						}
+					}
+					else if ($set_status && $set_status == 'on') {
+						if ($parameter) {
+							if (ZimAPI_cameraOn($parameter)) {
+								$cr = ERROR_OK;
+							}
+							else {
+								$cr = ERROR_INTERNAL;
+							}
+						}
+						else {
+							$cr = ERROR_MISS_PRM;
+						}
+					}
+					else if ($set_status) {
+						$cr = ERROR_WRONG_PRM;
+					}
+					else {
+						$cr = ERROR_MISS_PRM;
+					}
+					break;
+					
 				case ZIMAPI_PRM_PRESET:
-					$this->_return_under_construction();
-					return;
+					$id_preset = $this->input->get('id');
+					
+					if ($id_preset) {
+						$cr = ZimAPI_setPreset($id_preset);
+					}
+					else {
+						$cr = ERROR_MISS_PRM;
+					}
 					break;
 					
 				default:
@@ -881,7 +925,17 @@ class Rest extends MY_Controller {
 	
 	
 	public function slicerlistpreset() {
-		$this->_return_under_construction();
+		$display = '';
+		
+		$this->load->helper('zimapi');
+		
+		$display = ZimAPI_getPresetList();
+		$this->output->set_content_type(RETURN_CONTENT_TYPE_JSON);
+// 		header('Content-type: text/plain; charset=UTF-8');
+// 		echo $display;
+		$this->load->library('parser');
+		$this->parser->parse('template/plaintxt', array('display' => $display));
+		
 		return;
 	}
 	
