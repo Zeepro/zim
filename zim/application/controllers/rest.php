@@ -554,6 +554,12 @@ class Rest extends MY_Controller {
 					
 				case ZIMAPI_PRM_CAPTURE:
 					$path_capture = '';
+					$password = $this->input->get('password');
+					
+					if (!ZimAPI_checkCameraPassword($password)) {
+						$cr = ERROR_WRONG_PWD;
+						break;
+					}
 					
 					$this->load->helper('file');
 					if (ZimAPI_cameraCapture($path_capture)) {
