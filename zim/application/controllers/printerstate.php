@@ -101,6 +101,10 @@ class Printerstate extends MY_Controller {
 	}
 	
 	private function _display_changecartridge_cartridge_detail($abb_cartridge, $id_model) {
+		$cr = 0;
+		$template_data = array();
+		$cartridge_data = array();
+		
 		$this->load->helper(array('printlist', 'printerstate'));
 		$this->load->library('parser');
 		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
@@ -109,16 +113,14 @@ class Printerstate extends MY_Controller {
 		$color_cart = PRINTERSTATE_VALUE_DEFAULT_COLOR;
 		$model_title = t('Color of model');
 		$cartridge_title = t('Color of cartridge');
-		$template_data = array();
 		
 		if ($id_model) {
-			$cr = 0;
 			$model_data = array();
-			$cartridge_data = array();
-		
+			
 			$cr = ModelList__getDetailAsArray($id_model, $model_data, TRUE);
 			if (($cr != ERROR_OK) || is_null($model_data)) {
-				//TODO log error here
+				$this->load->helper('printerlog');
+				PrinterLog_logMessage('can not get model info', __FILE__, __LINE__);
 				$id_model = NULL;
 				$model_title = t('No model');
 			}
@@ -126,15 +128,19 @@ class Printerstate extends MY_Controller {
 				$color_model = ($abb_cartridge == 'r')
 				? $model_data[PRINTLIST_TITLE_COLOR_F1] : $model_data[PRINTLIST_TITLE_COLOR_F2];
 			}
+		}
+		else {
+			$model_title = t('No model');
+		}
 		
-			$cr = PrinterState_getCartridgeAsArray($cartridge_data, $abb_cartridge);
-			if (($cr != ERROR_OK) && is_null($cartridge_data)) {
-				//TODO log error here
-				$cartridge_title = t('Error');
-			}
-			else {
-				$color_cart = $cartridge_data[PRINTERSTATE_TITLE_COLOR];
-			}
+		$cr = PrinterState_getCartridgeAsArray($cartridge_data, $abb_cartridge);
+		if (($cr != ERROR_OK) && is_null($cartridge_data)) {
+			$this->load->helper('printerlog');
+			PrinterLog_logError('can not get cartridge info', __FILE__, __LINE__);
+			$cartridge_title = t('Error');
+		}
+		else {
+			$color_cart = $cartridge_data[PRINTERSTATE_TITLE_COLOR];
 		}
 		
 		$template_data = array (
@@ -163,16 +169,16 @@ class Printerstate extends MY_Controller {
 	
 	private function _display_changecartridge_need_prime($abb_cartridge, $id_model) {
 		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
-		$yes_url = '/printdetail/printmodel?id=';
+		$yes_url = '/printdetail/printprime?v=' . $abb_cartridge;
 		$no_url = '';
 		
-		$this->load->helper('printlist');
-		if ($abb_cartridge == 'r') {
-			$yes_url .= ModelList_codeModelHash(PRINTLIST_MODEL_PRIME_R);
-		}
-		else {
-			$yes_url .= ModelList_codeModelHash(PRINTLIST_MODEL_PRIME_L);
-		}
+// 		$this->load->helper('printlist');
+// 		if ($abb_cartridge == 'r') {
+// 			$yes_url .= ModelList_codeModelHash(PRINTLIST_MODEL_PRIME_R);
+// 		}
+// 		else {
+// 			$yes_url .= ModelList_codeModelHash(PRINTLIST_MODEL_PRIME_L);
+// 		}
 		if ($id_model) {
 			$no_url = '/printmodel/detail?id=' . $id_model;
 			$yes_url .= '&cb=' . $id_model;
@@ -197,6 +203,29 @@ class Printerstate extends MY_Controller {
 		return;
 	}
 	
+	private function _deal_with_unloading_wait_time() {
+		// wait the time for arduino before checking filament when unloading filament
+		// we return TRUE only when finishing action or passing max wait time (Arduino is avaliable for command)
+		if (CoreStatus_checkInWaitTime(PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD)) {
+			// check if we have finished action within max wait time
+			$cr = PrinterState_checkAsynchronousResponse();
+			if ($cr == ERROR_INTERNAL) {
+				$this->load->helper('printerlog');
+				PrinterLog_logError('check asynchronous response error', __FILE__, __LINE__);
+				return FALSE;
+			}
+			else if ($cr != ERROR_OK) { // do not break if we have finished (ERROR_OK)
+				return FALSE;
+			}
+			else {
+				$this->load->helper('printerlog');
+				PrinterLog_logDebug('finished asynchronous unloading within max wait time', __FILE__, __LINE__);
+			}
+		}
+		
+		return TRUE;
+	}
+	
 	public function index() {
 		$template_data = array();
 		$body_page = NULL;
@@ -207,7 +236,10 @@ class Printerstate extends MY_Controller {
 
 		// parse the main body
 		$template_data = array(
-				'reset_network'	=> t('Reset printer\'s network'),
+				'reset_network'	=> t('reset_network'),
+				'change_left'	=> t('change_left'),
+				'change_right'	=> t('change_right'),
+				'printer_info'	=> t('printer_info'),
 				'back'			=> t('back'),
 		);
 		
@@ -216,7 +248,57 @@ class Printerstate extends MY_Controller {
 		// parse all page
 		$template_data = array(
 				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Configuration') . '</title>',
+				'headers'		=> '<title>' . t('printerstate_index_pagetitle') . '</title>',
+				'contents'		=> $body_page,
+		);
+		
+		$this->parser->parse('template/basetemplate', $template_data);
+		
+		return;
+	}
+	
+	public function printerinfo() {
+		$template_data = array();
+		$body_page = NULL;
+		$temp_info = array();
+		$array_info = array();
+		
+		$this->load->helper('printerstate');
+		$this->load->library('parser');
+		$this->lang->load('printerstate/printerinfo', $this->config->item('language'));
+		
+		$temp_info = PrinterState_getInfoAsArray();
+		$array_info = array(
+				array(
+						'title'	=> t('version_title'),
+						'value'	=> $temp_info[PRINTERSTATE_TITLE_VERSION],
+				),
+				array(
+						'title'	=> t('type_title'),
+						'value'	=> $temp_info[PRINTERSTATE_TITLE_TYPE],
+				),
+				array(
+						'title'	=> t('serial_title'),
+						'value'	=> $temp_info[PRINTERSTATE_TITLE_SERIAL],
+				),
+				array(
+						'title'	=> t('extruder_title'),
+						'value'	=> $temp_info[PRINTERSTATE_TITLE_NB_EXTRUD],
+				),
+		);
+		
+		// parse the main body
+		$template_data = array(
+				'array_info'	=> $array_info,
+				'back'			=> t('back'),
+		);
+		
+		$body_page = $this->parser->parse('template/printerstate/printerinfo', $template_data, TRUE);
+		
+		// parse all page
+		$template_data = array(
+				'lang'			=> $this->config->item('language_abbr'),
+				'headers'		=> '<title>' . t('printerstate_printerinfo_pagetitle') . '</title>',
 				'contents'		=> $body_page,
 		);
 		
@@ -310,9 +392,22 @@ class Printerstate extends MY_Controller {
 		switch ($next_phase) {
 			case PRINTERSTATE_CHANGECART_UNLOAD_F:
 				// we call the page: wait unload filament, need checking status (first status page)
+				$status_current = '';
+				
+				// block any sending command to arduino when in unloading wait time
+				//TODO test me
+				if (CoreStatus_checkInIdle($status_current) == FALSE
+						&& ($status_current == CORESTATUS_VALUE_UNLOAD_FILA_L
+								|| $status_current == CORESTATUS_VALUE_UNLOAD_FILA_R)) {
+					if (!$this->_deal_with_unloading_wait_time()) {
+						$this->_display_changecartridge_in_unload_filament();
+						break;
+					}
+				}
+				
+				
 				if (PrinterState_getFilamentStatus($abb_cartridge)) {
 					// have filament
-					$status_current = '';
 					$status_correct = ($abb_cartridge == 'r') ? CORESTATUS_VALUE_UNLOAD_FILA_R : CORESTATUS_VALUE_UNLOAD_FILA_L;
 					$status_changed = ($abb_cartridge == 'r') ? CORESTATUS_VALUE_LOAD_FILA_R : CORESTATUS_VALUE_LOAD_FILA_L;
 					
@@ -342,7 +437,6 @@ class Printerstate extends MY_Controller {
 				}
 				else {
 					// no filament
-					$status_current = '';
 					$status_correct = ($abb_cartridge == 'r') ? CORESTATUS_VALUE_LOAD_FILA_R : CORESTATUS_VALUE_LOAD_FILA_L;
 					$status_changed = ($abb_cartridge == 'r') ? CORESTATUS_VALUE_UNLOAD_FILA_R : CORESTATUS_VALUE_UNLOAD_FILA_L;
 					
@@ -392,6 +486,12 @@ class Printerstate extends MY_Controller {
 				
 			case PRINTERSTATE_CHANGECART_REMOVE_C:
 				// we call the page: in unload filament
+				//TODO test me
+				if (!$this->_deal_with_unloading_wait_time()) {
+					$this->_display_changecartridge_in_unload_filament();
+					break;
+				}
+				
 				if (PrinterState_getFilamentStatus($abb_cartridge)) {
 					// have filament
 					$this->_display_changecartridge_in_unload_filament();
@@ -476,14 +576,7 @@ class Printerstate extends MY_Controller {
 				// we call the page: in load filament
 				
 				// wait the time for arduino before checking filament when loading filament
-				//TODO improve this part for more reliable
-				$time_start = 0;
-				$ret_val = CoreStatus_getStartTime($time_start);
-				if ($ret_val != TRUE) {
-					$this->load->helper('printerlog');
-					PrinterLog_logError('get start time error in loading filament', __FILE__, __LINE__);
-				}
-				if (time() - $time_start < 43) {
+				if (CoreStatus_checkInWaitTime(PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD)) {
 					$this->_display_changecartridge_in_load_filament();
 					break;
 				}
@@ -517,12 +610,14 @@ class Printerstate extends MY_Controller {
 		$abb_cartridge = $this->input->get('v');
 		
 		if (!$abb_cartridge && !in_array($abb_cartridge, array('l', 'r'))) {
-			if (isset($_SERVER['HTTP_REFERER'])) {
-				$this->output->set_header('Location: ' . $_SERVER['HTTP_REFERER']);
-			}
-			else {
-				$this->output->set_header('Location: /');
-			}
+			$this->output->set_status_header(403); // invalid request
+			return;
+		}
+		
+		//block request when not in idle
+		$this->load->helper('corestatus');
+		if (CoreStatus_checkInIdle() == FALSE) {
+			$this->output->set_status_header(403); // bad request
 			return;
 		}
 		

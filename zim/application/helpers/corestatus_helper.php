@@ -141,6 +141,32 @@ function CoreStatus_checkCallPrinting(&$url_redirect = '') {
 	));
 }
 
+function CoreStatus_checkCallCanceling(&$url_redirect = '') {
+	$url_redirect = '/printdetail/cancel';
+	
+	return CoreStatus__checkCallURI(array(
+			'/printdetail/cancel'		=> NULL,
+			'/printdetail/cancel_ajax'	=> NULL,
+	));
+}
+
+function CoreStatus_checkCallUnloading(&$url_redirect = '') {
+	$status_current = '';
+	CoreStatus_checkInIdle($status_current);
+	if ($status_current == CORESTATUS_VALUE_UNLOAD_FILA_L) {
+		$url_redirect = '/printerstate/changecartridge?v=l&f=0';
+	}
+	else { // CORESTATUS_VALUE_UNLOAD_FILA_R
+		$url_redirect = '/printerstate/changecartridge?v=r&f=0';
+	}
+	
+	return CoreStatus__checkCallURI(array(
+			'/printerstate/changecartridge'			=> NULL,
+			'/printerstate/changecartridge_ajax'	=> NULL,
+			'/printerstate/changecartridge_action'	=> NULL,
+	));
+}
+
 function CoreStatus_checkCallPrintingAjax() {
 // 	$url_redirect = '/printdetail/status';
 	
@@ -157,43 +183,39 @@ function CoreStatus_checkCallCancelingAjax() {
 	));
 }
 
+function CoreStatus_checkCallDebug() {
+	// test_log & test_video & test_cartridge controller is not in My_controller's control
+	return (CoreStatus__checkCallController('gcode')
+			|| CoreStatus__checkCallController('pronterface'));
+}
+
 function CoreStatus_checkCallNoBlockREST() {
 	$CI = &get_instance();
 	$CI->load->helper('printerstate');
 	
 	return CoreStatus__checkCallURI(array(
-			'/rest/status'	=> NULL,
-			'/rest/get'		=> array(
+			'/rest/status'		=> NULL,
+			'/rest/get'			=> array(
 					'p'	=> array(PRINTERSTATE_PRM_TEMPER, PRINTERSTATE_PRM_INFO),
 			),
-			'/rest/cancel'	=> NULL, //TODO make it only for printing, now for all status
-			'/rest/suspend'	=> NULL,
-			'/rest/resume'	=> NULL,
-			'/rest/gcode'	=> NULL,
+			'/rest/gcode'		=> NULL,
+			'/rest/gcodefile'	=> NULL,
 	));
 }
 
-function CoreStatus_checkCallNoBlockRESTInConnection() {
-	$CI = &get_instance();
-	$CI->load->helper('printerstate');
-	
+function CoreStatus_checkCallNoBlockRESTInConnection() {	
 	return CoreStatus__checkCallURI(array(
 			'/rest/status'		=> NULL,
 			'/rest/setnetwork'	=> NULL,
 	));
 }
 
-function CoreStatus_checkCallCanceling(&$url_redirect = '') {
-	$url_redirect = '/printdetail/cancel';
-	
+function CoreStatus_checkCallNoBlockRESTInPrint() {
 	return CoreStatus__checkCallURI(array(
-			'/printdetail/cancel'		=> NULL,
-			'/printdetail/cancel_ajax'	=> NULL,
+			'/rest/cancel'		=> NULL,
+			'/rest/suspend'		=> NULL,
+			'/rest/resume'		=> NULL,
 	));
-}
-
-function CoreStatus_checkCallRunGcode() {
-	return CoreStatus__checkCallController('gcode');
 }
 
 function CoreStatus_setInIdle() {
@@ -213,15 +235,15 @@ function CoreStatus_setInIdle() {
 			return FALSE;
 		}
 	}
-	else if ($status_previous == CORESTATUS_VALUE_UNLOAD_FILA_L
-			|| $status_previous == CORESTATUS_VALUE_UNLOAD_FILA_R) {
-		$CI = &get_instance();
-		$CI->load->helper('printerstate');
-		$ret_val = PrinterState_afterUnloadFilament();
-		if ($ret_val != ERROR_OK) {
-			return FALSE;
-		}
-	}
+// 	else if ($status_previous == CORESTATUS_VALUE_UNLOAD_FILA_L
+// 			|| $status_previous == CORESTATUS_VALUE_UNLOAD_FILA_R) {
+// 		$CI = &get_instance();
+// 		$CI->load->helper('printerstate');
+// 		$ret_val = PrinterState_afterUnloadFilament();
+// 		if ($ret_val != ERROR_OK) {
+// 			return FALSE;
+// 		}
+// 	}
 	
 	return CoreStatus__setInStatus(CORESTATUS_VALUE_IDLE,
 			array(CORESTATUS_TITLE_STARTTIME => NULL)
@@ -274,7 +296,7 @@ function CoreStatus_setInUnloading($abb_filament) {
 	$value_status = ($abb_filament == 'r')
 			? CORESTATUS_VALUE_UNLOAD_FILA_R : CORESTATUS_VALUE_UNLOAD_FILA_L;
 	
-	return CoreStatus__setInStatus($value_status, array());
+	return CoreStatus__setInStatus($value_status, array(CORESTATUS_TITLE_STARTTIME => time()));
 }
 
 function CoreStatus_getStartTime(&$time_start) {
@@ -307,6 +329,21 @@ function CoreStatus_getStartTime(&$time_start) {
 // 	}
 	
 	return TRUE;
+}
+
+function CoreStatus_checkInWaitTime($time_wait) {
+	$time_start = 0;
+	$ret_val = CoreStatus_getStartTime($time_start);
+	if ($ret_val != TRUE) {
+		$CI = &get_instance();
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('get start time error', __FILE__, __LINE__);
+	}
+	if (time() - $time_start > $time_wait) {
+		return FALSE;
+	}
+	
+	return TRUE; // we treat getting start time error as still in wait time
 }
 
 function CoreStatus_wantConnection() {

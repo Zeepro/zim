@@ -1,6 +1,6 @@
 <?php
-if (! defined ( 'BASEPATH' ))
-	exit ( 'No direct script access allowed' );
+if (!defined('BASEPATH'))
+	exit('No direct script access allowed');
 
 $CI = &get_instance();
 $CI->load->helper(array('detectos', 'errorcode'));
@@ -704,7 +704,14 @@ function ZimAPI_cameraOff() {
 	$command = $CFG->config['camera'] . ZIMAPI_PRM_CAMERA_STOP;
 	$data_json = array();
 	$fp = 0;
+	$mode_current = '';
 	
+	if (!ZimAPI_checkCamera($mode_current)) {
+		return FALSE;
+	}
+	if ($mode_current == ZIMAPI_VALUE_MODE_OFF) {
+		return TRUE;
+	}
 	exec($command, $output, $ret_val);
 	if ($ret_val != ERROR_NORMAL_RC_OK) {
 		$CI = &get_instance();
@@ -894,5 +901,3 @@ function ZimAPI__checkPreset($id_preset) {
 	
 	return FALSE;
 }
-
-/* End of file Someclass.php */

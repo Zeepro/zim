@@ -77,7 +77,7 @@ else {
 					continue;
 				}
 				if ($extruder == 'T1') {
-					$nb_extruder = 2;
+					$nb_extruder = ($nb_extruder < 2) ? 2 : $nb_extruder;
 				}
 				$extruder_current = $extruder;
 			}

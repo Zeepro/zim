@@ -16,6 +16,40 @@ class Printdetail extends MY_Controller {
 		return;
 	}
 	
+	public function printprime() {
+		$abb_cartridge = NULL;
+		$reprime = FALSE;
+		$cr = 0;
+		
+		// check model id, and then send it to print command
+		$this->load->helper('printer');
+		$abb_cartridge = $this->input->get('v');
+		$reprime = $this->input->get('r');
+		$callback = $this->input->get('cb');
+		
+		if ($abb_cartridge) {
+			$reprime = ($reprime === FALSE) ? FALSE : TRUE;
+			$cr = Printer_printFromPrime($abb_cartridge, $reprime);
+// 			$cr = Printer_startPrintingStatusFromModel($mid);
+			if ($cr != ERROR_OK) {
+				$this->output->set_header('Location: /printmodel/listmodel');
+				return;
+			}
+		} else {
+			$this->output->set_header('Location: /printmodel/listmodel');
+			return;
+		}
+		
+		if ($callback) {
+			$this->output->set_header('Location: /printdetail/status?v=' . $abb_cartridge . '&cb=' . $callback);
+		}
+		else {
+			$this->output->set_header('Location: /printdetail/status');
+		}
+		
+		return;
+	}
+	
 	public function printmodel() {
 		$mid = NULL;
 		$cr = 0;
@@ -23,7 +57,7 @@ class Printdetail extends MY_Controller {
 		// check model id, and then send it to print command
 		$this->load->helper('printer');
 		$mid = $this->input->get('id');
-		$callback = $this->input->get('cb');
+// 		$callback = $this->input->get('cb');
 		
 		if ($mid) {
 			$cr = Printer_printFromModel($mid);
@@ -37,12 +71,12 @@ class Printdetail extends MY_Controller {
 			return;
 		}
 		
-		if ($callback) {
-			$this->output->set_header('Location: /printdetail/status?id=' . $mid . '&cb=' . $callback);
-		}
-		else {
-			$this->output->set_header('Location: /printdetail/status');
-		}
+// 		if ($callback) {
+// 			$this->output->set_header('Location: /printdetail/status?id=' . $mid . '&cb=' . $callback);
+// 		}
+// 		else {
+// 			$this->output->set_header('Location: /printdetail/status');
+// 		}
 		
 		return;
 	}
@@ -58,7 +92,7 @@ class Printdetail extends MY_Controller {
 		$this->lang->load('printdetail', $this->config->item('language'));
 		
 		$callback = $this->input->get('cb');
-		$mid = $this->input->get('id');
+		$abb_cartridge = $this->input->get('v');
 		
 		// parse the main body
 		$template_data = array(
@@ -69,13 +103,13 @@ class Printdetail extends MY_Controller {
 				'finish_info'	=> t('Congratulation, your printing is complete!'),
 				'return_button'	=> t('Home'),
 				'return_url'	=> '/',
-				'restart_url'	=> '/printdetail/printmodel?id=' . $mid . '&cb=' . $callback,
+				'restart_url'	=> '/printdetail/printprime?r&v=' . $abb_cartridge . '&cb=' . $callback,
 				'var_prime'		=> 'false',
 				'prime_button'	=> t('Yes'),
 				'video_url'		=> $this->config->item('video_url'),
 		);
 		
-		if ($callback && $mid) {
+		if ($callback && $abb_cartridge) {
 			$template_data['finish_info']	= t('Restart?');
 			$template_data['return_url']	= '/printmodel/detail?id=' . $callback;
 			$template_data['return_button']	= t('No');

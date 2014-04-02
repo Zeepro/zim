@@ -3,7 +3,13 @@
 $lang['back']
 	= 'back';
 
-$lang['ZeePro Personal Printer 21 - Configuration']
+$lang['printerstate_index_pagetitle']
 	= 'Zim - Configuration';
-$lang['Reset printer\'s network']
+$lang['reset_network']
 	= 'Reset printer\'s network';
+$lang['change_left']
+	= 'Change left cartridge';
+$lang['change_right']
+	= 'Change right cartridge';
+$lang['printer_info']
+	= 'Printer information';

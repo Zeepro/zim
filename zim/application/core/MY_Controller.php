@@ -55,8 +55,8 @@ class MY_Controller extends CI_Controller {
 				$url_redirect = '/';
 			}
 			// check we are in runGcode debug interface
-			else if (CoreStatus_checkCallRunGcode()) {
-				// we always let this interface go for debug
+			else if (CoreStatus_checkCallDebug()) {
+				// we always let these interfaces go for debug
 				return;
 			}
 			// check working issue
@@ -69,7 +69,6 @@ class MY_Controller extends CI_Controller {
 						break;
 						
 					case CORESTATUS_VALUE_CANCEL:
-						//TODO test here for canceling
 						if (CoreStatus_checkCallCanceling($url_redirect)) {
 							return; // we are calling the right page
 						}
@@ -77,9 +76,15 @@ class MY_Controller extends CI_Controller {
 						
 					case CORESTATUS_VALUE_LOAD_FILA_L:
 					case CORESTATUS_VALUE_LOAD_FILA_R:
+						return; // we do not block users when charging filament
+						break;
+						
 					case CORESTATUS_VALUE_UNLOAD_FILA_L:
 					case CORESTATUS_VALUE_UNLOAD_FILA_R:
-						return; // we do not block users when charging / uncharging filament
+						//FIXME finish here to block users
+						if (CoreStatus_checkCallUnloading($url_redirect)) {
+							return; // we are calling the right page
+						}
 						break;
 						
 					default:

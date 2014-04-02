@@ -93,7 +93,12 @@ use constant CMD_DELETE_SD_FILE => 'M30';
 
 use constant CMD_UNIN_FILA_PLUS => 'G99';
 use constant CMD_RELATIVE_POS   => 'G91';
+use constant CMD_ABSOLUTE_POS   => 'G90';
 use constant CMD_ALLOW_COLD_E   => 'M302';
+use constant CMD_RELATIVE_EXTUD => 'M83';
+
+use constant CMD_MOVE => 'G1';
+use constant CMD_HOME => 'G28';
 
 # general return code
 use constant RC_OK => 0;
@@ -1021,13 +1026,21 @@ else {
 		|| $command eq CMD_STOP_SD_WRITE
 		|| $command eq CMD_SELECT_SD_FILE
 		|| $command eq CMD_START_SD_FILE
-		|| $command eq CMD_DELETE_SD_FILE
-		|| $command eq CMD_UNIN_FILA_PLUS
-		|| $command eq CMD_RELATIVE_POS
-		|| $command eq CMD_ALLOW_COLD_E )
+		|| $command eq CMD_DELETE_SD_FILE )
 	{
 
 		#cmd: sd card
+		exit(RC_OK);
+	}
+	elsif ( $command eq CMD_MOVE
+		|| $command eq CMD_HOME
+		|| $command eq CMD_RELATIVE_POS
+		|| $command eq CMD_ABSOLUTE_POS
+		|| $command eq CMD_RELATIVE_EXTUD
+		|| $command eq CMD_UNIN_FILA_PLUS
+		|| $command eq CMD_ALLOW_COLD_E ) {
+
+		#cmd: move / extrude / special g99
 		exit(RC_OK);
 	}
 	else {    #default, wrong cmd, send help

@@ -3,8 +3,11 @@
 if (!defined('BASEPATH'))
 	exit('No direct script access allowed');
 
-// FIXME must run the following code before run this function
+// run the following code before run this function (optional)
 // $this->lang->load('timedisplay', $this->config->item('language'));
+$CI = &get_instance();
+$CI->lang->load('timedisplay', $CI->config->item('language'));
+
 function TimeDisplay__convertsecond($second, $prefix, $unknown = 'N/A') {
 	$display = '';
 	

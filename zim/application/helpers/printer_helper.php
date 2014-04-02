@@ -53,8 +53,8 @@ function Printer_preparePrint($need_prime = TRUE) {
 		}
 	}
 	else {
-		unlink($CI->config->item('temp') . PRINTLIST_MODEL_PRINTPRIME_L);
-		unlink($CI->config->item('temp') . PRINTLIST_MODEL_PRINTPRIME_R);
+		unlink($CI->config->item('temp') . PRINTER_FN_PRINTPRIME_L);
+		unlink($CI->config->item('temp') . PRINTER_FN_PRINTPRIME_R);
 	}
 	
 	$cr = Printer__getFileFromModel(ModelList_codeModelHash(PRINTLIST_MODEL_CHARGE),

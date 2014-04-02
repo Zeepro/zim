@@ -1,6 +1,6 @@
 <?php
-if (! defined ( 'BASEPATH' ))
-	exit ( 'No direct script access allowed' );
+if (!defined('BASEPATH'))
+	exit('No direct script access allowed');
 
 if (!defined('RETURN_CONTENT_TYPE')) {
 	define('RETURN_CONTENT_TYPE',		'text/plain; charset=UTF-8');
@@ -43,8 +43,14 @@ class Rest extends MY_Controller {
 			$this->load->helper('printerstate');
 			
 			switch ($status_current) {
+				// we treat canceling as printing
 				case CORESTATUS_VALUE_PRINT:
-				case CORESTATUS_VALUE_CANCEL: // we treat canceling as printing
+					// do not block some special REST for action in printing
+					if (CoreStatus_checkCallNoBlockRESTInPrint()) {
+						return;
+					}
+					
+				case CORESTATUS_VALUE_CANCEL:
 					//TODO test here for canceling
 					$ret_val = PrinterState_checkInPrint();
 					if ($ret_val == FALSE) {
@@ -544,12 +550,32 @@ class Rest extends MY_Controller {
 				case PRINTERSTATE_PRM_SPEED_MOVE:
 				case PRINTERSTATE_PRM_SPEED_EXTRUDE:
 				case PRINTERSTATE_PRM_COLDEXTRUSION:
-				case PRINTERSTATE_PRM_STRIPLED:
-				case PRINTERSTATE_PRM_HEADLED:
 				case PRINTERSTATE_PRM_ENDSTOP:
 				case 'render':
 					$this->_return_under_construction();
 					return;
+					break;
+					
+				case PRINTERSTATE_PRM_STRIPLED:
+					$cr = PrinterState_getStripLedStatus();
+					if ($cr == TRUE) {
+						$display = 'on';
+					}
+					else {
+						$display = 'off';
+					}
+					$cr = ERROR_OK;
+					break;
+					
+				case PRINTERSTATE_PRM_HEADLED:
+					$cr = PrinterState_getTopLedStatus();
+					if ($cr == TRUE) {
+						$display = 'on';
+					}
+					else {
+						$display = 'off';
+					}
+					$cr = ERROR_OK;
 					break;
 					
 				case ZIMAPI_PRM_CAPTURE:
@@ -971,6 +997,43 @@ class Rest extends MY_Controller {
 	public function upload() {
 		$this->_return_under_construction();
 		return;
+		
+		$cr = 0;
+		$model = NULL;
+		
+		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+			$upload_config = array (
+					'upload_path'	=> $this->config->item('temp'),
+					'allowed_types'	=> '*',
+// 					'allowed_types'	=> 'gcode',
+					'overwrite'		=> TRUE,
+					'remove_spaces'	=> TRUE,
+					'encrypt_name'	=> TRUE,
+			);
+			$this->load->library('upload', $upload_config);
+			
+			if ($this->upload->do_upload('f')) {
+				$model = $this->upload->data();
+				
+				$model_path = $model['full_path'];
+				if ($cr == TRUE) {
+					$cr = ERROR_OK;
+				}
+				else {
+					$cr = ERROR_INTERNAL;
+				}
+			} else {
+				// treat error - missing gcode file
+				$cr = ERROR_MISS_PRM;
+			}
+			
+			$this->_return_cr($cr);
+		}
+		else {
+			$this->load->view('template/rest/gcodefile_form');
+		}
+		
+		return;
 	}
 	
 	public function removemodel() {
@@ -994,8 +1057,14 @@ class Rest extends MY_Controller {
 		
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$gcodes = $this->input->post('v');
+			$mode = $this->input->post('mode');
 			
-			$cr = PrinterState_runGcode($gcodes);
+			if ($mode == 'verbatim') {
+				$cr = PrinterState_runGcode($gcodes, FALSE);
+			}
+			else {
+				$cr = PrinterState_runGcode($gcodes);
+			}
 			if ($cr == TRUE) {
 				$cr = ERROR_OK;
 			}
@@ -1016,7 +1085,7 @@ class Rest extends MY_Controller {
 			}
 			$return_data = '';
 			
-			if (PrinterState_runGcode($array_gcode, TRUE, $return_data)) {
+			if (PrinterState_runGcode($array_gcode, TRUE, TRUE, $return_data)) {
 				print $return_data;
 				$this->output->set_content_type(RETURN_CONTENT_TYPE);
 			}
@@ -1031,8 +1100,15 @@ class Rest extends MY_Controller {
 	public function gcodefile() {
 		$cr = 0;
 		$gcode = NULL;
+		$mode = '';
+		$rewrite = TRUE;
 		
 		$this->load->helper('printerstate');
+		
+		$mode = $this->input->post('mode');
+		if ($mode == 'verbatim') {
+			$rewrite = FALSE;
+		}
 		
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$upload_config = array (
@@ -1048,7 +1124,7 @@ class Rest extends MY_Controller {
 			if ($this->upload->do_upload('f')) {
 				$gcode = $this->upload->data();
 				
-				$cr = PrinterState_runGcodeFile($gcode['full_path']);
+				$cr = PrinterState_runGcodeFile($gcode['full_path'], $rewrite);
 				if ($cr == TRUE) {
 					$cr = ERROR_OK;
 				}

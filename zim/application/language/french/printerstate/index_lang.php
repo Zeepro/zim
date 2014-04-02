@@ -3,7 +3,13 @@
 $lang['back']
 	= 'retour';
 
-$lang['ZeePro Personal Printer 21 - Configuration']
+$lang['printerstate_index_pagetitle']
 	= 'Zim - Configuration';
-$lang['Reset printer\'s network']
+$lang['reset_network']
 	= 'Réinitialiser le réseau de l\'imprimante';
+$lang['change_left']
+	= 'Changer la cartouche gauche';
+$lang['change_right']
+	= 'Changer la cartouche droite';
+$lang['printer_info']
+	= 'Information de l\'imprimante';
