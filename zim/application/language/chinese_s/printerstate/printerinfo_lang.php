@@ -7,6 +7,8 @@ $lang['printerstate_printerinfo_pagetitle']
 	= 'Zim - 打印机信息';
 $lang['version_title']
 	= '打印机镜像版本';
+$lang['next_version_title']
+	= '打印机镜像版本（重启后）';
 $lang['type_title']
 	= '打印机型号';
 $lang['serial_title']

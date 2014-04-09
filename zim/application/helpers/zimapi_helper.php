@@ -16,6 +16,8 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_CMD_RESTART_WEB',	'sudo /etc/init.d/zeepro-network delayed-restart >> /var/log/network.log 2>&1 &');
 	define('ZIMAPI_CMD_GATEWAY',		'route -n | awk \'$2 != "0.0.0.0" { print $2 }\' | sed -n 3p');
 	define('ZIMAPI_CMD_DNS',			'grep nameserver /etc/resolv.conf | awk \'{print $2}\'');
+	define('ZIMAPI_CMD_SERIAL',			'ifconfig -a | grep wlan0 | awk \'{print $5}\'');
+	define('ZIMAPI_CMD_VERSION',		'zfw_printenv version`zfw_printenv last_good`');
 	
 	define('ZIMAPI_TITLE_TOPOLOGY',	'topology');
 	define('ZIMAPI_TITLE_MEDIUM',	'medium');
@@ -869,6 +871,48 @@ function ZimAPI_setPreset($id_preset) {
 	}
 	
 	return ERROR_OK;
+}
+
+function ZimAPI_getSerial() {
+	$address_mac = NULL;
+	
+	$CI = &get_instance();
+	$CI->load->helper('detectos');
+	
+	if ($CI->config->item('simulator') && DectectOS_checkWindows()) {
+		$address_mac = '0c:82:68:ff:ff:ff';
+	}
+	else {
+		try {
+			$address_mac = trim(shell_exec(ZIMAPI_CMD_SERIAL));
+		} catch (Exception $e) {
+			$address_mac = 'ff:ff:ff:ff:ff:ff';
+		}
+	}
+	
+	return $address_mac;
+}
+
+function ZimAPI_getVersion($next_boot = FALSE) {
+	$version = NULL;
+	
+	$CI = &get_instance();
+	$CI->load->helper('detectos');
+	
+	if ($next_boot == TRUE || DectectOS_checkWindows()) {
+		$version = trim(file_get_contents($CI->config->item('version_file')));
+	}
+	else {
+		$version = trim(shell_exec(ZIMAPI_CMD_VERSION));
+	}
+	
+	return $version;
+}
+
+function ZimAPI_getType() {
+	global $CFG;
+	
+	return trim(file_get_contents($CFG->config['type_file']));
 }
 
 //internal function

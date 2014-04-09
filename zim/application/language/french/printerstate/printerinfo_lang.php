@@ -7,6 +7,8 @@ $lang['printerstate_printerinfo_pagetitle']
 	= 'Zim - Information';
 $lang['version_title']
 	= 'Version d\'image de l\'imprimante';
+$lang['next_version_title']
+	= 'Version d\'image de l\'imprimante (après redémarrage)';
 $lang['type_title']
 	= 'Type de l\'imprimante';
 $lang['serial_title']

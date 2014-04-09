@@ -56,7 +56,6 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_GET_TOP_LED',		' M1615');
 
 // 	define('PRINTERSTATE_TEMP_PRINT_FILENAME',	'/tmp/printer_percentage'); // fix the name on SD card
-	define('PRINTERSTATE_CMD_SERIAL',		'ifconfig -a | grep wlan0 | awk \'{print $5}\'');
 	define('PRINTERSTATE_FILE_PRINTLOG',	'/tmp/printlog.log');
 	define('PRINTERSTATE_FILE_RESPONSE',	'/tmp/printer_response.log');
 
@@ -78,6 +77,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_TITLE_PERCENT',	'percentage');
 	define('PRINTERSTATE_TITLE_DURATION',	'duration');
 	define('PRINTERSTATE_TITLE_VERSION',	'ver');
+	define('PRINTERSTATE_TITLE_VERSION_N',	'ver_next');
 	define('PRINTERSTATE_TITLE_TYPE',		'type');
 	define('PRINTERSTATE_TITLE_SERIAL',		'sn');
 	define('PRINTERSTATE_TITLE_NB_EXTRUD',	'extruder');
@@ -101,7 +101,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_VALUE_OFFSET_TO_CAL_TIME',	10);
 	
 	define('PRINTERSTATE_VALUE_DEFAULT_EXTRUD',			5);
-	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD',	43);
+	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD',	90);
 	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD',	90);
 	
 	define('PRINTERSTATE_PRM_EXTRUDER',			'extruder');
@@ -1450,28 +1450,16 @@ function PrinterState_getNbExtruder() {
 }
 
 function PrinterState_getInfoAsArray() {
-	global $CFG;
-	$json_info = array();
-	$address_mac = NULL;
-
 	$CI = &get_instance();
-	$CI->load->helper('detectos');
+	$CI->load->helper('zimapi');
 	
-	if ($CFG->config['simulator'] && DectectOS_checkWindows()) {
-		$address_mac = '0c:82:68:ff:ff:ff';
-	}
-	else {
-		$address_mac = trim(shell_exec(PRINTERSTATE_CMD_SERIAL));
-	}
-	
-	$json_info = array(
-			PRINTERSTATE_TITLE_VERSION		=> trim(file_get_contents($CFG->config['version_file'])),
-			PRINTERSTATE_TITLE_TYPE			=> trim(file_get_contents($CFG->config['type_file'])),
-			PRINTERSTATE_TITLE_SERIAL		=> $address_mac,
+	return array(
+			PRINTERSTATE_TITLE_VERSION		=> ZimAPI_getVersion(),
+			PRINTERSTATE_TITLE_VERSION_N	=> ZimAPI_getVersion(TRUE),
+			PRINTERSTATE_TITLE_TYPE			=> ZimAPI_getType(),
+			PRINTERSTATE_TITLE_SERIAL		=> ZimAPI_getSerial(),
 			PRINTERSTATE_TITLE_NB_EXTRUD	=> PrinterState_getNbExtruder(),
 	);
-	
-	return $json_info;
 }
 
 function PrinterState_homing($axis = 'ALL') {

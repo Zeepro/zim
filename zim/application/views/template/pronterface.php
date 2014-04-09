@@ -81,63 +81,75 @@
 			</div>
 			<div data-role="collapsible" data-collapsed="true" style="align: center;" id="temper_collaspible">
 				<h4>Temperature</h4>
-				<div style="height:5em;">
-					<div style="width:50%;float:left;">
-						<label for="temper_l">Left</label>
-						<div style="width:40px;float:left;margin-right:10px;">
-							<input type="text" data-clear-btn="false" name="temper_l_current" id="temper_l_current" value="0" disabled>
+				<div class="ui-grid-a">
+					<div class="ui-block-a">
+						<div class="ui-bar ui-bar-c">
+							<label for="temper_l">Left</label>
+							<div style="width:40px;float:left;margin-right:10px;">
+								<input type="text" data-clear-btn="false" name="temper_l_current" id="temper_l_current" value="0" disabled>
+							</div>
+							<div style="width:60px;float:left;margin-right:10px;">
+								<input type="number" data-clear-btn="false" name="temper_l" id="temper_l" value="200">
+							</div>
+							<a href="#" data-role="button" data-icon="check" data-iconpos="left" data-inline="true" onclick="heat('l');">Set</a>
+							<a href="#" data-role="button" data-icon="delete" data-iconpos="left" data-inline="true" onclick="heat('l', 0);">Stop</a>
+							<a href="#" data-role="button" data-icon="refresh" data-iconpos="left" data-inline="true" onclick="refreshCheckTemper();">Refresh</a>
 						</div>
-						<div style="width:60px;float:left;margin-right:10px;">
-							<input type="number" data-clear-btn="false" name="temper_l" id="temper_l" value="200">
-						</div>
-						<a href="#" data-role="button" data-icon="check" data-iconpos="left" data-inline="true" onclick="heat('l');">Set</a>
-						<a href="#" data-role="button" data-icon="delete" data-iconpos="left" data-inline="true" onclick="heat('l', 0);">Stop</a>
 					</div>
-					<div style="width:50%;float:left;">
-						<label for="temper_r">Right</label>
-						<div style="width:40px;float:left;margin-right:10px;">
-							<input type="text" data-clear-btn="false" name="temper_r_current" id="temper_r_current" value="0" disabled>
+					<div class="ui-block-b">
+						<div class="ui-bar ui-bar-c">
+							<label for="temper_r">Right</label>
+							<div style="width:40px;float:left;margin-right:10px;">
+								<input type="text" data-clear-btn="false" name="temper_r_current" id="temper_r_current" value="0" disabled>
+							</div>
+							<div style="width:60px;float:left;margin-right:10px;">
+								<input type="number" data-clear-btn="false" name="temper_r" id="temper_r" value="200">
+							</div>
+							<a href="#" data-role="button" data-icon="check" data-iconpos="left" data-inline="true" onclick="heat('r');">Set</a>
+							<a href="#" data-role="button" data-icon="delete" data-iconpos="left" data-inline="true" onclick="heat('r', 0);">Stop</a>
+							<a href="#" data-role="button" data-icon="refresh" data-iconpos="left" data-inline="true" onclick="refreshCheckTemper();">Refresh</a>
 						</div>
-						<div style="width:60px;float:left;margin-right:10px;">
-							<input type="number" data-clear-btn="false" name="temper_r" id="temper_r" value="200">
-						</div>
-						<a href="#" data-role="button" data-icon="check" data-iconpos="left" data-inline="true" onclick="heat('r');">Set</a>
-						<a href="#" data-role="button" data-icon="delete" data-iconpos="left" data-inline="true" onclick="heat('r', 0);">Stop</a>
 					</div>
 				</div>
 			</div>
 			<div data-role="collapsible" data-collapsed="false" style="align: center;">
 				<h4>Filament</h4>
-				<div style="height:10em;">
-					<div style="width:50%;float:left;">
-						<label for="temper_l">Left</label>
-						<div style="width:350px;float:left;margin-right:10px;">
-							<input type="text" data-clear-btn="false" name="rfid_l_current" id="rfid_l_current" value="NEED REFRESH" disabled>
+				<div class="ui-grid-a">
+					<div class="ui-block-a">
+						<div class="ui-bar ui-bar-c">
+							<label for="temper_l">Left</label>
+							<div style="width:350px;float:left;margin-right:10px;">
+								<input type="text" data-clear-btn="false" name="rfid_l_current" id="rfid_l_current" value="NEED REFRESH" disabled>
+							</div>
+							<a href="#" data-role="button" data-icon="refresh" data-iconpos="left" data-inline="true" onclick="refreshRfid();">Refresh</a>
+							<br style="clear:left;" />
+							<div style="width:60px;float:left;margin-right:10px;">
+								<input type="number" data-clear-btn="false" name="extrude_l" id="extrude_l" value="20"> mm
+							</div>
+							<div style="width:60px;float:left;margin-right:10px;">
+								<input type="number" data-clear-btn="false" name="speed_l" id="speed_l" value="100"> mm/s
+							</div>
+							<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" data-inline="true" onclick="extrude('l', '-');">Reverse</a>
+							<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" data-inline="true" onclick="extrude('l', '+');">Extrude</a>
 						</div>
-						<a href="#" data-role="button" data-icon="refresh" data-iconpos="left" data-inline="true" onclick="refreshRfid();">Refresh</a><br/>
-						<div style="width:60px;float:left;margin-right:10px;">
-							<input type="number" data-clear-btn="false" name="extrude_l" id="extrude_l" value="20"> mm
-						</div>
-						<div style="width:60px;float:left;margin-right:10px;">
-							<input type="number" data-clear-btn="false" name="speed_l" id="speed_l" value="100"> mm/s
-						</div>
-						<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" data-inline="true" onclick="extrude('l', '-');">Reverse</a>
-						<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" data-inline="true" onclick="extrude('l', '+');">Extrude</a>
 					</div>
-					<div style="width:50%;float:left;">
-						<label for="temper_r">Right</label>
-						<div style="width:350px;float:left;margin-right:10px;">
-							<input type="text" data-clear-btn="false" name="rfid_r_current" id="rfid_r_current" value="NEED REFRESH" disabled>
+					<div class="ui-block-b">
+						<div class="ui-bar ui-bar-c">
+							<label for="temper_r">Right</label>
+							<div style="width:350px;float:left;margin-right:10px;">
+								<input type="text" data-clear-btn="false" name="rfid_r_current" id="rfid_r_current" value="NEED REFRESH" disabled>
+							</div>
+							<a href="#" data-role="button" data-icon="refresh" data-iconpos="left" data-inline="true" onclick="refreshRfid();">Refresh</a>
+							<br style="clear:left;" />
+							<div style="width:60px;float:left;margin-right:10px;">
+								<input type="number" data-clear-btn="false" name="extrude_r" id="extrude_r" value="20"> mm
+							</div>
+							<div style="width:60px;float:left;margin-right:10px;">
+								<input type="number" data-clear-btn="false" name="speed_r" id="speed_r" value="100"> mm/s
+							</div>
+							<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" data-inline="true" onclick="extrude('r', '-');">Reverse</a>
+							<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" data-inline="true" onclick="extrude('r', '+');">Extrude</a>
 						</div>
-						<a href="#" data-role="button" data-icon="refresh" data-iconpos="left" data-inline="true" onclick="refreshRfid();">Refresh</a><br/>
-						<div style="width:60px;float:left;margin-right:10px;">
-							<input type="number" data-clear-btn="false" name="extrude_r" id="extrude_r" value="20"> mm
-						</div>
-						<div style="width:60px;float:left;margin-right:10px;">
-							<input type="number" data-clear-btn="false" name="speed_r" id="speed_r" value="100"> mm/s
-						</div>
-						<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" data-inline="true" onclick="extrude('r', '-');">Reverse</a>
-						<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" data-inline="true" onclick="extrude('r', '+');">Extrude</a>
 					</div>
 				</div>
 			</div>
@@ -170,6 +182,7 @@
 					<input type="file" data-clear-btn="true" name="f" id="file_n_e">
 					<input type="submit" value="Send" data-icon="arrow-r" data-iconpos="right">
 				</form>
+				<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete" onclick="javascript: window.location.href='/pronterface/stop';">Stop</button>
 			</div>
 			<label for="gcode_detail_info">Output</label>
 			<textarea name="gcode_detail_info" id="gcode_detail_info" disabled></textarea>
@@ -185,31 +198,31 @@ var var_refreshCheckTemper = 0;
 $(document).ready(checkTemper());
 
 function checkTemper() {
-	refreshCheckTemper();
-	var_refreshCheckTemper = setInterval(refreshCheckTemper, 10000);
+//	refreshCheckTemper();
+//	var_refreshCheckTemper = setInterval(refreshCheckTemper, 10000);
 	$("#temper_collaspible").bind('expand', function () {
 		if (var_refreshCheckTemper == 0)
 			checkTemper();
 	}).bind('collapse', function() {
-		clearInterval(var_refreshCheckTemper);
+//		clearInterval(var_refreshCheckTemper);
 		var_refreshCheckTemper = 0;
 	});
-	
-	function refreshCheckTemper() {
-		var_ajax = $.ajax({
-			url: "/pronterface/temper_ajax",
-			type: "GET",
-			cache: false,
-		})
-		.done(function(html) {
-			var response = JSON.parse(html);
-			$("#temper_l_current").val(response.left);
-			$("#temper_r_current").val(response.right);
-		})
-		.fail(function() {
-			$("#gcode_detail_info").html('ERROR');
-		});
-	}
+}
+
+function refreshCheckTemper() {
+	var_ajax = $.ajax({
+		url: "/pronterface/temper_ajax",
+		type: "GET",
+		cache: false,
+	})
+	.done(function(html) {
+		var response = JSON.parse(html);
+		$("#temper_l_current").val(response.left);
+		$("#temper_r_current").val(response.right);
+	})
+	.fail(function() {
+		$("#gcode_detail_info").html('ERROR');
+	});
 }
 
 function home(var_axis) {
@@ -217,7 +230,7 @@ function home(var_axis) {
 
 	var_axis = typeof var_axis !== 'undefined' ? var_axis : 'all';
 	if (var_axis == 'all') {
-		var_url = "/pronterface/home/";
+		var_url = "/pronterface/home";
 	}
 	else {
 		var_url = "/pronterface/home/" + var_axis;
@@ -307,7 +320,12 @@ function heat(var_extruder, var_value) {
 		return false;
 	}
 	if (var_value == 'get') {
-		var_value = $("#temper_l").val();
+		if (var_extruder == 'l') {
+			var_value = $("#temper_l").val();
+		}
+		else {
+			var_value = $("#temper_r").val();
+		}
 	}
 
 	var_url = "/pronterface/heat/" + var_extruder + '/' + var_value;
@@ -375,7 +393,7 @@ function extrude(var_extruder, var_direction) {
 
 function refreshRfid() {
 	var_ajax = $.ajax({
-		url: "/pronterface/rfid_ajax/",
+		url: "/pronterface/rfid_ajax",
 		type: "GET",
 		cache: false,
 	})

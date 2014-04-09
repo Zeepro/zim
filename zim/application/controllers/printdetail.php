@@ -18,18 +18,18 @@ class Printdetail extends MY_Controller {
 	
 	public function printprime() {
 		$abb_cartridge = NULL;
-		$reprime = FALSE;
+		$first_run = FALSE;
 		$cr = 0;
 		
 		// check model id, and then send it to print command
 		$this->load->helper('printer');
 		$abb_cartridge = $this->input->get('v');
-		$reprime = $this->input->get('r');
+		$first_run = $this->input->get('r');
 		$callback = $this->input->get('cb');
 		
 		if ($abb_cartridge) {
-			$reprime = ($reprime === FALSE) ? FALSE : TRUE;
-			$cr = Printer_printFromPrime($abb_cartridge, $reprime);
+			$first_run = ($first_run === FALSE) ? TRUE : FALSE;
+			$cr = Printer_printFromPrime($abb_cartridge, $first_run);
 // 			$cr = Printer_startPrintingStatusFromModel($mid);
 			if ($cr != ERROR_OK) {
 				$this->output->set_header('Location: /printmodel/listmodel');
@@ -44,7 +44,7 @@ class Printdetail extends MY_Controller {
 			$this->output->set_header('Location: /printdetail/status?v=' . $abb_cartridge . '&cb=' . $callback);
 		}
 		else {
-			$this->output->set_header('Location: /printdetail/status');
+			$this->output->set_header('Location: /printdetail/status?v=' . $abb_cartridge);
 		}
 		
 		return;
@@ -75,7 +75,7 @@ class Printdetail extends MY_Controller {
 // 			$this->output->set_header('Location: /printdetail/status?id=' . $mid . '&cb=' . $callback);
 // 		}
 // 		else {
-// 			$this->output->set_header('Location: /printdetail/status');
+ 			$this->output->set_header('Location: /printdetail/status');
 // 		}
 		
 		return;
@@ -109,11 +109,14 @@ class Printdetail extends MY_Controller {
 				'video_url'		=> $this->config->item('video_url'),
 		);
 		
-		if ($callback && $abb_cartridge) {
+		if ($abb_cartridge) {
 			$template_data['finish_info']	= t('Restart?');
-			$template_data['return_url']	= '/printmodel/detail?id=' . $callback;
+		//	$template_data['return_url']	= '/printmodel/detail?id=' . $callback;
 			$template_data['return_button']	= t('No');
 			$template_data['var_prime']		= 'true';
+		}
+		if ($callback) {
+			$template_data['return_url']	= '/printmodel/detail?id=' . $callback;
 		}
 		
 		$body_page = $this->parser->parse('template/printdetail/status', $template_data, TRUE);

@@ -274,6 +274,10 @@ class Printerstate extends MY_Controller {
 						'value'	=> $temp_info[PRINTERSTATE_TITLE_VERSION],
 				),
 				array(
+						'title'	=> t('next_version_title'),
+						'value'	=> $temp_info[PRINTERSTATE_TITLE_VERSION_N],
+				),
+				array(
 						'title'	=> t('type_title'),
 						'value'	=> $temp_info[PRINTERSTATE_TITLE_TYPE],
 				),

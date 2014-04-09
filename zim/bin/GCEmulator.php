@@ -80,7 +80,7 @@ else {
 		foreach (array('T0', 'T1') as $extruder) {
 			$pos_extruder = strpos($line, $extruder);
 			
-			if ($pos_extruder !== FALSE) {
+			if ($pos_extruder !== FALSE && $pos_extruder == 0) {
 				// do not count key word in comment
 				if ($pos_comment !== FALSE && $pos_comment < $pos_extruder) {
 					continue;
@@ -100,7 +100,6 @@ else {
 				// get temperature
 				$string_temp = '';
 				$offset = 0;
-				$extruder_set = $extruder_current;
 				
 				// count M109 and TX in only one line
 				if (strpos($line, 'T0') !== FALSE) {
@@ -108,8 +107,9 @@ else {
 				}
 				else if (strpos($line, 'T1') !== FALSE) {
 					$extruder_set = 'T1';
+				} else {
+					$extruder_set = $extruder_current;
 				}
-				
 				
 				//start output
 				print ";modification of cubie start\r\n";
@@ -165,7 +165,6 @@ else {
 				// get temperature
 				$string_temp = '';
 				$offset = 0;
-				$extruder_set = $extruder_current;
 				
 				$pos_temp = strpos($line, 'S', 0);
 				while ($pos_temp < $pos_m104) {
@@ -186,6 +185,9 @@ else {
 				}
 				else if (strpos($line, 'T1') !== FALSE) {
 					$extruder_set = 'T1';
+				}
+				else {
+					$extruder_set = $extruder_current;
 				}
 				
 				// start output

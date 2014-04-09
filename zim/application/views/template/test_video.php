@@ -13,6 +13,9 @@
 		jwplayer("myVideo").setup({
 			file: "{video_url}",
 			autostart: true,
+			analytics: {
+				enabled: false
+			}
 		});
 	</script>
 </body>

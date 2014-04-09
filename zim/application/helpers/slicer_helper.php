@@ -11,6 +11,17 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 	define('SLICER_URL_RELOAD_PRESET',	'reload');
 	define('SLICER_URL_LISTMODEL',		'listmodel');
 	define('SLICER_URL_REMOVE_MODEL',	'removemodel?id=');
+	define('SLICER_URL_SET_MODEL',		'setmodel?');
+	
+	define('SLICER_PRM_ID',		'id');
+	define('SLICER_PRM_XPOS',	'xpos');
+	define('SLICER_PRM_YPOS',	'ypos');
+	define('SLICER_PRM_ZPOS',	'zpos');
+	define('SLICER_PRM_XROT',	'xrot');
+	define('SLICER_PRM_YROT',	'yrot');
+	define('SLICER_PRM_ZROT',	'zrot');
+	define('SLICER_PRM_SCALE',	's');
+	define('SLICER_PRM_COLOR',	'c');
 	
 	define('SLICER_RESPONSE_OK',		200);
 	define('SLICER_RESPONSE_MISS_PRM',	432);
@@ -22,7 +33,7 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 
 function Slicer_addModel($model_path) {
 	$cr = 0;
-	$ret_val = Slicer__requestSlicer(SLICER_URL_ADD_MODEL . $model_path, $response);
+	$ret_val = Slicer__requestSlicer(SLICER_URL_ADD_MODEL . $model_path);
 	
 	switch ($ret_val) {
 		case SLICER_RESPONSE_OK:
@@ -49,7 +60,7 @@ function Slicer_addModel($model_path) {
 
 function Slicer_removeModel($model_id) {
 	$cr = 0;
-	$ret_val = Slicer__requestSlicer(SLICER_URL_REMOVE_MODEL . $model_id, $response);
+	$ret_val = Slicer__requestSlicer(SLICER_URL_REMOVE_MODEL . $model_id);
 	
 	switch ($ret_val) {
 		case SLICER_RESPONSE_OK:
@@ -102,7 +113,7 @@ function Slicer_slice() {
 	
 }
 
-function Slicer_listmodel(&$response) {
+function Slicer_listModel(&$response) {
 	$cr = 0;
 	$ret_val = Slicer__requestSlicer(SLICER_URL_LISTMODEL, $response);
 	
@@ -117,13 +128,59 @@ function Slicer_listmodel(&$response) {
 	return $cr;
 }
 
+function Slicer_setModel($array_data) {
+	$cr = 0;
+	$ret_val = 0;
+	$url_request = SLICER_URL_SET_MODEL;
+	
+	if (!is_array($array_data)) {
+		return ERROR_INTERNAL;
+	}
+	else if (!isset($array_data[SLICER_PRM_ID])
+			|| !isset($array_data[SLICER_PRM_XPOS])
+			|| !isset($array_data[SLICER_PRM_YPOS])
+			|| !isset($array_data[SLICER_PRM_ZPOS])
+			|| !isset($array_data[SLICER_PRM_XROT])
+			|| !isset($array_data[SLICER_PRM_YROT])
+			|| !isset($array_data[SLICER_PRM_ZROT])
+			|| !isset($array_data[SLICER_PRM_SCALE])
+			|| !isset($array_data[SLICER_PRM_COLOR])) {
+		return ERROR_MISS_PRM;
+	}
+	
+	$url_request .= SLICER_PRM_ID . '=' . $array_data[SLICER_PRM_ID]
+			. '&' . SLICER_PRM_XPOS . '=' . $array_data[SLICER_PRM_XPOS]
+			. '&' . SLICER_PRM_YPOS . '=' . $array_data[SLICER_PRM_YPOS]
+			. '&' . SLICER_PRM_ZPOS . '=' . $array_data[SLICER_PRM_ZPOS]
+			. '&' . SLICER_PRM_XROT . '=' . $array_data[SLICER_PRM_XROT]
+			. '&' . SLICER_PRM_YROT . '=' . $array_data[SLICER_PRM_YROT]
+			. '&' . SLICER_PRM_ZROT . '=' . $array_data[SLICER_PRM_ZROT]
+			. '&' . SLICER_PRM_SCALE . '=' . $array_data[SLICER_PRM_SCALE]
+			. '&' . SLICER_PRM_COLOR . '=' . $array_data[SLICER_PRM_COLOR];
+	$ret_val = Slicer__requestSlicer($url_request, $response);
+	
+	switch ($ret_val) {
+		case SLICER_RESPONSE_OK:
+		case SLICER_RESPONSE_WRONG_PRM:
+		case SLICER_RESPONSE_MISS_PRM:
+			$cr = $ret_val;
+			break;
+			
+		default:
+			$cr = ERROR_INTERNAL;
+			break;
+	}
+	
+	return $cr;
+}
+
 function Slicer_reset() {
 	
 }
 
 function Slicer_reloadPreset() {
 	$cr = 0;
-	$ret_val = Slicer__requestSlicer(SLICER_URL_RELOAD_PRESET, $response);
+	$ret_val = Slicer__requestSlicer(SLICER_URL_RELOAD_PRESET);
 	
 	if ($ret_val == SLICER_RESPONSE_OK) {
 		$cr = ERROR_OK;
@@ -142,7 +199,7 @@ function Slicer__getHTTPCode($http_response_header) {
 	return (int)$matches[1];
 }
 
-function Slicer__requestSlicer($suffix_url, &$response) {
+function Slicer__requestSlicer($suffix_url, &$response = NULL) {
 	global $CFG;
 	$context = stream_context_create(
 			array('http' => array('ignore_errors' => TRUE))
