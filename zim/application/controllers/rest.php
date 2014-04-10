@@ -390,7 +390,7 @@ class Rest extends MY_Controller {
 // 				header('Content-Type: ' . get_mime_by_extension($path_pid));
 // 				header('Content-Disposition: inline; filename="img' . $pid . '";'); //filename header
 // 				exit(file_get_contents($path_pid));
-				$this->output->set_content_type(get_mime_by_extension($path_pid))->set_output(file_get_contents($path_pid));
+				$this->output->set_content_type(get_mime_by_extension($path_pid))->set_output(@file_get_contents($path_pid));
 				return;
 			}
 		} else {
@@ -589,7 +589,7 @@ class Rest extends MY_Controller {
 					
 					$this->load->helper('file');
 					if (ZimAPI_cameraCapture($path_capture)) {
-						$this->output->set_content_type(get_mime_by_extension($path_capture))->set_output(file_get_contents($path_capture));
+						$this->output->set_content_type(get_mime_by_extension($path_capture))->set_output(@file_get_contents($path_capture));
 						return;
 					}
 					else {
@@ -985,7 +985,22 @@ class Rest extends MY_Controller {
 	}
 	
 	public function plateformmodel() {
-		$this->_return_under_construction();
+		$cr = 0;
+		$display = '';
+		
+		$this->load->helper('slicer');
+		$cr = Slicer_listModel($display);
+		
+		if ($cr != ERROR_OK) {
+			$this->_return_cr($cr);
+		}
+		else {
+			$this->load->library('parser');
+			$this->output->set_status_header($cr, $display);
+			$this->output->set_content_type(RETURN_CONTENT_TYPE);
+			$this->parser->parse('template/plaintxt', array('display' => $display));
+		}
+		
 		return;
 	}
 	
@@ -995,9 +1010,6 @@ class Rest extends MY_Controller {
 	}
 	
 	public function upload() {
-		$this->_return_under_construction();
-		return;
-		
 		$cr = 0;
 		$model = NULL;
 		
@@ -1014,14 +1026,10 @@ class Rest extends MY_Controller {
 			
 			if ($this->upload->do_upload('f')) {
 				$model = $this->upload->data();
-				
 				$model_path = $model['full_path'];
-				if ($cr == TRUE) {
-					$cr = ERROR_OK;
-				}
-				else {
-					$cr = ERROR_INTERNAL;
-				}
+				
+				$this->load->helper('slicer');
+				$cr = Slicer_addModel($model_path);
 			} else {
 				// treat error - missing gcode file
 				$cr = ERROR_MISS_PRM;
@@ -1030,14 +1038,26 @@ class Rest extends MY_Controller {
 			$this->_return_cr($cr);
 		}
 		else {
-			$this->load->view('template/rest/gcodefile_form');
+			$this->load->view('template/rest/model_form');
 		}
 		
 		return;
 	}
 	
 	public function removemodel() {
-		$this->_return_under_construction();
+		$cr = 0;
+		$id_model = $this->input->get('id');
+		
+		$this->load->helper('slicer');
+		if ($id_model !== FALSE) {
+			$cr = Slicer_removeModel($id_model);
+		}
+		else {
+			$cr = ERROR_MISS_PRM;
+		}
+		
+		$this->_return_cr($cr);
+		
 		return;
 	}
 	

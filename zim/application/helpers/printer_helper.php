@@ -497,7 +497,7 @@ function Printer__getStartTemperatureFromFile($gcode_path, &$array_temper) {
 // 	$ret_val = 0;
 	
 	//TODO get the right start temperature here
-	$lines = file($gcode_path, FILE_SKIP_EMPTY_LINES);
+	$lines = @file($gcode_path, FILE_SKIP_EMPTY_LINES);
 	if (count($lines) == 0) {
 		return ERROR_INTERNAL; // file not found
 	}

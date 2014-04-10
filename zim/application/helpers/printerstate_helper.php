@@ -100,9 +100,11 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_VALUE_DEFAULT_COLOR',		'transparent');
 	define('PRINTERSTATE_VALUE_OFFSET_TO_CAL_TIME',	10);
 	
-	define('PRINTERSTATE_VALUE_DEFAULT_EXTRUD',			5);
-	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD',	90);
-	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD',	90);
+	define('PRINTERSTATE_VALUE_DEFAULT_EXTRUD',				5);
+	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD',		90);
+	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD',		90);
+	define('PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_LOAD',		180);
+	define('PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_UNLOAD',	180);
 	
 	define('PRINTERSTATE_PRM_EXTRUDER',			'extruder');
 	define('PRINTERSTATE_PRM_TEMPER',			'temp');
@@ -777,6 +779,7 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) 
 	$ret_val = 0;
 	$time_wait = NULL;
 	
+	//FIXME add timeout for checking loading / unloading
 	switch ($status_current) {
 		case CORESTATUS_VALUE_WAIT_CONNECT:
 			$ret_val = CoreStatus_checkInConnection();
@@ -880,7 +883,7 @@ function PrinterState_checkStatusAsArray() {
 //		return ERROR_INTERNAL;
 //	}
 	if (file_exists($CFG->config['printstatus'])) {
-		$output = file($CFG->config['printstatus']);
+		$output = @file($CFG->config['printstatus']);
 	} else {
 		$output = array('0');
 	}
@@ -1029,7 +1032,7 @@ function PrinterState_loadFilament($abb_filament) {
 		
 		if ($CFG->config['simulator'] && DectectOS_checkWindows()) {
 			pclose(popen($command, 'r')); // only for windows arcontrol client
-			PrinterLog_logArduino($command); //FIXME we can't check return output when using simulator
+			PrinterLog_logArduino($command); // we can't check return output when using simulator
 		}
 		else {
 			exec($command, $output, $ret_val);
@@ -1059,7 +1062,7 @@ function PrinterState_loadFilament($abb_filament) {
 // 	$ret_val = 0;
 	
 // 	// start temporary solution
-// 	//TODO find another solution for unloading
+// 	//TO_DO find another solution for unloading
 // 	if ($CFG->config['simulator'] == TRUE) {
 // 		switch ($abb_filament) {
 // 			case 'l':
@@ -1124,7 +1127,7 @@ function PrinterState_loadFilament($abb_filament) {
 		
 // 		if ($CFG->config['simulator'] || DectectOS_checkWindows()) {
 // 			pclose(popen($command, 'r')); // only for windows arcontrol client
-// 			PrinterLog_logArduino($command); //FIXME we can't check return output when using simulator
+// 			PrinterLog_logArduino($command); //FIX_ME we can't check return output when using simulator
 // 		}
 // 		else {
 // 			exec($command, $output, $ret_val);
@@ -1215,7 +1218,7 @@ function PrinterState_checkAsynchronousResponse() {
 		return ERROR_INTERNAL;
 	}
 	else {
-		$array_response = file(PRINTERSTATE_FILE_RESPONSE);
+		$array_response = @file(PRINTERSTATE_FILE_RESPONSE);
 		if (!PrinterState_filterOutput($array_response, FALSE)) {
 			PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 			return ERROR_INTERNAL;
@@ -1340,7 +1343,7 @@ function PrinterState_runGcode($gcodes, $rewrite = TRUE, $need_return = FALSE, &
 	if ($need_return && is_array($gcodes)) {
 		foreach ($gcodes as $gcode) {
 			$command = $arcontrol_fullpath . ' "' . $gcode . '"';
-			//TODO some gcode will not be responsed directly when using simulator
+			//TO_DO some gcode will not be responsed directly when using simulator
 			exec($command, $output, $ret_val);
 			if (!PrinterState_filterOutput($output)) {
 				PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);

@@ -293,11 +293,17 @@ class Pronterface extends MY_Controller {
 						. $this->config->item('temp') . '&v=' . $gcode['full_path'];
 				
 				Printer_preparePrint();
-				$response = file_get_contents($url, FALSE, $context);
+				$response = @file_get_contents($url, FALSE, $context);
 				
-				$this->output->set_content_type('txt_u');
-				$this->load->library('parser');
-				$this->parser->parse('template/plaintxt', array('display' => $response));
+				if ($response === FALSE) {
+					$cr = 403;
+				}
+				else {
+					$cr = ERROR_OK;
+					$this->output->set_content_type('txt_u');
+					$this->load->library('parser');
+					$this->parser->parse('template/plaintxt', array('display' => $response));
+				}
 				
 // 				$command .= $gcode['full_path'] . ' > ' . $path_file;
 // 				PrinterLog_logArduino($command);
@@ -309,15 +315,22 @@ class Pronterface extends MY_Controller {
 // 					$this->output->set_status_header(404);
 // 				} else {
 // 					$this->load->helper('file');
-// 					$this->output->set_content_type(get_mime_by_extension($path_file))->set_output(file_get_contents($path_file));
+// 					$this->output->set_content_type(get_mime_by_extension($path_file))->set_output(@file_get_contents($path_file));
 // 				}
 			}
 			else {
-				$this->output->set_status_header(403);
+				$cr = 403;
 			}
 		}
 		else {
-			$this->output->set_status_header(403);
+			$cr = 403;
+		}
+		
+		if ($cr != ERROR_OK) {
+			$this->output->set_status_header($cr);
+			$this->output->set_content_type('txt_u');
+			$this->load->library('parser');
+			$this->parser->parse('template/plaintxt', array('display' => $cr . MyERRMSG($cr)));
 		}
 		
 		return;

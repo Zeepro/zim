@@ -900,7 +900,7 @@ function ZimAPI_getVersion($next_boot = FALSE) {
 	$CI->load->helper('detectos');
 	
 	if ($next_boot == TRUE || DectectOS_checkWindows()) {
-		$version = trim(file_get_contents($CI->config->item('version_file')));
+		$version = trim(@file_get_contents($CI->config->item('version_file')));
 	}
 	else {
 		$version = trim(shell_exec(ZIMAPI_CMD_VERSION));
@@ -912,7 +912,7 @@ function ZimAPI_getVersion($next_boot = FALSE) {
 function ZimAPI_getType() {
 	global $CFG;
 	
-	return trim(file_get_contents($CFG->config['type_file']));
+	return trim(@file_get_contents($CFG->config['type_file']));
 }
 
 //internal function

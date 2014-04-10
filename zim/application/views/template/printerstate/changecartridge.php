@@ -77,6 +77,15 @@ function inputUserChoice(action) {
 			});
 			break;
 
+		case 'unload_r':
+			var_action = $.ajax({
+				url: "/printerstate/changecartridge_action/unload_r",
+				type: "GET",
+				data: {v: "{abb_cartridge}"},
+				cache: false,
+			});
+			break;
+
 		case 'change':
 			var_next_phase = '{insert_status}';
 			checkChangeStatus();

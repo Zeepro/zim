@@ -6,18 +6,23 @@ if (!defined('BASEPATH'))
 class Test_log extends CI_Controller {
 
 	public function index() {
+		$display = '';
+		
 // 		$this->output->set_content_type('text/plain; charset=UTF-8');
 		$this->output->set_content_type('txt_u');
-		echo 'Log level: ' . $this->config->item('log_level') . "\n";
+		$display .= 'Log level: ' . $this->config->item('log_level') . "\n";
 		if (file_exists($this->config->item('log_file'))) {
-			$array_log = file($this->config->item('log_file'));
+			$array_log = @file($this->config->item('log_file'));
 			foreach ($array_log as $line) {
-				echo $line;
+				$display .= $line;
 			}
 		}
 		else {
-			echo "no log file\n";
+			$display .= "no log file\n";
 		}
+		
+		$this->load->library('parser');
+		$this->parser->parse('template/plaintxt', array('display' => $display));
 		
 		return;
 	}
@@ -62,7 +67,7 @@ class Test_log extends CI_Controller {
 		}
 		else {
 			$this->load->helper('file');
-			$this->output->set_content_type(get_mime_by_extension($path_file))->set_output(file_get_contents($path_file));
+			$this->output->set_content_type(get_mime_by_extension($path_file))->set_output(@file_get_contents($path_file));
 		}
 		
 		return;

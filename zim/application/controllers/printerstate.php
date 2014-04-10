@@ -203,6 +203,51 @@ class Printerstate extends MY_Controller {
 		return;
 	}
 	
+	private function _display_changecartridge_error_status($status_current) {
+		$template_data = NULL;
+		$message = NULL;
+		
+		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
+		switch ($status_current) {
+			case CORESTATUS_VALUE_UNLOAD_FILA_R:
+			case CORESTATUS_VALUE_LOAD_FILA_R:
+				$message = t('PLEASE GO TO CHANGE RIGHT CARTRIDGE');
+				break;
+
+			case CORESTATUS_VALUE_UNLOAD_FILA_L:
+			case CORESTATUS_VALUE_LOAD_FILA_L:
+				$message = t('PLEASE GO TO CHANGE LEFT CARTRIDGE');
+				break;
+				
+			default:
+				$message = t('IN BUSY: ') . $status_current;
+				break;
+		}
+		$template_data = array (
+				'message'	=> $message,
+		);
+		$template_name = 'template/printerstate/changecartridge_ajax/error_status';
+		$this->_display_changecartridge_base($template_name, $template_data);
+		
+		$this->output->set_status_header(202); // disable checking
+		
+		return;
+	}
+	
+	private function _display_changecartridge_error_loading() {
+		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
+		$template_data = array (
+				'next_phase'	=> PRINTERSTATE_CHANGECART_UNLOAD_F,
+				'unload_button'	=> t('Unload the filament'),
+		);
+		$template_name = 'template/printerstate/changecartridge_ajax/error_loading';
+		$this->_display_changecartridge_base($template_name, $template_data);
+		
+		$this->output->set_status_header(202); // disable checking
+		
+		return;
+	}
+	
 	private function _deal_with_unloading_wait_time() {
 		// wait the time for arduino before checking filament when unloading filament
 		// we return TRUE only when finishing action or passing max wait time (Arduino is avaliable for command)
@@ -436,7 +481,8 @@ class Printerstate extends MY_Controller {
 						// in other busy status
 						$this->load->helper('printerlog');
 						PrinterLog_logError('error status when changing filament', __FILE__, __LINE__);
-						$this->output->set_status_header(202); // disable checking
+						$this->_display_changecartridge_error_status($status_current);
+// 						$this->output->set_status_header(202); // disable checking
 					}
 				}
 				else {
@@ -482,7 +528,8 @@ class Printerstate extends MY_Controller {
 						// in other busy status
 						$this->load->helper('printerlog');
 						PrinterLog_logError('error status when changing filament', __FILE__, __LINE__);
-						$this->output->set_status_header(202); // disable checking
+						$this->_display_changecartridge_error_status($status_current);
+// 						$this->output->set_status_header(202); // disable checking
 					}
 					
 				}
@@ -584,6 +631,11 @@ class Printerstate extends MY_Controller {
 					$this->_display_changecartridge_in_load_filament();
 					break;
 				}
+				else if (!CoreStatus_checkInWaitTime(PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_LOAD)) {
+					// already passed the timeout of changement
+					$this->_display_changecartridge_error_loading();
+					break;
+				}
 				
 				if (PrinterState_getFilamentStatus($abb_cartridge)) {
 					// have filament
@@ -618,18 +670,26 @@ class Printerstate extends MY_Controller {
 			return;
 		}
 		
-		//block request when not in idle
-		$this->load->helper('corestatus');
-		if (CoreStatus_checkInIdle() == FALSE) {
-			$this->output->set_status_header(403); // bad request
-			return;
+		if ($mode == 'unload_r') {
+			$mode = 'unload';
+		}
+		else if ($mode == 'load_r') {
+			$mode = 'load';
+		}
+		else {
+			//block request when not in idle
+			$this->load->helper('corestatus');
+			if (CoreStatus_checkInIdle() == FALSE) {
+				$this->output->set_status_header(403); // bad request
+				return;
+			}
 		}
 		
 		switch ($mode) {
 			case 'unload':
 				$ret_val = PrinterState_unloadFilament($abb_cartridge);
 				if ($ret_val != ERROR_OK) {
-					$this->output->set_status_header($ret_val);
+					$this->output->set_status_header($ret_val, MyERRMSG($ret_val));
 				}
 				break;
 				

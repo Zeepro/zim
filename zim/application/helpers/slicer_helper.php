@@ -121,7 +121,7 @@ function Slicer_listModel(&$response) {
 		$cr = ERROR_OK;
 	}
 	else {
-		$cr = ERROR_INTERNAL;
+		$cr = $ret_val;
 		$response = "[]";
 	}
 	
@@ -204,8 +204,12 @@ function Slicer__requestSlicer($suffix_url, &$response = NULL) {
 	$context = stream_context_create(
 			array('http' => array('ignore_errors' => TRUE))
 	);
-	$url = $CFG['slicer_url'] . $suffix_url;
-	$response = file_get_contents($url, FALSE, $context);
+	$url = $CFG->config['slicer_url'] . $suffix_url;
+	$response = @file_get_contents($url, FALSE, $context);
+	
+	if ($response === FALSE || is_null($http_response_header)) {
+		return 404;
+	}
 	
 	return Slicer__getHTTPCode($http_response_header);
 }
