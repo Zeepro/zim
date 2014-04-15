@@ -201,9 +201,9 @@ function Printer_printFromFile($gcode_path, $need_prime = TRUE, $stop_printing =
 	else {
 		$ret_val = CoreStatus_setInCanceling();
 	}
-// 	if ($ret_val == FALSE) {
-// 		return ERROR_INTERNAL;
-// 	}
+	if ($ret_val == FALSE) {
+		return ERROR_INTERNAL;
+	}
 
 	// pass gcode to printer
 //	if (!PrinterState_beforeFileCommand()) {

@@ -81,6 +81,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_TITLE_TYPE',		'type');
 	define('PRINTERSTATE_TITLE_SERIAL',		'sn');
 	define('PRINTERSTATE_TITLE_NB_EXTRUD',	'extruder');
+	define('PRINTERSTATE_TITLE_LASTERROR',	'e');
 	
 	define('PRINTERSTATE_JSON_PRINTER', 		'Printer.json');
 	define('PRINTERSTATE_TITLE_JSON_NB_EXTRUD', 'ExtrudersNumber');
@@ -789,7 +790,84 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) 
 			break;
 	
 		case CORESTATUS_VALUE_SLICE:
-			//TODO get percentage and time / check finished or not
+			// get percentage and check finished or not
+			$CI = &get_instance();
+			$progress = 0;
+			$array_slicer = array();
+			
+			$CI->load->helper('slicer');
+			$ret_val = Slicer_checkSlice($progress, $array_slicer);
+			if ($ret_val != ERROR_OK) {
+				// handle error for slicing
+				$CI->load->helper('printerlog');
+				
+				CoreStatus_setInIdle($ret_val);
+				$array_data[PRINTERSTATE_TITLE_LASTERROR] = $ret_val;
+				$status_current = CORESTATUS_VALUE_IDLE;
+				if ($ret_val == ERROR_NO_PRINT) {
+					PrinterLog_logMessage('not in slicing', __FILE__, __LINE__);
+				}
+				else {
+					PrinterLog_logError('error return from slicer', __FILE__, __LINE__);
+					PrinterLog_logDebug('return: ' . $ret_val . ', progress: ' . $progress);
+				}
+				
+				return TRUE;
+			}
+			elseif ($progress == 100) {
+				// try to start printing after slicing
+				// check filament first
+				foreach ($array_slicer as $abb_filament => $volume_need) {
+					$ret_val = PrinterState_checkFilament($abb_filament, $volume_need);
+					if ($ret_val != ERROR_OK) {
+						$CI->load->helper('printerlog');
+						
+						CoreStatus_setInIdle($ret_val);
+						$array_data[PRINTERSTATE_TITLE_LASTERROR] = $ret_val;
+						$status_current = CORESTATUS_VALUE_IDLE;
+						PrinterLog_logError('check filament error after slicing - usually because of no enough filament', __FILE__, __LINE__);
+						
+						return TRUE;
+					}
+				}
+				// try to launch printing after checking
+				$CI->load->helper('printer');
+				if ($CI->config->item('simulator')) {
+					$ret_val = Printer_printFromFile($CI->config->item('temp') . PRINTER_FN_CHARGE);
+				}
+				else {
+					$ret_val = Printer_printFromFile(SLICER_FILE_MODEL);
+				}
+				if ($ret_val != ERROR_OK) {
+					$CI->load->helper('printerlog');
+					
+					CoreStatus_setInIdle($ret_val);
+					$array_data[PRINTERSTATE_TITLE_LASTERROR] = $ret_val;
+					$status_current = CORESTATUS_VALUE_IDLE;
+					PrinterLog_logError('launch printing after slicing error', __FILE__, __LINE__);
+					
+					return TRUE;
+				}
+				// change status to printing
+				$ret_val = CoreStatus_setInPrinting();
+				if ($ret_val != ERROR_OK) {
+					$CI->load->helper('printerlog');
+					
+					CoreStatus_setInIdle($ret_val);
+					$array_data[PRINTERSTATE_TITLE_LASTERROR] = $ret_val;
+					$status_current = CORESTATUS_VALUE_IDLE;
+					PrinterLog_logError('change status to printing after slicing error', __FILE__, __LINE__);
+				}
+				else {
+					$status_current = CORESTATUS_VALUE_PRINT;
+					$array_data[PRINTERSTATE_TITLE_PERCENT] = 0; // set percentage to 0 because of launching of printing
+				}
+				
+				return TRUE;
+			}
+			else { // still in slicing, so get percentage (estimated time is useless for now, slicer exports percentage badly)
+				$array_data[PRINTERSTATE_TITLE_PERCENT] = $progress;
+			}
 			break;
 	
 		case CORESTATUS_VALUE_LOAD_FILA_L:
@@ -858,6 +936,7 @@ function PrinterState_checkStatusAsArray() {
 	$output = array();
 	$ret_val = 0;
 	$data_json = array();
+	$status_json = array();
 	$time_start = NULL;
 	$status_current = '';
 	
@@ -866,8 +945,15 @@ function PrinterState_checkStatusAsArray() {
 	$CI = &get_instance();
 	$CI->load->helper('corestatus');
 	
-	$ret_val = CoreStatus_checkInIdle($status_current);
-	if ($ret_val == FALSE && !in_array($status_current, array(CORESTATUS_VALUE_PRINT, CORESTATUS_VALUE_CANCEL))) {
+	$ret_val = CoreStatus_checkInIdle($status_current, $status_json);
+	if ($ret_val == TRUE) {
+		$data_json[PRINTERSTATE_TITLE_STATUS] = CORESTATUS_VALUE_IDLE;
+		if (!is_null($status_json[CORESTATUS_TITLE_MESSAGE])) {
+			$data_json[PRINTERSTATE_TITLE_LASTERROR] = $status_json[CORESTATUS_TITLE_MESSAGE];
+		}
+		return $data_json;
+	}
+	else if ($ret_val == FALSE && !in_array($status_current, array(CORESTATUS_VALUE_PRINT, CORESTATUS_VALUE_CANCEL))) {
 		PrinterState_checkBusyStatus($status_current, $data_json);
 		$data_json[PRINTERSTATE_TITLE_STATUS] = $status_current;
 		
@@ -934,6 +1020,26 @@ function PrinterState_changeFilament($left_filament = 0, $right_filament = 0) {
 	// in the other hand, when we stop a printing task, how can we get the quantity that was used
 	
 	return ERROR_OK;
+}
+
+function PrinterState_cartridgeNumber2Abbreviate($number) {
+	$abb_cartridge = '';
+	switch ($number) {
+		case PRINTERSTATE_RIGHT_EXTRUD:
+			$abb_cartridge = 'r';
+			break;
+			
+		case PRINTERSTATE_LEFT_EXTRUD:
+			$abb_cartridge = 'l';
+			break;
+			
+		default:
+			$abb_cartridge = 'error';
+			PrinterLog_logError('change cartridge number to abbreviate error', __FILE__, __LINE__);
+			break;
+	}
+	
+	return $abb_cartridge;
 }
 
 function PrinterState_getFilamentStatus($abb_filament) {

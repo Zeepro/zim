@@ -43,6 +43,26 @@ class Rest extends MY_Controller {
 			$this->load->helper('printerstate');
 			
 			switch ($status_current) {
+				case CORESTATUS_VALUE_SLICE:
+					if (CoreStatus_checkCallNoBlockRESTInSlice()) {
+						// do not block some special REST for action in slicing
+						return;
+					}
+					
+					$ret_val = PrinterState_checkBusyStatus($status_current);
+					if ($ret_val == FALSE) {
+						// still in slicing
+						break;
+					}
+					else if ($status_current == CORESTATUS_VALUE_IDLE) {
+						// encounted some errors
+						break;
+					}
+					else { // CORESTATUS_VALUE_PRINT
+						$this->load->helper('printerlog');
+						PrinterLog_logMessage('call rest when we are in slicing, but finished really', __FILE__, __LINE__);
+					}
+				
 				// we treat canceling as printing
 				case CORESTATUS_VALUE_PRINT:
 					// do not block some special REST for action in printing
@@ -121,7 +141,8 @@ class Rest extends MY_Controller {
 	//==========================================================
 	public function index()
 	{
-		$this->status();
+// 		$this->status();
+		$this->output->set_header('Location: /rest/status');
 		return;
 	}
 	
@@ -984,7 +1005,7 @@ class Rest extends MY_Controller {
 		return;
 	}
 	
-	public function plateformmodel() {
+	public function platformmodel() {
 		$cr = 0;
 		$display = '';
 		
@@ -1005,7 +1026,36 @@ class Rest extends MY_Controller {
 	}
 	
 	public function setmodel() {
-		$this->_return_under_construction();
+		$cr = 0;
+		$array_data = NULL;
+		
+		$this->load->helper('slicer');
+		$array_data = array(
+				SLICER_PRM_ID		=> $this->input->get('id'),
+				SLICER_PRM_XPOS		=> $this->input->get('xpos'),
+				SLICER_PRM_YPOS		=> $this->input->get('ypos'),
+				SLICER_PRM_ZPOS		=> $this->input->get('zpos'),
+				SLICER_PRM_XROT		=> $this->input->get('xrot'),
+				SLICER_PRM_YROT		=> $this->input->get('yrot'),
+				SLICER_PRM_ZROT		=> $this->input->get('zrot'),
+				SLICER_PRM_SCALE	=> $this->input->get('s'),
+				SLICER_PRM_COLOR	=> $this->input->get('c'),
+		);
+		
+		// check missing parameter
+		foreach ($array_data as $value) {
+			if ($value === FALSE) {
+				$cr = ERROR_MISS_PRM;
+				break;
+			}
+		}
+		if ($cr != ERROR_MISS_PRM) {
+			$cr = Slicer_setModel($array_data);
+		}
+		
+		$this->_return_cr($cr);
+// 		$this->_return_under_construction();
+		
 		return;
 	}
 	
@@ -1062,7 +1112,19 @@ class Rest extends MY_Controller {
 	}
 	
 	public function platformprint() {
-		$this->_return_under_construction();
+		$cr = 0;
+		$this->load->helper('slicer');
+		
+		// check platform and filament present (do not check filament quantity)
+		$cr = Slicer_checkPlatformColor();
+		
+		// start slice command after checking filament
+		if ($cr == ERROR_OK) {
+			$cr = Slicer_slice();
+		}
+		
+		$this->_return_cr($cr);
+		
 		return;
 	}
 	

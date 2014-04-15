@@ -194,6 +194,11 @@ class Printdetail extends MY_Controller {
 		return;
 	}
 	
+	public function slice() {
+		$this->load->library('parser');
+		$this->parser->parse('template/plaintxt', array('display' => 'IN CONSTRUCTION, goto /rest/status or any rest service'));
+	}
+	
 	public function cancel() {
 		$ret_val = NULL;
 		//TODO finish me for canceling

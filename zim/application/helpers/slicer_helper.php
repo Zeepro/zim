@@ -12,6 +12,9 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 	define('SLICER_URL_LISTMODEL',		'listmodel');
 	define('SLICER_URL_REMOVE_MODEL',	'removemodel?id=');
 	define('SLICER_URL_SET_MODEL',		'setmodel?');
+	define('SLICER_URL_SLICE',			'slice');
+	define('SLICER_URL_SLICE_STATUS',	'slicestatus');
+	define('SLICER_URL_SLICE_HALT',		'slicehalt');
 	
 	define('SLICER_PRM_ID',		'id');
 	define('SLICER_PRM_XPOS',	'xpos');
@@ -22,6 +25,11 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 	define('SLICER_PRM_ZROT',	'zrot');
 	define('SLICER_PRM_SCALE',	's');
 	define('SLICER_PRM_COLOR',	'c');
+	
+	define('SLICER_TITLE_COLOR',	'color');
+	define('SLICER_FILE_MODEL',		'/tmp/_sliced_model.gcode');
+	
+	define('SLICER_OFFSET_VALUE_COLOR2EXTRUDER',	-1);
 	
 	define('SLICER_RESPONSE_OK',		200);
 	define('SLICER_RESPONSE_MISS_PRM',	432);
@@ -110,7 +118,74 @@ function Slicer_getModelFile($model_id) {
 }
 
 function Slicer_slice() {
+	$cr = 0;
+	$ret_val = Slicer__requestSlicer(SLICER_URL_SLICE, $response);
 	
+	if ($ret_val == SLICER_RESPONSE_OK) {
+		if (CoreStatus_setInSlicing()) {
+			$cr = ERROR_OK;
+		}
+		else {
+			$cr = ERROR_INTERNAL;
+		}
+	}
+	else {
+		$cr = ERROR_INTERNAL;
+	}
+	
+	return $cr;
+}
+
+function Slicer_sliceHalt() {
+	$cr = 0;
+	$ret_val = Slicer__requestSlicer(SLICER_URL_SLICE_HALT, $response);
+	
+	if ($ret_val == SLICER_RESPONSE_OK) {
+		$cr = ERROR_OK;
+	}
+	else {
+		$cr = ERROR_INTERNAL;
+	}
+	
+	return $cr;
+}
+
+function Slicer_checkSlice(&$progress, &$array_extruder = array()) {
+	$cr = 0;
+	$ret_val = Slicer__requestSlicer(SLICER_URL_SLICE_STATUS, $response);
+	
+	if ($ret_val == SLICER_RESPONSE_OK) {
+		if ((int)$response < 0) {
+			$cr = ERROR_NO_PRINT;
+			$progress = -1;
+		}
+		else {
+			$cr = ERROR_OK;
+			$progress = (int)$response;
+			if ($progress == 100) {
+				$CI = &get_instance();
+				$CI->load->helper('printerstate');
+				
+				$explode_array = explode("\n", $response);
+				if (isset($explode_array[1])) {
+					$explode_array = explode(';', $explode_array[1]);
+					foreach ($explode_array as $key_value) {
+						$tmp_array = explode(':', $key_value);
+						$abb_filament = PrinterState_cartridgeNumber2Abbreviate((int)$tmp_array[0]);
+						$array_extruder[$abb_filament] = ceil($tmp_array[1]);
+					}
+				}
+				else {
+					$cr = ERROR_INTERNAL;
+				}
+			}
+		}
+	}
+	else {
+		$cr = ERROR_INTERNAL;
+	}
+	
+	return $cr;
 }
 
 function Slicer_listModel(&$response) {
@@ -123,6 +198,47 @@ function Slicer_listModel(&$response) {
 	else {
 		$cr = $ret_val;
 		$response = "[]";
+	}
+	
+	return $cr;
+}
+
+function Slicer_checkPlatformColor() {
+	$cr = 0;
+	$array_platform = array();
+	$array_color = array();
+	
+	Slicer_listModel($array_model);
+	$array_platform = json_decode($array_model, TRUE);
+	if (is_null($array_platform)) {
+		$cr = ERROR_EMPTY_PLATFORM;
+	}
+	else {
+		$CI = &get_instance();
+		$CI->load->helper('printerstate');
+		$cr = ERROR_OK;
+		// get the extruder which we need
+		foreach ($array_platform as $model) {
+			$colors = $model[SLICER_TITLE_COLOR];
+			foreach ($colors as $color) {
+				$array_color[] = (int)$color + SLICER_OFFSET_VALUE_COLOR2EXTRUDER;
+			}
+		}
+		$array_color = array_unique($array_color);
+		foreach ($array_color as $number_color) {
+			$abb_cartridge = PrinterState_cartridgeNumber2Abbreviate($number_color);
+			if (PrinterState_getFilamentStatus($abb_cartridge)) {
+				continue;
+			}
+			else if ($abb_cartridge == 'l') {
+				$cr = ERROR_MISS_LEFT_FILA;
+				break;
+			}
+			else {
+				$cr = ERROR_MISS_RIGT_FILA;
+				break;
+			}
+		}
 	}
 	
 	return $cr;
@@ -202,7 +318,7 @@ function Slicer__getHTTPCode($http_response_header) {
 function Slicer__requestSlicer($suffix_url, &$response = NULL) {
 	global $CFG;
 	$context = stream_context_create(
-			array('http' => array('ignore_errors' => TRUE))
+			array('http' => array('ignore_errors' => TRUE, 'timeout' => 1))
 	);
 	$url = $CFG->config['slicer_url'] . $suffix_url;
 	$response = @file_get_contents($url, FALSE, $context);

@@ -87,6 +87,13 @@ class MY_Controller extends CI_Controller {
 						}
 						break;
 						
+					case CORESTATUS_VALUE_SLICE:
+						//TODO finish here
+						if (CoreStatus_checkCallSlicing($url_redirect)) {
+							return;
+						}
+						break;
+						
 					default:
 						$url_redirect = '/'; // internal error, never reach here normally
 						break;

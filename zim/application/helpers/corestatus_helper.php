@@ -17,6 +17,7 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 // 	define('CORESTATUS_TITLE_URL_REDIRECT',	'RedirectURL');
 	define('CORESTATUS_TITLE_MESSAGE',		'Message');
 	define('CORESTATUS_TITLE_STARTTIME',	'StartDate');
+// 	define('CORESTATUS_TITLE_LASTERROR',	'LastError');
 	
 	define('CORESTATUS_VALUE_IDLE',				'idle');
 	define('CORESTATUS_VALUE_PRINT',			'printing');
@@ -59,7 +60,7 @@ function CoreStatus_initialFile() {
 	return TRUE;
 }
 
-function CoreStatus_checkInIdle(&$status_current = '') {
+function CoreStatus_checkInIdle(&$status_current = '', &$array_status = array()) {
 	global $CFG;
 	$state_file = $CFG->config['conf'] . CORESTATUS_FILENAME_WORK;
 	$tmp_array = array();
@@ -80,6 +81,7 @@ function CoreStatus_checkInIdle(&$status_current = '') {
 	}
 	
 	// check status
+	$array_status = $tmp_array['json'];
 	if ($tmp_array['json'][CORESTATUS_TITLE_STATUS] == CORESTATUS_VALUE_IDLE) {
 		return TRUE;
 	}
@@ -152,16 +154,21 @@ function CoreStatus_checkCallCanceling(&$url_redirect = '') {
 
 function CoreStatus_checkCallUnloading(&$url_redirect = '') {
 	$status_current = '';
+	$abb_filament = '';
 	CoreStatus_checkInIdle($status_current);
 	if ($status_current == CORESTATUS_VALUE_UNLOAD_FILA_L) {
 		$url_redirect = '/printerstate/changecartridge?v=l&f=0';
+		$abb_filament = 'l';
 	}
 	else { // CORESTATUS_VALUE_UNLOAD_FILA_R
 		$url_redirect = '/printerstate/changecartridge?v=r&f=0';
+		$abb_filament = 'r';
 	}
 	
 	return CoreStatus__checkCallURI(array(
-			'/printerstate/changecartridge'			=> NULL,
+			'/printerstate/changecartridge'			=> array(
+					'v'	=> $abb_filament,
+			),
 			'/printerstate/changecartridge_ajax'	=> NULL,
 			'/printerstate/changecartridge_action'	=> NULL,
 	));
@@ -183,6 +190,16 @@ function CoreStatus_checkCallCancelingAjax() {
 	));
 }
 
+function CoreStatus_checkCallSlicing(&$url_redirect = '') {
+	$url_redirect = '/printdetail/slice';
+	
+	return CoreStatus__checkCallURI(array(
+			'/printdetail/slice'		=> NULL,
+			'/printdetail/slice_ajax'	=> NULL,
+			'/printdetail/slice_action'	=> NULL,
+	));
+}
+
 function CoreStatus_checkCallDebug() {
 	// test_log & test_video & test_cartridge controller is not in My_controller's control
 	return (CoreStatus__checkCallController('gcode')
@@ -196,14 +213,14 @@ function CoreStatus_checkCallNoBlockREST() {
 	return CoreStatus__checkCallURI(array(
 			'/rest/status'		=> NULL,
 			'/rest/get'			=> array(
-					'p'	=> array(PRINTERSTATE_PRM_TEMPER, PRINTERSTATE_PRM_INFO),
+					'p'	=> PRINTERSTATE_PRM_INFO,
 			),
 			'/rest/gcode'		=> NULL,
 			'/rest/gcodefile'	=> NULL,
 	));
 }
 
-function CoreStatus_checkCallNoBlockRESTInConnection() {	
+function CoreStatus_checkCallNoBlockRESTInConnection() {
 	return CoreStatus__checkCallURI(array(
 			'/rest/status'		=> NULL,
 			'/rest/setnetwork'	=> NULL,
@@ -212,13 +229,24 @@ function CoreStatus_checkCallNoBlockRESTInConnection() {
 
 function CoreStatus_checkCallNoBlockRESTInPrint() {
 	return CoreStatus__checkCallURI(array(
+			'/rest/status'		=> NULL,
 			'/rest/cancel'		=> NULL,
 			'/rest/suspend'		=> NULL,
 			'/rest/resume'		=> NULL,
+			'/rest/get'			=> array(
+					'p'	=> PRINTERSTATE_PRM_TEMPER,
+			),
 	));
 }
 
-function CoreStatus_setInIdle() {
+function CoreStatus_checkCallNoBlockRESTInSlice() {
+	return CoreStatus__checkCallURI(array(
+			'/rest/status'		=> NULL,
+			'/rest/cancel'		=> NULL,
+	));
+}
+
+function CoreStatus_setInIdle($last_error = FALSE) {
 	$status_previous = '';
 	$ret_val = CoreStatus_checkInIdle($status_previous);
 	if ($ret_val == TRUE) {
@@ -244,6 +272,16 @@ function CoreStatus_setInIdle() {
 // 			return FALSE;
 // 		}
 // 	}
+	if ($last_error !== FALSE) {
+		// add last_error for slicing
+		//TODO perhaps also check $status_previous == CORESTATUS_VALUE_SLICE ?
+		return CoreStatus__setInStatus(CORESTATUS_VALUE_IDLE,
+				array(
+						CORESTATUS_TITLE_STARTTIME	=> NULL,
+						CORESTATUS_TITLE_MESSAGE	=> $last_error,
+				)
+		);
+	}
 	
 	return CoreStatus__setInStatus(CORESTATUS_VALUE_IDLE,
 			array(CORESTATUS_TITLE_STARTTIME => NULL)
@@ -297,6 +335,12 @@ function CoreStatus_setInUnloading($abb_filament) {
 			? CORESTATUS_VALUE_UNLOAD_FILA_R : CORESTATUS_VALUE_UNLOAD_FILA_L;
 	
 	return CoreStatus__setInStatus($value_status, array(CORESTATUS_TITLE_STARTTIME => time()));
+}
+
+function CoreStatus_setInSlicing() {
+	return CoreStatus__setInStatus(CORESTATUS_VALUE_SLICE,
+			array(CORESTATUS_TITLE_MESSAGE => NULL)
+	);
 }
 
 function CoreStatus_getStartTime(&$time_start) {
@@ -419,12 +463,15 @@ function CoreStatus__checkCallURI($array_URI) {
 				$real_value = $CI->input->get($key);
 				if (is_array($value) && in_array($real_value, $value)) {
 					continue; // compare with a data array
+// 					return TRUE;
 				} else if ($real_value == $value) {
 					continue; // compare with an alone data
+// 					return TRUE;
 				}
 				else {
 					return FALSE;
 					break; // never reach here
+// 					continue;
 				}
 			}
 		}
@@ -434,6 +481,7 @@ function CoreStatus__checkCallURI($array_URI) {
 	}
 	
 	return TRUE;
+// 	return FALSE;
 }
 
 function CoreStatus__setInStatus($value_status, $data_array = array()) {
