@@ -56,6 +56,10 @@ function Slicer_addModel($model_path) {
 			$cr = ERROR_WRONG_FORMAT;
 			break;
 			
+		case 404:
+			$cr = 404;
+			break;
+			
 		default:
 			$cr = ERROR_INTERNAL;
 			break;
@@ -81,6 +85,10 @@ function Slicer_removeModel($model_id) {
 			
 		case SLICER_RESPONSE_WRONG_PRM:
 			$cr = ERROR_WRONG_PRM;
+			break;
+			
+		case 404:
+			$cr = 404;
 			break;
 			
 		default:
@@ -318,7 +326,7 @@ function Slicer__getHTTPCode($http_response_header) {
 function Slicer__requestSlicer($suffix_url, &$response = NULL) {
 	global $CFG;
 	$context = stream_context_create(
-			array('http' => array('ignore_errors' => TRUE, 'timeout' => 1))
+			array('http' => array('ignore_errors' => TRUE, 'timeout' => 3))
 	);
 	$url = $CFG->config['slicer_url'] . $suffix_url;
 	$response = @file_get_contents($url, FALSE, $context);
