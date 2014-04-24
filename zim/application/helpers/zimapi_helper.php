@@ -265,11 +265,11 @@ function ZimAPI_setsWifi($nameWifi, $passWifi = '') {
 			if (!ctype_print($nameWifi) || ($passWifi && !ctype_print($passWifi))) {
 				return ERROR_WRONG_PRM;
 			}
-			$nameWifi = str_replace('"', '\"', $nameWifi);
-			$passWifi = str_replace('"', '\"', $passWifi);
+			$nameWifi = ZimAPI__filterCharacter($nameWifi); //str_replace('"', '\"', $nameWifi);
+			$passWifi = ZimAPI__filterCharacter($passWifi); //str_replace('"', '\"', $passWifi);
 			
 			if (strlen($passWifi) == 0) {
-				$command = ZIMAPI_CMD_SWIFI . ' "' . $nameWifi . '"';
+				$command = ZIMAPI_CMD_SWIFI . ' ' . $nameWifi;
 			}
 			else {
 				// check password length
@@ -278,7 +278,7 @@ function ZimAPI_setsWifi($nameWifi, $passWifi = '') {
 				}
 				
 				// use WPA crypt as default
-				$command = ZIMAPI_CMD_SWIFI . ' "' . $nameWifi . '" wpa "' . $passWifi . '"';
+				$command = ZIMAPI_CMD_SWIFI . ' ' . $nameWifi . ' wpa ' . $passWifi;
 			}
 			exec($command, $output, $ret_val);
 			if ($ret_val != ERROR_NORMAL_RC_OK) {
@@ -323,8 +323,8 @@ function ZimAPI_setcWifi($nameWifi, $passWifi = '') {
 			if (!ctype_print($nameWifi) || ($passWifi && !ctype_print($passWifi))) {
 				return ERROR_WRONG_PRM;
 			}
-			$nameWifi = str_replace('"', '\"', $nameWifi);
-			$passWifi = str_replace('"', '\"', $passWifi);
+			$nameWifi = ZimAPI__filterCharacter($nameWifi); //str_replace('"', '\"', $nameWifi);
+			$passWifi = ZimAPI__filterCharacter($passWifi); //str_replace('"', '\"', $passWifi);
 			
 			if (strlen($passWifi) == 0) {
 				$command = ZIMAPI_CMD_CWIFI . ' "' . $nameWifi . '"';
@@ -944,4 +944,10 @@ function ZimAPI__checkPreset($id_preset) {
 	}
 	
 	return FALSE;
+}
+
+function ZimAPI__filterCharacter($raw) {
+	$filtered = "'" . str_replace("'", "'\"'\"'", $raw) . "'";
+	
+	return $filtered;
 }

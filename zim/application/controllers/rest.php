@@ -476,16 +476,40 @@ class Rest extends MY_Controller {
 	
 	public function cancel() {
 		$ret_val = 0;
+		$status_current = '';
 		
-		$this->load->helper('printer');
+		if (CoreStatus_checkInIdle($status_current)) {
+			$this->_return_cr(ERROR_NO_PRINT);
+			return;
+		}
 		
-		$ret_val = Printer_stopPrint();
-		if ($ret_val == TRUE) {
-			$this->_return_cr(ERROR_OK);
+		if ($status_current == CORESTATUS_VALUE_SLICE) {
+			$this->load->helper('slicer');
+			
+			$ret_val = Slicer_sliceHalt();
+			if ($ret_val == ERROR_OK) {
+				$this->_return_cr(ERROR_OK);
+			}
+			else {
+				$this->load->helper('printerlog');
+				PrinterLog_logError('can not stop slicing by REST', __FILE__, __LINE__);
+				$this->_return_cr($ret_val);
+			}
+		}
+		else if ($status_current == CORESTATUS_VALUE_PRINT) {
+			$this->load->helper('printer');
+			
+			$ret_val = Printer_stopPrint();
+			if ($ret_val == TRUE) {
+				$this->_return_cr(ERROR_OK);
+			}
+			else {
+				$this->load->helper('printerlog');
+				PrinterLog_logError('can not stop printing by REST', __FILE__, __LINE__);
+				$this->_return_cr(ERROR_NO_PRINT);
+			}
 		}
 		else {
-			$this->load->helper('printerlog');
-			PrinterLog_logError('can not stop printing by REST', __FILE__, __LINE__);
 			$this->_return_cr(ERROR_NO_PRINT);
 		}
 		
@@ -567,36 +591,67 @@ class Rest extends MY_Controller {
 					$display = PrinterState_getInfo();
 					break;
 					
-				case PRINTERSTATE_PRM_ACCELERATION:
-				case PRINTERSTATE_PRM_SPEED_MOVE:
-				case PRINTERSTATE_PRM_SPEED_EXTRUDE:
-				case PRINTERSTATE_PRM_COLDEXTRUSION:
-				case PRINTERSTATE_PRM_ENDSTOP:
 				case 'render':
 					$this->_return_under_construction();
 					return;
 					break;
+				case PRINTERSTATE_PRM_ACCELERATION:
+					$cr = PrinterState_getAcceleration($display);
+					break;
+					
+				case PRINTERSTATE_PRM_SPEED_MOVE:
+				case PRINTERSTATE_PRM_SPEED_EXTRUDE:
+					$cr = PrinterState_getSpeed($display);
+					break;
+					
+				case PRINTERSTATE_PRM_COLDEXTRUSION:
+					$value = NULL;
+					$cr = PrinterState_getColdExtrusion($value);
+					if ($cr == ERROR_OK) {
+						if ($value == TRUE) {
+							$display = 'on';
+						}
+						else {
+							$display = 'off';
+						}
+					}
+					break;
+					
+				case PRINTERSTATE_PRM_ENDSTOP:
+					$status = NULL;
+					$abb_endstop = $this->input->get('axis');
+					
+					$cr = PrinterState_getEndstop($abb_endstop, $status);
+					if ($cr == ERROR_OK) {
+						$display = $status ? 'on' : 'off';
+					}
+					break;
 					
 				case PRINTERSTATE_PRM_STRIPLED:
-					$cr = PrinterState_getStripLedStatus();
-					if ($cr == TRUE) {
-						$display = 'on';
+					$value = NULL;
+					$cr = PrinterState_getStripLedStatus($value);
+					if ($cr == ERROR_OK) {
+						if ($value == TRUE) {
+							$display = 'on';
+						}
+						else {
+							$display = 'off';
+						}
 					}
-					else {
-						$display = 'off';
-					}
-					$cr = ERROR_OK;
 					break;
 					
 				case PRINTERSTATE_PRM_HEADLED:
-					$cr = PrinterState_getTopLedStatus();
-					if ($cr == TRUE) {
-						$display = 'on';
+					$value = NULL;
+					$cr = PrinterState_getTopLedStatus($value);
+					
+					if ($cr == ERROR_OK) {
+						if ($value == TRUE) {
+							$display = 'on';
+						}
+						else {
+							$display = 'off';
+						}
 					}
-					else {
-						$display = 'off';
-					}
-					$cr = ERROR_OK;
 					break;
 					
 				case ZIMAPI_PRM_CAPTURE:
@@ -700,8 +755,26 @@ class Rest extends MY_Controller {
 					break;
 					
 				case PRINTERSTATE_PRM_ACCELERATION:
+					$val_acceleration = (int)$this->input->get('v');
+					if ($val_acceleration) {
+						$cr = PrinterState_setAcceleration($val_acceleration);
+					}
+					else {
+						$cr = ERROR_MISS_PRM;
+					}
+					break;
+					
 				case PRINTERSTATE_PRM_SPEED_MOVE:
 				case PRINTERSTATE_PRM_SPEED_EXTRUDE:
+					$val_speed = (int)$this->input->get('v');
+					if ($val_speed) {
+						$cr = PrinterState_setSpeed($val_speed);
+					}
+					else {
+						$cr = ERROR_MISS_PRM;
+					}
+					break;
+					
 				case PRINTERSTATE_PRM_COLDEXTRUSION:
 					$this->_return_under_construction();
 					return;
@@ -996,7 +1069,27 @@ class Rest extends MY_Controller {
 	//platform web service
 	//==========================================================
 	public function getmodel() {
-		$this->_return_under_construction();
+		$cr = 0;
+		$id_model = $this->input->get('id');
+		
+		if ($id_model !== FALSE) {
+			$path_model = '';
+			
+			$this->load->helper('slicer');
+			$cr = Slicer_getModelFile($id_model, $path_model);
+			
+			if ($cr != ERROR_OK) {
+				$this->_return_cr($cr);
+			}
+			else {
+				$this->load->helper('file');
+				$this->output->set_content_type(get_mime_by_extension($path_model))->set_output(@file_get_contents($path_model));
+			}
+		}
+		else {
+			$this->_return_cr(ERROR_MISS_PRM);
+		}
+		
 		return;
 	}
 	

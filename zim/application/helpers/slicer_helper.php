@@ -35,6 +35,7 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 	define('SLICER_RESPONSE_MISS_PRM',	432);
 	define('SLICER_RESPONSE_ADD_ERROR',	433);
 	define('SLICER_RESPONSE_WRONG_PRM',	433);
+	define('SLICER_RESPONSE_ERROR',		499);
 	
 	define('SLICER_FILENAME_ZIPMODEL',	'_model_slicer.zip');
 }
@@ -99,14 +100,16 @@ function Slicer_removeModel($model_id) {
 	return $cr;
 }
 
-function Slicer_getModelFile($model_id) {
+function Slicer_getModelFile($model_id, &$path_model) {
 	$cr = 0;
 	$ret_val = Slicer__requestSlicer(SLICER_URL_GET_MODELFILE . $model_id, $response);
 	
 	switch ($ret_val) {
 		case SLICER_RESPONSE_OK:
 			if (file_exists($response)) {
-				//TODO zip it and return file to user
+				//TODO zip it and return file to user or compress it by lighttpd/php via gzip
+				$path_model = $response;
+				$cr = ERROR_OK;
 			}
 			else {
 				$cr = ERROR_INTERNAL;
@@ -152,7 +155,7 @@ function Slicer_sliceHalt() {
 		$cr = ERROR_OK;
 	}
 	else {
-		$cr = ERROR_INTERNAL;
+		$cr = ERROR_NO_PRINT;
 	}
 	
 	return $cr;
@@ -188,6 +191,22 @@ function Slicer_checkSlice(&$progress, &$array_extruder = array()) {
 				}
 			}
 		}
+	}
+	else if ($ret_val == SLICER_RESPONSE_ERROR) {
+		if (strpos($response, "InitalError" !== FALSE)) {
+			$cr = ERROR_WRONG_PRM;
+		}
+		else if (strpos($response, "ExportError" !== FALSE)) {
+			$cr = ERROR_UNKNOWN_MODEL;
+		}
+		else {
+			$cr = ERROR_INTERNAL;
+		}
+		$progress = -1;
+		
+		$CI = &get_instance();
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('slicer error: ' . $response);
 	}
 	else {
 		$cr = ERROR_INTERNAL;

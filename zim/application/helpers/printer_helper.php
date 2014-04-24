@@ -27,6 +27,11 @@ if (!defined('PRINTER_FN_CHARGE')) {
 	define('PRINTER_FN_RETRACT',		'_retract.gcode');
 	define('PRINTER_FN_PRINTPRIME_L',	'_print_prime_left.gcode');
 	define('PRINTER_FN_PRINTPRIME_R',	'_print_prime_right.gcode');
+	define('PRINTER_PRM_TEMPER_L_N',	' -ll ');	// left temperature for other layer (if exist)
+	define('PRINTER_PRM_TEMPER_L_F',	' -l ');	// left temperature for first layer (or all layer)
+	define('PRINTER_PRM_TEMPER_R_N',	' -rr ');	// right temperature for other layer (if exist)
+	define('PRINTER_PRM_TEMPER_R_F',	' -r ');	// right temperature for first layer (or all layer)
+	define('PRINTER_PRM_FILE',			' -f ');	// file path
 }
 
 function Printer_preparePrint($need_prime = TRUE) {
@@ -109,8 +114,14 @@ function Printer_printFromPrime($abb_extruder, $first_run = TRUE) {
 	
 	$ret_val = Printer__getFileFromModel($id_model, $gcode_path);
 	if (($ret_val == ERROR_OK) && $gcode_path) {
-		//TODO modify the temperature of gcode file according to cartridge info
-		;
+		// modify the temperature of gcode file according to cartridge info
+		//TODO test me
+		$ret_val = Printer__changeTemperature($gcode_path);
+		if ($ret_val != ERROR_OK) {
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('change temperature error', __FILE__, __LINE__);
+			return $ret_val;
+		}
 		
 		$ret_val = Printer_printFromFile($gcode_path, FALSE);
 	}
@@ -124,6 +135,15 @@ function Printer_printFromModel($id_model, $stop_printing = FALSE) {
 	
 	$ret_val = Printer__getFileFromModel($id_model, $gcode_path);
 	if (($ret_val == ERROR_OK) && $gcode_path) {
+		// modify the temperature of gcode file according to cartridge info
+		//TODO test me
+		$ret_val = Printer__changeTemperature($gcode_path);
+		if ($ret_val != ERROR_OK) {
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('change temperature error', __FILE__, __LINE__);
+			return $ret_val;
+		}
+		
 		$ret_val = Printer_printFromFile($gcode_path, TRUE, $stop_printing);
 	}
 	
@@ -174,10 +194,10 @@ function Printer_printFromFile($gcode_path, $need_prime = TRUE, $stop_printing =
 
 	// check if having enough filament
 	//TODO get the quantity of filament needed by file
-	$ret_val = PrinterState_checkFilaments();
-	if ($ret_val != ERROR_OK) {
-		return $ret_val;
-	}
+// 	$ret_val = PrinterState_checkFilaments();
+// 	if ($ret_val != ERROR_OK) {
+// 		return $ret_val;
+// 	}
 	
 	// prepare subprinting gcode files
 	$ret_val = Printer_preparePrint($need_prime);
@@ -550,4 +570,53 @@ function Printer__getFileFromModel($id_model, &$gcode_path, $filename = NULL) {
 	}
 	
 	return ERROR_OK; // never reach here
+}
+
+function Printer__changeTemperature(&$gcode_path) {
+	$temp_r = 0;
+	$temp_rs = 0;
+	$temp_l = 0;
+	$temp_ls = 0;
+	$cr = 0;
+	$command = '';
+	$output = array();
+	$json_cartridge = array();
+	$CI = &get_instance();
+	
+	$CI->load->helper('printerstate');
+	
+	$cr = PrinterState_getCartridgeAsArray($json_cartridge, 'r');
+	if ($cr == ERROR_OK) {
+		$temp_r = $json_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER];
+		$temp_rs = $json_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1];
+	}
+	if ($temp_r * $temp_rs == 0) {
+		// we have at least one value not initialised to call change temper program
+		return ($cr == ERROR_OK) ? ERROR_INTERNAL : $cr;
+	}
+	
+	if (PrinterState_getNbExtruder() >= 2) {
+	$cr = PrinterState_getCartridgeAsArray($json_cartridge, 'l');
+		if ($cr == ERROR_OK) {
+			$temp_l = $json_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER];
+			$temp_ls = $json_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1];
+		}
+		if ($temp_l * $temper_ls == 0) {
+			// we have at least one value not initialised to call change temper program
+			return ($cr == ERROR_OK) ? ERROR_INTERNAL : $cr;
+		}
+	}
+	
+	$command = $CI->config->item('gcdaemon')
+			. PRINTER_PRM_TEMPER_R_F . $temp_r . PRINTER_PRM_TEMPER_R_N . $temp_rs
+			. PRINTER_PRM_TEMPER_L_F . $temp_l . PRINTER_PRM_TEMPER_L_N . $temp_ls
+			. PRINTER_PRM_FILE . $gcode_path . ' > ' . $gcode_path . '.new';
+	exec($command, $output, $cr);
+	if ($cr != ERROR_NORMAL_RC_OK) {
+		return ERROR_INTERNAL;
+	}
+	
+	$gcode_path = $gcode_path . '.new';
+	
+	return ERROR_OK;
 }

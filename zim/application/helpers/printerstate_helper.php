@@ -54,6 +54,12 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_EXTRUDE_RELAT',	' M83');
 	define('PRINTERSTATE_GET_STRIP_LED',	' M1614');
 	define('PRINTERSTATE_GET_TOP_LED',		' M1615');
+	define('PRINTERSTATE_GET_ENDSTOPS',		' M119');
+	define('PRINTERSTATE_GET_SPEED',		' M1620');
+	define('PRINTERSTATE_SET_SPEED',		' M1621 V');
+	define('PRINTERSTATE_GET_ACCELERATION', ' M1623');
+	define('PRINTERSTATE_SET_ACCELERATION',	' M1624 A');
+	define('PRINTERSTATE_GET_COLDEXTRUDE',	' M1622');
 
 // 	define('PRINTERSTATE_TEMP_PRINT_FILENAME',	'/tmp/printer_percentage'); // fix the name on SD card
 	define('PRINTERSTATE_FILE_PRINTLOG',	'/tmp/printlog.log');
@@ -72,6 +78,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_TITLE_INITIAL',	'initial');
 	define('PRINTERSTATE_TITLE_USED',		'used');
 	define('PRINTERSTATE_TITLE_EXT_TEMPER',	'temperature');
+	define('PRINTERSTATE_TITLE_EXT_TEMP_1',	'temperature_first');
 	define('PRINTERSTATE_TITLE_SETUP_DATE',	'setup');
 	define('PRINTERSTATE_TITLE_STATUS',		'status');
 	define('PRINTERSTATE_TITLE_PERCENT',	'percentage');
@@ -88,6 +95,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 
 	define('PRINTERSTATE_MAGIC_NUMBER_V1',			23567);
 	define('PRINTERSTATE_MAGIC_NUMBER_V2',			23568);
+	define('PRINTERSTATE_MAGIC_NUMBER_V3',			23569);
 	define('PRINTERSTATE_VALUE_CARTRIDGE_NORMAL',	0);
 	define('PRINTERSTATE_DESP_CARTRIDGE_NORMAL',	'normal');
 	define('PRINTERSTATE_VALUE_CARTRIDGE_REFILL',	1);
@@ -97,15 +105,17 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_VALUE_MATERIAL_ABS',		1);
 	define('PRINTERSTATE_DESP_MATERIAL_ABS',		'abs');
 	define('PRINTERSTATE_OFFSET_TEMPER',			100);
+	define('PRINTERSTATE_OFFSET_TEMPER_V2',			150);
 	define('PRINTERSTATE_OFFSET_YEAR_SETUP_DATE',	2014);
 	define('PRINTERSTATE_VALUE_DEFAULT_COLOR',		'transparent');
 	define('PRINTERSTATE_VALUE_OFFSET_TO_CAL_TIME',	10);
 	
 	define('PRINTERSTATE_VALUE_DEFAULT_EXTRUD',				5);
-	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD',		90);
+	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD',		89);
 	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD',		90);
 	define('PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_LOAD',		180);
 	define('PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_UNLOAD',	180);
+	define('PRINTERSTATE_VALUE_ENDSTOP_OPEN',				'open');
 	
 	define('PRINTERSTATE_PRM_EXTRUDER',			'extruder');
 	define('PRINTERSTATE_PRM_TEMPER',			'temp');
@@ -528,6 +538,10 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 				$version_rfid = 2;
 				break;
 				
+			case PRINTERSTATE_MAGIC_NUMBER_V3:
+				$version_rfid = 3;
+				break;
+				
 			default:
 				PrinterLog_logError('magic number error', __FILE__, __LINE__);
 				return ERROR_INTERNAL;
@@ -583,12 +597,23 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 				$offset_pack = 24;
 				$length_pack = 4;
 			}
-			else { //$version_rfid == 2
+			else if ($version_rfid == 2) { //$version_rfid == 2
 				$length_init = 5;
 				$offset_used = 19;
 				$length_used = 5;
 				$offset_temp = 24;
 				$length_temp = 2;
+				$offset_pack = 26;
+				$length_pack = 4;
+			}
+			else { //$version_rfid == 3
+				$length_init = 5;
+				$offset_used = 19;
+				$length_used = 5;
+				$offset_temp = 24;
+				$length_temp = 1;
+				$offset_temp_f = 25;
+				$length_temp_f = 1;
 				$offset_pack = 26;
 				$length_pack = 4;
 			}
@@ -605,8 +630,23 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 			
 			// normal extrusion temperature
 			$string_tmp = substr($last_output, $offset_temp, $length_temp);
-			$hex_tmp = hexdec($string_tmp) + PRINTERSTATE_OFFSET_TEMPER;
+			if ($version_rfid > 2) {
+				$hex_tmp = hexdec($string_tmp) + PRINTERSTATE_OFFSET_TEMPER_V2;
+			}
+			else {
+				$hex_tmp = hexdec($string_tmp) + PRINTERSTATE_OFFSET_TEMPER;
+			}
 			$data_json[PRINTERSTATE_TITLE_EXT_TEMPER] = $hex_tmp;
+			
+			// first layer extrusion temperature
+			if ($version_rfid > 2) {
+				$string_tmp = substr($last_output, $offset_temp, $length_temp_f);
+				$hex_tmp = hexdec($string_tmp) + PRINTERSTATE_OFFSET_TEMPER_V2;
+				$data_json[PRINTERSTATE_TITLE_EXT_TEMP_1] = $hex_tmp;
+			}
+			else {
+				$data_json[PRINTERSTATE_TITLE_EXT_TEMP_1] = $data_json[PRINTERSTATE_TITLE_EXT_TEMPER] + 10;
+			}
 			
 			// packing date
 			//TODO argument max acceptable date (Unix timestamp, 2038-01-19)
@@ -804,12 +844,24 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) 
 				CoreStatus_setInIdle($ret_val);
 				$array_data[PRINTERSTATE_TITLE_LASTERROR] = $ret_val;
 				$status_current = CORESTATUS_VALUE_IDLE;
-				if ($ret_val == ERROR_NO_PRINT) {
-					PrinterLog_logMessage('not in slicing', __FILE__, __LINE__);
-				}
-				else {
-					PrinterLog_logError('error return from slicer', __FILE__, __LINE__);
-					PrinterLog_logDebug('return: ' . $ret_val . ', progress: ' . $progress);
+				switch ($ret_val) {
+					//TODO treat the error with api and ui
+					case ERROR_NO_PRINT:
+						PrinterLog_logMessage('not in slicing', __FILE__, __LINE__);
+						break;
+						
+					case ERROR_WRONG_PRM:
+						PrinterLog_logMessage('slicer error, perhaps because of parameter', __FILE__, __LINE__);
+						break;
+						
+					case ERROR_UNKNOWN_MODEL:
+						PrinterLog_logMessage('slicer export error, perhaps because of model', __FILE__, __LINE__);
+						break;
+						
+					default:
+						PrinterLog_logError('error return from slicer', __FILE__, __LINE__);
+						PrinterLog_logDebug('return: ' . $ret_val . ', progress: ' . $progress);
+						break;
 				}
 				
 				return TRUE;
@@ -1721,8 +1773,7 @@ function PrinterState_setStripLed($value = 'off') {
 	return ERROR_OK;
 }
 
-function PrinterState_getStripLedStatus() {
-	// return TRUE only when strip LED is on
+function PrinterState_getStripLedStatus(&$value) {
 	global $CFG;
 	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
 	$command = $arcontrol_fullpath . PRINTERSTATE_GET_STRIP_LED;
@@ -1738,25 +1789,26 @@ function PrinterState_getStripLedStatus() {
 	PrinterLog_logArduino($command, $output);
 	if ($ret_val != ERROR_NORMAL_RC_OK) {
 		PrinterLog_logError('get strip LED status command error', __FILE__, __LINE__);
-		return FALSE;
+		return ERROR_INTERNAL;
 	}
 	else {
 		$last_output = $output[0];
 		if ($last_output == '1') {
-			return TRUE;
+			$value = TRUE;
 		}
 		else if ($last_output == '0') {
-			return FALSE;
+			$value = FALSE;
 		}
 		else {
 			PrinterLog_logError('get strip api error', __FILE__, __LINE__);
-			return FALSE;
+			return ERROR_INTERNAL;
 		}
 	}
+	
+	return ERROR_OK;
 }
 
-function PrinterState_getTopLedStatus() {
-	// return TRUE only when top LED is on
+function PrinterState_getTopLedStatus(&$value) {
 	global $CFG;
 	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
 	$command = $arcontrol_fullpath . PRINTERSTATE_GET_TOP_LED;
@@ -1772,21 +1824,23 @@ function PrinterState_getTopLedStatus() {
 	PrinterLog_logArduino($command, $output);
 	if ($ret_val != ERROR_NORMAL_RC_OK) {
 		PrinterLog_logError('get top LED status command error', __FILE__, __LINE__);
-		return FALSE;
+		return ERROR_INTERNAL;;
 	}
 	else {
 		$last_output = $output[0];
 		if ($last_output == '1') {
-			return TRUE;
+			$value = TRUE;
 		}
 		else if ($last_output == '0') {
-			return FALSE;
+			$value = FALSE;
 		}
 		else {
 			PrinterLog_logError('get top api error', __FILE__, __LINE__);
-			return FALSE;
+			return ERROR_INTERNAL;
 		}
 	}
+	
+	return ERROR_OK;
 }
 
 function PrinterState_setHeadLed($value = 'off') {
@@ -1876,7 +1930,7 @@ function PrinterState_relativePositioning($on = TRUE) {
 	return ERROR_OK;
 }
 
-function PrintState_pausePrinting() {
+function PrinterState_pausePrinting() {
 	global $CFG;
 	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
 	$output = array();
@@ -1907,7 +1961,7 @@ function PrintState_pausePrinting() {
 	return ERROR_OK;
 }
 
-function PrintState_resumePrinting() {
+function PrinterState_resumePrinting() {
 	global $CFG;
 	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
 	$output = array();
@@ -1936,6 +1990,221 @@ function PrintState_resumePrinting() {
 	}
 	
 	return ERROR_OK;
+}
+
+function PrinterState_getEndstop($abb_endstop, &$status) {
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$output = array();
+	$command = '';
+	$ret_val = 0;
+	
+	// check input
+	if (!in_array($abb_endstop, array('xmin', 'xmax', 'ymin', 'ymax', 'zmin', 'zmax'))) {
+		return ERROR_WRONG_PRM;
+	}
+	
+	// check if we are in printing
+	$ret_val = FALSE; //PrinterState_checkInPrint();
+	if ($ret_val == FALSE) {
+		$command = $arcontrol_fullpath . PRINTERSTATE_GET_ENDSTOPS;
+		exec($command, $output, $ret_val);
+		if (!PrinterState_filterOutput($output)) {
+			PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
+			return ERROR_INTERNAL;
+		}
+		PrinterLog_logArduino($command, $output);
+		if ($ret_val != ERROR_NORMAL_RC_OK) {
+			return ERROR_INTERNAL;
+		}
+		
+		// treat return of arduino
+		if (count($output)) {
+			$status = NULL;
+			foreach ($output as $line) {
+				if (strpos($line, ':') === FALSE) {
+					continue;
+				}
+				$tmp_array = explode(':', $line);
+				$endstop_line = str_replace('_', '', trim($tmp_array[0]));
+				if ($endstop_line == $abb_endstop) {
+					$status = (strtolower(trim($tmp_array[1])) == PRINTERSTATE_VALUE_ENDSTOP_OPEN) ? FALSE : TRUE;
+					return ERROR_OK;
+					break;
+				}
+			}
+		}
+		else {
+			// no usful return
+			PrinterLog_logError('no arduino return', __FILE__, __LINE__);
+		}
+	} else {
+		PrinterLog_logMessage('call getting end stop in printing', __FILE__, __LINE__);
+		return ERROR_BUSY_PRINTER;
+	}
+	
+	return ERROR_INTERNAL;
+}
+
+function PrinterState_getSpeed(&$value) {
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$command = $arcontrol_fullpath . PRINTERSTATE_GET_SPEED;
+	$ret_val = 0;
+	$output = array();
+	$last_output = '';
+	
+	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output)) {
+		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	PrinterLog_logArduino($command, $output);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		PrinterLog_logError('get speed command error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	else {
+		$last_output = $output[0];
+		$value = (int)$last_output;
+		if ($value == 0) {
+			PrinterLog_logError('get speed api error', __FILE__, __LINE__);
+			return ERROR_INTERNAL;
+		}
+	}
+}
+
+function PrinterState_getAcceleration(&$value) {
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$command = $arcontrol_fullpath . PRINTERSTATE_GET_ACCELERATION;
+	$ret_val = 0;
+	$output = array();
+	$last_output = '';
+	
+	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output)) {
+		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	PrinterLog_logArduino($command, $output);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		PrinterLog_logError('get acceleration command error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	else {
+		$last_output = $output[0];
+		$value = (int)$last_output;
+		if ($value == 0) {
+			PrinterLog_logError('get acceleration api error', __FILE__, __LINE__);
+			return ERROR_INTERNAL;
+		}
+	}
+}
+
+function PrinterState_getColdExtrusion(&$value) {
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$command = $arcontrol_fullpath . PRINTERSTATE_GET_COLDEXTRUDE;
+	$ret_val = 0;
+	$output = array();
+	$last_output = '';
+	
+	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output)) {
+		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	PrinterLog_logArduino($command, $output);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		PrinterLog_logError('get cold extrude status command error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	else {
+		$last_output = $output[0];
+		if ($last_output == '1') {
+			$value = TRUE;
+		}
+		else if ($last_output == '0') {
+			$value = FALSE;
+		}
+		else {
+			PrinterLog_logError('get cold extrude api error', __FILE__, __LINE__);
+			return ERROR_INTERNAL;
+		}
+	}
+	
+	return ERROR_OK;
+}
+
+function PrinterState_setSpeed($value) {
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$command = $arcontrol_fullpath . PRINTERSTATE_SET_SPEED;
+	$ret_val = 0;
+	$output = array();
+	$last_output = '';
+	
+	if ($value <= 0) {
+		return ERROR_WRONG_PRM;
+	}
+	else {
+		$command .= $value;
+	}
+	
+	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output)) {
+		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	PrinterLog_logArduino($command, $output);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		PrinterLog_logError('set speed command error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	else {
+		$last_output = $output[0];
+		$value = (int)$last_output;
+		if ($value == 0) {
+			PrinterLog_logError('set speed api error', __FILE__, __LINE__);
+			return ERROR_INTERNAL;
+		}
+	}
+}
+
+function PrinterState_setAcceleration($value) {
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$command = $arcontrol_fullpath . PRINTERSTATE_SET_ACCELERATION;
+	$ret_val = 0;
+	$output = array();
+	$last_output = '';
+	
+	if ($value <= 0) {
+		return ERROR_WRONG_PRM;
+	}
+	else {
+		$command .= $value;
+	}
+	
+	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output)) {
+		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	PrinterLog_logArduino($command, $output);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		PrinterLog_logError('set acceleration command error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	else {
+		$last_output = $output[0];
+		$value = (int)$last_output;
+		if ($value == 0) {
+			PrinterLog_logError('set acceleration api error', __FILE__, __LINE__);
+			return ERROR_INTERNAL;
+		}
+	}
 }
 
 //internal function

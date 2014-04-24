@@ -99,7 +99,6 @@ else {
 			else {
 				// get temperature
 				$string_temp = '';
-				$offset = 0;
 				
 				// count M109 and TX in only one line
 				if (strpos($line, 'T0') !== FALSE) {

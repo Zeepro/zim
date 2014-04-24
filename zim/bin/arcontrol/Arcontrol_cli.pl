@@ -96,9 +96,16 @@ use constant CMD_RELATIVE_POS   => 'G91';
 use constant CMD_ABSOLUTE_POS   => 'G90';
 use constant CMD_ALLOW_COLD_E   => 'M302';
 use constant CMD_RELATIVE_EXTUD => 'M83';
+use constant CMD_GET_ENDSTOPS   => 'M119';
 
 use constant CMD_MOVE => 'G1';
 use constant CMD_HOME => 'G28';
+
+use constant CMD_GET_SPEED        => 'M1620';
+use constant CMD_GET_ACCELERATION => 'M1623';
+use constant CMD_SET_SPEED        => 'M1621';
+use constant CMD_SET_ACCELERATION => 'M1624';
+use constant CMD_GET_COLD_E       => 'M1622';
 
 # general return code
 use constant RC_OK => 0;
@@ -727,6 +734,22 @@ sub check_led_state {
 	return;
 }
 
+sub show_endstops {
+	print <<ENDSTOP
+Reporting endstop status
+x_min: TRIGGERED
+x_max: open
+y_min: TRIGGERED
+y_max: open
+z_min: TRIGGERED
+z_max: open
+E0: TRIGGERED
+E1: TRIGGERED
+ENDSTOP
+;
+	return;
+}
+
 sub reset_printer {
 	_set_default_temper_file();
 	_set_default_config_file();
@@ -999,7 +1022,7 @@ else {
 		unload_filament($command);
 	}
 	elsif ($command eq CMD_GET_ETAT_LEFT_FILA
-		|| $command eq CMD_GET_ETAT_RIGHT_FILA )
+			|| $command eq CMD_GET_ETAT_RIGHT_FILA )
 	{
 
 		#cmd: check filament state L / R
@@ -1016,31 +1039,51 @@ else {
 		reset_printer();
 	}
 	elsif ( $command eq CMD_GET_ETAT_LED_STRIP
-		|| $command eq CMD_GET_ETAT_LED_HEAD)
+			|| $command eq CMD_GET_ETAT_LED_HEAD)
 	{
 
 		#cmd: get led state strips / head
 		check_led_state($command);
 	}
+	elsif ( $command eq CMD_GET_ENDSTOPS ) {
+
+		#cmd: move / extrude / special g99
+		show_endstops();
+	}
 	elsif ( $command eq CMD_START_SD_WRITE
-		|| $command eq CMD_STOP_SD_WRITE
-		|| $command eq CMD_SELECT_SD_FILE
-		|| $command eq CMD_START_SD_FILE
-		|| $command eq CMD_DELETE_SD_FILE )
+			|| $command eq CMD_STOP_SD_WRITE
+			|| $command eq CMD_SELECT_SD_FILE
+			|| $command eq CMD_START_SD_FILE
+			|| $command eq CMD_DELETE_SD_FILE )
 	{
 
 		#cmd: sd card
 		exit(RC_OK);
 	}
 	elsif ( $command eq CMD_MOVE
-		|| $command eq CMD_HOME
-		|| $command eq CMD_RELATIVE_POS
-		|| $command eq CMD_ABSOLUTE_POS
-		|| $command eq CMD_RELATIVE_EXTUD
-		|| $command eq CMD_UNIN_FILA_PLUS
-		|| $command eq CMD_ALLOW_COLD_E ) {
+			|| $command eq CMD_HOME
+			|| $command eq CMD_RELATIVE_POS
+			|| $command eq CMD_ABSOLUTE_POS
+			|| $command eq CMD_RELATIVE_EXTUD
+			|| $command eq CMD_UNIN_FILA_PLUS
+			|| $command eq CMD_ALLOW_COLD_E ) {
 
 		#cmd: move / extrude / special g99
+		exit(RC_OK);
+	}
+	elsif ( $command eq CMD_GET_SPEED ) {
+		print "2000\n";
+	}
+	elsif ( $command eq CMD_GET_ACCELERATION ) {
+		print "1000\n";
+	}
+	elsif ( $command eq CMD_GET_COLD_E ) {
+		print "0\n";
+	}
+	elsif ( $command eq CMD_SET_SPEED
+			|| $command eq CMD_SET_ACCELERATION ) {
+
+		#cmd: set speed / acceleration
 		exit(RC_OK);
 	}
 	else {    #default, wrong cmd, send help
