@@ -39,6 +39,8 @@ var var_refreshVideoURL;
 var var_firstRun = true;
 var var_ajax;
 var var_prime = {var_prime};
+var var_finish = false;
+
 $(document).ready(checkPrintStatus());
 
 function checkPrintStatus() {
@@ -119,10 +121,13 @@ function finishPrint() {
 function finishPrime() {
 	// do the same thing as printing
 	finishPrint();
-	// add yes button for re-prime
-	$('<button>').appendTo('#container')
-	.attr({'id': 'yes_button', 'onclick': 'javascript: window.location.href="{restart_url}";'}).html('{prime_button}')
-	.button().button('refresh');
+	if (var_finish == false) {
+		var_finish = true;
+		// add yes button for re-prime
+		$('<button>').appendTo('#container')
+		.attr({'id': 'yes_button', 'onclick': 'javascript: window.location.href="{restart_url}";'}).html('{prime_button}')
+		.button().button('refresh');
+	}
 
 	return;
 }

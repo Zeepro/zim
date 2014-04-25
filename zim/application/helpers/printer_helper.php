@@ -601,7 +601,7 @@ function Printer__changeTemperature(&$gcode_path) {
 			$temp_l = $json_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER];
 			$temp_ls = $json_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1];
 		}
-		if ($temp_l * $temper_ls == 0) {
+		if ($temp_l * $temp_ls == 0) {
 			// we have at least one value not initialised to call change temper program
 			return ($cr == ERROR_OK) ? ERROR_INTERNAL : $cr;
 		}
