@@ -32,6 +32,10 @@ class MY_Controller extends CI_Controller {
 			// and we do not need them in normal condition
 			return;
 		}
+		else if (CoreStatus_checkCallNoBlockPage()) {
+			// always allow certains pages pass, for example, set host name service
+			return;
+		}
 		else {
 			$status_current = '';
 			$url_redirect = '';

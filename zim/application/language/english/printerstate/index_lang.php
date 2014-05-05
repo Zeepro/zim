@@ -13,3 +13,5 @@ $lang['change_right']
 	= 'Change right cartridge';
 $lang['printer_info']
 	= 'Printer information';
+$lang['set_hostname']
+	= 'Set hostname';

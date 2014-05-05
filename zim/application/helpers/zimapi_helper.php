@@ -18,6 +18,7 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_CMD_DNS',			'grep nameserver /etc/resolv.conf | awk \'{print $2}\'');
 	define('ZIMAPI_CMD_SERIAL',			'ifconfig -a | grep wlan0 | awk \'{print $5}\'');
 	define('ZIMAPI_CMD_VERSION',		'zfw_printenv version`zfw_printenv last_good`');
+	define('ZIMAPI_CMD_SETHOSTNAME',	ZIMAPI_CMD_CONFIG_NET . '-n ');
 	
 	define('ZIMAPI_TITLE_TOPOLOGY',	'topology');
 	define('ZIMAPI_TITLE_MEDIUM',	'medium');
@@ -266,12 +267,13 @@ function ZimAPI_setsWifi($nameWifi, $passWifi = '') {
 				return ERROR_WRONG_PRM;
 			}
 			$nameWifi = ZimAPI__filterCharacter($nameWifi); //str_replace('"', '\"', $nameWifi);
-			$passWifi = ZimAPI__filterCharacter($passWifi); //str_replace('"', '\"', $passWifi);
 			
-			if (strlen($passWifi) == 0) {
+			if (strlen($passWifi == 0)) {
 				$command = ZIMAPI_CMD_SWIFI . ' ' . $nameWifi;
 			}
 			else {
+				$passWifi = ZimAPI__filterCharacter($passWifi); //str_replace('"', '\"', $passWifi);
+				
 				// check password length
 				if (strlen($passWifi) < 8 || strlen($passWifi) > 64) {
 					return ERROR_WRONG_PRM;
@@ -376,7 +378,7 @@ function ZimAPI_setcEth($ip = '', $mask = '', $gateWay = '') {
 		$output = NULL;
 		$ret_val = 0;
 		
-		if (is_null($ip . $mask . $gateWay)) {
+		if (strlen($ip . $mask . $gateWay) == 0) {
 			$command = ZIMAPI_CMD_PETH;
 		}
 		else if (filter_var($ip, FILTER_VALIDATE_IP)
@@ -391,15 +393,15 @@ function ZimAPI_setcEth($ip = '', $mask = '', $gateWay = '') {
 		
 		try {
 			exec($command, $output, $ret_val);
-			
-			if ($ret_val != ERROR_NORMAL_RC_OK) {
-				return ERROR_INTERNAL;
-			}
-			else {
-				exec(ZIMAPI_CMD_RESTART_WEB);
-			}
 		} catch (Exception $e) {
 			return ERROR_INTERNAL;
+		}
+			
+		if ($ret_val != ERROR_NORMAL_RC_OK) {
+			return ERROR_INTERNAL;
+		}
+		else {
+			exec(ZIMAPI_CMD_RESTART_WEB);
 		}
 	}
 	
@@ -415,6 +417,38 @@ function ZimAPI_setcEth($ip = '', $mask = '', $gateWay = '') {
 
 function ZimAPI_setpEth() {	
 	return ZimAPI_setcEth();
+}
+
+function ZimAPI_setHostname($hostname) {
+	// check characters
+	if (preg_match('/^[A-Za-z0-9]+$/', $hostname)) {
+		$ret_val = 0;
+		$output = array();
+		$command = ZIMAPI_CMD_SETHOSTNAME . $hostname;
+		
+		// do nothing for windows
+		if (DectectOS_checkWindows()) {
+			return ERROR_OK;
+		}
+		
+		try {
+			exec($command, $output, $ret_val);
+			
+			if ($ret_val != ERROR_NORMAL_RC_OK) {
+				return ERROR_INTERNAL;
+			}
+			else {
+				return ERROR_OK;
+			}
+		} catch (Exception $e) {
+			return ERROR_INTERNAL;
+		}
+	}
+	else {
+		return ERROR_WRONG_PRM;
+	}
+	
+	return ERROR_INTERNAL; // never reach here
 }
 
 function ZimAPI_setNetwork($string_json) {

@@ -9,6 +9,9 @@
 				<li><a href="/printerstate/resetnetwork">
 					<h2>{reset_network}</h2></a>
 				</li>
+				<li><a href="/printerstate/sethostname">
+					<h2>{set_hostname}</h2></a>
+				</li>
 				<li><a href="#" onclick="javascript: window.location.href='/printerstate/changecartridge?v=l&f=0';">
 					<h2>{change_left}</h2></a>
 				</li>

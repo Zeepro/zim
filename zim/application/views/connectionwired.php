@@ -11,7 +11,7 @@
 			<?= t("Text")?> 
 			<ul data-role="listview" data-inset="true" id="listview"
 				class="shadowBox">
-				<li><a href="/connection/wiredauto" data-prefetch><?= htmlspecialchars(t("OK")) ?></a></li>
+				<li><a href="/connection/wiredauto"><?= htmlspecialchars(t("OK")) ?></a></li>
 			</ul>
 			<img src="/assets/images/shadow2.png" class="shadow" alt="shadow">
 			<?= t("Text2")?>

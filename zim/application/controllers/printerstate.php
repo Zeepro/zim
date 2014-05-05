@@ -286,6 +286,7 @@ class Printerstate extends MY_Controller {
 				'change_right'	=> t('change_right'),
 				'printer_info'	=> t('printer_info'),
 				'back'			=> t('back'),
+				'set_hostname'	=> t('set_hostname'),
 		);
 		
 		$body_page = $this->parser->parse('template/printerstate/index', $template_data, TRUE);
@@ -727,7 +728,7 @@ class Printerstate extends MY_Controller {
 			if (ZimAPI_resetNetwork() == ERROR_OK) {
 // 				$error = t('wait a moment');
 // 				$this->output->set_header("Location:/connection");
-		
+				
 				// parse the main body
 				$template_data = array(
 						'hint'		=> t('Connect to the new printer\'s network, then press OK'),
@@ -750,7 +751,6 @@ class Printerstate extends MY_Controller {
 			else {
 				$error = t('Reset error');
 			}
-			
 		}
 		
 		// parse the main body
@@ -772,6 +772,71 @@ class Printerstate extends MY_Controller {
 		
 		$this->parser->parse('template/basetemplate', $template_data);
 		
+		return;
+	}
+	
+	public function sethostname() {
+		$template_data = array();
+		$body_page = NULL;
+		$error = '';
+	
+		$this->load->library('parser');
+		$this->lang->load('printerstate/sethostname', $this->config->item('language'));
+	
+		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+			$hostname = $this->input->post('hostname');
+			
+			if ($hostname) {
+				$this->load->helper('zimapi');
+				
+				if (ZimAPI_setHostname($hostname) == ERROR_OK) {
+					// parse the main body
+					$template_data = array(
+							'hint'			=> t('finish_hint'),
+							'home_button'	=> t('home_button'),
+					);
+					
+					$body_page = $this->parser->parse('template/printerstate/sethostname_finish', $template_data, TRUE);
+					
+					// parse all page
+					$template_data = array(
+							'lang'			=> $this->config->item('language_abbr'),
+							'headers'		=> '<title>' . t('page_title') . '</title>',
+							'contents'		=> $body_page,
+					);
+					
+					$this->parser->parse('template/basetemplate', $template_data);
+					
+					return;
+				}
+				else {
+					$error = t('set_error');
+				}
+			}
+			else {
+				$error = t('no_input');
+			}
+		}
+	
+		// parse the main body
+		$template_data = array(
+				'hint'			=> t('set_hint'),
+				'set_button'	=> t('set_button'),
+				'error'			=> $error,
+				'back'			=> t('back'),
+		);
+	
+		$body_page = $this->parser->parse('template/printerstate/sethostname', $template_data, TRUE);
+	
+		// parse all page
+		$template_data = array(
+				'lang'			=> $this->config->item('language_abbr'),
+				'headers'		=> '<title>' . t('page_title') . '</title>',
+				'contents'		=> $body_page,
+		);
+	
+		$this->parser->parse('template/basetemplate', $template_data);
+	
 		return;
 	}
 }

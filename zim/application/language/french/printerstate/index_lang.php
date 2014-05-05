@@ -13,3 +13,5 @@ $lang['change_right']
 	= 'Changer la cartouche droite';
 $lang['printer_info']
 	= 'Information de l\'imprimante';
+$lang['set_hostname']
+	= 'Assigner le nom de l\'imprimante';

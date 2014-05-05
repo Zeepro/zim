@@ -55,11 +55,12 @@ class Connection extends MY_Controller {
 		
 		// parse the main body
 		$template_data = array(
-				'title'		=> t('Connection configuration'),
-				'hint'		=> t('Welcome...'),
-				'wifissid'	=> htmlspecialchars(t('Option 1')),
-				'wifip2p'	=> htmlspecialchars(t('Option 3')),
-				'wired'		=> htmlspecialchars(t('Option 2')),
+				'title'			=> t('Connection configuration'),
+				'hint'			=> t('Welcome...'),
+				'wifissid'		=> htmlspecialchars(t('Option 1')),
+				'wifip2p'		=> htmlspecialchars(t('Option 3')),
+				'wired'			=> htmlspecialchars(t('Option 2')),
+				'set_hostname'	=> t('set_hostname'),
 		);
 		
 		$body_page = $this->parser->parse('template/connection/index', $template_data, TRUE);
@@ -223,6 +224,7 @@ class Connection extends MY_Controller {
 		$this->template->set ( 'header', "<title>" . t ( 'ZeePro Personal Printer 21 - Connection configuration' ) . "</title>" );
 		
 		if ($this->form_validation->run () == FALSE) {
+			$data = array();
 			$this->template->load ( 'connectionmaster', 'connectionwired', $data );
 		} else {
 // 			$arr = array("Connection.Topology" => "Network",
@@ -252,8 +254,10 @@ class Connection extends MY_Controller {
 //         fwrite($fh, json_encode($arr));
 //         fclose($fh);
 
-		CoreStatus_wantConnection();
-		header ( "Location:/connection/confirmation" );
+		$this->load->helper(array('zimapi'));
+		ZimAPI_setpEth();
+// 		header ( "Location:/connection/confirmation" );
+		$this->confirmation();
     }
     
     public function wiredadvanced() {

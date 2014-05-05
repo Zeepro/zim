@@ -5,6 +5,7 @@
 	<div data-role="content">
 		<div id="container">
 			<h2>{title}</h2>
+			<a href="/printerstate/sethostname" data-role="button">{set_hostname}</a><br>
 			{hint}<br><br>
 			<ul data-role="listview" data-inset="true" id="listview"
 				class="shadowBox">

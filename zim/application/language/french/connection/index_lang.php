@@ -11,4 +11,6 @@ $lang['Option 2'] =
         "Connexion par réseau filaire";
 $lang['Option 3'] =
         "Point d'accès WiFi (point à point)";
+$lang['set_hostname'] =
+		'Assigner le nom de l\'imprimante';
 ?>

@@ -246,6 +246,12 @@ function CoreStatus_checkCallNoBlockRESTInSlice() {
 	));
 }
 
+function CoreStatus_checkCallNoBlockPage() {
+	return CoreStatus__checkCallURI(array(
+			'/printerstate/sethostname'	=> NULL,
+	));
+}
+
 function CoreStatus_setInIdle($last_error = FALSE) {
 	$status_previous = '';
 	$ret_val = CoreStatus_checkInIdle($status_previous);

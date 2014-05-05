@@ -13,3 +13,5 @@ $lang['change_right']
 	= '替换右墨盒';
 $lang['printer_info']
 	= '打印机信息';
+$lang['set_hostname']
+	= '更改打印机名称';

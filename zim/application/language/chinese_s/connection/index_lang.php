@@ -11,4 +11,6 @@ $lang['Option 2'] =
         "使用有线网络连接";
 $lang['Option 3'] =
         "WIFI无线热点模式（点对点）";
+$lang['set_hostname'] =
+		'更改打印机名称';
 ?>

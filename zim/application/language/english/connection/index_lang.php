@@ -11,4 +11,6 @@ $lang['Option 2'] =
         "Wired network connection";
 $lang['Option 3'] =
         "WiFi Peer to Peer";
+$lang['set_hostname'] =
+		'Set hostname';
 ?>
