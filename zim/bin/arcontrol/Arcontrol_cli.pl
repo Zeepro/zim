@@ -81,6 +81,10 @@ use constant CMD_GET_ETAT_RIGHT_FILA => 'M1608';
 use constant CMD_GET_ETAT_LEFT_FILA  => 'M1609';
 use constant CMD_GET_ETAT_LED_STRIP  => 'M1614';
 use constant CMD_GET_ETAT_LED_HEAD   => 'M1615';
+use constant CMD_SET_LED_STRIP_ON    => 'M1202';
+use constant CMD_SET_LED_STRIP_OFF   => 'M1203';
+use constant CMD_SET_LED_HEAD_ON     => 'M1200';
+use constant CMD_SET_LED_HEAD_OFF    => 'M1201';
 
 use constant CMD_STOP_PRINT    => 'M1000';
 use constant CMD_RESET_PRINTER => 'M1100';
@@ -734,6 +738,54 @@ sub check_led_state {
 	return;
 }
 
+sub set_led {
+	my $command = shift;
+	my ($led_sel, $led_val);
+	
+	if ( $command eq CMD_SET_LED_STRIP_ON ) {
+		$led_sel = JSON_LED_STRIP;
+		$led_val = 1;
+	}
+	elsif ( $command eq CMD_SET_LED_STRIP_OFF ) {
+		$led_sel = JSON_LED_STRIP;
+		$led_val = 0;
+	}
+	elsif ( $command eq CMD_SET_LED_HEAD_ON ) {
+		$led_sel = JSON_LED_HEAD;
+		$led_val = 1;
+	}
+	elsif ( $command eq CMD_SET_LED_HEAD_OFF ) {
+		$led_sel = JSON_LED_HEAD;
+		$led_val = 0;
+	}
+	else {
+		return; # error - do not treat
+	}
+
+	# read config file
+	my $data;
+	{
+		my ( $fp, $raw );
+		local $/;    #Enable 'slurp' mode
+		open( $fp, "<", $mypath . FILENAME_CONFIG );
+		$raw = <$fp>;
+		close($fp);
+		$data = decode_json($raw);
+	}
+
+	# change config if necessary
+	my $test = int( $data->{$led_sel} );
+	if ( int( $data->{$led_sel} ) != $led_val ) {
+		my $fp;
+		$data->{$led_sel} = $led_val;
+		open( $fp, ">", $mypath . FILENAME_CONFIG );
+		print $fp encode_json($data);
+		close($fp);
+	}
+
+	return;
+}
+
 sub show_endstops {
 	print <<ENDSTOP
 Reporting endstop status
@@ -1044,6 +1096,15 @@ else {
 
 		#cmd: get led state strips / head
 		check_led_state($command);
+	}
+	elsif ( $command eq CMD_SET_LED_STRIP_ON
+			|| $command eq CMD_SET_LED_STRIP_OFF
+			|| $command eq CMD_SET_LED_HEAD_ON
+			|| $command eq CMD_SET_LED_HEAD_OFF)
+	{
+
+		#cmd: set led state strips / head
+		set_led($command);
 	}
 	elsif ( $command eq CMD_GET_ENDSTOPS ) {
 

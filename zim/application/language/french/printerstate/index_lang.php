@@ -15,3 +15,12 @@ $lang['printer_info']
 	= 'Information de l\'imprimante';
 $lang['set_hostname']
 	= 'Assigner le nom de l\'imprimante';
+$lang['strip_led']
+	= 'LED';
+$lang['head_led']
+	= 'Tête LED';
+$lang['led_on']
+	= 'Allumé';
+$lang['led_off']
+	= 'Eteint';
+

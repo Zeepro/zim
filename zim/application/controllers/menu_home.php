@@ -23,6 +23,8 @@ class Menu_home extends MY_Controller {
 // 				'title'				=> t('Home'),
 				'menu_printlist'	=> t('Quick print'),
 				'menu_printerstate'	=> t('Configuration'),
+				'manage'			=> t('manage'),
+				'upload'			=> t('upload'),
 		);
 		
 		$body_page = $this->parser->parse('template/menu_home', $template_data, TRUE);

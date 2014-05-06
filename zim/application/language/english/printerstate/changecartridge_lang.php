@@ -44,5 +44,7 @@ $lang['Remove the cartridge above']
 	= 'Remove the cartridge above';
 $lang['Insert the cartridge above']
 	= 'Insert the cartridge above';
+$lang['prime_button']
+	= 'Prime the filament';
 
 ?>

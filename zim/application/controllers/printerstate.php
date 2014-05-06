@@ -20,11 +20,13 @@ class Printerstate extends MY_Controller {
 		return;
 	}
 	
-	private function _display_changecartridge_wait_unload_filament() {
+	private function _display_changecartridge_wait_unload_filament($abb_cartridge) {
 		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
 		$template_data = array (
 				'next_phase'	=> PRINTERSTATE_CHANGECART_UNLOAD_F,
 				'unload_button'	=> t('Unload the filament'),
+				'prime_button'	=> t('prime_button'),
+				'abb_cartridge'	=> $abb_cartridge,
 		);
 		$template_name = 'template/printerstate/changecartridge_ajax/wait_unload_filament';
 		$this->_display_changecartridge_base($template_name, $template_data);
@@ -274,6 +276,21 @@ class Printerstate extends MY_Controller {
 	public function index() {
 		$template_data = array();
 		$body_page = NULL;
+		$ret_val = 0;
+		$status_strip = FALSE;
+		$status_head = FALSE;
+		$option_selected = 'selected="selected"';
+		
+		// get led status
+		$this->load->helper('printerstate');
+		$ret_val = PrinterState_getStripLedStatus($status_strip);
+		if ($ret_val != ERROR_OK) {
+			$status_strip = FALSE;
+		}
+		$ret_val = PrinterState_getTopLedStatus($status_head);
+		if ($ret_val != ERROR_OK) {
+			$status_head = FALSE;
+		}
 		
 // 		$this->changecartridge();
 		$this->load->library('parser');
@@ -282,11 +299,15 @@ class Printerstate extends MY_Controller {
 		// parse the main body
 		$template_data = array(
 				'reset_network'	=> t('reset_network'),
-				'change_left'	=> t('change_left'),
-				'change_right'	=> t('change_right'),
 				'printer_info'	=> t('printer_info'),
 				'back'			=> t('back'),
 				'set_hostname'	=> t('set_hostname'),
+				'strip_led_on'	=> ($status_strip == TRUE) ? $option_selected : NULL,
+				'head_led_on'	=> ($status_head == TRUE) ? $option_selected : NULL,
+				'strip_led'		=> t('strip_led'),
+				'head_led'		=> t('head_led'),
+				'led_on'		=> t('led_on'),
+				'led_off'		=> t('led_off'),
 		);
 		
 		$body_page = $this->parser->parse('template/printerstate/index', $template_data, TRUE);
@@ -463,7 +484,7 @@ class Printerstate extends MY_Controller {
 					
 					if (CoreStatus_checkInIdle($status_current)) {
 						// in idle
-						$this->_display_changecartridge_wait_unload_filament();
+						$this->_display_changecartridge_wait_unload_filament($abb_cartridge);
 					}
 					else if ($status_current == $status_correct) {
 						// in busy (normally only unloading is possible)

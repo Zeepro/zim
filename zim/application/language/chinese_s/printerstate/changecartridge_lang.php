@@ -44,5 +44,7 @@ $lang['Remove the cartridge above']
 	= '移除上方所示的墨盒';
 $lang['Insert the cartridge above']
 	= '插入上方所示的墨盒';
+$lang['prime_button']
+	= '校正打印丝';
 
 ?>

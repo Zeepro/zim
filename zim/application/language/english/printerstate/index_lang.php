@@ -15,3 +15,11 @@ $lang['printer_info']
 	= 'Printer information';
 $lang['set_hostname']
 	= 'Set hostname';
+$lang['strip_led']
+	= 'LED';
+$lang['head_led']
+	= 'Head LED';
+$lang['led_on']
+	= 'On';
+$lang['led_off']
+	= 'Off';

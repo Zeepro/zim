@@ -7,5 +7,7 @@ $lang['Configuration']
 	= 'Configuration';
 $lang['ZeePro Personal Printer 21 - Home']
 	= 'Zim - Accueil';
-
-?>
+$lang['manage']
+	= 'Gérer l\'imprimante';
+$lang['upload']
+	= 'Charger un fichier';
