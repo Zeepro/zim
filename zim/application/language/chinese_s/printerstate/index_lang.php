@@ -19,3 +19,5 @@ $lang['led_on']
 	= '开';
 $lang['led_off']
 	= '关';
+$lang['set_preset']
+	= '分层分析';

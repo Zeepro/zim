@@ -23,3 +23,5 @@ $lang['led_on']
 	= 'On';
 $lang['led_off']
 	= 'Off';
+$lang['set_preset']
+	= 'Slicer';

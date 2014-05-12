@@ -30,6 +30,9 @@
 				</div></div>
 			</div>
 			<ul data-role="listview" id="listview" class="shadowBox" data-inset="true">
+				<li><a href="/preset/listpreset">
+					<h2>{set_preset}</h2></a>
+				</li>
 				<li><a href="/printerstate/resetnetwork">
 					<h2>{reset_network}</h2></a>
 				</li>

@@ -23,4 +23,5 @@ $lang['led_on']
 	= 'Allumé';
 $lang['led_off']
 	= 'Eteint';
-
+$lang['set_preset']
+	= 'Gestion de préset de slicer';

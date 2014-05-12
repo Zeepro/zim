@@ -54,6 +54,8 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_VALUE_MODE_OFF',		'off');
 	define('ZIMAPI_VALUE_MODE_HLS',		'hls');
 	define('ZIMAPI_TITLE_PRESET',		'preset');
+	define('ZIMAPI_TITLE_PRESET_ID',	'id');
+	define('ZIMAPI_TITLE_PRESET_NAME',	'name');
 	
 	define('ZIMAPI_PRM_CAPTURE',	'picture');
 	define('ZIMAPI_PRM_VIDEO_MODE',	'video');
@@ -792,26 +794,29 @@ function ZimAPI_getPresetListAsArray() {
 	
 	$CI = &get_instance();
 	$CI->load->helper(array('file', 'directory', 'json'));
-	$presetlist_basepath = $CI->config->item('presetlist');
-	$preset_array = directory_map($presetlist_basepath, 1);
-	
-	foreach ($preset_array as $preset_id) {
-		$preset_path = $presetlist_basepath . $preset_id . '/';
+	foreach (array(
+					$CI->config->item('systempreset'), $CI->config->item('presetlist')
+			) as $presetlist_basepath) {
+		$preset_array = directory_map($presetlist_basepath, 1);
 		
-		try {
-			$tmp_array = json_read($preset_path . ZIMAPI_FILE_PRESET_JSON, TRUE);
-			if ($tmp_array['error']) {
-				throw new Exception('read json error');
+		foreach ($preset_array as $preset_id) {
+			$preset_path = $presetlist_basepath . $preset_id . '/';
+			
+			try {
+				$tmp_array = json_read($preset_path . ZIMAPI_FILE_PRESET_JSON, TRUE);
+				if ($tmp_array['error']) {
+					throw new Exception('read json error');
+				}
+			} catch (Exception $e) {
+				// log internal error
+				$CI = &get_instance();
+				$CI->load->helper('printerlog');
+				PrinterLog_logError('catch exception when getting preset json ' . $preset_id, __FILE__, __LINE__);
+				continue; // just jump through the wrong data file
 			}
-		} catch (Exception $e) {
-			// log internal error
-			$CI = &get_instance();
-			$CI->load->helper('printerlog');
-			PrinterLog_logError('catch exception when getting preset json ' . $preset_id, __FILE__, __LINE__);
-			continue; // just jump through the wrong data file
+			
+			$json_data[] = $tmp_array['json']; //asign final data
 		}
-		
-		$json_data[] = $tmp_array['json']; //asign final data
 	}
 	
 	return $json_data;
@@ -949,6 +954,441 @@ function ZimAPI_getType() {
 	return trim(@file_get_contents($CFG->config['type_file']));
 }
 
+function ZimAPI_getPresetInfoAsArray($preset_id, &$array_info, &$system_preset = NULL) {
+	$presetlist_basepath = NULL;
+	$tmp_array = NULL;
+	$system_preset = FALSE;
+	
+	$CI = &get_instance();
+	$CI->load->helper(array('file', 'json'));
+	
+	if (!ZimAPI__checkPreset($preset_id, $presetlist_basepath, $system_preset)) {
+		return ERROR_WRONG_PRM;
+	}
+// 	$presetlist_basepath = $CI->config->item('presetlist');
+	
+	try {
+		$preset_path = $presetlist_basepath . $preset_id . '/';
+		$tmp_array = json_read($preset_path . ZIMAPI_FILE_PRESET_JSON, TRUE);
+		if ($tmp_array['error']) {
+			throw new Exception('read json error');
+		}
+	} catch (Exception $e) {
+		// log internal error
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('catch exception when getting preset json ' . $preset_id, __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	
+	$array_info = $tmp_array['json']; //asign final data
+	
+	return ERROR_OK;
+}
+
+function ZimAPI_getPresetSettingAsArray($id_preset, &$array_setting) {
+	//TODO finish me, the following function is only for test
+	$preset_basepath = '';
+	
+	// check if preset exists
+	if (!ZimAPI__checkPreset($id_preset, $preset_basepath)) {
+		return ERROR_WRONG_PRM;
+	}
+	$array_setting = @parse_ini_file($preset_basepath . $id_preset . '/' . ZIMAPI_FILE_PRESET_INI);
+	
+	if ($array_setting == FALSE) {
+		return ERROR_INTERNAL; // read ini file error
+	}
+	if (!ZimAPI_checkPresetSetting($array_setting, FALSE)) {
+		return ERROR_INTERNAL; // internal settings file error
+	}
+	
+	return ERROR_OK;
+}
+
+function ZimAPI_setPresetSetting($id_preset, $array_input, $name_preset = NULL) {
+	// $name_preset is NULL when creating preset from an old id
+	$ret_val = 0;
+	$array_setting = array();
+	$preset_path = NULL;
+	$CI = &get_instance();
+	
+	if (!is_array($array_input)) {
+		return ERROR_INTERNAL;
+	}
+	
+	// check if we have same name, and define preset path
+	if ($name_preset != NULL) {
+		$ret_val = ZimAPI__checkPreset(ZimAPI__codePresetHash($name_preset));
+		if ($ret_val == TRUE) {
+			$CI->load->helper('printerlog');
+			PrinterLog_logMessage('system has already the same preset name: ' . $name_preset);
+			return ERROR_FULL_PRTLST; // just use another error code
+		}
+		
+		$preset_path = $CI->config->item('presetlist') . ZimAPI__codePresetHash($name_preset) . '/';
+	}
+	else {
+		$system_preset = FALSE;
+		$ret_val = ZimAPI__checkPreset($id_preset, $preset_path, $system_preset);
+		if ($ret_val == TRUE) {
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('system can not find preset: ' . $id_preset);
+			return ERROR_WRONG_PRM; // just use another error code
+		}
+		
+		if ($system_preset == TRUE) {
+			$CI->load->helper('printerlog');
+			PrinterLog_logMessage('system can not modify default preset');
+			return ERROR_WRONG_PRM;
+		}
+		
+		$preset_path .= '/' . $id_preset . '/';
+	}
+	
+	$ret_val = ZimAPI_checkPresetSetting($array_input);
+	if ($ret_val != TRUE) {
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('user input preset setting has wrong parameter');
+		return ERROR_WRONG_PRM;
+	}
+	
+	$ret_val = ZimAPI_getPresetSettingAsArray($id_preset, $array_setting);
+	if ($ret_val != ERROR_OK) {
+		return $ret_val;
+	}
+	
+	// assign new setting
+	foreach ($array_input as $key => $value) {
+		$array_setting[$key] = $value;
+	}
+	
+	// save preset
+	if (!file_exists($preset_path)) {
+		mkdir($preset_path);
+	}
+	if ($name_preset != NULL) {
+		$json_data = array(
+				ZIMAPI_TITLE_PRESET_ID		=> ZimAPI__codePresetHash($name_preset),
+				ZIMAPI_TITLE_PRESET_NAME	=> $name_preset,
+		);
+		
+		$CI->load->helper('json');
+		//write model json info
+		try {
+			$fp = fopen($preset_path . ZIMAPI_FILE_PRESET_JSON, 'w');
+			if ($fp) {
+				fwrite($fp, json_encode_unicode($json_data));
+				fclose($fp);
+			}
+			else {
+				return ERROR_INTERNAL;
+			}
+		} catch (Exception $e) {
+			return ERROR_INTERNAL;
+		}
+	}
+	//write config ini file
+	try {
+		$fp = fopen($preset_path . ZIMAPI_FILE_PRESET_INI, 'w');
+		if ($fp) {
+			foreach ($array_setting as $key => $value) {
+				fwrite($fp, $key . " = " . $value . "\r\n");
+			}
+			fclose($fp);
+		}
+		else {
+			return ERROR_INTERNAL;
+		}
+	} catch (Exception $e) {
+		return ERROR_INTERNAL;
+	}
+	
+	return ERROR_OK;
+}
+
+
+function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
+	// check no any extra settings for user input preset setting only
+	if ($input == TRUE) {
+		$array_check = array(
+				'layer_height',
+				'first_layer_height',
+				'perimeters',
+				'spiral_vase',
+				'top_solid_layers',
+				'bottom_solid_layers',
+				'extra_perimeters',
+				'avoid_crossing_perimeters',
+				'start_perimeters_at_concave_points',
+				'start_perimeters_at_non_overhang',
+				'thin_walls',
+				'overhangs',
+				'randomize_start',
+				'external_perimeters_first',
+				'fill_density',
+				'fill_pattern',
+				'solid_fill_pattern',
+				'infill_every_layers',
+				'infill_only_where_needed',
+				'solid_infill_every_layers',
+				'fill_angle',
+				'solid_infill_below_area',
+				'only_retract_when_crossing_perimeters',
+				'infill_first',
+				'perimeter_speed',
+				'small_perimeter_speed',
+				'external_perimeter_speed',
+				'infill_speed',
+				'solid_infill_speed',
+				'top_solid_infill_speed',
+				'support_material_speed',
+				'bridge_speed',
+				'gap_fill_speed',
+				'travel_speed',
+				'first_layer_speed',
+				'skirts',
+				'skirt_distance',
+				'skirt_height',
+				'min_skirt_length',
+				'brim_width',
+				'support_material',
+				'support_material_threshold',
+				'support_material_enforce_layers',
+				'raft_layers',
+				'support_material_pattern',
+				'support_material_spacing',
+				'support_material_angle',
+				'support_material_interface_layers',
+				'support_material_interface_spacing',
+				'perimeter_extruder',
+				'infill_extruder',
+				'support_material_extruder',
+				'support_material_interface_extruder',
+				'ooze_prevention',
+				'standby_temperature_delta',
+				'extrusion_width',
+				'first_layer_extrusion_width',
+				'perimeter_extrusion_width',
+				'infill_extrusion_width',
+				'solid_infill_extrusion_width',
+				'top_infill_extrusion_width',
+				'support_material_extrusion_width',
+				'bridge_flow_ratio',
+				'resolution',
+		);
+		foreach ($array_check as $value) {
+			if (!array_key_exists($value, $array_setting)) {
+				return FALSE;
+				break; // never reach here
+			}
+		}
+	}
+	
+	// check no any losing settings
+	//TODO add value checking
+	// layers and perimeters
+	if (!array_key_exists('layer_height', $array_setting)) {
+		$array_setting['layer_height'] = 0.4;
+	}
+	if (!array_key_exists('first_layer_height', $array_setting)) {
+		$array_setting['first_layer_height'] = 0.35;
+	}
+	if (!array_key_exists('perimeters', $array_setting)) {
+		$array_setting['perimeters'] = 3;
+	}
+	if (!array_key_exists('spiral_vase', $array_setting)) {
+		$array_setting['spiral_vase'] = 0;
+	}
+	if (!array_key_exists('top_solid_layers', $array_setting)) {
+		$array_setting['top_solid_layers'] = 3;
+	}
+	if (!array_key_exists('bottom_solid_layers', $array_setting)) {
+		$array_setting['bottom_solid_layers'] = 3;
+	}
+	if (!array_key_exists('extra_perimeters', $array_setting)) {
+		$array_setting['extra_perimeters'] = 1;
+	}
+	if (!array_key_exists('avoid_crossing_perimeters', $array_setting)) {
+		$array_setting['avoid_crossing_perimeters'] = 0;
+	}
+	if (!array_key_exists('start_perimeters_at_concave_points', $array_setting)) {
+		$array_setting['start_perimeters_at_concave_points'] = 0;
+	}
+	if (!array_key_exists('start_perimeters_at_non_overhang', $array_setting)) {
+		$array_setting['start_perimeters_at_non_overhang'] = 0;
+	}
+	if (!array_key_exists('thin_walls', $array_setting)) {
+		$array_setting['thin_walls'] = 1;
+	}
+	if (!array_key_exists('overhangs', $array_setting)) {
+		$array_setting['overhangs'] = 1;
+	}
+	if (!array_key_exists('randomize_start', $array_setting)) {
+		$array_setting['randomize_start'] = 0;
+	}
+	if (!array_key_exists('external_perimeters_first', $array_setting)) {
+		$array_setting['external_perimeters_first'] = 0;
+	}
+	// infill
+	if (!array_key_exists('fill_density', $array_setting)) {
+		$array_setting['fill_density'] = 0.4;
+	}
+	if (!array_key_exists('fill_pattern', $array_setting)) {
+		$array_setting['fill_pattern'] = 'honeycomb';
+	}
+	if (!array_key_exists('solid_fill_pattern', $array_setting)) {
+		$array_setting['solid_fill_pattern'] = 'rectilinear';
+	}
+	if (!array_key_exists('infill_every_layers', $array_setting)) {
+		$array_setting['infill_every_layers'] = 1;
+	}
+	if (!array_key_exists('infill_only_where_needed', $array_setting)) {
+		$array_setting['infill_only_where_needed'] = 0;
+	}
+	if (!array_key_exists('solid_infill_every_layers', $array_setting)) {
+		$array_setting['solid_infill_every_layers'] = 0;
+	}
+	if (!array_key_exists('fill_angle', $array_setting)) {
+		$array_setting['fill_angle'] = 45;
+	}
+	if (!array_key_exists('solid_infill_below_area', $array_setting)) {
+		$array_setting['solid_infill_below_area'] = 70;
+	}
+	if (!array_key_exists('only_retract_when_crossing_perimeters', $array_setting)) {
+		$array_setting['only_retract_when_crossing_perimeters'] = 1;
+	}
+	if (!array_key_exists('infill_first', $array_setting)) {
+		$array_setting['infill_first'] = 0;
+	}
+	// speed
+	if (!array_key_exists('perimeter_speed', $array_setting)) {
+		$array_setting['perimeter_speed'] = 30;
+	}
+	if (!array_key_exists('small_perimeter_speed', $array_setting)) {
+		$array_setting['small_perimeter_speed'] = 30;
+	}
+	if (!array_key_exists('external_perimeter_speed', $array_setting)) {
+		$array_setting['external_perimeter_speed'] = '70%';
+	}
+	if (!array_key_exists('infill_speed', $array_setting)) {
+		$array_setting['infill_speed'] = 60;
+	}
+	if (!array_key_exists('solid_infill_speed', $array_setting)) {
+		$array_setting['solid_infill_speed'] = 60;
+	}
+	if (!array_key_exists('top_solid_infill_speed', $array_setting)) {
+		$array_setting['top_solid_infill_speed'] = 50;
+	}
+	if (!array_key_exists('support_material_speed', $array_setting)) {
+		$array_setting['support_material_speed'] = 60;
+	}
+	if (!array_key_exists('bridge_speed', $array_setting)) {
+		$array_setting['bridge_speed'] = 60;
+	}
+	if (!array_key_exists('gap_fill_speed', $array_setting)) {
+		$array_setting['gap_fill_speed'] = 20;
+	}
+	if (!array_key_exists('travel_speed', $array_setting)) {
+		$array_setting['travel_speed'] = 130;
+	}
+	if (!array_key_exists('first_layer_speed', $array_setting)) {
+		$array_setting['first_layer_speed'] = '30%';
+	}
+	// skirt and brim
+	if (!array_key_exists('skirts', $array_setting)) {
+		$array_setting['skirts'] = 1;
+	}
+	if (!array_key_exists('skirt_distance', $array_setting)) {
+		$array_setting['skirt_distance'] = 6;
+	}
+	if (!array_key_exists('skirt_height', $array_setting)) {
+		$array_setting['skirt_height'] = 1;
+	}
+	if (!array_key_exists('min_skirt_length', $array_setting)) {
+		$array_setting['min_skirt_length'] = 0;
+	}
+	if (!array_key_exists('brim_width', $array_setting)) {
+		$array_setting['brim_width'] = 0;
+	}
+	// support material
+	if (!array_key_exists('support_material', $array_setting)) {
+		$array_setting['support_material'] = 0;
+	}
+	if (!array_key_exists('material_threshold', $array_setting)) {
+		$array_setting['material_threshold'] = 0;
+	}
+	if (!array_key_exists('support_material_enforce_layers', $array_setting)) {
+		$array_setting['support_material_enforce_layers'] = 0;
+	}
+	if (!array_key_exists('raft_layers', $array_setting)) {
+		$array_setting['raft_layers'] = 0;
+	}
+	if (!array_key_exists('support_material_pattern', $array_setting)) {
+		$array_setting['support_material_pattern'] = 'honeycomb';
+	}
+	if (!array_key_exists('support_material_spacing', $array_setting)) {
+		$array_setting['support_material_spacing'] = 2.5;
+	}
+	if (!array_key_exists('support_material_angle', $array_setting)) {
+		$array_setting['support_material_angle'] = 0;
+	}
+	if (!array_key_exists('support_material_interface_layers', $array_setting)) {
+		$array_setting['support_material_interface_layers'] = 3;
+	}
+	if (!array_key_exists('support_material_interface_spacing', $array_setting)) {
+		$array_setting['support_material_interface_spacing'] = 0;
+	}
+	// multiple extruders
+	if (!array_key_exists('perimeter_extruder', $array_setting)) {
+		$array_setting['perimeter_extruder'] = 1;
+	}
+	if (!array_key_exists('infill_extruder', $array_setting)) {
+		$array_setting['infill_extruder'] = 1;
+	}
+	if (!array_key_exists('support_material_extruder', $array_setting)) {
+		$array_setting['support_material_extruder'] = 1;
+	}
+	if (!array_key_exists('support_material_interface_extruder', $array_setting)) {
+		$array_setting['support_material_interface_extruder'] = 1;
+	}
+	if (!array_key_exists('ooze_prevention', $array_setting)) {
+		$array_setting['ooze_prevention'] = 0;
+	}
+	if (!array_key_exists('standby_temperature_delta', $array_setting)) {
+		$array_setting['standby_temperature_delta'] = -5;
+	}
+	// advanced
+	if (!array_key_exists('extrusion_width', $array_setting)) {
+		$array_setting['extrusion_width'] = 0;
+	}
+	if (!array_key_exists('first_layer_extrusion_width', $array_setting)) {
+		$array_setting['first_layer_extrusion_width'] = '200%';
+	}
+	if (!array_key_exists('perimeter_extrusion_width', $array_setting)) {
+		$array_setting['perimeter_extrusion_width'] = 0;
+	}
+	if (!array_key_exists('infill_extrusion_width', $array_setting)) {
+		$array_setting['infill_extrusion_width'] = 0;
+	}
+	if (!array_key_exists('solid_infill_extrusion_width', $array_setting)) {
+		$array_setting['solid_infill_extrusion_width'] = 0;
+	}
+	if (!array_key_exists('top_infill_extrusion_width', $array_setting)) {
+		$array_setting['top_infill_extrusion_width'] = 0;
+	}
+	if (!array_key_exists('support_material_extrusion_width', $array_setting)) {
+		$array_setting['support_material_extrusion_width'] = 0;
+	}
+	if (!array_key_exists('bridge_flow_ratio', $array_setting)) {
+		$array_setting['bridge_flow_ratio'] = 1;
+	}
+	if (!array_key_exists('resolution', $array_setting)) {
+		$array_setting['resolution'] = 0;
+	}
+	
+	return TRUE;
+}
+
 //internal function
 function ZimAPI__getModebyParameter($parameter) {
 	switch ($parameter) {
@@ -964,16 +1404,24 @@ function ZimAPI__getModebyParameter($parameter) {
 	return ZIMAPI_VALUE_MODE_OFF; // never reach here
 }
 
-function ZimAPI__checkPreset($id_preset) {
+function ZimAPI__checkPreset($id_preset, &$preset_basepath = NULL, &$system_preset = NULL) {
 	$CI = &get_instance();
 	$CI->load->helper('directory');
-	$presetlist_basepath = $CI->config->item('presetlist');
-	$preset_array = directory_map($presetlist_basepath, 1);
 	
-	foreach ($preset_array as $check_id) {
-		if ($check_id == $id_preset) {
-			return TRUE;
-			break; // never reach here
+	foreach (array(
+					$CI->config->item('systempreset'), $CI->config->item('presetlist')
+			) as $presetlist_basepath) {
+		$preset_array = directory_map($presetlist_basepath, 1);
+		
+		foreach ($preset_array as $check_id) {
+			if ($check_id == $id_preset) {
+				$preset_basepath = $presetlist_basepath;
+				if ($CI->config->item('systempreset') == $preset_basepath) {
+					$system_preset = TRUE;
+				}
+				return TRUE;
+				break; // never reach here
+			}
 		}
 	}
 	
@@ -984,4 +1432,16 @@ function ZimAPI__filterCharacter($raw) {
 	$filtered = "'" . str_replace("'", "'\"'\"'", $raw) . "'";
 	
 	return $filtered;
+}
+
+function ZimAPI__codePresetHash($raw_name) {
+	$CI = &get_instance();
+	$CI->load->helper(array('detectos'));
+
+	if (DectectOS_checkWindows()) {
+		return md5(utf8_encode($raw_name));
+	}
+	else {
+		return md5($raw_name);
+	}
 }

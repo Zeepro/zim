@@ -12,13 +12,12 @@ class Manage extends MY_Controller {
 	}
 	
 	public function index() {
-		global $CFG;
 		$template_data = array();
 		$body_page = NULL;
-
+		
 		$this->load->library('parser');
 		$this->lang->load('manage', $this->config->item('language'));
-
+		
 		// parse the main body
 		$template_data = array(
 				'back'			=> t('back'),
@@ -29,7 +28,7 @@ class Manage extends MY_Controller {
 				'manage_right'	=> t('manage_right'),
 		);
 		$body_page = $this->parser->parse('template/manage', $template_data, TRUE);
-
+		
 		// parse all page
 		$template_data = array(
 				'lang'			=> $this->config->item('language_abbr'),
@@ -37,9 +36,9 @@ class Manage extends MY_Controller {
 						. '<link rel="stylesheet" href="/assets/jquery-mobile-fluid960.min.css">',
 				'contents'		=> $body_page,
 		);
-
+		
 		$this->parser->parse('template/basetemplate', $template_data);
-
+		
 		return;
 	}
 	

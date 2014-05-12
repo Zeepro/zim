@@ -302,6 +302,7 @@ class Printerstate extends MY_Controller {
 				'printer_info'	=> t('printer_info'),
 				'back'			=> t('back'),
 				'set_hostname'	=> t('set_hostname'),
+				'set_preset'	=> t('set_preset'),
 				'strip_led_on'	=> ($status_strip == TRUE) ? $option_selected : NULL,
 				'head_led_on'	=> ($status_head == TRUE) ? $option_selected : NULL,
 				'strip_led'		=> t('strip_led'),
