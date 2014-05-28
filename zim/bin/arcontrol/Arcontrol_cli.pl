@@ -85,6 +85,7 @@ use constant CMD_SET_LED_STRIP_ON    => 'M1202';
 use constant CMD_SET_LED_STRIP_OFF   => 'M1203';
 use constant CMD_SET_LED_HEAD_ON     => 'M1200';
 use constant CMD_SET_LED_HEAD_OFF    => 'M1201';
+use constant CMD_GET_VERSION         => 'M1400';
 
 use constant CMD_STOP_PRINT    => 'M1000';
 use constant CMD_RESET_PRINTER => 'M1100';
@@ -1146,6 +1147,9 @@ else {
 
 		#cmd: set speed / acceleration
 		exit(RC_OK);
+	}
+	elsif ( $command eq CMD_GET_VERSION ) {
+		print "1.0.99\n";
 	}
 	else {    #default, wrong cmd, send help
 		usage(EXIT_ERROR_PRM);

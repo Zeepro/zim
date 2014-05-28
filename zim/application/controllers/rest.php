@@ -714,7 +714,7 @@ class Rest extends MY_Controller {
 		$cr = 0;
 		$api_prm = NULL;
 		
-		$this->load->helper(array('printerstate', 'zimapi'));
+		$this->load->helper(array('printerstate', 'zimapi', 'slicer'));
 		
 		$parameter = $this->input->get('p'); //return false if missing
 		
@@ -876,6 +876,38 @@ class Rest extends MY_Controller {
 					}
 					else {
 						$cr = ERROR_MISS_PRM;
+					}
+					break;
+					
+				case SLICER_PRM_PRM:
+					$density = $this->input->get('density');
+					$skirt = $this->input->get('skirt');
+					$raft = $this->input->get('raft');
+					$support = $this->input->get('support');
+					
+					$array_setting = array();
+					if ($density !== FALSE) {
+						$density = (int)$density / 100;
+						if ($density <= 0 || $density >= 1) {
+							$cr = ERROR_MISS_PRM;
+							break;
+						}
+						$array_setting['fill_density'] = $density;
+					}
+					if ($skirt !== FALSE) {
+						$array_setting['skirts'] = ((int)$skirt == 1) ? 1 : 0;
+					}
+					if ($raft !== FALSE) {
+						$array_setting['raft_layers'] = ((int)$raft == 1) ? 1 : 0;
+					}
+					if ($support !== FALSE) {
+						$array_setting['support_material'] = ((int)$support == 1) ? 1 : 0;
+					}
+					if (count($array_setting) == 0) {
+						$cr = ERROR_MISS_PRM;
+					}
+					else {
+						$cr = Slicer_changeParameter($array_setting);
 					}
 					break;
 					
@@ -1136,12 +1168,27 @@ class Rest extends MY_Controller {
 		);
 		
 		// check missing parameter
+		$cr = ERROR_OK;
 		foreach ($array_data as $value) {
 			if ($value === FALSE) {
 				$cr = ERROR_MISS_PRM;
 				break;
 			}
 		}
+		// if we pass to allow part of parameter
+// 		$cr = ERROR_MISS_PRM;
+// 		foreach ($array_data as $key => $value) {
+// 			if ($value === FALSE) {
+// 				if ($key == SLICER_PRM_ID) {
+// 					break;
+// 				}
+// 			}
+// 			else if ($key != SLICER_PRM_ID) {
+// 				$cr = ERROR_OK;
+// 				break;
+// 			}
+// 		}
+		
 		if ($cr != ERROR_MISS_PRM) {
 			$cr = Slicer_setModel($array_data);
 		}
@@ -1206,10 +1253,19 @@ class Rest extends MY_Controller {
 	
 	public function platformprint() {
 		$cr = 0;
+		$array_cartridge = array();
 		$this->load->helper('slicer');
 		
+		$cr = Slicer_reloadPreset();
+		
 		// check platform and filament present (do not check filament quantity)
-		$cr = Slicer_checkPlatformColor();
+		if ($cr == ERROR_OK) {
+			$cr = Slicer_checkPlatformColor($array_cartridge);
+		}
+		
+		if ($cr == ERROR_OK) {
+			$cr = Slicer_changeTemperByCartridge($array_cartridge);
+		}
 		
 		// start slice command after checking filament
 		if ($cr == ERROR_OK) {

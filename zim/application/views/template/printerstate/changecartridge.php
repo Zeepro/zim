@@ -16,13 +16,21 @@
 <script type="text/javascript">
 var var_refreshChangeStatus;
 var var_ajax;
+var var_ajax_lock = false;
 var var_next_phase = '{first_status}';
 $(document).ready(checkChangeStatus());
 
 function checkChangeStatus() {
 	refreshChangeStatus();
-	var_refreshChangeStatus = setInterval(refreshChangeStatus, 6000);
+	var_refreshChangeStatus = setInterval(refreshChangeStatus, 5000);
 	function refreshChangeStatus() {
+		if (var_ajax_lock == true) {
+			return;
+		}
+		else {
+			var_ajax_lock = true;
+		}
+		
 		var_ajax = $.ajax({
 			url: "/printerstate/changecartridge_ajax",
 			type: "POST",
@@ -51,6 +59,9 @@ function checkChangeStatus() {
 // 			$('button#print_action').parent().find('span.ui-btn-text').text('{return_button}');
 // 			$('button#print_action').html('{return_button}');
 // 			alert("failed");
+		})
+		.always(function() {
+			var_ajax_lock = false;
 		});
 	}
 }

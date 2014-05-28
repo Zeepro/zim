@@ -60,6 +60,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_GET_ACCELERATION', ' M1623');
 	define('PRINTERSTATE_SET_ACCELERATION',	' M1624 A');
 	define('PRINTERSTATE_GET_COLDEXTRUDE',	' M1622');
+	define('PRINTERSTATE_GET_MARLIN_VER',	' M1400');
 
 // 	define('PRINTERSTATE_TEMP_PRINT_FILENAME',	'/tmp/printer_percentage'); // fix the name on SD card
 	define('PRINTERSTATE_FILE_PRINTLOG',	'/tmp/printlog.log');
@@ -89,9 +90,12 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_TITLE_SERIAL',		'sn');
 	define('PRINTERSTATE_TITLE_NB_EXTRUD',	'extruder');
 	define('PRINTERSTATE_TITLE_LASTERROR',	'e');
+	define('PRINTERSTATE_TITLE_NEED_L',		'need');
+	define('PRINTERSTATE_TITLE_VER_MARLIN',	'marlin');
 	
 	define('PRINTERSTATE_JSON_PRINTER', 		'Printer.json');
 	define('PRINTERSTATE_TITLE_JSON_NB_EXTRUD', 'ExtrudersNumber');
+	define('PRINTERSTATE_JSON_REFILL_TEMPER',	'RefillTemperature.json');
 
 	define('PRINTERSTATE_MAGIC_NUMBER_V1',			23567);
 	define('PRINTERSTATE_MAGIC_NUMBER_V2',			23568);
@@ -640,7 +644,7 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 			
 			// first layer extrusion temperature
 			if ($version_rfid > 2) {
-				$string_tmp = substr($last_output, $offset_temp, $length_temp_f);
+				$string_tmp = substr($last_output, $offset_temp_f, $length_temp_f);
 				$hex_tmp = hexdec($string_tmp) + PRINTERSTATE_OFFSET_TEMPER_V2;
 				$data_json[PRINTERSTATE_TITLE_EXT_TEMP_1] = $hex_tmp;
 			}
@@ -656,6 +660,32 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 			$time_pack = $time_start + $hex_tmp * 60 * 60 * 24;
 			// $data_json[PRINTERSTATE_TITLE_SETUP_DATE] = date("Y-m-d\TH:i:sO", $time_pack);
 			$data_json[PRINTERSTATE_TITLE_SETUP_DATE] = date("Y-m-d\TH:i:s\Z", $time_pack);
+		}
+		
+		// change temperature values to user settings if cartridge is refillable
+		//TODO test me
+		if ($data_json[PRINTERSTATE_TITLE_TYPE] == PRINTERSTATE_DESP_CARTRIDGE_REFILL) {
+			$CI = &get_instance();
+			$tmp_array = array();
+			$temper_filepath = $CI->config->item('conf') . PRINTERSTATE_JSON_REFILL_TEMPER;
+			
+			$CI->load->helper('json');
+			try {
+				$tmp_array = json_read($temper_filepath, TRUE);
+				if ($tmp_array['error']) {
+					throw new Exception('read json error');
+				}
+			} catch (Exception $e) {
+				$CI->load->helper('printerlog');
+				PrinterLog_logMessage('read refillable cartridge user temperature json error', __FILE__, __LINE__);
+				
+				// log error message and use the default temperature in RFID
+				$json_cartridge = $data_json;
+				return ERROR_OK;
+			}
+			
+			$data_json[PRINTERSTATE_TITLE_EXT_TEMPER] = $tmp_array['json'][$abb_cartridge][PRINTERSTATE_TITLE_EXT_TEMPER];
+			$data_json[PRINTERSTATE_TITLE_EXT_TEMP_1] = $tmp_array['json'][$abb_cartridge][PRINTERSTATE_TITLE_EXT_TEMP_1];
 		}
 		
 		$json_cartridge = $data_json;
@@ -816,7 +846,7 @@ function PrinterState_afterFileCommand() {
 	return TRUE;
 }
 
-function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) {
+function PrinterState_checkBusyStatus(&$status_current, &$array_data = array(), $printafterslice = TRUE) {
 	$ret_val = 0;
 	$time_wait = NULL;
 	
@@ -867,28 +897,52 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) 
 				return TRUE;
 			}
 			elseif ($progress == 100) {
-				// try to start printing after slicing
-				// check filament first
+				// copy the data we need and check filament first
+				$ret_val = ERROR_OK;
 				foreach ($array_slicer as $abb_filament => $volume_need) {
-					$ret_val = PrinterState_checkFilament($abb_filament, $volume_need);
-					if ($ret_val != ERROR_OK) {
-						$CI->load->helper('printerlog');
-						
-						CoreStatus_setInIdle($ret_val);
-						$array_data[PRINTERSTATE_TITLE_LASTERROR] = $ret_val;
-						$status_current = CORESTATUS_VALUE_IDLE;
-						PrinterLog_logError('check filament error after slicing - usually because of no enough filament', __FILE__, __LINE__);
-						
-						return TRUE;
+					$data_cartridge = array();
+					$tmp_ret = 0;
+					
+					$tmp_ret = PrinterState_checkFilament($abb_filament, $volume_need, $data_cartridge);
+					$array_data[$abb_filament] = array(
+							PRINTERSTATE_TITLE_COLOR		=> $data_cartridge[PRINTERSTATE_TITLE_COLOR],
+							PRINTERSTATE_TITLE_EXT_TEMPER	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER],
+							PRINTERSTATE_TITLE_EXT_TEMP_1	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1],
+							PRINTERSTATE_TITLE_NEED_L		=> $volume_need,
+							PRINTERSTATE_TITLE_MATERIAL		=> $data_cartridge[PRINTERSTATE_TITLE_MATERIAL], // for different material check
+					);
+					
+					// only assign return value when no error, so we can grap all data we need in checking loop
+					if ($ret_val == ERROR_OK) {
+						$ret_val = $tmp_ret;
 					}
 				}
+				if ($ret_val != ERROR_OK) {
+					$CI->load->helper('printerlog');
+					
+					CoreStatus_setInIdle($ret_val);
+					$array_data[PRINTERSTATE_TITLE_LASTERROR] = $ret_val;
+					$status_current = CORESTATUS_VALUE_IDLE;
+					PrinterLog_logError('check filament error after slicing - usually because of no enough filament', __FILE__, __LINE__);
+					
+					return TRUE;
+				}
+				
+				// try to start printing after slicing if necessary
+				if ($printafterslice == FALSE) {
+					CoreStatus_setInIdle(ERROR_OK); //TODO check if we need to rewrite last error or not
+					$status_current = CORESTATUS_VALUE_IDLE;
+					
+					return TRUE;
+				}
+				
 				// try to launch printing after checking
 				$CI->load->helper('printer');
 				if ($CI->config->item('simulator')) {
 					$ret_val = Printer_printFromFile($CI->config->item('temp') . PRINTER_FN_CHARGE);
 				}
 				else {
-					$ret_val = Printer_printFromFile(SLICER_FILE_MODEL);
+					$ret_val = Printer_printFromFile($CI->config->item('temp') . SLICER_FILE_MODEL);
 				}
 				if ($ret_val != ERROR_OK) {
 					$CI->load->helper('printerlog');
@@ -1000,7 +1054,8 @@ function PrinterState_checkStatusAsArray() {
 	$ret_val = CoreStatus_checkInIdle($status_current, $status_json);
 	if ($ret_val == TRUE) {
 		$data_json[PRINTERSTATE_TITLE_STATUS] = CORESTATUS_VALUE_IDLE;
-		if (!is_null($status_json[CORESTATUS_TITLE_MESSAGE])) {
+		//TODO think about if we need to display last error as 200 (error_ok) or not
+		if (!is_null($status_json[CORESTATUS_TITLE_MESSAGE]) && $status_json[CORESTATUS_TITLE_MESSAGE] != ERROR_OK) {
 			$data_json[PRINTERSTATE_TITLE_LASTERROR] = $status_json[CORESTATUS_TITLE_MESSAGE];
 		}
 		return $data_json;
@@ -1610,9 +1665,38 @@ function PrinterState_getNbExtruder() {
 	return $tmp_array['json'][PRINTERSTATE_TITLE_JSON_NB_EXTRUD];
 }
 
+function PrinterState_getMarlinVersion(&$version_marlin) {
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$command = '';
+	$ret_val = 0;
+	$output = array();
+	
+	$command = $arcontrol_fullpath . PRINTERSTATE_GET_MARLIN_VER;
+	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output)) {
+		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	PrinterLog_logArduino($command, $output);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		return ERROR_INTERNAL;
+	}
+	else {
+		$version_marlin = $output ? trim($output[0]) : NULL;
+	}
+	
+	return ERROR_OK;
+}
+
 function PrinterState_getInfoAsArray() {
 	$CI = &get_instance();
 	$CI->load->helper('zimapi');
+	$version_marlin = NULL;
+	$cr = PrinterState_getMarlinVersion($version_marlin);
+	if ($cr != ERROR_OK) {
+		$version_marlin = 'N/A';
+	}
 	
 	return array(
 			PRINTERSTATE_TITLE_VERSION		=> ZimAPI_getVersion(),
@@ -1620,6 +1704,7 @@ function PrinterState_getInfoAsArray() {
 			PRINTERSTATE_TITLE_TYPE			=> ZimAPI_getType(),
 			PRINTERSTATE_TITLE_SERIAL		=> ZimAPI_getSerial(),
 			PRINTERSTATE_TITLE_NB_EXTRUD	=> PrinterState_getNbExtruder(),
+			PRINTERSTATE_TITLE_VER_MARLIN	=> $version_marlin,
 	);
 }
 

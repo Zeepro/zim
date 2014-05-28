@@ -32,6 +32,7 @@
 var var_refreshCancelStatus;
 var var_refreshVideoURL;
 var var_ajax;
+var var_ajax_lock = false;
 $(document).ready(checkCancelStatus());
 
 function checkCancelStatus() {
@@ -39,6 +40,13 @@ function checkCancelStatus() {
 	var_refreshCancelStatus = setInterval(refreshCancelStatus, 5000);
 	refreshVideoURL();
 	function refreshCancelStatus() {
+		if (var_ajax_lock == true) {
+			return;
+		}
+		else {
+			var_ajax_lock = true;
+			refreshVideoURL();
+		}
 		var_ajax = $.ajax({
 			url: "/printdetail/cancel_ajax",
 			cache: false,
@@ -55,6 +63,9 @@ function checkCancelStatus() {
 // 			window.location.replace("/");
 			finishAction();
 <!--	//	<?php //FIXME just disable redirection and do same as finished for simulation ?> -->
+		})
+		.always(function() {
+			var_ajax_lock = false;
 		});
 	}
 

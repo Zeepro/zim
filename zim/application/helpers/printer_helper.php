@@ -150,6 +150,18 @@ function Printer_printFromModel($id_model, $stop_printing = FALSE) {
 	return $ret_val;
 }
 
+function Printer_printFromSlice() {
+	$ret_val = 0;
+	
+	$CI = &get_instance();
+	$CI->load->helper('slicer');
+	$gcode_path = $CI->config->item('temp') . SLICER_FILE_MODEL;
+	
+	$ret_val = Printer_printFromFile($gcode_path);
+	
+	return $ret_val;
+}
+
 function Printer_printFromFile($gcode_path, $need_prime = TRUE, $stop_printing = FALSE) {
 	global $CFG;
 	$command = '';

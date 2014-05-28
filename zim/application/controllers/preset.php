@@ -250,7 +250,7 @@ class Preset extends MY_Controller {
 					$this->output->set_header('Location: /preset/listpreset');
 					return;
 				}
-				$error = t('success' . $ret_val); // test
+				$error = t('errorcode' . $ret_val); // test
 			}
 		}
 		

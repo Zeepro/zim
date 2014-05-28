@@ -35,19 +35,28 @@
 
 <script type="text/javascript">
 var var_refreshPrintStatus;
-var var_refreshVideoURL;
+var var_refreshVideoURL = 0;
 var var_firstRun = true;
+var var_onPlay = false;
 var var_ajax;
 var var_prime = {var_prime};
-var var_finish = false;
+// var var_finish = false;
+var var_ajax_lock = false;
 
 $(document).ready(checkPrintStatus());
 
 function checkPrintStatus() {
 	refreshPrintStatus();
 	var_refreshPrintStatus = setInterval(refreshPrintStatus, 5000);
-	refreshVideoURL();
 	function refreshPrintStatus() {
+		if (var_ajax_lock == true) {
+			return;
+		}
+		else {
+			var_ajax_lock = true;
+			refreshVideoURL();
+		}
+		
 		var_ajax = $.ajax({
 			url: "/printdetail/status_ajax",
 			cache: false,
@@ -61,24 +70,42 @@ function checkPrintStatus() {
 			}
 		})
 		.fail(function() { // not in printing
-// 			window.location.replace("/");
-			finishAction();
+			window.location.replace("/");
+// 			finishAction();
+// 			finishLoop();
+// 			alert("no connection");
 <!--	//	<?php //FIXME just disable redirection and do same as finished for simulation ?> -->
+		})
+		.always(function() {
+			var_ajax_lock = false;
 		});
 	}
+
+	jwplayer("myVideo").onPlay(function() {
+		var_onPlay = true;
+	})
 
 	return;
 }
 
 function refreshVideoURL() {
-	if (var_firstRun == true) {
+// 	if (var_refreshVideoURL == 0) {
+// 		var_refreshVideoURL = setInterval(refreshVideo, 1000 * 5);
+// 	}
+// 	else if (var_firstRun == true) {
+// 		clearInterval(var_refreshVideoURL);
+// 		var_refreshVideoURL = setInterval(refreshVideo, 1000 * 30 * 4);
+// 		var_firstRun = false;
+// 	}
+	if (var_onPlay == false) {
 		var_refreshVideoURL = setInterval(refreshVideo, 1000 * 5);
-		var_firstRun = false;
 	}
-	else {
+	else if (var_firstRun == true) {
 		clearInterval(var_refreshVideoURL);
 		var_refreshVideoURL = setInterval(refreshVideo, 1000 * 30 * 4);
+		var_firstRun = false;
 	}
+	
 	function refreshVideo() {
 		jwplayer('myVideo').load({file:'{video_url}'});
 	}
@@ -88,6 +115,7 @@ function refreshVideoURL() {
 
 function finishLoop() {
 	clearInterval(var_refreshPrintStatus);
+	clearInterval(var_refreshVideoURL);
 
 	return;
 }
@@ -106,7 +134,7 @@ function stopPrint() {
 	return;
 }
 
-function finishPrint() {
+function finishAction() {
 	finishLoop();
 	// display info
 	$("#print_detail_info").html('<p>{finish_info}</p>');
@@ -115,30 +143,10 @@ function finishPrint() {
 	$('button#print_action').parent().find('span.ui-btn-text').text('{return_button}');
 	$('button#print_action').html('{return_button}');
 
-	return;
-}
-
-function finishPrime() {
-	// do the same thing as printing
-	finishPrint();
-	if (var_finish == false) {
-		var_finish = true;
-		// add yes button for re-prime
-		$('<button>').appendTo('#container')
-		.attr({'id': 'yes_button', 'onclick': 'javascript: window.location.href="{restart_url}";'}).html('{prime_button}')
-		.button().button('refresh');
-	}
-
-	return;
-}
-
-function finishAction() {
-	if (var_prime == true) {
-		finishPrime();
-	}
-	else {
-		finishPrint();
-	}
+	// add restart button for print again
+	$('<button>').appendTo('#container')
+	.attr({'id': 'again_button', 'onclick': 'javascript: window.location.href="{restart_url}";'}).html('{again_button}')
+	.button().button('refresh');
 
 	return;
 }

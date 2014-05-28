@@ -173,7 +173,20 @@ class Connection extends MY_Controller {
 		//TODO finish me
 		if ($this->form_validation->run() == FALSE) {
 			$ssid = $this->input->get('ssid');
-			$this->template->load ('connectionmaster', 'connectionwifipswd', array('ssid' => $ssid));
+			
+			$this->load->library('parser');
+			$template_data = array(
+					'title'		=> htmlspecialchars(t("network", $ssid)),
+					'ssid'		=> $ssid,
+					'label'		=> htmlspecialchars(t("network password")),
+					'back'		=> t('Back'),
+					'submit'	=> htmlspecialchars(t("OK")),
+			);
+// 			$this->template->load ('connectionmaster', 'connectionwifipswd', array('ssid' => $ssid));
+			$body_page = $this->parser->parse('template/connection/wifipswd', $template_data, TRUE);
+				
+			// parse all page
+			$this->_generate_framePage($body_page);
 		} else {
 			$ssid = $this->input->post('ssid');
 			$passwd = $this->input->post('password');

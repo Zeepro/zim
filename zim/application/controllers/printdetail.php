@@ -35,7 +35,8 @@ class Printdetail extends MY_Controller {
 				$this->output->set_header('Location: /printmodel/listmodel');
 				return;
 			}
-		} else {
+		}
+		else {
 			$this->output->set_header('Location: /printmodel/listmodel');
 			return;
 		}
@@ -66,7 +67,8 @@ class Printdetail extends MY_Controller {
 				$this->output->set_header('Location: /printmodel/listmodel');
 				return;
 			}
-		} else {
+		}
+		else {
 			$this->output->set_header('Location: /printmodel/listmodel');
 			return;
 		}
@@ -75,8 +77,26 @@ class Printdetail extends MY_Controller {
 // 			$this->output->set_header('Location: /printdetail/status?id=' . $mid . '&cb=' . $callback);
 // 		}
 // 		else {
- 			$this->output->set_header('Location: /printdetail/status');
+//  			$this->output->set_header('Location: /printdetail/status');
 // 		}
+		$this->output->set_header('Location: /printdetail/status?id=' . $mid);
+		
+		return;
+	}
+	
+	public function printslice() {
+		$cr = 0;
+		
+		$this->load->helper('printer');
+		
+		$cr = Printer_printFromSlice();
+		if ($cr != ERROR_OK) {
+			$this->output->set_header('Location: /sliceupload/slice?callback');
+			return;
+		}
+		else {
+			$this->output->set_header('Location: /printdetail/status?id=slice');
+		}
 		
 		return;
 	}
@@ -87,12 +107,18 @@ class Printdetail extends MY_Controller {
 		$template_data = array();
 		$data_status = array();
 		$temper_status = array();
+		$print_slice = FALSE;
 		
 		$this->load->library('parser');
 		$this->lang->load('printdetail', $this->config->item('language'));
 		
 		$callback = $this->input->get('cb');
 		$abb_cartridge = $this->input->get('v');
+		$id = $this->input->get('id');
+		
+		if ($id == 'slice') {
+			$print_slice = TRUE;
+		}
 		
 		// parse the main body
 		$template_data = array(
@@ -103,20 +129,30 @@ class Printdetail extends MY_Controller {
 				'finish_info'	=> t('Congratulation, your printing is complete!'),
 				'return_button'	=> t('Home'),
 				'return_url'	=> '/',
-				'restart_url'	=> '/printdetail/printprime?r&v=' . $abb_cartridge . '&cb=' . $callback,
+// 				'restart_url'	=> '/printdetail/printprime?r&v=' . $abb_cartridge . '&cb=' . $callback,
+				'restart_url'	=> '/printdetail/printmodel?id=' . $id,
 				'var_prime'		=> 'false',
-				'prime_button'	=> t('Yes'),
+				'again_button'	=> t('Print again'),
 				'video_url'		=> $this->config->item('video_url'),
 		);
 		
-		if ($abb_cartridge) {
+		if ($print_slice == TRUE) {
+			$template_data['restart_url'] = '/printdetail/printslice';
+		} else if ($abb_cartridge) {
 			$template_data['finish_info']	= t('Restart?');
-		//	$template_data['return_url']	= '/printmodel/detail?id=' . $callback;
+// 			$template_data['return_url']	= '/printmodel/detail?id=' . $callback;
+			$template_data['restart_url']	= '/printdetail/printprime?r&v=' . $abb_cartridge . '&cb=' . $callback;
 			$template_data['return_button']	= t('No');
 			$template_data['var_prime']		= 'true';
+			$template_data['again_button']	= t('Yes');
 		}
 		if ($callback) {
-			$template_data['return_url']	= '/printmodel/detail?id=' . $callback;
+			if ($callback == 'slice') {
+				$template_data['return_url']	= '/sliceupload/slice?callback';
+			}
+			else {
+				$template_data['return_url']	= '/printmodel/detail?id=' . $callback;
+			}
 		}
 		
 		$body_page = $this->parser->parse('template/printdetail/status', $template_data, TRUE);

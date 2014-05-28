@@ -61,11 +61,11 @@ sub alter_file {
 			$pos_extruder = index($line, $extruder_test);
 			
 			if ($pos_extruder != -1 && $pos_extruder == 0) {
-				# do not count key word in comment
-				if ($pos_comment != -1 && $pos_comment < $pos_extruder) {
-					print $line . "\n";
-					next;
-				}
+#				# do not count key word in comment
+#				if ($pos_comment != -1 && $pos_comment < $pos_extruder) {
+#					print $line . "\n";
+#					next;
+#				}
 				$extruder_current = $extruder_test;
 			}
 		}
@@ -161,6 +161,7 @@ sub alter_file {
 	return RC_OK;
 }
 
+#TODO finish analyze_file
 sub analyze_file {
 #	my $filename;
 	my @lines;
@@ -289,6 +290,60 @@ sub analyze_file {
 	return RC_OK;
 }
 
+sub change_extruder {
+	my ($filename) = @_;
+	my @lines;
+	
+	open my $fh, '<', $filename;
+	if (tell($fh) != -1) {
+		@lines = <$fh>;
+		close $fh;
+	} else {
+		return EXIT_NO_FILE; #todo here
+	}
+	
+	# inverse the default extruder at first
+	# to avoid no change of extruder in body
+	print "T1\n";
+	
+	foreach my $line (@lines) {
+		my $pos_extruder = -1;
+		my $pos_comment = -1;
+		my $change_extruder = FALSE;
+		
+		# do not count comment and empty line
+		$line =~ s/\R//g;
+		$pos_comment = index($line, ';');
+		if ($line eq "" || $pos_comment == 0) {
+			next;
+		}
+		
+		# control current extruder
+		foreach my $extruder_test ("T0", "T1") {
+			$pos_extruder = index($line, $extruder_test);
+			
+			if ($pos_extruder != -1 && $pos_extruder == 0) {
+				$extruder_current = $extruder_test;
+				$change_extruder = TRUE;
+				if ($extruder_test eq "T0") { # T0
+					print "T1\n";
+				}
+				else { # T1
+					print "T0\n";
+				}
+				last;
+			}
+		}
+		if ($change_extruder == TRUE) {
+			next;
+		}
+		
+		print $line . "\n";
+	}
+	
+	return RC_OK;
+}
+
 #=========================
 # main function below
 #=========================
@@ -311,7 +366,8 @@ my %opt = ();
 		'temp_r|r=s'   => \$opt{temp_r},	# right temperature for first layer (or all layer)
 		'temp_ls|ll=s' => \$opt{temp_ls},	# left temperature for other layer (if exists)
 		'temp_rs|rr=s' => \$opt{temp_rs},	# right temperature for other layer (if exists)
-		'analyze|a'    => \$opt{analyze}
+		'analyze|a'    => \$opt{analyze},
+		'change|c'     => \$opt{change_e},
 	);
 	GetOptions(%options);
 }
@@ -348,6 +404,18 @@ elsif ( $opt{analyze} ) {
 	else {
 		#todo test
 		exit(EXIT_ERROR_PRM);
+	}
+}
+elsif ( $opt{change_e} ) {
+	unless ( $opt{openfile} ) {
+		my $rc = usage(EXIT_ERROR_PRM);
+		
+		exit($rc);
+	}
+	else {
+		my $rc = change_extruder($opt{openfile});
+	
+		exit($rc);
 	}
 }
 else {

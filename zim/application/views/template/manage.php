@@ -1,4 +1,4 @@
-<div data-role="page" data-url="/pronterface">
+<div data-role="page" data-url="/manage">
 	<header data-role="header" class="page-header">
 		<a href="javascript:history.back();" data-icon="back" data-ajax="false">{back}</a>
 	</header>

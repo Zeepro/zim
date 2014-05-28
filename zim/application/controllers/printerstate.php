@@ -20,13 +20,14 @@ class Printerstate extends MY_Controller {
 		return;
 	}
 	
-	private function _display_changecartridge_wait_unload_filament($abb_cartridge) {
+	private function _display_changecartridge_wait_unload_filament($abb_cartridge, $id_model) {
 		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
 		$template_data = array (
 				'next_phase'	=> PRINTERSTATE_CHANGECART_UNLOAD_F,
 				'unload_button'	=> t('Unload the filament'),
 				'prime_button'	=> t('prime_button'),
 				'abb_cartridge'	=> $abb_cartridge,
+				'id_model'		=> $id_model,
 		);
 		$template_name = 'template/printerstate/changecartridge_ajax/wait_unload_filament';
 		$this->_display_changecartridge_base($template_name, $template_data);
@@ -485,7 +486,7 @@ class Printerstate extends MY_Controller {
 					
 					if (CoreStatus_checkInIdle($status_current)) {
 						// in idle
-						$this->_display_changecartridge_wait_unload_filament($abb_cartridge);
+						$this->_display_changecartridge_wait_unload_filament($abb_cartridge, $id_model);
 					}
 					else if ($status_current == $status_correct) {
 						// in busy (normally only unloading is possible)

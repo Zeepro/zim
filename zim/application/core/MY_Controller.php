@@ -17,11 +17,11 @@ class MY_Controller extends CI_Controller {
 			$this->load->helper('printerlog');
 			PrinterLog_logError('status files initialisation error when MY_Controller started', __FILE__, __LINE__);
 			
-			// let ajax request failed when we finishing printing / canceling
+			// let request failed
 			$protocol = (isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0');
 			header($protocol . ' 500');
 			header('Content-type: text/plain; charset=UTF-8');
-			echo 'status file initialisation error';
+			echo 'file initialisation error';
 			exit;
 		}
 		

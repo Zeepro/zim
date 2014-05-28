@@ -34,6 +34,7 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_TITLE_CUS_GW',	'user_assigned_gateway');
 	define('ZIMAPI_TITLE_CUS_MK',	'user_assigned_mask');
 	define('ZIMAPI_TITLE_PASSWD',	'password');
+	define('ZIMAPI_TITLE_VERSION',	'Version');
 	
 	define('ZIMAPI_VALUE_ETH',		'eth');
 	define('ZIMAPI_VALUE_WIFI',		'wifi');
@@ -57,6 +58,10 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_TITLE_PRESET_ID',	'id');
 	define('ZIMAPI_TITLE_PRESET_NAME',	'name');
 	
+	define('ZIMAPI_VALUE_DEFAULT_RHO',		600);
+	define('ZIMAPI_VALUE_DEFAULT_DELTA',	45);
+	define('ZIMAPI_VALUE_DEFAULT_THETA',	30);
+	
 	define('ZIMAPI_PRM_CAPTURE',	'picture');
 	define('ZIMAPI_PRM_VIDEO_MODE',	'video');
 	define('ZIMAPI_PRM_PRESET',		'slicerpreset');
@@ -64,6 +69,44 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	
 	define('ZIMAPI_FILE_PRESET_JSON',	'preset.json');
 	define('ZIMAPI_FILE_PRESET_INI',	'config.ini');
+}
+
+function ZimAPI_initialFile() {
+	global $CFG;
+	$setting_fullpath = $CFG->config['conf'] . ZIMAPI_FILENAME_SOFTWARE;
+	
+	if (file_exists($setting_fullpath)) {
+		return TRUE;
+	}
+	else {
+		// prepare data array
+		$cr = 0;
+		$array_preset = ZimAPI_getPresetListAsArray();
+		
+		$data_json = array(
+				ZIMAPI_TITLE_VERSION	=> '1.0',
+				ZIMAPI_TITLE_PASSWD		=> md5(''),
+				ZIMAPI_TITLE_PRESET		=> NULL,
+		);
+		
+		// write json file
+		$fp = fopen($setting_fullpath, 'w');
+		if ($fp) {
+			fwrite($fp, json_encode($data_json));
+			fclose($fp);
+		}
+		else {
+			return FALSE;
+		}
+		
+		$cr = ZimAPI_setPreset($array_preset[0][ZIMAPI_TITLE_PRESET_ID]);
+		if ($cr != ERROR_OK) {
+			unlink($setting_fullpath);
+			return FALSE;
+		}
+	}
+	
+	return TRUE;
 }
 
 function ZimAPI_getNetworkInfoAsArray(&$array_data) {
@@ -580,7 +623,7 @@ function ZimAPI_checkCamera(&$info_camera = '') {
 function ZimAPI_checkCameraPassword($password) {
 	$tmp_array = array();
 	$CI = &get_instance();
-	$json_fullpath = $CI->config->item('hardconf') . ZIMAPI_FILENAME_SOFTWARE;
+	$json_fullpath = $CI->config->item('conf') . ZIMAPI_FILENAME_SOFTWARE;
 	
 	$CI->load->helper('json');
 	try {
@@ -609,7 +652,7 @@ function ZimAPI_setCameraPassword($password = '') {
 	$tmp_array = array();
 	$data_json = array();
 	$CI = &get_instance();
-	$json_fullpath = $CI->config->item('hardconf') . ZIMAPI_FILENAME_SOFTWARE;
+	$json_fullpath = $CI->config->item('conf') . ZIMAPI_FILENAME_SOFTWARE;
 	
 	$CI->load->helper('json');
 	try {
@@ -825,7 +868,7 @@ function ZimAPI_getPresetListAsArray() {
 function ZimAPI_getPreset(&$id_preset) {
 	$tmp_array = array();
 	$CI = &get_instance();
-	$json_fullpath = $CI->config->item('hardconf') . ZIMAPI_FILENAME_SOFTWARE;
+	$json_fullpath = $CI->config->item('conf') . ZIMAPI_FILENAME_SOFTWARE;
 	
 	$CI->load->helper('json');
 	try {
@@ -853,11 +896,13 @@ function ZimAPI_getPreset(&$id_preset) {
 function ZimAPI_setPreset($id_preset) {
 	$tmp_array = array();
 	$data_json = array();
+// 	$cr = 0;
 	$config_fullpath = '';
+	$preset_basepath = '';
 	$CI = &get_instance();
-	$json_fullpath = $CI->config->item('hardconf') . ZIMAPI_FILENAME_SOFTWARE;
+	$json_fullpath = $CI->config->item('conf') . ZIMAPI_FILENAME_SOFTWARE;
 	
-	if (!ZimAPI__checkPreset($id_preset)) {
+	if (!ZimAPI__checkPreset($id_preset, $preset_basepath)) {
 		return ERROR_WRONG_PRM;
 	}
 	
@@ -876,26 +921,26 @@ function ZimAPI_setPreset($id_preset) {
 	$data_json = $tmp_array['json'];
 	$data_json[ZIMAPI_TITLE_PRESET] = $id_preset;
 	
-	$config_fullpath = $CI->config->item('presetlist') . $id_preset . '/' . ZIMAPI_FILE_PRESET_INI;
+	$config_fullpath = $preset_basepath . $id_preset . '/' . ZIMAPI_FILE_PRESET_INI;
 	if (file_exists($config_fullpath)) {
-		$command = '';
-		$ret_val = 0;
-		$output = NULL;
-		
-		$CI->load->helper('detectos');
-		if (DectectOS_checkWindows()) {
-			$command = 'copy "' . $config_fullpath . '" "' . $CI->config->item('hardconf') . ZIMAPI_FILE_PRESET_INI;
-		}
-		else {
-			$command = 'cp "' . $config_fullpath . '" "' . $CI->config->item('hardconf') . ZIMAPI_FILE_PRESET_INI;
-		}
-		exec($command, $output, $ret_val);
-		if ($ret_val != ERROR_NORMAL_RC_OK) {
+		$ret_val = copy($config_fullpath, $CI->config->item('conf') . ZIMAPI_FILE_PRESET_INI);
+		if ($ret_val != TRUE) {
 			$CI->load->helper('printerlog');
 			PrinterLog_logError('copy preset file error', __FILE__, __LINE__);
 			return ERROR_INTERNAL;
 		}
 	}
+	else {
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('not find preset file: ' . ZIMAPI_FILE_PRESET_INI, __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	
+// 	$CI->load->helper('slicer');
+// 	$cr = Slicer_reloadPreset();
+// 	if ($cr != ERROR_OK) {
+// 		return $cr;
+// 	}
 	
 	// write json file
 	$fp = fopen($json_fullpath, 'w');
@@ -1030,7 +1075,7 @@ function ZimAPI_setPresetSetting($id_preset, $array_input, $name_preset = NULL) 
 	else {
 		$system_preset = FALSE;
 		$ret_val = ZimAPI__checkPreset($id_preset, $preset_path, $system_preset);
-		if ($ret_val == TRUE) {
+		if ($ret_val == FALSE) {
 			$CI->load->helper('printerlog');
 			PrinterLog_logError('system can not find preset: ' . $id_preset);
 			return ERROR_WRONG_PRM; // just use another error code

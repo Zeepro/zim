@@ -29,11 +29,60 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_VALUE_WAIT_CONNECT',		'to_be_connected');
 	define('CORESTATUS_VALUE_SLICE',			'slicing');
 // 	define('CORESTATUS_VALUE_UPGRADE',			'upgrading');
+	
+	define('CORESTATUS_CMD_CHECK_SD',		'echo writable > ');
+	define('CORESTATUS_SUFFIX_CONF',		'conf/');
+	define('CORESTATUS_SUFFIX_PRESET',		'conf/presetlist/');
 }
 
 function CoreStatus_initialFile() {
-	global $CFG;
-	$state_file = $CFG->config['conf'] . CORESTATUS_FILENAME_WORK;
+	$CI = &get_instance();
+	$state_file = NULL;
+	$sdcard = FALSE;
+	
+	// check if we can use all files in sdcard instead of config partition
+	if (is_writable($CI->config->item('sdcard'))) {
+		$cr = 0;
+		$command = CORESTATUS_CMD_CHECK_SD . $CI->config->item('sdcard') . '.phptest.tmp';
+		$output = array();
+		
+		$CI->load->helper('errorcode');
+		exec($command, $output, $cr);
+		
+		if ($cr == ERROR_NORMAL_RC_OK) {
+			$sdcard = TRUE;
+		}
+	}
+	
+	$array_change = array(
+			'conf'			=> CORESTATUS_SUFFIX_CONF,
+			'presetlist'	=> CORESTATUS_SUFFIX_PRESET,
+	);
+	foreach ($array_change as $key => $value) {
+		$folder_path = NULL;
+		if ($sdcard == TRUE) {
+			$folder_path = $CI->config->item('sdcard') . $value;
+		}
+		else {
+			$folder_path = $CI->config->item('nandconf') . $value;
+		}
+		
+		// check folder exists or not, if not, create it
+		if (!file_exists($folder_path)) {
+			mkdir($folder_path);
+		}
+		
+		// change config setting to right path
+		$CI->config->set_item($key, $folder_path);
+	}
+	$CI->config->set_item('use_sdcard', $sdcard);
+	
+	$CI->load->helper('zimapi');
+	if (!ZimAPI_initialFile()) {
+		return FALSE;
+	}
+	
+	$state_file = $CI->config->item('conf') . CORESTATUS_FILENAME_WORK;
 	
 	if (file_exists($state_file)) {
 		return TRUE;
@@ -191,12 +240,13 @@ function CoreStatus_checkCallCancelingAjax() {
 }
 
 function CoreStatus_checkCallSlicing(&$url_redirect = '') {
-	$url_redirect = '/printdetail/slice';
+	$url_redirect = '/sliceupload/slice';
 	
 	return CoreStatus__checkCallURI(array(
-			'/printdetail/slice'		=> NULL,
-			'/printdetail/slice_ajax'	=> NULL,
-			'/printdetail/slice_action'	=> NULL,
+			'/sliceupload/preview'				=> NULL,
+			'/sliceupload/slice'				=> NULL,
+			'/sliceupload/slice_status_ajax'	=> NULL,
+			'/sliceupload/slice_action'			=> NULL,
 	));
 }
 
