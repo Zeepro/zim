@@ -15,3 +15,5 @@ $lang['serial_title']
 	= '打印机序列号';
 $lang['extruder_title']
 	= '打印头数量';
+$lang['marlin_title']
+	= '硬件版本';

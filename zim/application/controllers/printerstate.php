@@ -358,6 +358,10 @@ class Printerstate extends MY_Controller {
 						'title'	=> t('extruder_title'),
 						'value'	=> $temp_info[PRINTERSTATE_TITLE_NB_EXTRUD],
 				),
+				array(
+						'title'	=> t('marlin_title'),
+						'value'	=> $temp_info[PRINTERSTATE_TITLE_VER_MARLIN],
+				),
 		);
 		
 		// parse the main body

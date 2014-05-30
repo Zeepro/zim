@@ -126,12 +126,12 @@ class Connection extends MY_Controller {
 				'form',
 				'url'
 		));
-
+		
 		$this->load->library(array('form_validation', 'parser'));
-
+		
 		$this->form_validation->set_rules('ssid', 'SSID', 'required');
 		$this->form_validation->set_message('required', t('required ssid'));
-
+		
 		if ($this->form_validation->run () == FALSE) {
 			$this->template->load ( 'connectionmaster', 'connectionwifinotvisiblessid');
 			
@@ -148,7 +148,6 @@ class Connection extends MY_Controller {
 			// parse all page
 			$this->_generate_framePage($body_page);
 		} else {
-// 			header("Location:/connection/wifipswd?ssid=" . rawurlencode($this->input->post('ssid')));
 			$this->output->set_header('Location: /connection/wifipswd?ssid=' . rawurlencode($this->input->post('ssid')));
 		}
 		
@@ -167,10 +166,6 @@ class Connection extends MY_Controller {
 		$this->lang->load('connection/master', $this->config->item('language'));
 		$this->lang->load('connection/wifipswd', $this->config->item('language'));
 		
-// 		$this->template->set ( 'lang', $this->config->item('language_abbr') );
-// 		$this->template->set ( 'header', "<title>" . t ( 'ZeePro Personal Printer 21 - Connection configuration' ) . "</title>" );
-		
-		//TODO finish me
 		if ($this->form_validation->run() == FALSE) {
 			$ssid = $this->input->get('ssid');
 			
@@ -182,7 +177,6 @@ class Connection extends MY_Controller {
 					'back'		=> t('Back'),
 					'submit'	=> htmlspecialchars(t("OK")),
 			);
-// 			$this->template->load ('connectionmaster', 'connectionwifipswd', array('ssid' => $ssid));
 			$body_page = $this->parser->parse('template/connection/wifipswd', $template_data, TRUE);
 				
 			// parse all page
@@ -195,96 +189,77 @@ class Connection extends MY_Controller {
 			if ($ret_val != ERROR_OK) {
 // 				$error = t('invalid data');
 				$this->output->set_header("Location:/connection/wifissid");
-				return;
 			}
 			else {
-// 				$this->output->set_header("Location:/connection/confirmation");
 				$this->confirmation();
-				return; // end generating if successed
 			}
-// 			$arr = array (
-// 					"Connection.Topology" => "Network",
-// 					"Connection.Support" => "WiFi",
-// 					"IP.addresses.V4" => array (
-// 							array (
-// 									"Address" => "0.0.0.0" 
-// 							) 
-// 					) 
-// 			);
-			
-// 			$fh = fopen ( $CFG->config ['conf'] . 'Connection.json', 'w' );
-// 			fwrite ( $fh, json_encode ( $arr ) );
-// 			fclose ( $fh );
-			
-// 			header ( "Location:/connection/confirmation" );
 		}
-	}
-
-	public function wired() {
-        global $CFG;
-    	
-    	$this->load->helper ( array (
-				'form',
-				'url'
-		) );
 		
-		$this->load->library ( 'form_validation' );
+		return;
+	}
+	
+	public function wired() {
+		$template_data = array();
+		$body_page = NULL;
+		
+		$this->load->helper(array('form', 'url'));
+		
+		$this->load->library(array('form_validation', 'parser'));
 				
-		$this->lang->load ( 'connection/master', $this->config->item ( 'language' ) );
-		$this->lang->load ( 'connection/wired', $this->config->item ( 'language' ) );
+		$this->lang->load('connection/master', $this->config->item('language'));
+		$this->lang->load('connection/wired', $this->config->item('language'));
 		
 		$this->template->set ( 'lang', $this->config->item('language_abbr') );
 		$this->template->set ( 'header', "<title>" . t ( 'ZeePro Personal Printer 21 - Connection configuration' ) . "</title>" );
 		
 		if ($this->form_validation->run () == FALSE) {
-			$data = array();
-			$this->template->load ( 'connectionmaster', 'connectionwired', $data );
-		} else {
-// 			$arr = array("Connection.Topology" => "Network",
-//             "Connection.Support" => "RJ45"
-// 			);
-
-// 	        $fh = fopen($CFG->config['conf'] . 'Connection.json', 'w');
-// 	        fwrite($fh, json_encode($arr));
-// 	        fclose($fh);
-	
-			header ( "Location:/connection/confirmation" );
-	    }
-    }
-        
-	public function wiredauto() {
-		global $CFG;
-
-        // To be managed by API...
-
-//         $arr = array("Connection.Topology" => "P2P",
-//             "Connection.Support" => "WiFi",
-//             "IP.addresses.V4" => array(array("Address" => "0.0.0.0")),
-//             "IP.lease" => standard_date("DATE_ISO8601", local_to_gmt(time()))
-//         );
-
-//         $fh = fopen($CFG->config['conf'] . 'Connection.json', 'w');
-//         fwrite($fh, json_encode($arr));
-//         fclose($fh);
-
-		$this->load->helper(array('zimapi'));
-		ZimAPI_setpEth();
-// 		header ( "Location:/connection/confirmation" );
-		$this->confirmation();
-    }
-    
-    public function wiredadvanced() {
-        global $CFG;
-    	
-    	$this->load->helper ( array (
-				'form',
-				'url'
-		) );
-		
-		$this->load->library ( 'form_validation' );
+			$template_data = array(
+					'title'		=> t('Wired network connection'),
+					'back'		=> t('Back'),
+					'text1'		=> t("Text"),
+					'auto_btn'	=> htmlspecialchars(t("OK")),
+					'text2'		=> t("Text2"),
+					'adv_btn'	=> htmlspecialchars(t("Advanced")),
+			);
+			$body_page = $this->parser->parse('template/connection/wired', $template_data, TRUE);
 				
-		$this->lang->load ( 'connection/master', $this->config->item ( 'language' ) );
-		$this->lang->load ( 'connection/wiredadvanced', $this->config->item ( 'language' ) );
+			// parse all page
+			$this->_generate_framePage($body_page);
+		}
+		else {
+			$this->confirmation();
+		}
+		
+		return;
+	}
+	
+	public function wiredauto() {
+		$cr = 0;
+		
+		$this->load->helper(array('zimapi'));
+		
+		$cr = ZimAPI_setpEth();
+		if ($cr != ERROR_OK) {
+			$this->output->set_header("Location:/connection");
+		}
+		else {
+			$this->confirmation();
+		}
+		
+		return;
+	}
+	
+	public function wiredadvanced() {
+// 		global $CFG;
+		$template_data = array();
+		$body_page = NULL;
+		
+		$this->load->helper(array('form', 'url'));
+		
+		$this->load->library('form_validation');
+				
+		$this->lang->load('connection/master', $this->config->item ('language'));
+		$this->lang->load('connection/wiredadvanced', $this->config->item('language'));
 		
 		$this->template->set ( 'lang', $this->config->item('language_abbr') );
 		$this->template->set ( 'header', "<title>" . t ( 'ZeePro Personal Printer 21 - Connection configuration' ) . "</title>" );
@@ -300,29 +275,51 @@ class Connection extends MY_Controller {
  		$this->form_validation->set_error_delimiters('<i>', '</i>');
  		 			
 		if ($this->form_validation->run () == FALSE) {
-			$this->template->load ( 'connectionmaster', 'connectionwiredadvanced', $data );
+			$this->load->library('parser');
+// 			$this->template->load ( 'connectionmaster', 'connectionwiredadvanced', $data );
+			$template_data = array(
+					'title'			=> t('Advanced wired network connection'),
+					'back'			=> t('Back'),
+					'ip_label'		=> htmlspecialchars(t("ip")),
+					'ip_value'		=> set_value('ip'),
+					'ip_hint'		=> htmlspecialchars(t("ip ex")),
+					'ip_error'		=> form_error('ip'),
+					'mask_label'	=> htmlspecialchars(t("mask")),
+					'mask_value'	=> set_value('mask'),
+					'mask_hint'		=> htmlspecialchars(t("mask ex")),
+					'mask_error'	=> form_error('mask'),
+					'gateway_label'	=> htmlspecialchars(t("gateway")),
+					'gateway_value'	=> set_value('gateway'),
+					'gateway_hint'	=> htmlspecialchars(t("gateway ex")),
+					'gateway_error'	=> form_error('gateway'),
+					'dns_label'		=> htmlspecialchars(t("dns")),
+					'dns_value'		=> set_value('dns'),
+					'dns_hint'		=> htmlspecialchars(t("dns ex")),
+					'dns_error'		=> form_error('dns'),
+					'submit'		=> htmlspecialchars(t("OK")),
+			);
+			$body_page = $this->parser->parse('template/connection/wiredadvanced', $template_data, TRUE);
+				
+			// parse all page
+			$this->_generate_framePage($body_page);
 		} else {
-// 			$arr = array (
-// 					"Topology" => "Network",
-// 					"Support" => "RJ45",
-// 					"IPV4" => array (
-// 							array (
-// 									"Address" => set_value('ip'), 
-// 									"Mask" => set_value('mask'), 
-// 									"Gateway" => set_value('gateway'), 
-// 									"DNS" => set_value('dns'), 
-// 							) 
-// 					) 
-// 			);
-
-// 	        $fh = fopen($CFG->config['conf'] . 'Connection.json', 'w');
-// 	        fwrite($fh, json_encode($arr));
-// 	        fclose($fh);
+			$cr = 0;
+			$ip = $this->input->post('ip');
+			$mask = $this->intput->post('mask');
+			$gateWay = $this->input->post('gateway');
+			
+			$cr = ZimAPI_setcEth($ip, $mask, $gateWay);
+			if ($cr != ERROR_OK) {
+				$this->output->set_header("Location:/connection");
+			}
+			else {
+				$this->confirmation();
+			}
+		}
+		
+		return;
+	}
 	
-			header ( "Location:/connection/confirmation" );
-        }
-    }
-    
 	public function wifip2p() {
 		$ret_val = 0;
 		$error = '';
@@ -365,7 +362,7 @@ class Connection extends MY_Controller {
 		
 		// generate form to submit when not in post method
 		$this->load->library('parser');
-
+		
 		// parse the main body
 		$template_data = array(
 				'title'			=> t('Personalize the printer\'s network'),
@@ -377,29 +374,33 @@ class Connection extends MY_Controller {
 		);
 		
 		$body_page = $this->parser->parse('template/connection/wifip2p', $template_data, TRUE);
-		
+				
 		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Connection setting') . '</title>',
-				'contents'		=> $body_page,
-		);
-		
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->_generate_framePage($body_page);
 		
 		return;
 	}
-    
+	
 	public function confirmation() {
-        global $CFG;
-
-        $this->lang->load('connection/master', $this->config->item('language'));
-        $this->lang->load('connection/confirmation', $this->config->item('language'));
-
-        $this->template->set('lang', $CFG->config['language_abbr']);
-        $this->template->set('header', "<title>" . t('ZeePro Personal Printer 21 - Connection configuration') . "</title>");
-        $this->template->load('connectionmaster', 'confirmation');
-
+		$template_data = array();
+		$body_page = NULL;
+		
+		$this->load->library('parser');
+		$this->lang->load('connection/master', $this->config->item('language'));
+		$this->lang->load('connection/confirmation', $this->config->item('language'));
+		
+		// parse the main body
+		$template_data = array(
+				'thank_you'	=> t('thank you'),
+				'confirm'	=> t("confirmation text"),
+		);
+		
+		$body_page = $this->parser->parse('template/connection/confirmation', $template_data, TRUE);
+				
+		// parse all page
+		$this->_generate_framePage($body_page);
+		
+		return;
 	}
-    
 }
+//TODO test me

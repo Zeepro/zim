@@ -15,3 +15,5 @@ $lang['serial_title']
 	= 'Printer serial number';
 $lang['extruder_title']
 	= 'Number of extruders';
+$lang['marlin_title']
+	= 'Firmware version';
