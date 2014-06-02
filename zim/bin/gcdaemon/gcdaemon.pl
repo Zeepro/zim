@@ -20,7 +20,7 @@ use constant EXIT_NO_FILE        => -1;
 use constant EXIT_ERROR_PRM      => -2;
 use constant EXIT_ERROR_INTERNAL => -9;
 
-use constant CEILING_HEAT => 150;
+use constant CEILING_HEAT => 50;
 
 # our global variable here
 my $is_windows;
@@ -165,8 +165,8 @@ sub alter_file {
 sub analyze_file {
 #	my $filename;
 	my @lines;
-	my ($filename, $temp_l, $temp_r, $temp_ls, $temp_rs) = @_;
-	my $nb_extruder;
+	my ($filename) = @_;
+	my ($nb_extruder, $temp_l, $temp_r, $temp_b);
 	
 	open my $fh, '<', $filename;
 	if (tell($fh) != -1) {
@@ -176,11 +176,13 @@ sub analyze_file {
 		return EXIT_NO_FILE; #todo here
 	}
 	
+	$nb_extruder = 1;
+	
 	foreach my $line (@lines) {
 		my $pos_extruder = -1;
 		my $pos_comment = -1;
 		my $pos_m109 = -1;
-		my $pos_m104 = -1;
+		my $pos_m190 = -1;
 		my $pos_temp = -1;
 		
 		# do not count comment and empty line
@@ -206,36 +208,6 @@ sub analyze_file {
 				$extruder_current = $extruder_test;
 			}
 		}
-		
-#		# count of m109
-#		$pos_m109 = index($line, "M109");
-#		if ($pos_m109 != -1) {
-#			# do not count key word in comment
-#			unless ($pos_comment != -1 && $pos_comment < $pos_m109) {
-#				my $extruder_set = "";
-#				
-#				# count m109 and tx in only one line
-#				if (index($line, "T0") != -1) {
-#					$extruder_set = "T0";
-#				}
-#				elsif (index($line, "T1") != -1) {
-#					$extruder_set = "T1";
-#				}
-#				else {
-#					$extruder_set = $extruder_current;
-#				}
-#				
-#				# start output
-#				if ($extruder_set eq "T0") {
-#					print "M109 S" . $temp_r . " T0\n";
-#				}
-#				else { # T1
-#					print "M109 S" . $temp_l . " T1\n";
-#				}
-#				
-#				next;
-#			}
-#		}
 		
 		# count of m109
 		$pos_m109 = index($line, "M109");
@@ -271,20 +243,74 @@ sub analyze_file {
 				}
 				
 				# change only when we are in heating
-				if ((int $string_temp) > CEILING_HEAT) {
+				no warnings 'numeric';
+				my $temp_temp = int $string_temp;
+				use warnings 'numeric';
+				if ($temp_temp > CEILING_HEAT) {
 					if ($extruder_set eq "T0") {
-						
-#						print "M104 S" . $temp_rs . " T0\n";
+						$temp_r = defined($temp_r) ? $temp_r : $temp_temp;
 					}
 					else { # T1
-#						print "M104 S" . $temp_ls . " T1\n";
+						$temp_l = defined($temp_l) ? $temp_l : $temp_temp;
 					}
 					next;
 				}
 			}
 		}
 		
-		print $line . "\n";
+		# count of m190
+		$pos_m190 = index($line, "M190");
+		if ($pos_m190 != -1) {
+			# do not count key word in comment
+			unless ($pos_comment != -1 && $pos_comment < $pos_m190) {
+				my $string_temp = "";
+				my $offset = 0;
+				
+				# get temperature
+				$pos_temp = index ($line, 'S', $offset);
+				while ($pos_temp < $pos_m190) {
+					$offset = $pos_temp + 1;
+					$pos_temp = index ($line, 'S', $offset);
+				}
+				if ($pos_comment != -1) {
+					$string_temp = substr($line, $pos_temp + 1, $pos_comment - $pos_temp - 1);
+				}
+				else {
+					$string_temp = substr($line, $pos_temp + 1);
+				}
+				
+				# change only when we are in heating
+				no warnings 'numeric';
+				my $temp_temp = int $string_temp;
+				use warnings 'numeric';
+				if ($temp_temp > CEILING_HEAT) {
+					$temp_b = defined($temp_b) ? $temp_b : $temp_temp;
+					next;
+				}
+			}
+		}
+		
+		# do not treat the rest if we get all info
+		if (defined($temp_l) && defined($temp_r) && defined($temp_b)) {
+			last;
+		}
+	}
+	
+	{
+		use JSON;
+		
+		my %array_output = ();
+		my %array_check = (T0 => $temp_r, T1 => $temp_l, B => $temp_b);
+		$array_output{'N'} = $nb_extruder;
+		
+		for my $key ( keys %array_check) {
+			my $value = $array_check{$key};
+			if (defined($value) && int $value != 0) {
+				$array_output{$key} = $value;
+			}
+		}
+		
+		print to_json(\%array_output);
 	}
 	
 	return RC_OK;
@@ -402,8 +428,9 @@ elsif ( $opt{analyze} ) {
 		exit($rc);
 	}
 	else {
-		#todo test
-		exit(EXIT_ERROR_PRM);
+		my $rc = analyze_file($opt{openfile});
+	
+		exit($rc);
 	}
 }
 elsif ( $opt{change_e} ) {
@@ -428,23 +455,21 @@ else {
 
 	$command = shift @ARGV;
 
-	if ( $command eq 'CMD_CHECK' ) {
+	if ( $command eq '' ) {
 
-		#cmd: check status
+		#cmd: do nothing, never reach here
 	}
 	else {    #default, wrong cmd, send help
 		usage(EXIT_ERROR_PRM);
 	}
 }
 
-print "\n\n[<-] ok\n";
-
 exit(RC_OK);
 
 sub usage {
 	my ($exit_code) = @_;
 
-	#print 'usage' . $exit_code;
+	print 'usage' . $exit_code;
 	exit($exit_code);
 }
 
