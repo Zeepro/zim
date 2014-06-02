@@ -43,8 +43,8 @@ var var_interval_zrot = 30;
 $(document).ready(prepareDisplay());
 
 function prepareDisplay() {
-	getPreview(var_current_rho, var_current_delta, var_current_theta);
 	if (var_stage == "wait_slice") {
+		getPreview();
 		// set goto preset listener
 		$("select#preset_menu").change(function() {
 			if ($(this).val() == "_GOTO_PRESET_LIST_") {
@@ -57,6 +57,8 @@ function prepareDisplay() {
 	}
 	else if (var_stage == "wait_print") {
 		// try to get sliced info
+		$("#detail_zone").html("");
+		getPreview(false);
 		getSlice();
 	}
 	else {
@@ -67,13 +69,16 @@ function prepareDisplay() {
 	return;
 }
 
-function getPreview() {
+function getPreview(var_control) {
 	if (var_slice_status_lock == true) {
 		return;
 	}
 	else {
 		var_slice_status_lock = true;
 	}
+	
+	var_control = typeof var_control !== 'undefined' ? var_control : true;
+	
 	$("a#slice_button").addClass("ui-disabled");
 	var_preview = $.ajax({
 		url: "/sliceupload/preview_ajax",
@@ -88,23 +93,79 @@ function getPreview() {
 	})
 	.done(function(html) {
 		// html => link to image
-		$("#preview_zone").html('<img src="' + html + '"><br>');
+		var var_html = '<img src="' + html + '"><br>';
+		var_html = var_html
+		+ '<div id="control_general_group">'
+			+ '<button id="preview_near_button" data-inline="true" data-icon="minus" data-iconpos="left"'
+			+ ' onclick="javascript: getPreviewNear(' + var_control + ');" class="ui-btn-hidden" data-disabled="false">{near_button}</button>'
+			+ '<button id="preview_far_button" data-inline="true" data-icon="plus" data-iconpos="left"'
+			+ ' onclick="javascript: getPreviewFar(' + var_control + ');" class="ui-btn-hidden" data-disabled="false">{far_button}</button>'
+		+ '</div>';
+		if (var_control == true) {
+			var_html = var_html + '<div class="ui-grid-b" id="control_grid">'
+			+ '<div class="ui-block-a"><div class="ui-bar ui-bar-f" id="xrot_grid">'
+				+ '<button id="model_xrotminus_button" data-inline="true" data-icon="minus" data-iconpos="notext"'
+				+ ' onclick="javascript: changeModel(\'xrot-\');" class="ui-btn-hidden" data-disabled="false">xrot add</button>'
+				+ '<br><br>X<br><br>'
+				+ '<button id="model_xrotadd_button" data-inline="true" data-icon="plus" data-iconpos="notext"'
+				+ ' onclick="javascript: changeModel(\'xrot+\');" class="ui-btn-hidden" data-disabled="false">xrot minus</button>'
+			+ '</div></div>'
+			+ '<div class="ui-block-b"><div class="ui-bar ui-bar-f" id="yrot_grid">'
+				+ '<button id="model_yrotminus_button" data-inline="true" data-icon="minus" data-iconpos="notext"'
+				+ ' onclick="javascript: changeModel(\'yrot-\');" class="ui-btn-hidden" data-disabled="false">yrot add</button>'
+				+ '<br><br>Y<br><br>'
+				+ '<button id="model_yrotadd_button" data-inline="true" data-icon="plus" data-iconpos="notext"'
+				+ ' onclick="javascript: changeModel(\'yrot+\');" class="ui-btn-hidden" data-disabled="false">yrot minus</button>'
+			+ '</div></div>'
+			+ '<div class="ui-block-c"><div class="ui-bar ui-bar-f" id="zrot_grid">'
+				+ '<button id="model_zrotminus_button" data-inline="true" data-icon="minus" data-iconpos="notext"'
+				+ ' onclick="javascript: changeModel(\'zrot-\');" class="ui-btn-hidden" data-disabled="false">zrot add</button>'
+				+ '<br><br>Z<br><br>'
+				+ '<button id="model_zrotadd_button" data-inline="true" data-icon="plus" data-iconpos="notext"'
+				+ ' onclick="javascript: changeModel(\'zrot+\');" class="ui-btn-hidden" data-disabled="false">zrot minus</button>'
+			+ '</div></div>'
+			+ '</div>';
+		}
+		$("#preview_zone").html(var_html);
 		$("a#slice_button").removeClass("ui-disabled");
-		$('<button>').appendTo('#preview_zone')
-		.attr({'id': 'prime_button', 'data-inline': 'true', 'data-icon': 'minus', 'data-iconpos': 'notext',
-			'onclick': 'javascript: getPreviewNear();'}).html('Near')
-		.button().button('refresh');
-		$('<button>').appendTo('#preview_zone')
-		.attr({'id': 'preview_near_button', 'data-inline': 'true', 'data-icon': 'minus', 'data-iconpos': 'left',
-			'onclick': 'javascript: getPreviewNear();'}).html('{near_button}')
-		.button().button('refresh');
-		$('<button>').appendTo('#preview_zone')
-		.attr({'id': 'preview_far_button', 'data-inline': 'true', 'data-icon': 'plus', 'data-iconpos': 'left',
-			'onclick': 'javascript: getPreviewFar();'}).html('{far_button}')
-		.button().button('refresh');
-// 		$('<button>').appendTo('#cartridge_detail_info')
-// 		.attr({'id': 'prime_button', 'onclick': 'javascript: window.location.href="/printdetail/printprime?v={abb_cartridge}";'}).html('{prime_button}')
-// 		
+		$('button#preview_near_button').button().button('refresh');
+		$('button#preview_far_button').button().button('refresh');
+		if (var_control == true) {
+// 			$('<button>').appendTo('#control_general_group')
+// 			.attr({'id': 'model_small_button', 'data-inline': 'true', 'data-icon': 'minus', 'data-iconpos': 'left',
+// 				'onclick': 'javascript: changeModel("s-");'}).html('{small_button}')
+// 			.button().button('refresh');
+// 			$('<button>').appendTo('#control_general_group')
+// 			.attr({'id': 'model_big_button', 'data-inline': 'true', 'data-icon': 'plus', 'data-iconpos': 'left',
+// 				'onclick': 'javascript: changeModel("s+");'}).html('{big_button}')
+// 			.button().button('refresh');
+// 			$('<button>').appendTo('#preview_zone')
+// 			.attr({'id': 'preview_far_button', 'data-inline': 'true', 'data-icon': 'minus', 'data-iconpos': 'left',
+// 				'onclick': 'javascript: getPreviewFar();'}).html('{far_button}')
+// 			.button().button('refresh');
+// 			$('<button>').appendTo('#preview_zone')
+// 			.attr({'id': 'preview_near_button', 'data-inline': 'true', 'data-icon': 'plus', 'data-iconpos': 'left',
+// 				'onclick': 'javascript: getPreviewNear();'}).html('{near_button}')
+// 			.button().button('refresh');
+			$('#control_general_group').append(
+					'<button id="model_small_button" data-inline="true" data-icon="minus" data-iconpos="left"'
+					+ ' onclick="javascript: changeModel(\'s-\');" class="ui-btn-hidden" data-disabled="false">{small_button}</button>'
+					+ '<button id="model_big_button" data-inline="true" data-icon="plus" data-iconpos="left"'
+					+ ' onclick="javascript: changeModel(\'s+\');" class="ui-btn-hidden" data-disabled="false">{big_button}</button>'
+					);
+			$('button#model_small_button').button().button('refresh');
+			$('button#model_big_button').button().button('refresh');
+			$('button#model_xrotminus_button').button().button('refresh');
+			$('button#model_xrotadd_button').button().button('refresh');
+			$('button#model_yrotminus_button').button().button('refresh');
+			$('button#model_yrotadd_button').button().button('refresh');
+			$('button#model_zrotminus_button').button().button('refresh');
+			$('button#model_zrotadd_button').button().button('refresh');
+			
+// 			$('<button>').appendTo('#cartridge_detail_info')
+// 			.attr({'id': 'prime_button', 'onclick': 'javascript: window.location.href="/printdetail/printprime?v={abb_cartridge}";'})
+// 			.html('{prime_button}').button().button('refresh');
+		}
 	})
 	.fail(function() { // not allowed
 		alert("failed preview");
@@ -117,22 +178,24 @@ function getPreview() {
 	return;
 }
 
-function getPreviewNear() {
+function getPreviewNear(var_control) {
+	var_control = typeof var_control !== 'undefined' ? var_control : true;
 	var_current_rho = var_current_rho - var_interval_rho;
 	if (var_current_rho < 0) {
 		var_current_rho = 0;
 	}
-	getPreview();
+	getPreview(var_control);
 
 	return;
 }
 
-function getPreviewFar() {
+function getPreviewFar(var_control) {
+	var_control = typeof var_control !== 'undefined' ? var_control : true;
 	var_current_rho = var_current_rho + var_interval_rho;
 	if (var_current_rho > 5000) {
 		var_current_rho = 5000;
 	}
-	getPreview();
+	getPreview(var_control);
 
 	return;
 }
@@ -252,6 +315,7 @@ function checkSlice() {
 		if (var_slice_status.status == 202) { // finished checking, wait user to input
 			clearInterval(var_slice_interval);
 			$("#preview_zone").show();
+			getPreview(false);
 			$("#detail_zone").html(html);
 		}
 		else if (var_slice_status.status == 200) { // in checking

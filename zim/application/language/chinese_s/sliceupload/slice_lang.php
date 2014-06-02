@@ -17,3 +17,7 @@ $lang['near_button']
 	= '镜头拉进';
 $lang['far_button']
 	= '镜头拉远';
+$lang['small_button']
+	= '尺寸 -';
+$lang['big_button']
+	= '尺寸 +';

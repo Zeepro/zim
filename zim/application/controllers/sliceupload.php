@@ -124,6 +124,8 @@ class Sliceupload extends MY_Controller {
 				'wait_in_slice'	=> t('wait_in_slice'),
 				'near_button'	=> t('near_button'),
 				'far_button'	=> t('far_button'),
+				'small_button'	=> t('small_button'),
+				'big_button'	=> t('big_button'),
 		);
 		$body_page = $this->parser->parse('template/sliceupload/slice', $template_data, TRUE);
 		
@@ -174,6 +176,9 @@ class Sliceupload extends MY_Controller {
 		if ($cr != ERROR_OK) {
 			$this->load->helper('printerlog');
 			PrinterLog_logError($cr, __FILE__, __LINE__);
+		}
+		else {
+			unlink($this->config->item('temp') . SLICER_FILE_TEMP_DATA);
 		}
 		
 		return;
@@ -471,9 +476,48 @@ class Sliceupload extends MY_Controller {
 			}
 			else {
 				$file_info = array();
+				$file_cartridge = NULL;
+				$color1 = NULL;
+				$color2 = NULL;
 				
+				$cr = ERROR_OK;
 				$this->load->helper('slicer');
-				$cr = Slicer_rendering((int)$rho, (int)$theta, (int)$delta, $path_image);
+				$file_cartridge = $this->config->item('temp') . SLICER_FILE_TEMP_DATA;
+				if (file_exists($file_cartridge)) {
+					$this->load->helper(array('json', 'printerstate'));
+					$temp_json = json_read($file_cartridge, TRUE);
+					
+					if (isset($temp_json['error'])) {
+						$this->load->helper('printerlog');
+						PrinterLog_logError('read temp data file error', __FILE__, __LINE__);
+						$cr = ERROR_INTERNAL;
+					}
+					else {
+						foreach ($temp_json['json'] as $abb_cartridge => $data_cartridge) {
+							switch ($abb_cartridge) {
+								case 'r':
+									$color1 = $data_cartridge[PRINTERSTATE_TITLE_COLOR];
+									break;
+									
+								case 'l':
+									$color2 = $data_cartridge[PRINTERSTATE_TITLE_COLOR];
+									break;
+									
+								default:
+									$this->load->helper('printerlog');
+									PrinterLog_logError('unknown cartridge abb: ' . $abb_cartridge, __FILE__, __LINE__);
+									$cr = ERROR_INTERNAL;
+									break;
+							}
+							if ($cr != ERROR_OK) {
+								break;
+							}
+						}
+					}
+				}
+				if ($cr == ERROR_OK) {
+					$cr = Slicer_rendering((int)$rho, (int)$theta, (int)$delta, $path_image, $color1, $color2);
+				}
 				if ($cr == ERROR_OK) {
 					//TODO add the possibility of making path everywhere, but not only in /var/www/tmp/
 					$this->load->helper('file');

@@ -33,6 +33,8 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_CMD_CHECK_SD',		'echo writable > ');
 	define('CORESTATUS_SUFFIX_CONF',		'conf/');
 	define('CORESTATUS_SUFFIX_PRESET',		'conf/presetlist/');
+	define('CORESTATUS_FILE_SD_ON',			'_SD_On.tmp');
+	define('CORESTATUS_FILE_SD_OFF',		'_SD_Off.tmp');
 }
 
 function CoreStatus_initialFile() {
@@ -40,7 +42,14 @@ function CoreStatus_initialFile() {
 	$state_file = NULL;
 	$sdcard = FALSE;
 	
-	// check if we can use all files in sdcard instead of config partition
+	// for the first time, check if we can use all files in sdcard instead of config partition
+	// then save the choice in a status file in the temp to remember it
+	if (file_exists($CI->config->item('temp') . CORESTATUS_FILE_SD_ON)) {
+		$sdcard = TRUE;
+	}
+	else if (file_exists($CI->config->item('temp') . CORESTATUS_FILE_SD_OFF)) {
+		$sdcard = FALSE;
+	}
 	if (is_writable($CI->config->item('sdcard'))) {
 		$cr = 0;
 		$command = CORESTATUS_CMD_CHECK_SD . $CI->config->item('sdcard') . '.phptest.tmp';
@@ -51,6 +60,12 @@ function CoreStatus_initialFile() {
 		
 		if ($cr == ERROR_NORMAL_RC_OK) {
 			$sdcard = TRUE;
+			$command = CORESTATUS_CMD_CHECK_SD . $CI->config->item('temp') . CORESTATUS_FILE_SD_ON;
+			exec($command);
+		}
+		else {
+			$command = CORESTATUS_CMD_CHECK_SD . $CI->config->item('temp') . CORESTATUS_FILE_SD_OFF;
+			exec($command);
 		}
 	}
 	

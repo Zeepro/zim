@@ -17,3 +17,7 @@ $lang['near_button']
 	= 'Zoomer';
 $lang['far_button']
 	= 'Zoomer arrière';
+$lang['small_button']
+	= 'Taille -';
+$lang['big_button']
+	= 'Taille +';
