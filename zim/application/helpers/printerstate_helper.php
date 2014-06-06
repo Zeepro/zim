@@ -56,9 +56,9 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_GET_TOP_LED',		' M1615');
 	define('PRINTERSTATE_GET_ENDSTOPS',		' M119');
 	define('PRINTERSTATE_GET_SPEED',		' M1620');
-	define('PRINTERSTATE_SET_SPEED',		' M1621 V');
+	define('PRINTERSTATE_SET_SPEED',		' M1621\ V');
 	define('PRINTERSTATE_GET_ACCELERATION', ' M1623');
-	define('PRINTERSTATE_SET_ACCELERATION',	' M1624 A');
+	define('PRINTERSTATE_SET_ACCELERATION',	' M1624\ A');
 	define('PRINTERSTATE_GET_COLDEXTRUDE',	' M1622');
 	define('PRINTERSTATE_GET_MARLIN_VER',	' M1400');
 
@@ -2237,6 +2237,11 @@ function PrinterState_setSpeed($value) {
 		$command .= $value;
 	}
 	
+	if ($CFG->config['simulator'] && DectectOS_checkWindows()) {
+		// remove the symbol "\" for simulator
+		$command = str_replace('\ ', ' ', $command);
+	}
+	
 	exec($command, $output, $ret_val);
 	if (!PrinterState_filterOutput($output)) {
 		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
@@ -2270,6 +2275,11 @@ function PrinterState_setAcceleration($value) {
 	}
 	else {
 		$command .= $value;
+	}
+	
+	if ($CFG->config['simulator'] && DectectOS_checkWindows()) {
+		// remove the symbol "\" for simulator
+		$command = str_replace('\ ', ' ', $command);
 	}
 	
 	exec($command, $output, $ret_val);

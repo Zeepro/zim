@@ -274,7 +274,7 @@ class Sliceupload extends MY_Controller {
 						$data_cartridge = array();
 						$tmp_ret = 0;
 						$volume_need = $array_temp[PRINTERSTATE_TITLE_NEED_L];
-							
+						
 						$tmp_ret = PrinterState_checkFilament($abb_filament, $volume_need, $data_cartridge);
 						$array_data[$abb_filament] = array(
 								PRINTERSTATE_TITLE_COLOR		=> $data_cartridge[PRINTERSTATE_TITLE_COLOR],

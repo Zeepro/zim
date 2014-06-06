@@ -131,22 +131,6 @@ function getPreview(var_control) {
 		$('button#preview_near_button').button().button('refresh');
 		$('button#preview_far_button').button().button('refresh');
 		if (var_control == true) {
-// 			$('<button>').appendTo('#control_general_group')
-// 			.attr({'id': 'model_small_button', 'data-inline': 'true', 'data-icon': 'minus', 'data-iconpos': 'left',
-// 				'onclick': 'javascript: changeModel("s-");'}).html('{small_button}')
-// 			.button().button('refresh');
-// 			$('<button>').appendTo('#control_general_group')
-// 			.attr({'id': 'model_big_button', 'data-inline': 'true', 'data-icon': 'plus', 'data-iconpos': 'left',
-// 				'onclick': 'javascript: changeModel("s+");'}).html('{big_button}')
-// 			.button().button('refresh');
-// 			$('<button>').appendTo('#preview_zone')
-// 			.attr({'id': 'preview_far_button', 'data-inline': 'true', 'data-icon': 'minus', 'data-iconpos': 'left',
-// 				'onclick': 'javascript: getPreviewFar();'}).html('{far_button}')
-// 			.button().button('refresh');
-// 			$('<button>').appendTo('#preview_zone')
-// 			.attr({'id': 'preview_near_button', 'data-inline': 'true', 'data-icon': 'plus', 'data-iconpos': 'left',
-// 				'onclick': 'javascript: getPreviewNear();'}).html('{near_button}')
-// 			.button().button('refresh');
 			$('#control_general_group').append(
 					'<button id="model_small_button" data-inline="true" data-icon="minus" data-iconpos="left"'
 					+ ' onclick="javascript: changeModel(\'s-\');" class="ui-btn-hidden" data-disabled="false">{small_button}</button>'
@@ -252,6 +236,29 @@ function changeModel(var_action) {
 	})
 	.fail(function() { // not allowed
 		alert('failed');
+		
+		// reverse the original state
+		switch (var_action) {
+			case 'zrot+':
+				var_model_zrot -= var_interval_zrot;
+				break;
+				
+			case 'zrot-':
+				var_model_zrot += var_interval_zrot;
+				break;
+				
+			case 's+':
+				var_model_scale -= var_interval_scale;
+				break;
+				
+			case 's-':
+				var_model_scale += var_interval_scale;
+				break;
+				
+			case 'error':
+			default:
+				return; 
+		}
 	})
 	.always(function() {
 		var_slice_status_lock = false;
