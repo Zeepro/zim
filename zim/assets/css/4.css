@@ -1648,8 +1648,7 @@ span.ui-slider-label-b { right: -100%;  margin-left: -1px }
 
 .page-header { 
 	background:url("../images/headerBack.png") bottom repeat-x; 
-	border:0px;
-	border-bottom:1px solid #FFFFFF; 
+	border:0px; 
 	color:#333; 
 	height:38px; 
 	text-shadow: 0 -1px 1px #fff; 
