@@ -68,6 +68,10 @@ function CoreStatus_initialFile() {
 			exec($command);
 		}
 	}
+	else {
+		$command = CORESTATUS_CMD_CHECK_SD . $CI->config->item('temp') . CORESTATUS_FILE_SD_OFF;
+		exec($command);
+	}
 	
 	$array_change = array(
 			'conf'			=> CORESTATUS_SUFFIX_CONF,
