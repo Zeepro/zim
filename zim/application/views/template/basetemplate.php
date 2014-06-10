@@ -45,7 +45,7 @@
 	.shadow {
 		width: 100%;
 		position: relative;
-		top: -1px;
+		top: -17px;
 		z-index: 5;
 	}
 </style>
