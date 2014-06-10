@@ -36,15 +36,21 @@
 		background-size: 79px 245px; 
 	}
 	.page-header { 
-		background:url("/assets/images/headerBack.png") bottom repeat-x; 
-		border:0px; 
-		color:#333; 
-		height:38px; 
-		text-shadow: 0 -1px 1px #fff; 
+		background:url("/assets/images/headerBack.png") bottom repeat-x;
+		border:0px;
+		color:#333;
+		height:38px;
+		text-shadow: 0 -1px 1px #fff;
+	}
+	.shadow {
+		width: 100%;
+		position: relative;
+		top: -1px;
+		z-index: 5;
 	}
 </style>
 <script type="text/javascript">
-	$(document).ready(function() {
+	$(document).on("pageinit", function() {
 		$('div#link_logo').click(function(){window.location.href='/'; return false;});
 	});
 </script>
