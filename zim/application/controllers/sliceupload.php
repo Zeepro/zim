@@ -109,7 +109,7 @@ class Sliceupload extends MY_Controller {
 		
 		// parse the main body
 		$template_data = array(
-// 				'back'			=> t('back'),
+ 				'home'			=> t('home'),
 				'select_hint'	=> t('select_hint'),
 				'slice_button'	=> t('slice_button'),
 				'goto_preset'	=> t('goto_preset'),

@@ -16,7 +16,7 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_CMD_RESTART_WEB',	'sudo /etc/init.d/zeepro-network delayed-restart >> /var/log/network.log 2>&1 &');
 	define('ZIMAPI_CMD_GATEWAY',		'route -n | awk \'$2 != "0.0.0.0" { print $2 }\' | sed -n 3p');
 	define('ZIMAPI_CMD_DNS',			'grep nameserver /etc/resolv.conf | awk \'{print $2}\'');
-	define('ZIMAPI_CMD_SERIAL',			'ifconfig -a | grep wlan0 | awk \'{print $5}\'');
+	define('ZIMAPI_CMD_SERIAL',			'ifconfig -a | grep eth0 | awk \'{print $5}\'');
 	define('ZIMAPI_CMD_VERSION',		'zfw_printenv version`zfw_printenv last_good`');
 	define('ZIMAPI_CMD_SETHOSTNAME',	ZIMAPI_CMD_CONFIG_NET . '-n ');
 	
@@ -41,7 +41,7 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_VALUE_NETWORK',	'network');
 	define('ZIMAPI_VALUE_P2P',		'p2p');
 	define('ZIMAPI_MODE_CETH',		'cEth');
-
+	
 	define('ZIMAPI_FILENAME_CAMERA',	'Camera.json');
 	define('ZIMAPI_FILENAME_SOFTWARE',	'Software.json');
 	define('ZIMAPI_FILEPATH_CAPTURE',	'/var/www/tmp/capture.jpg');
@@ -957,6 +957,52 @@ function ZimAPI_setPreset($id_preset) {
 	return ERROR_OK;
 }
 
+function ZimAPI_deletePreset($id_preset) {
+	$cr = 0;
+	$ret_val = 0;
+	$preset_basepath = NULL;
+	$system_preset = NULL;
+	
+	$CI = &get_instance();
+	$CI->load->helper('file');
+	
+	if ($id_preset) {
+		$ret_val = ZimAPI__checkPreset($id_preset, $preset_basepath, $system_preset);
+		if ($ret_val == TRUE) {
+			if ($system_preset == TRUE) {
+				$cr = ERROR_WRONG_PRM;
+				$CI->load->helper('printerlog');
+				PrinterLog_logMessage('try to delete system preset', __FILE__, __LINE__);
+			}
+			else {
+				$preset_path = $preset_basepath . $id_preset;
+				if (file_exists($preset_path)) {
+					delete_files($preset_path, TRUE); //there are no folders inside normally, but we delete all
+					rmdir($preset_path);
+					$cr = ERROR_OK;
+				}
+				else {
+					$cr = ERROR_INTERNAL;
+					$CI->load->helper('printerlog');
+					PrinterLog_logError('can not find preset filepath', __FILE__, __LINE__);
+				}
+			}
+		}
+		else {
+			$cr = ERROR_WRONG_PRM;
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('can not find preset by id', __FILE__, __LINE__);
+		}
+	}
+	else {
+		$cr = ERROR_MISS_PRM;
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('miss preset id', __FILE__, __LINE__);
+	}
+	
+	return $cr;
+}
+
 function ZimAPI_getSerial() {
 	$address_mac = NULL;
 	
@@ -973,6 +1019,7 @@ function ZimAPI_getSerial() {
 			$address_mac = 'ff:ff:ff:ff:ff:ff';
 		}
 	}
+	$address_mac = str_replace(':', '', $address_mac);
 	
 	return $address_mac;
 }

@@ -1,4 +1,6 @@
 <?php
+$lang['home']
+	= 'Accueil';
 $lang['select_hint']
 	= 'Selectionner une configuration préset à slicer le modèle';
 $lang['slice_button']

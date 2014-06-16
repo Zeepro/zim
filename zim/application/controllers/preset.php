@@ -62,6 +62,18 @@ class Preset extends MY_Controller {
 		return;
 	}
 	
+	public function delete() {
+		$id_preset = NULL;
+		$ret_val = 0;
+		
+		$id_preset = $this->input->get('id');
+		$ret_val = ZimAPI_deletePreset($id_preset);
+		
+		$this->output->set_header('Location: /preset/listpreset');
+		
+		return;
+	}
+	
 	public function detail() {
 		$id_preset = NULL;
 		$ret_val = 0;
@@ -71,6 +83,7 @@ class Preset extends MY_Controller {
 		$body_page = NULL;
 		$option_selected = 'selected="selected"';
 		$display_hide = 'display: none;';
+		$change_disable = 'disabled="disabled"';
 		$system_preset = FALSE;
 		$error = NULL;
 		
@@ -461,6 +474,7 @@ class Preset extends MY_Controller {
 				'hide_submit'	=> ($system_preset && $new_preset == NULL) ? $display_hide : NULL,
 				'hide_delete'	=> ($system_preset || $new_preset) ? $display_hide : NULL,
 				'error'			=> $error,
+				'disable_all'	=> $system_preset ? $change_disable : NULL,
 		);
 		
 		switch ($array_setting['fill_pattern']) {

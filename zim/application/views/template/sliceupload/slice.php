@@ -1,5 +1,7 @@
 <div data-role="page" data-url="sliceupload/slice">
-	<header data-role="header" class="page-header"></header>
+	<header data-role="header" class="page-header">
+		<a href="#" onclick="javascript:window.location.href='/';" data-icon="home" data-ajax="false">{home}</a>
+	</header>
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
@@ -361,6 +363,7 @@ function getSlice() {
 		}
 		else if (var_slice_status.status == 200) { // in checking
 			$("#detail_zone").html("{wait_in_slice} " + html);
+			getPreview(false); // redo previewing for changing color to cartridge's one
 		}
 	})
 	.fail(function() { // not allowed

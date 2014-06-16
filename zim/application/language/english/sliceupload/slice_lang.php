@@ -1,4 +1,6 @@
 <?php
+$lang['home']
+	= 'home';
 $lang['select_hint']
 	= 'Select one preset setting to slice model';
 $lang['slice_button']

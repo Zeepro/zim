@@ -936,6 +936,7 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array(), 
 					return TRUE;
 				}
 				
+				return TRUE;
 				// try to launch printing after checking
 				$CI->load->helper('printer');
 				if ($CI->config->item('simulator')) {

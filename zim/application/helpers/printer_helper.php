@@ -118,8 +118,6 @@ function Printer_printFromPrime($abb_extruder, $first_run = TRUE) {
 		//TODO test me
 		$ret_val = Printer__changeTemperature($gcode_path);
 		if ($ret_val != ERROR_OK) {
-			$CI->load->helper('printerlog');
-			PrinterLog_logError('change temperature error', __FILE__, __LINE__);
 			return $ret_val;
 		}
 		
@@ -139,8 +137,6 @@ function Printer_printFromModel($id_model, $stop_printing = FALSE) {
 		//TODO test me
 		$ret_val = Printer__changeTemperature($gcode_path);
 		if ($ret_val != ERROR_OK) {
-			$CI->load->helper('printerlog');
-			PrinterLog_logError('change temperature error', __FILE__, __LINE__);
 			return $ret_val;
 		}
 		
@@ -623,8 +619,14 @@ function Printer__changeTemperature(&$gcode_path) {
 			. PRINTER_PRM_TEMPER_R_F . $temp_r . PRINTER_PRM_TEMPER_R_N . $temp_rs
 			. PRINTER_PRM_TEMPER_L_F . $temp_l . PRINTER_PRM_TEMPER_L_N . $temp_ls
 			. PRINTER_PRM_FILE . $gcode_path . ' > ' . $gcode_path . '.new';
+	//TODO remove the debug message after test
+	$CI->load->helper('printerlog');
+	PrinterLog_logDebug('change temperature: ' . $command, __FILE__, __LINE__);
+	
 	exec($command, $output, $cr);
 	if ($cr != ERROR_NORMAL_RC_OK) {
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('change temperature error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
 	
