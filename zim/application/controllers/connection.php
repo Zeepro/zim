@@ -133,8 +133,6 @@ class Connection extends MY_Controller {
 		$this->form_validation->set_message('required', t('required ssid'));
 		
 		if ($this->form_validation->run () == FALSE) {
-			$this->template->load ( 'connectionmaster', 'connectionwifinotvisiblessid');
-			
 			// parse the main body
 			$template_data = array(
 					'title'		=> t('WiFi network connected to the Internet'),
