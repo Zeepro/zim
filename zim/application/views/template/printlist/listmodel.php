@@ -10,7 +10,7 @@
 				{model_lists}
 				<li><a href="{baseurl_detail}?id={id}">
 					<img src="{image}">
-					<h2 style="margin-left:100px;">{name}</h2></a>
+					<h2>{name}</h2></a>
 				</li>
 				{/model_lists}
 			</ul>

@@ -32,6 +32,8 @@ if (!defined('PRINTER_FN_CHARGE')) {
 	define('PRINTER_PRM_TEMPER_R_N',	' -rr ');	// right temperature for other layer (if exist)
 	define('PRINTER_PRM_TEMPER_R_F',	' -r ');	// right temperature for first layer (or all layer)
 	define('PRINTER_PRM_FILE',			' -f ');	// file path
+	
+	define('PRINTER_VALUE_DEFAULT_TEMPER',	240);
 }
 
 function Printer_preparePrint($need_prime = TRUE) {
@@ -608,6 +610,9 @@ function Printer__changeTemperature(&$gcode_path) {
 		if ($cr == ERROR_OK) {
 			$temp_l = $json_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER];
 			$temp_ls = $json_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1];
+		}
+		else if ($cr == ERROR_MISS_LEFT_CART) {
+			$temp_l = $temp_ls = PRINTER_VALUE_DEFAULT_TEMPER;
 		}
 		if ($temp_l * $temp_ls == 0) {
 			// we have at least one value not initialised to call change temper program
