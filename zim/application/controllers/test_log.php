@@ -23,6 +23,7 @@ class Test_log extends CI_Controller {
 		
 		$this->load->library('parser');
 		$this->parser->parse('template/plaintxt', array('display' => $display));
+// 		$this->output->set_header('Location: /test_log/debug');
 		
 		return;
 	}
@@ -34,9 +35,41 @@ class Test_log extends CI_Controller {
 		}
 // 		$this->index();
 		$this->output->set_header('Location: /test_log');
+		
+		return;
 	}
 	
-	public function file($type = 'debug') {
+	public function debug($type = NULL) {
+		if ($type == 'clear') {
+			if (file_exists($this->config->item('log_file'))) {
+				unlink($this->config->item('log_file'));
+			}
+		}
+		
+		$this->file('debug');
+		
+		return;
+	}
+	
+	public function arduino($type = NULL) {
+		if ($type == 'clear') {
+			if (file_exists($this->config->item('log_arduino'))) {
+				unlink($this->config->item('log_arduino'));
+			}
+		}
+		
+		$this->file('arduino');
+		
+		return;
+	}
+	
+	public function printlog() {
+		$this->file('printlog');
+		
+		return;
+	}
+	
+	private function file($type = 'debug') {
 		$path_file = '';
 		
 		switch ($type) {

@@ -61,18 +61,23 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_SET_ACCELERATION',	' M1624\ A');
 	define('PRINTERSTATE_GET_COLDEXTRUDE',	' M1622');
 	define('PRINTERSTATE_GET_MARLIN_VER',	' M1400');
-
+	define('PRINTERSTATE_RFID_POWER_ON',	' M1616');
+	define('PRINTERSTATE_RFID_POWER_OFF',	' M1617');
+	define('PRINTERSTATE_GET_RFID_POWER',	' M1618');
+	define('PRINTERSTATE_SET_CARTRIDGER',	' M1610\ ');
+	define('PRINTERSTATE_SET_CARTRIDGEL',	' M1611\ ');
+	
 // 	define('PRINTERSTATE_TEMP_PRINT_FILENAME',	'/tmp/printer_percentage'); // fix the name on SD card
 	define('PRINTERSTATE_FILE_PRINTLOG',	'/tmp/printlog.log');
 	define('PRINTERSTATE_FILE_RESPONSE',	'/tmp/printer_response.log');
-
+	
 	define('PRINTERSTATE_RIGHT_EXTRUD',	0);
 	define('PRINTERSTATE_LEFT_EXTRUD',	1);
 	define('PRINTERSTATE_TEMPER_MIN_E',	0);
 	define('PRINTERSTATE_TEMPER_MAX_E',	250);
 	define('PRINTERSTATE_TEMPER_MIN_H',	0);
 	define('PRINTERSTATE_TEMPER_MAX_H',	100);
-
+	
 	define('PRINTERSTATE_TITLE_CARTRIDGE',	'type');
 	define('PRINTERSTATE_TITLE_MATERIAL',	'material');
 	define('PRINTERSTATE_TITLE_COLOR',		'color');
@@ -97,9 +102,10 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_TITLE_JSON_NB_EXTRUD', 'ExtrudersNumber');
 	define('PRINTERSTATE_JSON_REFILL_TEMPER',	'RefillTemperature.json');
 
-	define('PRINTERSTATE_MAGIC_NUMBER_V1',			23567);
-	define('PRINTERSTATE_MAGIC_NUMBER_V2',			23568);
-	define('PRINTERSTATE_MAGIC_NUMBER_V3',			23569);
+	define('PRINTERSTATE_MAGIC_NUMBER_V1',			23567); //v1.0
+	define('PRINTERSTATE_MAGIC_NUMBER_V2',			23568); //v1.1
+	define('PRINTERSTATE_MAGIC_NUMBER_V3',			23569); //v1.2
+	define('PRINTERSTATE_MAGIC_NUMBER_V4',			23570); //v1.3
 	define('PRINTERSTATE_VALUE_CARTRIDGE_NORMAL',	0);
 	define('PRINTERSTATE_DESP_CARTRIDGE_NORMAL',	'normal');
 	define('PRINTERSTATE_VALUE_CARTRIDGE_REFILL',	1);
@@ -108,6 +114,8 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_DESP_MATERIAL_PLA',		'pla');
 	define('PRINTERSTATE_VALUE_MATERIAL_ABS',		1);
 	define('PRINTERSTATE_DESP_MATERIAL_ABS',		'abs');
+	define('PRINTERSTATE_VALUE_MATERIAL_PVA',		2);
+	define('PRINTERSTATE_DESP_MATERIAL_PVA',		'pva');
 	define('PRINTERSTATE_OFFSET_TEMPER',			100);
 	define('PRINTERSTATE_OFFSET_TEMPER_V2',			150);
 	define('PRINTERSTATE_OFFSET_YEAR_SETUP_DATE',	2014);
@@ -453,6 +461,58 @@ function PrinterState_checkInPrint() {
 	return FALSE;
 }
 
+function PrinterState_setCartridgeCode($code_cartridge, $abb_cartridge) {
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$command = '';
+	$output = array();
+	$ret_val = 0;
+	$CI = &get_instance();
+	$CI->load->helper('detectos');
+	
+	switch ($abb_cartridge) {
+		case 'l':
+			$command = $arcontrol_fullpath . PRINTERSTATE_SET_CARTRIDGEL;
+			break;
+			
+		case 'r':
+			$command = $arcontrol_fullpath . PRINTERSTATE_SET_CARTRIDGER;
+			break;
+			
+		default:
+			PrinterLog_logError('input parameter error, $abb_cartridge: "' . $abb_cartridge . '"', __FILE__, __LINE__);
+			return ERROR_WRONG_PRM;
+			break;
+	}
+	$command .= $code_cartridge;
+	
+	if ($CFG->config['simulator'] && DectectOS_checkWindows()) {
+		// remove the symbol "\" for simulator
+		$command = str_replace('\ ', ' ', $command);
+	}
+	//TODO test me
+	
+	// check if we are in printing
+	$ret_val = FALSE; //PrinterState_checkInPrint();
+	if ($ret_val == FALSE) {
+		exec($command, $output, $ret_val);
+		if (!PrinterState_filterOutput($output)) {
+			PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
+			return ERROR_INTERNAL;
+		}
+		PrinterLog_logArduino($command, $output);
+		if ($ret_val != ERROR_NORMAL_RC_OK) {
+			return ERROR_INTERNAL;
+		}
+	} else {
+// 		return ERROR_IN_PRINT;
+		PrinterLog_logError('can not get info in printing', __FILE__, __LINE__);
+		return ERROR_BUSY_PRINTER;
+	}
+	
+	return ERROR_OK;
+}
+
 function PrinterState_getCartridgeCode(&$code_cartridge, $abb_cartridge) {
 	global $CFG;
 	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
@@ -519,8 +579,8 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 		$time_pack = 0;
 		$data_json = array();
 		
-		// checksum 0 to 13
-		for($i=0; $i<=13; $i++) {
+		// checksum 0 to 14
+		for($i=0; $i<=14; $i++) {
 			$string_tmp = substr($last_output, $i*2, 2);
 			$hex_tmp = hexdec($string_tmp);
 			$hex_cal = $hex_cal ^ $hex_tmp;
@@ -546,51 +606,22 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 				$version_rfid = 3;
 				break;
 				
+			case PRINTERSTATE_MAGIC_NUMBER_V4:
+				$version_rfid = 4;
+				break;
+				
 			default:
 				PrinterLog_logError('magic number error', __FILE__, __LINE__);
 				return ERROR_INTERNAL;
 				break;
 		}
 		
-		// type of cartridge
-		$string_tmp = substr($last_output, 4, 2);
-		$hex_tmp = hexdec($string_tmp);
-		switch($hex_tmp) {
-			case PRINTERSTATE_VALUE_CARTRIDGE_NORMAL:
-				$data_json[PRINTERSTATE_TITLE_CARTRIDGE] = PRINTERSTATE_DESP_CARTRIDGE_NORMAL;
-				break;
-				
-			case PRINTERSTATE_VALUE_CARTRIDGE_REFILL:
-				$data_json[PRINTERSTATE_TITLE_CARTRIDGE] = PRINTERSTATE_DESP_CARTRIDGE_REFILL;
-				break;
-				
-			default:
-				PrinterLog_logError('cartridge type error', __FILE__, __LINE__);
-				return ERROR_INTERNAL;
-		}
-		
-		// type of material
-		$string_tmp = substr($last_output, 6, 2);
-		$hex_tmp = hexdec($string_tmp);
-		switch($hex_tmp) {
-			case PRINTERSTATE_VALUE_MATERIAL_PLA:
-				$data_json[PRINTERSTATE_TITLE_MATERIAL] = PRINTERSTATE_DESP_MATERIAL_PLA;
-				break;
-				
-			case PRINTERSTATE_VALUE_MATERIAL_ABS:
-				$data_json[PRINTERSTATE_TITLE_MATERIAL] = PRINTERSTATE_DESP_MATERIAL_ABS;
-				break;
-				
-			default:
-				PrinterLog_logError('filament type error', __FILE__, __LINE__);
-				return ERROR_INTERNAL;
-		}
-		
-		// color
-		$string_tmp = substr($last_output, 8, 6);
-		$data_json[PRINTERSTATE_TITLE_COLOR] = '#' . $string_tmp;
-		
-		if (in_array($version_rfid, array(1, 2))) {
+		if ($version_rfid <= 3) {
+			$length_cartridge = 2;
+			$offset_material = 6;
+			$length_material = 2;
+			$offset_color = 8;
+			$length_color = 6;
 			$offset_init = 14;
 			if ($version_rfid == 1) {
 				$length_init = 4;
@@ -610,7 +641,7 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 				$offset_pack = 26;
 				$length_pack = 4;
 			}
-			else { //$version_rfid == 3
+			else if ($version_rfid == 3) { //$version_rfid == 3
 				$length_init = 5;
 				$offset_used = 19;
 				$length_used = 5;
@@ -621,46 +652,110 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
 				$offset_pack = 26;
 				$length_pack = 4;
 			}
-			
-			// initial quantity
-			$string_tmp = substr($last_output, $offset_init, $length_init);
-			$hex_tmp = hexdec($string_tmp);
-			$data_json[PRINTERSTATE_TITLE_INITIAL] = $hex_tmp;
-			
-			// used quantity
-			$string_tmp = substr($last_output, $offset_used, $length_used);
-			$hex_tmp = hexdec($string_tmp);
-			$data_json[PRINTERSTATE_TITLE_USED] = $hex_tmp;
-			
-			// normal extrusion temperature
-			$string_tmp = substr($last_output, $offset_temp, $length_temp);
-			if ($version_rfid > 2) {
+		}
+		else { //$version_rfid == 4
+			$length_cartridge = 1;
+			$offset_material = 5;
+			$length_material = 1;
+			$offset_color = 6;
+			$length_color = 6;
+			$offset_init = 12;
+			$length_init = 5;
+			$offset_used = 17;
+			$length_used = 5;
+			$offset_temp = 22;
+			$length_temp = 2;
+			$offset_temp_f = 24;
+			$length_temp_f = 2;
+			$offset_pack = 26;
+			$length_pack = 4;
+		}
+		
+		// type of cartridge
+		$string_tmp = substr($last_output, 4, $length_cartridge);
+		$hex_tmp = hexdec($string_tmp);
+		switch($hex_tmp) {
+			case PRINTERSTATE_VALUE_CARTRIDGE_NORMAL:
+				$data_json[PRINTERSTATE_TITLE_CARTRIDGE] = PRINTERSTATE_DESP_CARTRIDGE_NORMAL;
+				break;
+				
+			case PRINTERSTATE_VALUE_CARTRIDGE_REFILL:
+				$data_json[PRINTERSTATE_TITLE_CARTRIDGE] = PRINTERSTATE_DESP_CARTRIDGE_REFILL;
+				break;
+				
+			default:
+				PrinterLog_logError('cartridge type error', __FILE__, __LINE__);
+				return ERROR_INTERNAL;
+		}
+		
+		// type of material
+		$string_tmp = substr($last_output, $offset_material, $length_material);
+		$hex_tmp = hexdec($string_tmp);
+		switch($hex_tmp) {
+			case PRINTERSTATE_VALUE_MATERIAL_PLA:
+				$data_json[PRINTERSTATE_TITLE_MATERIAL] = PRINTERSTATE_DESP_MATERIAL_PLA;
+				break;
+				
+			case PRINTERSTATE_VALUE_MATERIAL_ABS:
+				$data_json[PRINTERSTATE_TITLE_MATERIAL] = PRINTERSTATE_DESP_MATERIAL_ABS;
+				break;
+				
+			case PRINTERSTATE_VALUE_MATERIAL_PVA:
+				$data_json[PRINTERSTATE_TITLE_MATERIAL] = PRINTERSTATE_DESP_MATERIAL_PVA;
+				break;
+				
+			default:
+				PrinterLog_logError('filament type error', __FILE__, __LINE__);
+				return ERROR_INTERNAL;
+		}
+		
+		// color
+		$string_tmp = substr($last_output, $offset_color, $length_color);
+		$data_json[PRINTERSTATE_TITLE_COLOR] = '#' . $string_tmp;
+		
+		// initial quantity
+		$string_tmp = substr($last_output, $offset_init, $length_init);
+		$hex_tmp = hexdec($string_tmp);
+		$data_json[PRINTERSTATE_TITLE_INITIAL] = $hex_tmp;
+		
+		// used quantity
+		$string_tmp = substr($last_output, $offset_used, $length_used);
+		$hex_tmp = hexdec($string_tmp);
+		$data_json[PRINTERSTATE_TITLE_USED] = $hex_tmp;
+		
+		// normal extrusion temperature
+		$string_tmp = substr($last_output, $offset_temp, $length_temp);
+		if ($version_rfid == 3) {
+			$hex_tmp = hexdec($string_tmp) + PRINTERSTATE_OFFSET_TEMPER_V2;
+		}
+		else {
+			$hex_tmp = hexdec($string_tmp) + PRINTERSTATE_OFFSET_TEMPER;
+		}
+		$data_json[PRINTERSTATE_TITLE_EXT_TEMPER] = $hex_tmp;
+		
+		// first layer extrusion temperature
+		if ($version_rfid > 2) {
+			$string_tmp = substr($last_output, $offset_temp_f, $length_temp_f);
+			if ($version_rfid == 3) {
 				$hex_tmp = hexdec($string_tmp) + PRINTERSTATE_OFFSET_TEMPER_V2;
 			}
 			else {
 				$hex_tmp = hexdec($string_tmp) + PRINTERSTATE_OFFSET_TEMPER;
 			}
-			$data_json[PRINTERSTATE_TITLE_EXT_TEMPER] = $hex_tmp;
-			
-			// first layer extrusion temperature
-			if ($version_rfid > 2) {
-				$string_tmp = substr($last_output, $offset_temp_f, $length_temp_f);
-				$hex_tmp = hexdec($string_tmp) + PRINTERSTATE_OFFSET_TEMPER_V2;
-				$data_json[PRINTERSTATE_TITLE_EXT_TEMP_1] = $hex_tmp;
-			}
-			else {
-				$data_json[PRINTERSTATE_TITLE_EXT_TEMP_1] = $data_json[PRINTERSTATE_TITLE_EXT_TEMPER] + 10;
-			}
-			
-			// packing date
-			//TODO argument max acceptable date (Unix timestamp, 2038-01-19)
-			$string_tmp = substr($last_output, $offset_pack, $length_pack);
-			$hex_tmp = hexdec($string_tmp);
-			$time_start = gmmktime(0, 0, 0, 1, 1, PRINTERSTATE_OFFSET_YEAR_SETUP_DATE);
-			$time_pack = $time_start + $hex_tmp * 60 * 60 * 24;
-			// $data_json[PRINTERSTATE_TITLE_SETUP_DATE] = date("Y-m-d\TH:i:sO", $time_pack);
-			$data_json[PRINTERSTATE_TITLE_SETUP_DATE] = date("Y-m-d\TH:i:s\Z", $time_pack);
+			$data_json[PRINTERSTATE_TITLE_EXT_TEMP_1] = $hex_tmp;
 		}
+		else {
+			$data_json[PRINTERSTATE_TITLE_EXT_TEMP_1] = $data_json[PRINTERSTATE_TITLE_EXT_TEMPER] + 10;
+		}
+		
+		// packing date
+		//TODO argument max acceptable date (Unix timestamp, 2038-01-19)
+		$string_tmp = substr($last_output, $offset_pack, $length_pack);
+		$hex_tmp = hexdec($string_tmp);
+		$time_start = gmmktime(0, 0, 0, 1, 1, PRINTERSTATE_OFFSET_YEAR_SETUP_DATE);
+		$time_pack = $time_start + $hex_tmp * 60 * 60 * 24;
+		// $data_json[PRINTERSTATE_TITLE_SETUP_DATE] = date("Y-m-d\TH:i:sO", $time_pack);
+		$data_json[PRINTERSTATE_TITLE_SETUP_DATE] = date("Y-m-d\TH:i:s\Z", $time_pack);
 		
 		// change temperature values to user settings if cartridge is refillable
 		//TODO test me
