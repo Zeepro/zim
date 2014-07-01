@@ -490,7 +490,6 @@ function PrinterState_setCartridgeCode($code_cartridge, $abb_cartridge) {
 		// remove the symbol "\" for simulator
 		$command = str_replace('\ ', ' ', $command);
 	}
-	//TODO test me
 	
 	// check if we are in printing
 	$ret_val = FALSE; //PrinterState_checkInPrint();
@@ -1024,14 +1023,14 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array(), 
 				}
 				
 				// try to start printing after slicing if necessary
-				if ($printafterslice == FALSE) {
+// 				if ($printafterslice == FALSE) {
 					CoreStatus_setInIdle(ERROR_OK); //TODO check if we need to rewrite last error or not
 					$status_current = CORESTATUS_VALUE_IDLE;
 					
 					return TRUE;
-				}
+// 				}
 				
-				return TRUE;
+// 				return TRUE;
 				// try to launch printing after checking
 				$CI->load->helper('printer');
 				if ($CI->config->item('simulator')) {
@@ -2396,6 +2395,71 @@ function PrinterState_setAcceleration($value) {
 			return ERROR_INTERNAL;
 		}
 	}
+}
+
+function PrinterState_getRFIDPower(&$value) {
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$command = $arcontrol_fullpath . PRINTERSTATE_GET_RFID_POWER;
+	$ret_val = 0;
+	$output = array();
+	$last_output = '';
+	
+	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output)) {
+		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	PrinterLog_logArduino($command, $output);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		PrinterLog_logError('get rfid power status command error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	else {
+		$last_output = $output[0];
+		if ($last_output == '1') {
+			$value = TRUE;
+		}
+		else if ($last_output == '0') {
+			$value = FALSE;
+		}
+		else {
+			PrinterLog_logError('get rfid power api error', __FILE__, __LINE__);
+			return ERROR_INTERNAL;
+		}
+	}
+	
+	return ERROR_OK;
+}
+
+function PrinterState_setRFIDPower($on = TRUE) {
+	// as preview, the RFID will automatically active when we read and write
+	// so normally, we need only turn off the power
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$output = array();
+	$command = '';
+	$ret_val = 0;
+	
+	if ($on == TRUE) {
+		$command = $arcontrol_fullpath . PRINTERSTATE_RFID_POWER_ON;
+	}
+	else {
+		$command = $arcontrol_fullpath . PRINTERSTATE_RFID_POWER_OFF;
+	}
+	
+	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output)) {
+		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	PrinterLog_logArduino($command, $output);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		PrinterLog_logError('set rfid power error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	
+	return ERROR_OK;
 }
 
 //internal function

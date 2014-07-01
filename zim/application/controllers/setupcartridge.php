@@ -119,6 +119,7 @@ class Setupcartridge extends CI_Controller {
 		$code_read = NULL;
 		$template_data = array();
 		$body_page = NULL;
+		$button_html = '<input type="submit" value="ok 确认">';
 		$type = $this->input->post('type');
 		$year = (int)($this->input->post('year'));
 		$month = (int)($this->input->post('month'));
@@ -156,14 +157,18 @@ class Setupcartridge extends CI_Controller {
 					'month'	=> $month,
 					'day'	=> $day,
 					'times'	=> $times,
+					'ok'	=> NULL,
+					'ko'	=> NULL,
 			);
 			$template_data['image'] = '/images/' . (($cr == ERROR_OK) ? 'right.png' : 'wrong.png');
 			if ($cr == ERROR_OK) {
 				$template_data['hint'] = ($times == 0)
 						? 'All tags written 全部标签已写完' : 'Tag written successfully 标签已成功写入';
+				$template_data['ok'] = $button_html;
 			}
 			else {
 				$template_data['hint'] = 'Error 标签写入错误';
+				$template_data['ko'] = $button_html;
 			}
 			
 			$body_page = $this->parser->parse('template/setupcartridge/write', $template_data, TRUE);
