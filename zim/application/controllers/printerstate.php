@@ -593,7 +593,9 @@ class Printerstate extends MY_Controller {
 				
 			case PRINTERSTATE_CHANGECART_INSERT_C:
 				// we call the page: remove / reinsert cartridge
-				$ret_val = PrinterState_checkFilament($abb_cartridge, $need_filament);
+				$temp_data = NULL;
+				
+				$ret_val = PrinterState_checkFilament($abb_cartridge, $need_filament, $temp_data, FALSE);
 				if ($ret_val == $code_miss_cartridge) {
 					// no cartridge
 					$this->_display_changecartridge_insert_cartridge();
@@ -616,9 +618,18 @@ class Printerstate extends MY_Controller {
 				
 			case PRINTERSTATE_CHANGECART_LOAD_F:
 				// we call the page: insert cartridge
-				$ret_val = PrinterState_checkFilament($abb_cartridge, $need_filament);
+				$temp_data = NULL;
+				
+				$ret_val = PrinterState_checkFilament($abb_cartridge, $need_filament, $temp_data, FALSE);
 				if ($ret_val == $code_miss_filament) {
 					$this->_display_changecartridge_wait_load_filament(FALSE);
+					
+					// turn off RFID power after changing
+					$ret_val = PrinterState_setRFIDPower(FALSE);
+					if ($ret_val != ERROR_OK) {
+						$this->load->helper('printerlog');
+						PrinterLog_logError('error in turning off RFID power', __FILE__, __LINE__);
+					}
 				}
 				else if ($ret_val == $code_low_filament) {
 					$this->_display_changecartridge_remove_cartridge(TRUE);

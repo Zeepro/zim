@@ -82,7 +82,7 @@ $("#head_led").change(function() {
 		url: "/rest/set",
 		cache: false,
 		data: {
-			p: "headled",
+			p: "headlight",
 			v: var_state,
 			},
 		type: "GET",

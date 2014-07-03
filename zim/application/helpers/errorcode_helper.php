@@ -16,7 +16,8 @@ if (!defined('ERROR_OK')) {
 	define('ERROR_NO_PRINT',		437);
 	define('ERROR_MISS_LEFT_CART',	438);
 	define('ERROR_MISS_RIGT_CART',	439);
-	define('ERROR_PRES_FILAMENT',	440);
+// 	define('ERROR_PRES_FILAMENT',	440);
+ 	define('ERROR_WRONG_FORMAT',	440);
 	define('ERROR_EMPTY_PLATFORM',	441);
 	define('ERROR_MISS_LEFT_FILA',	442);
 	define('ERROR_MISS_RIGT_FILA',	443);
@@ -28,8 +29,7 @@ if (!defined('ERROR_OK')) {
 	define('ERROR_UNKNOWN_PIC',		449);
 	define('ERROR_TOOBIG_FILE',		450);
 	define('ERROR_TOOBIG_MODEL',	451);
-	define('ERROR_IN_UPDATE',		452);
- 	define('ERROR_WRONG_FORMAT',	453);
+	define('ERROR_NO_SLICED',		452);
 	
 	define('ERROR_INTERNAL',		500);
 	
@@ -47,7 +47,8 @@ if (!defined('ERROR_OK')) {
 			ERROR_NO_PRINT			=> 'No current printing',
 			ERROR_MISS_LEFT_CART	=> 'Left cartridge missing',
 			ERROR_MISS_RIGT_CART	=> 'right cartridge missing',
-			ERROR_PRES_FILAMENT		=> 'Filament present',
+// 			ERROR_PRES_FILAMENT		=> 'Filament present',
+	 		ERROR_WRONG_FORMAT		=> 'Incorrect format',
 			ERROR_EMPTY_PLATFORM	=> 'Platform empty',
 			ERROR_MISS_LEFT_FILA	=> 'Left filament missing',
 			ERROR_MISS_RIGT_FILA	=> 'Right filament missing',
@@ -59,8 +60,7 @@ if (!defined('ERROR_OK')) {
 			ERROR_UNKNOWN_PIC		=> 'Unknown picture',
 			ERROR_TOOBIG_FILE		=> 'File too big',
 			ERROR_TOOBIG_MODEL		=> 'Model too big',
-			ERROR_IN_UPDATE			=> 'Update in progress',
-	 		ERROR_WRONG_FORMAT		=> 'Incorrect format',
+			ERROR_NO_SLICED			=> 'No sliced model',
 			
 			ERROR_INTERNAL			=> 'Internal API error',
 			404						=> 'Not found',

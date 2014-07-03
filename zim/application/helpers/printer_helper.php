@@ -155,6 +155,10 @@ function Printer_printFromSlice() {
 	$CI->load->helper('slicer');
 	$gcode_path = $CI->config->item('temp') . SLICER_FILE_MODEL;
 	
+	if (!file_exists($gcode_path)) {
+		return ERROR_NO_SLICED;
+	}
+	
 	$ret_val = Printer_printFromFile($gcode_path);
 	
 	return $ret_val;

@@ -86,6 +86,8 @@ use constant CMD_SET_LED_STRIP_OFF   => 'M1203';
 use constant CMD_SET_LED_HEAD_ON     => 'M1200';
 use constant CMD_SET_LED_HEAD_OFF    => 'M1201';
 use constant CMD_GET_VERSION         => 'M1400';
+use constant CMD_SET_RFID_ON         => 'M1616';
+use constant CMD_SET_RFID_OFF        => 'M1617';
 
 use constant CMD_STOP_PRINT    => 'M1000';
 use constant CMD_RESET_PRINTER => 'M1100';
@@ -1129,7 +1131,9 @@ else {
 			|| $command eq CMD_ABSOLUTE_POS
 			|| $command eq CMD_RELATIVE_EXTUD
 			|| $command eq CMD_UNIN_FILA_PLUS
-			|| $command eq CMD_ALLOW_COLD_E ) {
+			|| $command eq CMD_ALLOW_COLD_E
+			|| $command eq CMD_SET_RFID_OFF
+			|| $command eq CMD_SET_RFID_ON ) {
 
 		#cmd: move / extrude / special g99
 		exit(RC_OK);

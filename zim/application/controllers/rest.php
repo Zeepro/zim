@@ -617,6 +617,28 @@ class Rest extends MY_Controller {
 					}
 					break;
 					
+				case PRINTERSTATE_PRM_FILAMENT:
+					$value = NULL;
+					$api_prm = $this->input->get('v');
+					// refuse getting data not existed for mono extruder
+					if ($api_prm == 'l' && PrinterState_getNbExtruder() == 1) {
+						$cr = ERROR_WRONG_PRM;
+					}
+					else if ($api_prm) {
+						$cr = ERROR_OK;
+						$value = PrinterState_getFilamentStatus($api_prm);
+						if ($value == TRUE) {
+							$display = 'true';
+						}
+						else {
+							$display = 'false';
+						}
+					}
+					else {
+						$cr = ERROR_MISS_PRM;
+					}
+					break;
+					
 				case PRINTERSTATE_PRM_ENDSTOP:
 					$status = NULL;
 					$abb_endstop = $this->input->get('axis');

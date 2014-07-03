@@ -138,9 +138,10 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_PRM_SPEED_EXTRUDE',	'extrusionspeed');
 	define('PRINTERSTATE_PRM_COLDEXTRUSION',	'coldextrusion');
 	define('PRINTERSTATE_PRM_STRIPLED',			'stripled');
-	define('PRINTERSTATE_PRM_HEADLED',			'headled');
+	define('PRINTERSTATE_PRM_HEADLED',			'headlight');
 	define('PRINTERSTATE_PRM_MOTOR_OFF',		'motor');
 	define('PRINTERSTATE_PRM_ENDSTOP',			'endstop');
+	define('PRINTERSTATE_PRM_FILAMENT',			'filament');
 	
 	define('PRINTERSTATE_CHANGECART_UNLOAD_F',	'unload_filament');
 	define('PRINTERSTATE_CHANGECART_REMOVE_C',	'remove_cartridge');
@@ -357,12 +358,12 @@ function PrinterState_setTemperature($val_temperature, $type = 'e') {
 	return ERROR_OK;
 }
 
-function PrinterState_getCartridge(&$json_cartridge, $abb_cartridge = 'r') {
+function PrinterState_getCartridge(&$json_cartridge, $abb_cartridge = 'r', $power_off = TRUE) {
 	// normally, no default value here, but we set it to right as default
 	$array_data = array();
 	$cr = 0;
 	
-	$cr = PrinterState_getCartridgeAsArray($array_data, $abb_cartridge);
+	$cr = PrinterState_getCartridgeAsArray($array_data, $abb_cartridge, $power_off);
 	if ($cr == ERROR_OK) {
 		$json_cartridge = json_encode($array_data);
 	}
@@ -512,7 +513,7 @@ function PrinterState_setCartridgeCode($code_cartridge, $abb_cartridge) {
 	return ERROR_OK;
 }
 
-function PrinterState_getCartridgeCode(&$code_cartridge, $abb_cartridge) {
+function PrinterState_getCartridgeCode(&$code_cartridge, $abb_cartridge, $power_off = TRUE) {
 	global $CFG;
 	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
 	$command = '';
@@ -555,14 +556,21 @@ function PrinterState_getCartridgeCode(&$code_cartridge, $abb_cartridge) {
 		return ERROR_BUSY_PRINTER;
 	}
 	
+	if ($power_off == TRUE) {
+		$ret_val = PrinterState_setRFIDPower(FALSE);
+		if ($ret_val != ERROR_OK) {
+			return ERROR_INTERNAL;
+		}
+	}
+	
 	return ERROR_OK;
 }
 
-function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge) {
+function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge, $power_off = TRUE) {
 	$last_output = NULL;
 	$ret_val = 0;
 	
-	$ret_val = PrinterState_getCartridgeCode($last_output, $abb_cartridge);
+	$ret_val = PrinterState_getCartridgeCode($last_output, $abb_cartridge, $power_off);
 	if ($ret_val != ERROR_OK) {
 		return $ret_val;
 	}
@@ -842,11 +850,11 @@ function PrinterState_checkFilaments($array_filament = array(
 	return ERROR_OK;
 }
 
-function PrinterState_checkFilament($abb_cartridge, $need_filament = 0, &$data_json = array()) {
+function PrinterState_checkFilament($abb_cartridge, $need_filament = 0, &$data_json = array(), $power_off = TRUE) {
 	$ret_val = 0;
 	$cr = 0;
 	
-	$ret_val = PrinterState_getCartridgeAsArray($data_json, $abb_cartridge);
+	$ret_val = PrinterState_getCartridgeAsArray($data_json, $abb_cartridge, $power_off);
 	if ($ret_val == ERROR_OK) {
 		// check if cartridge is not enough
 		$has_filament = $data_json[PRINTERSTATE_TITLE_INITIAL] - $data_json[PRINTERSTATE_TITLE_USED];
@@ -2252,6 +2260,8 @@ function PrinterState_getSpeed(&$value) {
 			return ERROR_INTERNAL;
 		}
 	}
+	
+	return ERROR_OK;
 }
 
 function PrinterState_getAcceleration(&$value) {
@@ -2280,6 +2290,8 @@ function PrinterState_getAcceleration(&$value) {
 			return ERROR_INTERNAL;
 		}
 	}
+	
+	return ERROR_OK;
 }
 
 function PrinterState_getColdExtrusion(&$value) {
@@ -2347,14 +2359,8 @@ function PrinterState_setSpeed($value) {
 		PrinterLog_logError('set speed command error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
-	else {
-		$last_output = $output[0];
-		$value = (int)$last_output;
-		if ($value == 0) {
-			PrinterLog_logError('set speed api error', __FILE__, __LINE__);
-			return ERROR_INTERNAL;
-		}
-	}
+	
+	return ERROR_OK;
 }
 
 function PrinterState_setAcceleration($value) {
@@ -2387,14 +2393,8 @@ function PrinterState_setAcceleration($value) {
 		PrinterLog_logError('set acceleration command error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
-	else {
-		$last_output = $output[0];
-		$value = (int)$last_output;
-		if ($value == 0) {
-			PrinterLog_logError('set acceleration api error', __FILE__, __LINE__);
-			return ERROR_INTERNAL;
-		}
-	}
+	
+	return ERROR_OK;
 }
 
 function PrinterState_getRFIDPower(&$value) {
@@ -2428,6 +2428,8 @@ function PrinterState_getRFIDPower(&$value) {
 			return ERROR_INTERNAL;
 		}
 	}
+	
+	PrinterLog_logDebug('Turn off rfid', __FILE__, __LINE__);
 	
 	return ERROR_OK;
 }
