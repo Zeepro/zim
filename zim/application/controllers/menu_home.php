@@ -19,13 +19,18 @@ class Menu_home extends MY_Controller {
 		$this->lang->load('menu_home', $this->config->item('language'));
 		
 		// parse the main body
+		//TODO WHEN HELPER, CHECK PRINTER NAME
+		$activation_btn = (false ?
+							$this->load->view('template/activation/activation_btn', null, true) : null);
 		$template_data = array(
 // 				'title'				=> t('Home'),
 				'menu_printlist'	=> t('Quick print'),
 				'menu_printerstate'	=> t('Configuration'),
 				'manage'			=> t('manage'),
 				'upload'			=> t('upload'),
+				'activation_btn'	=> $activation_btn
 		);
+		
 		
 		$body_page = $this->parser->parse('template/menu_home', $template_data, TRUE);
 		
