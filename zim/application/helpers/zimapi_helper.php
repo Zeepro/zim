@@ -69,6 +69,7 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	
 	define('ZIMAPI_FILE_PRESET_JSON',	'preset.json');
 	define('ZIMAPI_FILE_PRESET_INI',	'config.ini');
+	define('ZIMAPI_FILE_SSO_NAME',		'SSOActivation.txt');
 }
 
 function ZimAPI_initialFile() {
@@ -587,6 +588,57 @@ function ZimAPI_resetNetwork() {
 		$CI->load->helper('printerlog');
 		PrinterLog_logError('want connection in reset error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
+	}
+	
+	return ERROR_OK;
+}
+
+function ZimAPI_getPrinterSSOName(&$value) {
+	$CI = &get_instance();
+	$filename = $CI->config->item('conf') . ZIMAPI_FILE_SSO_NAME;
+	
+	$value = NULL;
+	if (file_exists($filename)) {
+		try {
+			$value = @file_get_contents($filename);
+		}
+		catch (Exception $e) {
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('read printer sso name error', __FILE__, __LINE__);
+			
+			return ERROR_INTERNAL;
+		}
+	}
+	
+	return ERROR_OK;
+}
+
+function ZimAPI_setPrinterSSOName($value) {
+	$CI = &get_instance();
+	$filename = $CI->config->item('conf') . ZIMAPI_FILE_SSO_NAME;
+	
+	if ($value == NULL) {
+		unlink($filename);
+	}
+	else {
+		try {
+			$fp = fopen($filename, 'w');
+			if ($fp) {
+				fwrite($fp, $value);
+				fclose($fp);
+			}
+			else {
+				$CI->load->helper('printerlog');
+				PrinterLog_logError('open sso name file error', __FILE__, __LINE__);
+				
+				return ERROR_INTERNAL;
+			}
+		} catch (Exception $e) {
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('write printer sso name error', __FILE__, __LINE__);
+			
+			return ERROR_INTERNAL;
+		}
 	}
 	
 	return ERROR_OK;
