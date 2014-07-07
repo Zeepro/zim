@@ -1,1 +1,1 @@
-<a>#yolosdfsfsdfds</a>
+<a href="/activation/index" data-role="button" data-ajax="false">Activer l'imprimante</a>

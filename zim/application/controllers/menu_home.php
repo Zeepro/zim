@@ -14,14 +14,19 @@ class Menu_home extends MY_Controller {
 	public function index() {
 		$template_data = array();
 		$body_page = NULL;
-		
+		$sso_name = NULL;
+
 		$this->load->library('parser');
 		$this->lang->load('menu_home', $this->config->item('language'));
+		$this->load->helper('zimapi');
 		
 		// parse the main body
-		//TODO WHEN HELPER, CHECK PRINTER NAME
-		$activation_btn = (false ?
-							$this->load->view('template/activation/activation_btn', null, true) : null);
+		if (ZimAPI_getPrinterSSOName($value) != ERROR_OK);
+			;
+		if ($value == '')
+			$activation_btn = $this->parser->parse('template/activation/activation_btn', array(), true);
+		else
+			$activation_btn = NULL;
 		$template_data = array(
 // 				'title'				=> t('Home'),
 				'menu_printlist'	=> t('Quick print'),
