@@ -35,6 +35,10 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_SUFFIX_PRESET',		'conf/presetlist/');
 	define('CORESTATUS_FILE_SD_ON',			'_SD_On.tmp');
 	define('CORESTATUS_FILE_SD_OFF',		'_SD_Off.tmp');
+	define('CORESTATUS_FILE_LEVEL_DEBUG',	'_Level_Debug.tmp');
+	define('CORESTATUS_FILE_LEVEL_MESSAGE',	'_Level_Message.tmp');
+	define('CORESTATUS_FILE_LEVEL_ERROR',	'_Level_Error.tmp');
+	define('CORESTATUS_FILE_LEVEL_NONE',	'_Level_None.tmp');
 }
 
 function CoreStatus_initialFile() {
@@ -103,10 +107,7 @@ function CoreStatus_initialFile() {
 	
 	$state_file = $CI->config->item('conf') . CORESTATUS_FILENAME_WORK;
 	
-	if (file_exists($state_file)) {
-		return TRUE;
-	}
-	else {
+	if (!file_exists($state_file)) {
 		// prepare data array
 		$data_json = array(
 				CORESTATUS_TITLE_VERSION	=> '1.0',
@@ -123,6 +124,17 @@ function CoreStatus_initialFile() {
 		else {
 			return FALSE;
 		}
+	}
+	
+	// debug level
+	if (file_exists($CI->config->item('temp') . CORESTATUS_FILE_LEVEL_DEBUG)) {
+		$CI->config->set_item('log_level', 3);
+	} else if (file_exists($CI->config->item('temp') . CORESTATUS_FILE_LEVEL_MESSAGE)) {
+		$CI->config->set_item('log_level', 2);
+	} else if (file_exists($CI->config->item('temp') . CORESTATUS_FILE_LEVEL_ERROR)) {
+		$CI->config->set_item('log_level', 1);
+	} else if (file_exists($CI->config->item('temp') . CORESTATUS_FILE_LEVEL_NONE)) {
+		$CI->config->set_item('log_level', 0);
 	}
 	
 	return TRUE;
@@ -499,6 +511,75 @@ function CoreStatus_finishConnection($data_json = array()) {
 	}
 	
 	return CoreStatus_setInIdle();
+}
+
+function CoreStatus_setDebugLevel($level = 1) {
+	global $CFG;
+	$array_unlink = array();
+	$file_set = NULL;
+	
+	switch ($level) {
+		case 0:
+			$array_unlink = array(
+				$CFG->config['temp'] . CORESTATUS_FILE_LEVEL_DEBUG,
+				$CFG->config['temp'] . CORESTATUS_FILE_LEVEL_MESSAGE,
+				$CFG->config['temp'] . CORESTATUS_FILE_LEVEL_ERROR,
+			);
+			$file_set = $CFG->config['temp'] . CORESTATUS_FILE_LEVEL_NONE;
+			break;
+			
+		case 1:
+			$array_unlink = array(
+				$CFG->config['temp'] . CORESTATUS_FILE_LEVEL_DEBUG,
+				$CFG->config['temp'] . CORESTATUS_FILE_LEVEL_MESSAGE,
+			);
+			$file_set = $CFG->config['temp'] . CORESTATUS_FILE_LEVEL_ERROR;
+			break;
+			
+		case 2:
+			$array_unlink = array(
+				$CFG->config['temp'] . CORESTATUS_FILE_LEVEL_DEBUG,
+			);
+			$file_set = $CFG->config['temp'] . CORESTATUS_FILE_LEVEL_MESSAGE;
+			break;
+			
+		case 3:
+			$array_unlink = array();
+			$file_set = $CFG->config['temp'] . CORESTATUS_FILE_LEVEL_DEBUG;
+			break;
+			
+		default:
+			$CI = &get_instance();
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('unknown debug level', __FILE__, __LINE__);
+			return ERROR_INTERNAL;
+			break; // never reach here
+	}
+	
+	foreach ($array_unlink as $file_unlink) {
+		unlink($file_unlink);
+	}
+	
+	try {
+		$fp = fopen($file_set, 'w');
+		if ($fp) {
+			fwrite($fp, 'debug');
+			fclose($fp);
+		}
+		else {
+			$CI = &get_instance();
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('open debug level file error', __FILE__, __LINE__);
+			return ERROR_INTERNAL;
+		}
+	} catch (Exception $e) {
+		$CI = &get_instance();
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('write debug level file error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	
+	return ERROR_OK;
 }
 
 // internal function

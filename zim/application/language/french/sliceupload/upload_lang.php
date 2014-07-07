@@ -8,6 +8,8 @@ $lang['select_hint']
 	= 'Selectionner et charger un fichier (.stl, .obj, .amf)';
 $lang['upload_button']
 	= 'Charger';
+$lang['button_goto_slice']
+	= 'Utiliser ancien modèle';
 
 // upload_wait
 $lang['wait_message']

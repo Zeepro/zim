@@ -66,6 +66,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_GET_RFID_POWER',	' M1618');
 	define('PRINTERSTATE_SET_CARTRIDGER',	' M1610\ ');
 	define('PRINTERSTATE_SET_CARTRIDGEL',	' M1611\ ');
+	define('PRINTERSTATE_GET_ALL_TEMPER',	' M1402');
 	
 // 	define('PRINTERSTATE_TEMP_PRINT_FILENAME',	'/tmp/printer_percentage'); // fix the name on SD card
 	define('PRINTERSTATE_FILE_PRINTLOG',	'/tmp/printlog.log');
@@ -97,6 +98,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_TITLE_LASTERROR',	'e');
 	define('PRINTERSTATE_TITLE_NEED_L',		'need');
 	define('PRINTERSTATE_TITLE_VER_MARLIN',	'marlin');
+	define('PRINTERSTATE_TITLE_SSO_NAME',	'name');
 	
 	define('PRINTERSTATE_JSON_PRINTER', 		'Printer.json');
 	define('PRINTERSTATE_TITLE_JSON_NB_EXTRUD', 'ExtrudersNumber');
@@ -142,6 +144,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_PRM_MOTOR_OFF',		'motor');
 	define('PRINTERSTATE_PRM_ENDSTOP',			'endstop');
 	define('PRINTERSTATE_PRM_FILAMENT',			'filament');
+	define('PRINTERSTATE_PRM_SSO_NAME',			'name');
 	
 	define('PRINTERSTATE_CHANGECART_UNLOAD_F',	'unload_filament');
 	define('PRINTERSTATE_CHANGECART_REMOVE_C',	'remove_cartridge');
@@ -392,42 +395,21 @@ function PrinterState_getExtruderTemperaturesAsArray() {
 	$command = '';
 	$ret_val = 0;
 	$data_array = array();
-	$cmd_array = array();
+	$output = array();
 	
-	switch (PrinterState_getNbExtruder()) {
-		case 1:
-			$cmd_array = array(PRINTERSTATE_GET_TEMPEREXT_R => PRINTERSTATE_RIGHT_EXTRUD);
-			break;
-			
-		case 2:
-			$cmd_array = array(
-				PRINTERSTATE_GET_TEMPEREXT_L => PRINTERSTATE_LEFT_EXTRUD,
-				PRINTERSTATE_GET_TEMPEREXT_R => PRINTERSTATE_RIGHT_EXTRUD,
-			);
-			break;
-			
-		default:
-			PrinterLog_logError('number of extruder error when get all temperatures', __FILE__, __LINE__);
-			break;
+	$command = $arcontrol_fullpath . PRINTERSTATE_GET_ALL_TEMPER;
+	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output)) {
+		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
 	}
 	
-	foreach ($cmd_array as $parameter_cmd => $data_key ) {
-		$output = array();
-		
-		$command = $arcontrol_fullpath . $parameter_cmd;
-		exec($command, $output, $ret_val);
-		if (!PrinterState_filterOutput($output)) {
-			PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
-			return ERROR_INTERNAL;
-		}
-		PrinterLog_logArduino($command, $output);
-		if ($ret_val != ERROR_NORMAL_RC_OK) {
-			PrinterLog_logError('get extruder temper (special) command error', __FILE__, __LINE__);
-			return ERROR_INTERNAL;
-		}
-		else {
-			$last_output = $output[0];
-			$data_array[$data_key] = (int)$last_output;
+	if (count($output) > 0) {
+		$explode_array = explode('-', $output[0]);
+		foreach ($explode_array as $key_value) {
+			$tmp_array = explode(':', $key_value);
+			$abb_filament = PrinterState_temperatureAbb2Number(trim($tmp_array[0]));
+			$data_array[$abb_filament] = ceil($tmp_array[1]);
 		}
 	}
 
@@ -1252,6 +1234,26 @@ function PrinterState_cartridgeNumber2Abbreviate($number) {
 	return $abb_cartridge;
 }
 
+function PrinterState_temperatureAbb2Number($abb) {
+	$num_cartridge = '';
+	switch ($abb) {
+		case 'TEMP 1':
+			$num_cartridge = PRINTERSTATE_RIGHT_EXTRUD;
+			break;
+			
+		case 'TEMP 2':
+			$num_cartridge = PRINTERSTATE_LEFT_EXTRUD;
+			break;
+			
+		default:
+			$num_cartridge = 'error';
+			PrinterLog_logError('change temperature number to cartridge error', __FILE__, __LINE__);
+			break;
+	}
+	
+	return $num_cartridge;
+}
+
 function PrinterState_getFilamentStatus($abb_filament) {
 	// return TRUE only when filament is loaded
 	global $CFG;
@@ -1796,12 +1798,14 @@ function PrinterState_getInfoAsArray() {
 	$CI = &get_instance();
 	$CI->load->helper('zimapi');
 	$version_marlin = NULL;
+	$name_sso = NULL;
+	$array_return= array();
 	$cr = PrinterState_getMarlinVersion($version_marlin);
 	if ($cr != ERROR_OK) {
 		$version_marlin = 'N/A';
 	}
 	
-	return array(
+	$array_return = array(
 			PRINTERSTATE_TITLE_VERSION		=> ZimAPI_getVersion(),
 			PRINTERSTATE_TITLE_VERSION_N	=> ZimAPI_getVersion(TRUE),
 			PRINTERSTATE_TITLE_TYPE			=> ZimAPI_getType(),
@@ -1809,6 +1813,13 @@ function PrinterState_getInfoAsArray() {
 			PRINTERSTATE_TITLE_NB_EXTRUD	=> PrinterState_getNbExtruder(),
 			PRINTERSTATE_TITLE_VER_MARLIN	=> $version_marlin,
 	);
+
+	$cr = ZimAPI_getPrinterSSOName($name_sso);
+	if ($cr == ERROR_OK && $name_sso != NULL) {
+		$array_return[PRINTERSTATE_TITLE_SSO_NAME] = $name_sso;
+	}
+	
+	return $array_return;
 }
 
 function PrinterState_homing($axis = 'ALL') {

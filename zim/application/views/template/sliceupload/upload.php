@@ -1,4 +1,4 @@
-<div data-role="page" data-url="sliceupload/upload">
+<div data-role="page" data-url="/sliceupload/upload">
 	<header data-role="header" class="page-header">
 		<a href="javascript:history.back();" data-icon="back" data-ajax="false">{back}</a>
 	</header>
@@ -10,6 +10,7 @@
 				<input type="file" data-clear-btn="true" name="file" id="file_upload">
 				<input type="submit" value="{upload_button}" data-icon="arrow-r" data-iconpos="right">
 			</form>
+			{goto_slice}
 			<span id="upload_error">{error}</span>
 		</div>
 	</div>

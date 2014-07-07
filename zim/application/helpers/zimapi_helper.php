@@ -593,57 +593,6 @@ function ZimAPI_resetNetwork() {
 	return ERROR_OK;
 }
 
-function ZimAPI_getPrinterSSOName(&$value) {
-	$CI = &get_instance();
-	$filename = $CI->config->item('conf') . ZIMAPI_FILE_SSO_NAME;
-	
-	$value = NULL;
-	if (file_exists($filename)) {
-		try {
-			$value = @file_get_contents($filename);
-		}
-		catch (Exception $e) {
-			$CI->load->helper('printerlog');
-			PrinterLog_logError('read printer sso name error', __FILE__, __LINE__);
-			
-			return ERROR_INTERNAL;
-		}
-	}
-	
-	return ERROR_OK;
-}
-
-function ZimAPI_setPrinterSSOName($value) {
-	$CI = &get_instance();
-	$filename = $CI->config->item('conf') . ZIMAPI_FILE_SSO_NAME;
-	
-	if ($value == NULL) {
-		unlink($filename);
-	}
-	else {
-		try {
-			$fp = fopen($filename, 'w');
-			if ($fp) {
-				fwrite($fp, $value);
-				fclose($fp);
-			}
-			else {
-				$CI->load->helper('printerlog');
-				PrinterLog_logError('open sso name file error', __FILE__, __LINE__);
-				
-				return ERROR_INTERNAL;
-			}
-		} catch (Exception $e) {
-			$CI->load->helper('printerlog');
-			PrinterLog_logError('write printer sso name error', __FILE__, __LINE__);
-			
-			return ERROR_INTERNAL;
-		}
-	}
-	
-	return ERROR_OK;
-}
-
 function ZimAPI_checkCamera(&$info_camera = '') {
 	global $CFG;
 	$camera_file = $CFG->config['temp'] . ZIMAPI_FILENAME_CAMERA;
@@ -1099,6 +1048,59 @@ function ZimAPI_getType() {
 	return trim(@file_get_contents($CFG->config['type_file']));
 }
 
+function ZimAPI_getPrinterSSOName(&$value) {
+	$CI = &get_instance();
+	$filename = $CI->config->item('conf') . ZIMAPI_FILE_SSO_NAME;
+	
+	$value = NULL;
+	if (file_exists($filename)) {
+		try {
+			$value = @file_get_contents($filename);
+		}
+		catch (Exception $e) {
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('read printer sso name error', __FILE__, __LINE__);
+			
+			return ERROR_INTERNAL;
+		}
+	}
+	
+	return ERROR_OK;
+}
+
+function ZimAPI_setPrinterSSOName($value) {
+	$CI = &get_instance();
+	$filename = $CI->config->item('conf') . ZIMAPI_FILE_SSO_NAME;
+	
+	if ($value == NULL) {
+		unlink($filename);
+		
+		//TODO disactivate the tromboning
+	}
+	else {
+		try {
+			$fp = fopen($filename, 'w');
+			if ($fp) {
+				fwrite($fp, $value);
+				fclose($fp);
+			}
+			else {
+				$CI->load->helper('printerlog');
+				PrinterLog_logError('open sso name file error', __FILE__, __LINE__);
+				
+				return ERROR_INTERNAL;
+			}
+		} catch (Exception $e) {
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('write printer sso name error', __FILE__, __LINE__);
+			
+			return ERROR_INTERNAL;
+		}
+	}
+	
+	return ERROR_OK;
+}
+
 function ZimAPI_getPresetInfoAsArray($preset_id, &$array_info, &$system_preset = NULL) {
 	$presetlist_basepath = NULL;
 	$tmp_array = NULL;
@@ -1250,7 +1252,6 @@ function ZimAPI_setPresetSetting($id_preset, $array_input, $name_preset = NULL) 
 	
 	return ERROR_OK;
 }
-
 
 function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 	// check no any extra settings for user input preset setting only

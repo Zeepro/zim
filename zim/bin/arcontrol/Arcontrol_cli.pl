@@ -88,6 +88,7 @@ use constant CMD_SET_LED_HEAD_OFF    => 'M1201';
 use constant CMD_GET_VERSION         => 'M1400';
 use constant CMD_SET_RFID_ON         => 'M1616';
 use constant CMD_SET_RFID_OFF        => 'M1617';
+use constant CMD_GET_ALL_TEMPER      => 'M1402';
 
 use constant CMD_STOP_PRINT    => 'M1000';
 use constant CMD_RESET_PRINTER => 'M1100';
@@ -343,6 +344,15 @@ sub get_temperature {
 		print $temper;
 	}
 
+	return;
+}
+
+sub get_all_temperature {
+	print "TEMP 1:";
+	get_temperature(CMD_GET_TEMPER1);
+	print " - TEMP 2:";
+	get_temperature(CMD_GET_TEMPER2);
+	
 	return;
 }
 
@@ -1155,6 +1165,9 @@ else {
 	}
 	elsif ( $command eq CMD_GET_VERSION ) {
 		print "1.0.99\n";
+	}
+	elsif ( $command eq CMD_GET_ALL_TEMPER ) {
+		get_all_temperature();
 	}
 	else {    #default, wrong cmd, send help
 		usage(EXIT_ERROR_PRM);

@@ -1,4 +1,4 @@
-<div data-role="page" data-url="sliceupload/upload">
+<div data-role="page" data-url="/sliceupload/upload">
 	<header data-role="header" class="page-header"></header>
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">

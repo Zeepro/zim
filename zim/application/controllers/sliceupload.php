@@ -20,6 +20,8 @@ class Sliceupload extends MY_Controller {
 		$template_data = array();
 		$body_page = NULL;
 		$error = NULL;
+		$response = 0;
+		$button_goto_slice = NULL;
 		
 		$this->load->library('parser');
 		$this->lang->load('sliceupload/upload', $this->config->item('language'));
@@ -62,11 +64,22 @@ class Sliceupload extends MY_Controller {
 			}
 		}
 		
+		$this->load->helper('slicer');
+		if (ERROR_OK == Slicer_listModel($response) && $response != "[]") {
+			$template_data = array(
+					'text'	=> t('button_goto_slice'),
+					'link'	=> '/sliceupload/slice',
+					'id'	=> 'goto_slice_button',
+			);
+			$button_goto_slice = $this->parser->parse('template/sliceupload/a_button', $template_data, TRUE);
+		}
+		
 		// parse the main body
 		$template_data = array(
 				'back'			=> t('back'),
 				'select_hint'	=> t('select_hint'),
 				'upload_button'	=> t('upload_button'),
+				'goto_slice'	=> $button_goto_slice,
 				'error'			=> $error,
 		);
 		$body_page = $this->parser->parse('template/sliceupload/upload', $template_data, TRUE);

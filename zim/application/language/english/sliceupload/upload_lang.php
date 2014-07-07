@@ -8,6 +8,8 @@ $lang['select_hint']
 	= 'Select and upload a file (.stl, .obj, .amf)';
 $lang['upload_button']
 	= 'Upload';
+$lang['button_goto_slice']
+	= 'Use precedent model';
 
 // upload_wait
 $lang['wait_message']

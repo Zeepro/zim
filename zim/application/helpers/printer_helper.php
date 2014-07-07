@@ -625,8 +625,8 @@ function Printer__changeTemperature(&$gcode_path) {
 	}
 	
 	$command = $CI->config->item('gcdaemon')
-			. PRINTER_PRM_TEMPER_R_F . $temp_r . PRINTER_PRM_TEMPER_R_N . $temp_rs
-			. PRINTER_PRM_TEMPER_L_F . $temp_l . PRINTER_PRM_TEMPER_L_N . $temp_ls
+			. PRINTER_PRM_TEMPER_R_F . $temp_rs . PRINTER_PRM_TEMPER_R_N . $temp_r
+			. PRINTER_PRM_TEMPER_L_F . $temp_ls . PRINTER_PRM_TEMPER_L_N . $temp_l
 			. PRINTER_PRM_FILE . $gcode_path . ' > ' . $gcode_path . '.new';
 	//TODO remove the debug message after test
 	$CI->load->helper('printerlog');

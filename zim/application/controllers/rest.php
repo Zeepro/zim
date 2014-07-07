@@ -933,6 +933,17 @@ class Rest extends MY_Controller {
 					}
 					break;
 					
+				case PRINTERSTATE_PRM_SSO_NAME:
+					$name = $this->input->get('name');
+					
+					if ($name) {
+						$cr = ZimAPI_setPrinterSSOName($name);
+					}
+					else {
+						$cr = ERROR_MISS_PRM;
+					}
+					break;
+					
 				default:
 					$cr = ERROR_WRONG_PRM;
 					break;

@@ -8,6 +8,8 @@ $lang['select_hint']
 	= '选择并上传一个文件（.stl .obj .amf）';
 $lang['upload_button']
 	= '上传';
+$lang['button_goto_slice']
+	= '使用之前的模型';
 
 // upload_wait
 $lang['wait_message']
