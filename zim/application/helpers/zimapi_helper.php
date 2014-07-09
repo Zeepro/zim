@@ -1012,7 +1012,7 @@ function ZimAPI_getSerial() {
 	$CI->load->helper('detectos');
 	
 	if ($CI->config->item('simulator') && DectectOS_checkWindows()) {
-		$address_mac = '0c:82:68:ff:ff:ff';
+		$address_mac = 'f4:0e:11:80:00:02';
 	}
 	else {
 		try {
