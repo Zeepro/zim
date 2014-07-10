@@ -18,6 +18,7 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_TITLE_MESSAGE',		'Message');
 	define('CORESTATUS_TITLE_STARTTIME',	'StartDate');
 // 	define('CORESTATUS_TITLE_LASTERROR',	'LastError');
+// 	define('CORESTATUS_TITLE_LASTSTATUS',	'LastState');
 	
 	define('CORESTATUS_VALUE_IDLE',				'idle');
 	define('CORESTATUS_VALUE_PRINT',			'printing');
@@ -28,6 +29,7 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_VALUE_CANCEL',			'canceling');
 	define('CORESTATUS_VALUE_WAIT_CONNECT',		'to_be_connected');
 	define('CORESTATUS_VALUE_SLICE',			'slicing');
+	define('CORESTATUS_VALUE_SLICED',			'sliced');
 // 	define('CORESTATUS_VALUE_UPGRADE',			'upgrading');
 	
 	define('CORESTATUS_CMD_CHECK_SD',		'echo writable > ');
@@ -120,6 +122,7 @@ function CoreStatus_initialFile() {
 		if ($fp) {
 			fwrite($fp, json_encode($data_json));
 			fclose($fp);
+			chmod($fp, 0777);
 		}
 		else {
 			return FALSE;
@@ -162,6 +165,8 @@ function CoreStatus_checkInIdle(&$status_current = '', &$array_status = array())
 	
 	// check status
 	$array_status = $tmp_array['json'];
+// 	if ($tmp_array['json'][CORESTATUS_TITLE_STATUS] == CORESTATUS_VALUE_IDLE
+// 			|| $tmp_array['json'][CORESTATUS_TITLE_STATUS] == CORESTATUS_VALUE_SLICED) {
 	if ($tmp_array['json'][CORESTATUS_TITLE_STATUS] == CORESTATUS_VALUE_IDLE) {
 		return TRUE;
 	}
@@ -374,6 +379,43 @@ function CoreStatus_setInIdle($last_error = FALSE) {
 			array(CORESTATUS_TITLE_STARTTIME => NULL)
 	);
 }
+
+function CoreStatus_cleanSliced() {
+	$CI = &get_instance();
+	$CI->load->helper('slicer');
+	
+	@unlink($CI->config->item('temp') . SLICER_FILE_MODEL);
+	@unlink($CI->config->item('temp') . SLICER_FILE_TEMP_DATA);
+	
+	return TRUE;
+}
+
+// function CoreStatus_setInSliced($last_error = FALSE) {
+// 	$status_previous = NULL;
+// 	$ret_val = CoreStatus_checkInIdle($status_previous);
+// 	if ($ret_val == TRUE && $status_previous == CORESTATUS_VALUE_SLICED) {
+// 		return TRUE; // we are already in idle
+// 	}
+// 	else if ($ret_val != FALSE || $status_previous != CORESTATUS_VALUE_SLICE) {
+// 		// reject the changment to sliced when not passing by slicing
+// 		return FALSE;
+// 	}
+	
+// 	if ($last_error !== FALSE) {
+// 		// add last_error for slicing
+// 		// perhaps also check $status_previous == CORESTATUS_VALUE_SLICE ?
+// 		return CoreStatus__setInStatus(CORESTATUS_VALUE_SLICED,
+// 				array(
+// 						CORESTATUS_TITLE_STARTTIME	=> NULL,
+// 						CORESTATUS_TITLE_MESSAGE	=> $last_error,
+// 				)
+// 		);
+// 	}
+	
+// 	return CoreStatus__setInStatus(CORESTATUS_VALUE_SLICED,
+// 			array(CORESTATUS_TITLE_STARTTIME => NULL)
+// 	);
+// }
 
 function CoreStatus_setInPrinting($stop_printing = FALSE) {
 	if ($stop_printing == FALSE) {

@@ -99,6 +99,11 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_TITLE_NEED_L',		'need');
 	define('PRINTERSTATE_TITLE_VER_MARLIN',	'marlin');
 	define('PRINTERSTATE_TITLE_SSO_NAME',	'name');
+	define('PRINTERSTATE_TITLE_EXTEND_PRM',	'eXtended_parameters');
+	define('PRINTERSTATE_TITLE_EXT_TEMP_L',	'l_temperature');
+	define('PRINTERSTATE_TITLE_EXT_TEMP_R',	'r_temperature');
+	define('PRINTERSTATE_TITLE_EXT_LENG_L',	'l_length');
+	define('PRINTERSTATE_TITLE_EXT_LENG_R',	'r_length');
 	
 	define('PRINTERSTATE_JSON_PRINTER', 		'Printer.json');
 	define('PRINTERSTATE_TITLE_JSON_NB_EXTRUD', 'ExtrudersNumber');
@@ -1004,18 +1009,36 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array(), 
 				if ($ret_val != ERROR_OK) {
 					$CI->load->helper('printerlog');
 					
-					CoreStatus_setInIdle($ret_val);
+// 					CoreStatus_setInIdle($ret_val);
+// 					CoreStatus_setInSliced($ret_val);
 					$array_data[PRINTERSTATE_TITLE_LASTERROR] = $ret_val;
-					$status_current = CORESTATUS_VALUE_IDLE;
+// 					$status_current = CORESTATUS_VALUE_IDLE;
 					PrinterLog_logError('check filament error after slicing - usually because of no enough filament', __FILE__, __LINE__);
 					
-					return TRUE;
+// 					return TRUE;
 				}
 				
 				// try to start printing after slicing if necessary
 // 				if ($printafterslice == FALSE) {
-					CoreStatus_setInIdle(ERROR_OK); //TODO check if we need to rewrite last error or not
+					CoreStatus_setInIdle($ret_val);
+// 					CoreStatus_setInSliced(ERROR_OK); //TODO check if we need to rewrite last error or not
 					$status_current = CORESTATUS_VALUE_IDLE;
+					
+					// save the temp file for every service
+					try {
+						$fp = fopen($CI->config->item('temp') . SLICER_FILE_TEMP_DATA, 'w');
+						if ($fp) {
+							fwrite($fp, json_encode($array_data));
+							fclose($fp);
+						}
+						else {
+							throw new Exception('can not open file');
+						}
+					} catch (Exception $e) {
+						$this->load->helper('printerlog');
+						PrinterLog_logError('can not save temp json file', __FILE__, __LINE__);
+						$cr = ERROR_INTERNAL;
+					}
 					
 					return TRUE;
 // 				}
@@ -1120,6 +1143,70 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array(), 
 	return FALSE; // status has not changed
 }
 
+function PrinterState_checkSlicedCondition(&$data_json) {
+	$temp_data = array();
+	$in_sliced = TRUE;
+	$CI = &get_instance();
+	
+	// check if we need to change idle into sliced or not
+	$CI->load->helper(array('corestatus', 'slicer'));
+	$temp_data = array(
+			$CI->config->item('temp') . SLICER_FILE_TEMP_DATA,
+			$CI->config->item('temp') . SLICER_FILE_MODEL,
+	);
+	foreach ($temp_data as $filename) {
+		if (!file_exists($filename)) {
+			$in_sliced = FALSE;
+		}
+	}
+	
+	if ($in_sliced == TRUE) {
+		$array_tmp = array();
+		
+		$data_json[PRINTERSTATE_TITLE_STATUS] = CORESTATUS_VALUE_SLICED;
+		
+		// try to get information of slicing
+		$CI->load->helper('json');
+		$array_tmp = json_read($temp_data[0], TRUE);
+			
+		if (isset($array_tmp['error'])) {
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('read json error', __FILE__, __LINE__);
+		}
+		else {
+			$temp_data = $array_tmp['json'];
+			foreach ($temp_data as $abb_filament => $array_temp) {
+				$title_length = NULL;
+				$title_temperature = NULL;
+				
+				switch ($abb_filament) {
+					case 'r':
+						$title_length = PRINTERSTATE_TITLE_EXT_LENG_R;
+						$title_temperature = PRINTERSTATE_TITLE_EXT_TEMP_R;
+						break;
+						
+					case 'l':
+						$title_length = PRINTERSTATE_TITLE_EXT_LENG_L;
+						$title_temperature = PRINTERSTATE_TITLE_EXT_TEMP_L;
+						break;
+							
+					default:
+						$CI->load->helper('printerlog');
+						PrinterLog_logError('unknown extruder abb name', __FILE__, __LINE__);
+						
+						return ERROR_INTERNAL;
+						break; // never reach here
+				}
+				
+				$data_json[PRINTERSTATE_TITLE_EXTEND_PRM][$title_length] = $array_temp[PRINTERSTATE_TITLE_NEED_L];
+				$data_json[PRINTERSTATE_TITLE_EXTEND_PRM][$title_temperature] = $array_temp[PRINTERSTATE_TITLE_EXT_TEMPER];
+			}
+		}
+	}
+	
+	return ERROR_OK;
+}
+
 function PrinterState_checkStatusAsArray() {
 	global $CFG;
 	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
@@ -1143,11 +1230,26 @@ function PrinterState_checkStatusAsArray() {
 		if (!is_null($status_json[CORESTATUS_TITLE_MESSAGE]) && $status_json[CORESTATUS_TITLE_MESSAGE] != ERROR_OK) {
 			$data_json[PRINTERSTATE_TITLE_LASTERROR] = $status_json[CORESTATUS_TITLE_MESSAGE];
 		}
+		
+		// check if we need to change idle into sliced or not
+		PrinterState_checkSlicedCondition($data_json);
+		
 		return $data_json;
 	}
 	else if ($ret_val == FALSE && !in_array($status_current, array(CORESTATUS_VALUE_PRINT, CORESTATUS_VALUE_CANCEL))) {
-		PrinterState_checkBusyStatus($status_current, $data_json);
+		$temp_data = array();
+
+// 		PrinterState_checkBusyStatus($status_current, $data_json);
+		PrinterState_checkBusyStatus($status_current, $temp_data);
+		if ($status_current == CORESTATUS_VALUE_SLICE) {
+			$data_json[PRINTERSTATE_TITLE_PERCENT] = $temp_data[PRINTERSTATE_TITLE_PERCENT];
+		}
 		$data_json[PRINTERSTATE_TITLE_STATUS] = $status_current;
+		
+		// try to change idle into sliced if necessary
+		if ($status_current == CORESTATUS_VALUE_IDLE) {
+			PrinterState_checkSlicedCondition($data_json);
+		}
 		
 		return $data_json;
 	}

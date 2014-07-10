@@ -62,6 +62,7 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 
 function Slicer_addModel($model_path) {
 	$cr = 0;
+	$CI = &get_instance();
 	$ret_val = Slicer__requestSlicer(SLICER_URL_ADD_MODEL . $model_path, FALSE);
 	
 	switch ($ret_val) {
@@ -87,12 +88,15 @@ function Slicer_addModel($model_path) {
 	}
 // 	var_dump($http_response_header);
 // 	var_dump($response);
+	@unlink($CI->config->item('temp') . SLICER_FILE_MODEL);
+	@unlink($CI->config->item('temp') . SLICER_FILE_TEMP_DATA);
 	
 	return $cr;
 }
 
 function Slicer_removeModel($model_id) {
 	$cr = 0;
+	$CI = &get_instance();
 	$ret_val = Slicer__requestSlicer(SLICER_URL_REMOVE_MODEL . $model_id);
 	
 	switch ($ret_val) {
@@ -116,6 +120,9 @@ function Slicer_removeModel($model_id) {
 			$cr = ERROR_INTERNAL;
 			break;
 	}
+	
+	@unlink($CI->config->item('temp') . SLICER_FILE_MODEL);
+	@unlink($CI->config->item('temp') . SLICER_FILE_TEMP_DATA);
 	
 	return $cr;
 }
@@ -330,6 +337,7 @@ function Slicer_checkPlatformColor(&$array_cartridge = array()) {
 function Slicer_setModel($array_data) {
 	$cr = 0;
 	$ret_val = 0;
+	$CI = &get_instance();
 	$url_request = SLICER_URL_SET_MODEL;
 	
 	if (!is_array($array_data)) {
@@ -390,6 +398,9 @@ function Slicer_setModel($array_data) {
 			$cr = ERROR_INTERNAL;
 			break;
 	}
+	
+	@unlink($CI->config->item('temp') . SLICER_FILE_MODEL);
+	@unlink($CI->config->item('temp') . SLICER_FILE_TEMP_DATA);
 	
 	return $cr;
 }
@@ -460,6 +471,7 @@ function Slicer_rendering($rho, $theta, $delta, &$path_image, $color1 = NULL, $c
 function Slicer_changeParameter($array_setting) {
 	$cr = 0;
 	$ret_val = 0;
+	$CI = &get_instance();
 	$url_request = SLICER_URL_SETPARAMETER;
 	
 	if (!is_array($array_setting)) {
@@ -496,6 +508,9 @@ function Slicer_changeParameter($array_setting) {
 				break;
 		}
 	}
+	
+	@unlink($CI->config->item('temp') . SLICER_FILE_MODEL);
+	@unlink($CI->config->item('temp') . SLICER_FILE_TEMP_DATA);
 	
 	return $cr;
 }
@@ -564,6 +579,7 @@ function Slicer_reset() {
 function Slicer_reloadPreset() {
 	global $CFG;
 	$cr = 0;
+	$CI = &get_instance();
 	$url = SLICER_URL_RELOAD_PRESET;
 	
 	if ($CFG->config['use_sdcard']) {
@@ -577,6 +593,9 @@ function Slicer_reloadPreset() {
 	else {
 		$cr = ERROR_INTERNAL;
 	}
+	
+	@unlink($CI->config->item('temp') . SLICER_FILE_MODEL);
+	@unlink($CI->config->item('temp') . SLICER_FILE_TEMP_DATA);
 	
 	return $cr;
 }

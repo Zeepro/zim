@@ -190,9 +190,9 @@ class Sliceupload extends MY_Controller {
 			$this->load->helper('printerlog');
 			PrinterLog_logError($cr, __FILE__, __LINE__);
 		}
-		else {
-			unlink($this->config->item('temp') . SLICER_FILE_TEMP_DATA);
-		}
+// 		else {
+// 			unlink($this->config->item('temp') . SLICER_FILE_TEMP_DATA);
+// 		}
 		
 		return;
 	}
