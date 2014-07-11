@@ -124,6 +124,7 @@ class Account extends MY_Controller
 				$result = substr($http_response_header[0], 9, 3);
 				if ($result == 200)
 				{
+					$this->session->set_flashdata('email', $email);
 					redirect('/account/signup_confirmation');
 				}
 			}
