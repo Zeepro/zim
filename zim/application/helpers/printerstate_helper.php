@@ -408,6 +408,7 @@ function PrinterState_getExtruderTemperaturesAsArray() {
 		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
+	PrinterLog_logArduino($command, $output);
 	
 	if (count($output) > 0) {
 		$explode_array = explode('-', $output[0]);
@@ -1264,6 +1265,14 @@ function PrinterState_checkStatusAsArray() {
 //	}
 	if (file_exists($CFG->config['printstatus'])) {
 		$output = @file($CFG->config['printstatus']);
+		if (count($output) == 0) {
+			// case: read the percentage status file when arcontrol_cli is writing in it
+			// so we let the percentage as 1 to continue printing
+			$output = array('1');
+			
+			$CI->load->helper('printerlog');
+			PrinterLog_logDebug('read percentage file when arcontrol_cli wrinting in it', __FILE__, __LINE__);
+		}
 	} else {
 		$output = array('0');
 	}
