@@ -28,7 +28,6 @@ class Account extends MY_Controller
 				$result = substr($http_response_header[0], 9, 3);
 				if ($result == 202)
 				{
-					var_dump("OK");
 					$file = 'template/activation/activation_form';
 					$data = array('email' =>$email, 'password' => $password);
 				}

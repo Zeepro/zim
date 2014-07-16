@@ -11,6 +11,70 @@
 
 
 /* Swatches */
+
+/* S
+-----------------------------------------------------------------------------------------------------------*/
+
+.ui-btn-up-s {
+	border: 1px solid #ff5252 /*{a-bup-border}*/;
+	background: #E42C38 /*{a-bup-background-color}*/;
+	font-weight: bold;
+	color: #f9f9f9 /*{a-bup-color}*/;
+	text-shadow: 0 /*{a-bup-shadow-x}*/ 1px /*{a-bup-shadow-y}*/ 0 /*{a-bup-shadow-radius}*/ #f3f3f3 /*{a-bup-shadow-color}*/;
+	background-image: -webkit-gradient(linear, left top, left bottom, from( #ef2e3a /*{a-bup-background-start}*/), to( #d82935 /*{a-bup-background-end}*/)); /* Saf4 , Chrome */
+	background-image: -webkit-linear-gradient( #ef2e3a /*{a-bup-background-start}*/, #d82935 /*{a-bup-background-end}*/); /* Chrome 10 , Saf5.1  */
+	background-image:    -moz-linear-gradient( #ef2e3a /*{a-bup-background-start}*/, #d82935 /*{a-bup-background-end}*/); /* FF3.6 */
+	background-image:     -ms-linear-gradient( #ef2e3a /*{a-bup-background-start}*/, #d82935 /*{a-bup-background-end}*/); /* IE10 */
+	background-image:      -o-linear-gradient( #ef2e3a /*{a-bup-background-start}*/, #d82935 /*{a-bup-background-end}*/); /* Opera 11.10  */
+	background-image:         linear-gradient( #ef2e3a /*{a-bup-background-start}*/, #d82935 /*{a-bup-background-end}*/);
+}
+.ui-btn-up-s:visited,
+.ui-btn-up-s a.ui-link-inherit {
+	color: #f9f9f9 /*{a-bup-color}*/;
+}
+.ui-btn-hover-s {
+	border: 1px solid #ff5252 /*{a-bhover-border}*/;
+	background: #c70000 /*{a-bhover-background-color}*/;
+	font-weight: bold;
+	color: #f9f9f9 /*{a-bhover-color}*/;
+	text-shadow: 0 /*{a-bhover-shadow-x}*/ 1px /*{a-bhover-shadow-y}*/ 0 /*{a-bhover-shadow-radius}*/ #f3f3f3 /*{a-bhover-shadow-color}*/;
+	background-image: -webkit-gradient(linear, left top, left bottom, from( #da0000 /*{a-bhover-background-start}*/), to( #b30000 /*{a-bhover-background-end}*/)); /* Saf4 , Chrome */
+	background-image: -webkit-linear-gradient( #da0000 /*{a-bhover-background-start}*/, #b30000 /*{a-bhover-background-end}*/); /* Chrome 10 , Saf5.1  */
+	background-image:    -moz-linear-gradient( #da0000 /*{a-bhover-background-start}*/, #b30000 /*{a-bhover-background-end}*/); /* FF3.6 */
+	background-image:     -ms-linear-gradient( #da0000 /*{a-bhover-background-start}*/, #b30000 /*{a-bhover-background-end}*/); /* IE10 */
+	background-image:      -o-linear-gradient( #da0000 /*{a-bhover-background-start}*/, #b30000 /*{a-bhover-background-end}*/); /* Opera 11.10  */
+	background-image:         linear-gradient( #da0000 /*{a-bhover-background-start}*/, #b30000 /*{a-bhover-background-end}*/);
+}
+.ui-btn-hover-s:visited,
+.ui-btn-hover-s:hover,
+.ui-btn-hover-s a.ui-link-inherit {
+	color: #f9f9f9 /*{a-bhover-color}*/;
+}
+.ui-btn-down-s {
+	border: 1px solid #ff5252 /*{a-bdown-border}*/;
+	background: #ff0a0a /*{a-bdown-background-color}*/;
+	font-weight: bold;
+	color: #f9f9f9 /*{a-bdown-color}*/;
+	text-shadow: 0 /*{a-bdown-shadow-x}*/ 0px /*{a-bdown-shadow-y}*/ 0 /*{a-bdown-shadow-radius}*/ #f3f3f3 /*{a-bdown-shadow-color}*/;
+	background-image: -webkit-gradient(linear, left top, left bottom, from( #990606 /*{a-bdown-background-start}*/), to( #FF0e0e /*{a-bdown-background-end}*/)); /* Saf4 , Chrome */
+	background-image: -webkit-linear-gradient( #990606 /*{a-bdown-background-start}*/, #FF0e0e /*{a-bdown-background-end}*/); /* Chrome 10 , Saf5.1  */
+	background-image:    -moz-linear-gradient( #990606 /*{a-bdown-background-start}*/, #FF0e0e /*{a-bdown-background-end}*/); /* FF3.6 */
+	background-image:     -ms-linear-gradient( #990606 /*{a-bdown-background-start}*/, #FF0e0e /*{a-bdown-background-end}*/); /* IE10 */
+	background-image:      -o-linear-gradient( #990606 /*{a-bdown-background-start}*/, #FF0e0e /*{a-bdown-background-end}*/); /* Opera 11.10  */
+	background-image:         linear-gradient( #990606 /*{a-bdown-background-start}*/, #FF0e0e /*{a-bdown-background-end}*/);
+}
+.ui-btn-down-s:visited,
+.ui-btn-down-s:hover,
+.ui-btn-down-s a.ui-link-inherit {
+	color: #f9f9f9 /*{a-bdown-color}*/;
+}
+.ui-btn-up-s,
+.ui-btn-hover-s,
+.ui-btn-down-s {
+	  font-family: Helvetica, Arial, sans-serif /*{global-font-family}*/;
+	text-decoration: none;
+}
+
 /* A
 -----------------------------------------------------------------------------------------------------------*/
 .ui-bar-a {
@@ -425,6 +489,7 @@
 	text-decoration: none;
 }
 
+/*
 
 /* Structure */
 /* links within "buttons" 
