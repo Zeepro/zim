@@ -103,6 +103,15 @@ class Sliceupload extends MY_Controller {
 		$list_display = array();
 		$current_stage = 'wait_slice';
 		
+		// redirect the client when in slicing
+		$this->load->helper('corestatus');
+		$ret_val = CoreStatus_checkInIdle($status_current);
+		// check status in slicing
+		if ($ret_val == FALSE || $status_current == CORESTATUS_VALUE_SLICE) {
+			$this->output->set_header('Location: /slicestatus/slicestatus');
+			return;
+		}
+		
 		$this->load->helper('zimapi');
 		$list_preset = ZimAPI_getPresetListAsArray();
 		
@@ -145,7 +154,42 @@ class Sliceupload extends MY_Controller {
 		// parse all page
 		$template_data = array(
 				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('sliceupload_upload_pagetitle') . '</title>',
+				'headers'		=> '<title>' . t('sliceupload_slice_pagetitle') . '</title>',
+				'contents'		=> $body_page,
+		);
+		
+		$this->parser->parse('template/basetemplate', $template_data);
+		
+		return;
+	}
+	
+	function slicestatus() {
+		$template_data = array();
+		$body_page = NULL;
+		$ret_val = 0;
+		$status_current = NULL;
+		
+		$this->load->helper('corestatus');
+		$ret_val = CoreStatus_checkInIdle($status_current);
+		// check status in slicing
+		if ($ret_val != FALSE || $status_current != CORESTATUS_VALUE_SLICE) {
+			$this->output->set_header('Location: /slicestatus/slice');
+			return;
+		}
+		
+		$this->load->library('parser');
+		$this->lang->load('sliceupload/slice', $this->config->item('language'));
+		
+		// parse the main body
+		$template_data = array(
+				'wait_in_slice'	=> t('wait_in_slice'),
+		);
+		$body_page = $this->parser->parse('template/sliceupload/slicestatus', $template_data, TRUE);
+		
+		// parse all page
+		$template_data = array(
+				'lang'			=> $this->config->item('language_abbr'),
+				'headers'		=> '<title>' . t('sliceupload_slice_pagetitle') . '</title>',
 				'contents'		=> $body_page,
 		);
 		

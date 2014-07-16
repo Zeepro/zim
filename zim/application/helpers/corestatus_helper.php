@@ -276,11 +276,12 @@ function CoreStatus_checkCallCancelingAjax() {
 }
 
 function CoreStatus_checkCallSlicing(&$url_redirect = '') {
-	$url_redirect = '/sliceupload/slice';
+	$url_redirect = '/sliceupload/slicestatus';
 	
 	return CoreStatus__checkCallURI(array(
 			'/sliceupload/preview'				=> NULL,
 			'/sliceupload/slice'				=> NULL,
+			'/sliceupload/slicestatus'			=> NULL,
 			'/sliceupload/slice_status_ajax'	=> NULL,
 			'/sliceupload/slice_action'			=> NULL,
 	));

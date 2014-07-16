@@ -101,6 +101,27 @@ class Printdetail extends MY_Controller {
 		return;
 	}
 	
+	public function printslice_temp() {
+		$cr = 0;
+		$temperature_r = $this->input->get('r');
+		$temperature_l = $this->input->get('l');
+		
+		//TODO change temperature here
+		
+		$this->load->helper('printer');
+		
+		$cr = Printer_printFromSlice();
+		if ($cr != ERROR_OK) {
+			$this->output->set_header('Location: /sliceupload/slice?callback');
+			return;
+		}
+		else {
+			$this->output->set_header('Location: /printdetail/status?id=slice');
+		}
+		
+		return;
+	}
+	
 	public function status() {
 		$time_remain = NULL;
 		$body_page = NULL;
