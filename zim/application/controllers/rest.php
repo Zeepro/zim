@@ -146,6 +146,13 @@ class Rest extends MY_Controller {
 		return;
 	}
 	
+	public function test_dump() { //FIXME remove this function after test
+		header('Content-type: ' . RETURN_CONTENT_TYPE);
+		print_r(getallheaders());
+		print_r($_SERVER);
+		return;
+	}
+	
 	
 	//==========================================================
 	//network web service

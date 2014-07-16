@@ -49,14 +49,24 @@ if (!defined('PRINTLIST_MAX_PIC_SIZE')) {
 	define('PRINTLIST_FILE_GCODE',		'model.gcode');
 	define('PRINTLIST_FILE_GCODE_BZ2',	'model.gcode.bz2');
 	define('PRINTLIST_FILE_JSON',		'model.json');
+	define('PRINTLIST_GLOBAL_URL_RDV',	'zeepro.com');
 	
 // 	define('PRINTLIST_GETPIC_BASE_WEB',	base_url() . 'getpicture');
 	//for IIS, we use only HTTP_HOST?
 // 	if ($_SERVER['SERVER_PORT'] != 80) {
 //  		define('PRINTLIST_GETPIC_BASE_WEB',	'http://' . $_SERVER['HTTP_HOST'] . ':' . $_SERVER['SERVER_PORT'] . base_url('rest/getpicture'));
 // 	} else {
-		define('PRINTLIST_GETPIC_BASE_WEB',	'http://' . $_SERVER['HTTP_HOST'] . base_url('rest/getpicture'));
+// 		define('PRINTLIST_GETPIC_BASE_WEB',	'http://' . $_SERVER['HTTP_HOST'] . base_url('rest/getpicture'));
 // 	}
+// 	if ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) {
+	if ($_SERVER['REMOTE_ADDR'] == $_SERVER['SERVER_ADDR']
+			&& substr($_SERVER['HTTP_HOST'], -strlen(PRINTLIST_GLOBAL_URL_RDV)) === PRINTLIST_GLOBAL_URL_RDV) {
+		// SSL connection
+		define('PRINTLIST_GETPIC_BASE_WEB',	'https://' . $_SERVER['HTTP_HOST'] . base_url('rest/getpicture'));
+	}
+	else {
+		define('PRINTLIST_GETPIC_BASE_WEB',	'http://' . $_SERVER['HTTP_HOST'] . base_url('rest/getpicture'));
+	}
 	define('PRINTLIST_GETPIC_PRM_MID',	'id');
 	define('PRINTLIST_GETPIC_PRM_PIC',	'p');
 }

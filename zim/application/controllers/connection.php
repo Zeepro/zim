@@ -19,7 +19,7 @@ class Connection extends MY_Controller {
 		return;
 	}
 	
-	private function ip_check($ip) {
+	public function ip_check($ip) {
 		if (filter_var ( $ip, FILTER_VALIDATE_IP )) {
 			return TRUE;
 		} else {
@@ -27,7 +27,7 @@ class Connection extends MY_Controller {
 		}
 	}
 	
-	private function mask_check($mask) {
+	public function mask_check($mask) {
 		if (! $m = ip2long ( $mask ))
 			return false;
 		
@@ -35,7 +35,7 @@ class Connection extends MY_Controller {
 		return $m && ~ $m && ! ($m & ($m + 1));
 	}
 	
-	private function gateway_check($ip) {
+	public function gateway_check($ip) {
 	// @todo The gateway should be within the mask
 		if (filter_var ( $ip, FILTER_VALIDATE_IP )) {
 			return TRUE;
@@ -303,7 +303,7 @@ class Connection extends MY_Controller {
 		} else {
 			$cr = 0;
 			$ip = $this->input->post('ip');
-			$mask = $this->intput->post('mask');
+			$mask = $this->input->post('mask');
 			$gateWay = $this->input->post('gateway');
 			
 			$cr = ZimAPI_setcEth($ip, $mask, $gateWay);

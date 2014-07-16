@@ -188,7 +188,7 @@ class Sliceupload extends MY_Controller {
 		
 		if ($cr != ERROR_OK) {
 			$this->load->helper('printerlog');
-			PrinterLog_logError($cr, __FILE__, __LINE__);
+			PrinterLog_logError('add model in slicer error, ' . $cr, __FILE__, __LINE__);
 		}
 // 		else {
 // 			unlink($this->config->item('temp') . SLICER_FILE_TEMP_DATA);
@@ -506,6 +506,8 @@ class Sliceupload extends MY_Controller {
 						$cr = ERROR_INTERNAL;
 					}
 					else {
+						unset($temp_json['json']['e']); //FIXME try to find a better way to remove error code
+						
 						foreach ($temp_json['json'] as $abb_cartridge => $data_cartridge) {
 							switch ($abb_cartridge) {
 								case 'r':

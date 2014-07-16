@@ -20,7 +20,7 @@
 	background: #E42C38 /*{a-bup-background-color}*/;
 	font-weight: bold;
 	color: #f9f9f9 /*{a-bup-color}*/;
-	text-shadow: 0 /*{a-bup-shadow-x}*/ 1px /*{a-bup-shadow-y}*/ 0 /*{a-bup-shadow-radius}*/ #f3f3f3 /*{a-bup-shadow-color}*/;
+	text-shadow: 0 /*{a-bup-shadow-x}*/ 1px /*{a-bup-shadow-y}*/ 0 /*{a-bup-shadow-radius}*/ #f30000 /*{a-bup-shadow-color}*/;
 	background-image: -webkit-gradient(linear, left top, left bottom, from( #ef2e3a /*{a-bup-background-start}*/), to( #d82935 /*{a-bup-background-end}*/)); /* Saf4 , Chrome */
 	background-image: -webkit-linear-gradient( #ef2e3a /*{a-bup-background-start}*/, #d82935 /*{a-bup-background-end}*/); /* Chrome 10 , Saf5.1  */
 	background-image:    -moz-linear-gradient( #ef2e3a /*{a-bup-background-start}*/, #d82935 /*{a-bup-background-end}*/); /* FF3.6 */
@@ -37,7 +37,7 @@
 	background: #c70000 /*{a-bhover-background-color}*/;
 	font-weight: bold;
 	color: #f9f9f9 /*{a-bhover-color}*/;
-	text-shadow: 0 /*{a-bhover-shadow-x}*/ 1px /*{a-bhover-shadow-y}*/ 0 /*{a-bhover-shadow-radius}*/ #f3f3f3 /*{a-bhover-shadow-color}*/;
+	text-shadow: 0 /*{a-bhover-shadow-x}*/ 1px /*{a-bhover-shadow-y}*/ 0 /*{a-bhover-shadow-radius}*/ #f30000 /*{a-bhover-shadow-color}*/;
 	background-image: -webkit-gradient(linear, left top, left bottom, from( #da0000 /*{a-bhover-background-start}*/), to( #b30000 /*{a-bhover-background-end}*/)); /* Saf4 , Chrome */
 	background-image: -webkit-linear-gradient( #da0000 /*{a-bhover-background-start}*/, #b30000 /*{a-bhover-background-end}*/); /* Chrome 10 , Saf5.1  */
 	background-image:    -moz-linear-gradient( #da0000 /*{a-bhover-background-start}*/, #b30000 /*{a-bhover-background-end}*/); /* FF3.6 */
@@ -55,7 +55,7 @@
 	background: #ff0a0a /*{a-bdown-background-color}*/;
 	font-weight: bold;
 	color: #f9f9f9 /*{a-bdown-color}*/;
-	text-shadow: 0 /*{a-bdown-shadow-x}*/ 0px /*{a-bdown-shadow-y}*/ 0 /*{a-bdown-shadow-radius}*/ #f3f3f3 /*{a-bdown-shadow-color}*/;
+	text-shadow: 0 /*{a-bdown-shadow-x}*/ 0px /*{a-bdown-shadow-y}*/ 0 /*{a-bdown-shadow-radius}*/ #f30000 /*{a-bdown-shadow-color}*/;
 	background-image: -webkit-gradient(linear, left top, left bottom, from( #990606 /*{a-bdown-background-start}*/), to( #FF0e0e /*{a-bdown-background-end}*/)); /* Saf4 , Chrome */
 	background-image: -webkit-linear-gradient( #990606 /*{a-bdown-background-start}*/, #FF0e0e /*{a-bdown-background-end}*/); /* Chrome 10 , Saf5.1  */
 	background-image:    -moz-linear-gradient( #990606 /*{a-bdown-background-start}*/, #FF0e0e /*{a-bdown-background-end}*/); /* FF3.6 */
