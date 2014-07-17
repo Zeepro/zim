@@ -295,8 +295,9 @@ function startSlice() {
 	.done(function(html) {
 		// html => link to image
 		var_slice_status_lock = false;
-		checkSlice(); // launch checking directly
-		var_slice_interval = setInterval(checkSlice, 3000);
+		window.location.href='/sliceupload/slicestatus';
+// 		checkSlice(); // launch checking directly
+// 		var_slice_interval = setInterval(checkSlice, 3000);
 	})
 	.fail(function() { // not allowed
 		alert("failed slice");
