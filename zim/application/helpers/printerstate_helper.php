@@ -71,6 +71,9 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 // 	define('PRINTERSTATE_TEMP_PRINT_FILENAME',	'/tmp/printer_percentage'); // fix the name on SD card
 	define('PRINTERSTATE_FILE_PRINTLOG',	'/tmp/printlog.log');
 	define('PRINTERSTATE_FILE_RESPONSE',	'/tmp/printer_response.log');
+	define('PRINTERSTATE_FILE_STOPFILE',	'/tmp/printer_stop');
+	define('PRINTERSTATE_FILE_PAUSEFILE',	'/tmp/printer_pause');
+	define('PRINTERSTATE_FILE_RESUMEFILE',	'/tmp/printer_resume');
 	
 	define('PRINTERSTATE_RIGHT_EXTRUD',	0);
 	define('PRINTERSTATE_LEFT_EXTRUD',	1);
@@ -946,9 +949,25 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array(), 
 			$ret_val = CoreStatus_checkInConnection();
 			if ($ret_val == FALSE) {
 				CoreStatus_setInIdle();
+				$status_current = CORESTATUS_VALUE_IDLE;
 			}
 			break;
-	
+			
+		case CORESTATUS_VALUE_CANCEL:
+			$CI = &get_instance();
+			
+			// jump out if it's a simulator
+			if ($CI->config->item('simulator')) {
+				CoreStatus_setInIdle();
+				$status_current = CORESTATUS_VALUE_IDLE;
+				break;
+			}
+			if (!file_exists(PRINTERSTATE_FILE_STOPFILE)) {
+				CoreStatus_setInIdle();
+				$status_current = CORESTATUS_VALUE_IDLE;
+			}
+			break;
+			
 		case CORESTATUS_VALUE_SLICE:
 			// get percentage and check finished or not
 			$CI = &get_instance();
@@ -1007,84 +1026,43 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array(), 
 						$ret_val = $tmp_ret;
 					}
 				}
-				if ($ret_val != ERROR_OK) {
-					$CI->load->helper('printerlog');
-					
-// 					CoreStatus_setInIdle($ret_val);
-// 					CoreStatus_setInSliced($ret_val);
-					$array_data[PRINTERSTATE_TITLE_LASTERROR] = $ret_val;
-// 					$status_current = CORESTATUS_VALUE_IDLE;
-					PrinterLog_logError('check filament error after slicing - usually because of no enough filament', __FILE__, __LINE__);
-					
-// 					return TRUE;
-				}
 				
-				// try to start printing after slicing if necessary
-// 				if ($printafterslice == FALSE) {
-					CoreStatus_setInIdle($ret_val);
-// 					CoreStatus_setInSliced(ERROR_OK); //TODO check if we need to rewrite last error or not
-					$status_current = CORESTATUS_VALUE_IDLE;
-					
-					// save the temp file for every service
-					try {
-						$fp = fopen($CI->config->item('temp') . SLICER_FILE_TEMP_DATA, 'w');
-						if ($fp) {
-							fwrite($fp, json_encode($array_data));
-							fclose($fp);
-						}
-						else {
-							throw new Exception('can not open file');
-						}
-					} catch (Exception $e) {
-						$this->load->helper('printerlog');
-						PrinterLog_logError('can not save temp json file', __FILE__, __LINE__);
-						$cr = ERROR_INTERNAL;
+				// save the temp file for every service (attention: do not change $ret_val in this block!)
+				$status_current = CORESTATUS_VALUE_IDLE;
+				try {
+					$fp = fopen($CI->config->item('temp') . SLICER_FILE_TEMP_DATA, 'w');
+					if ($fp) {
+						fwrite($fp, json_encode($array_data));
+						fclose($fp);
 					}
-					
-					return TRUE;
-// 				}
+					else {
+						throw new Exception('can not open file');
+					}
+				} catch (Exception $e) {
+					$this->load->helper('printerlog');
+					PrinterLog_logError('can not save temp json file', __FILE__, __LINE__);
+					$cr = ERROR_INTERNAL;
+				}
 				
-// 				return TRUE;
-				// try to launch printing after checking
-				$CI->load->helper('printer');
-				if ($CI->config->item('simulator')) {
-					$ret_val = Printer_printFromFile($CI->config->item('temp') . PRINTER_FN_CHARGE);
-				}
-				else {
-					$ret_val = Printer_printFromFile($CI->config->item('temp') . SLICER_FILE_MODEL);
-				}
 				if ($ret_val != ERROR_OK) {
 					$CI->load->helper('printerlog');
 					
-					CoreStatus_setInIdle($ret_val);
 					$array_data[PRINTERSTATE_TITLE_LASTERROR] = $ret_val;
-					$status_current = CORESTATUS_VALUE_IDLE;
-					PrinterLog_logError('launch printing after slicing error', __FILE__, __LINE__);
-					
-					return TRUE;
-				}
-				// change status to printing
-				$ret_val = CoreStatus_setInPrinting();
-				if ($ret_val != ERROR_OK) {
-					$CI->load->helper('printerlog');
-					
-					CoreStatus_setInIdle($ret_val);
-					$array_data[PRINTERSTATE_TITLE_LASTERROR] = $ret_val;
-					$status_current = CORESTATUS_VALUE_IDLE;
-					PrinterLog_logError('change status to printing after slicing error', __FILE__, __LINE__);
-				}
-				else {
-					$status_current = CORESTATUS_VALUE_PRINT;
-					$array_data[PRINTERSTATE_TITLE_PERCENT] = 0; // set percentage to 0 because of launching of printing
+					PrinterLog_logError('check filament error after slicing - usually because of no enough filament', __FILE__, __LINE__);
 				}
 				
+// 				// try to start printing after slicing if necessary
+// 				if ($printafterslice == FALSE) {
+				
+				CoreStatus_setInIdle($ret_val);
+					
 				return TRUE;
 			}
 			else { // still in slicing, so get percentage (estimated time is useless for now, slicer exports percentage badly)
 				$array_data[PRINTERSTATE_TITLE_PERCENT] = $progress;
 			}
 			break;
-	
+			
 		case CORESTATUS_VALUE_LOAD_FILA_L:
 		case CORESTATUS_VALUE_LOAD_FILA_R:
 			$time_wait = PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD;
@@ -1237,7 +1215,8 @@ function PrinterState_checkStatusAsArray() {
 		
 		return $data_json;
 	}
-	else if ($ret_val == FALSE && !in_array($status_current, array(CORESTATUS_VALUE_PRINT, CORESTATUS_VALUE_CANCEL))) {
+// 	else if ($ret_val == FALSE && !in_array($status_current, array(CORESTATUS_VALUE_PRINT, CORESTATUS_VALUE_CANCEL))) {
+	else if ($ret_val == FALSE && $status_current != CORESTATUS_VALUE_PRINT) {
 		$temp_data = array();
 
 // 		PrinterState_checkBusyStatus($status_current, $data_json);
@@ -2251,7 +2230,7 @@ function PrinterState_pausePrinting() {
 	$ret_val = PrinterState_checkInPrint();
 	if ($ret_val == TRUE) {
 		// send stop gcode
-		$command = $arcontrol_fullpath . PRINTERSTATE_STOP_PRINT;
+		$command = $arcontrol_fullpath . PRINTERSTATE_PAUSE_PRINT;
 		exec($command, $output, $ret_val);
 		if (!PrinterState_filterOutput($output)) {
 			PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);

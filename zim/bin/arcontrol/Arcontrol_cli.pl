@@ -137,6 +137,9 @@ my $myself;
 my $mypath;
 my ( $temperature1, $temperature2 );
 
+$myself = abs_path($0);
+$mypath = dirname($myself) . '/';
+
 # our sub thread function here
 sub start_print {
 	if ( -e ( $mypath . FILENAME_PRINT ) ) {
@@ -199,19 +202,6 @@ sub _start_print() {
 
 				return;
 			}
-
-			# check if we want to pause
-			if ( -e ( $mypath . FILENAME_PRINT_PAUSE ) ) {
-
-				# release pause status file
-				unlink( $mypath . FILENAME_PRINT_PAUSE );
-
-				# wait until resume status file, then release this status file
-				do {
-					usleep(TIME_PRECISION);
-				} until( -e ( $mypath . FILENAME_PRINT_RESUME ) );
-				unlink( $mypath . FILENAME_PRINT_RESUME );
-			}
 		}
 	}
 	for (
@@ -232,6 +222,19 @@ sub _start_print() {
 			last;
 		}
 
+		# check if we want to pause
+		if ( -e ( $mypath . FILENAME_PRINT_PAUSE ) ) {
+
+			# release pause status file
+			unlink( $mypath . FILENAME_PRINT_PAUSE );
+
+			# wait until resume status file, then release this status file
+			do {
+				usleep(TIME_PRECISION);
+			} until( -e ( $mypath . FILENAME_PRINT_RESUME ) );
+			unlink( $mypath . FILENAME_PRINT_RESUME );
+		}
+
 		# write status file
 		open( $fp, '>', $mypath . FILENAME_PRINT );
 		print $fp $progress;
@@ -240,6 +243,8 @@ sub _start_print() {
 
 	# release the status lock after finishing printing
 	unlink( $mypath . FILENAME_PRINT );
+	
+	return;
 }
 
 sub stop_print {

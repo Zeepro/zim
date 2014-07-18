@@ -550,7 +550,7 @@ class Sliceupload extends MY_Controller {
 						$cr = ERROR_INTERNAL;
 					}
 					else {
-						unset($temp_json['json']['e']); //FIXME try to find a better way to remove error code
+// 						unset($temp_json['json']['e']); //FIXME try to find a better way to remove error code
 						
 						foreach ($temp_json['json'] as $abb_cartridge => $data_cartridge) {
 							switch ($abb_cartridge) {

@@ -35,7 +35,7 @@ class Debug extends CI_Controller {
 			if ($level_set < 4 && $level_set >= 0) {
 				$this->load->helper('corestatus');
 				$ret_val = CoreStatus_setDebugLevel($level_set);
-				if ($ret_val == ERROR_OK) {
+				if ($ret_val == TRUE) {
 					$level_log = $level_set;
 				}
 			}

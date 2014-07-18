@@ -524,12 +524,40 @@ class Rest extends MY_Controller {
 	}
 	
 	public function suspend() {
-		$this->_return_under_construction();
+		$ret_val = 0;
+		$status_current = '';
+		
+		if (!CoreStatus_checkInIdle($status_current) && $status_current == CORESTATUS_VALUE_PRINT) {
+			$this->load->helper('printer');
+
+			$ret_val = Printer_pausePrint();
+			if ($ret_val == TRUE) {
+				$this->_return_cr(ERROR_OK);
+			}
+		}
+		else {
+			$this->_return_cr(ERROR_NO_PRINT);
+		}
+		
 		return;
 	}
 	
 	public function resume() {
-		$this->_return_under_construction();
+		$ret_val = 0;
+		$status_current = '';
+		
+		if (!CoreStatus_checkInIdle($status_current) && $status_current == CORESTATUS_VALUE_PRINT) {
+			$this->load->helper('printer');
+
+			$ret_val = Printer_resumePrint();
+			if ($ret_val == TRUE) {
+				$this->_return_cr(ERROR_OK);
+			}
+		}
+		else {
+			$this->_return_cr(ERROR_NO_PRINT);
+		}
+		
 		return;
 	}
 	

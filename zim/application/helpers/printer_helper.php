@@ -331,6 +331,68 @@ function Printer_stopPrint() {
 	return FALSE; // never reach here
 }
 
+function Printer_pausePrint() {
+	$CI = &get_instance();
+	$CI->load->helper(array('corestatus', 'printerstate'));
+	
+	if (CoreStatus_checkInPause()) {
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('call pause when in pausing', __FILE__, __LINE__);
+		return TRUE;
+	}
+	else {
+		$cr = CoreStatus_checkInIdle($status_current);
+		if ($cr == FALSE && $status_current == CORESTATUS_VALUE_PRINT) {
+			$cr = PrinterState_pausePrinting();
+			if ($cr == ERROR_OK) {
+				CoreStatus_setInPause();
+				return TRUE;
+			}
+			else {
+				$CI->load->helper('printerlog');
+				PrinterLog_logError('pause printing error', __FILE__, __LINE__);
+			}
+		}
+		else {
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('call pause when not in printing: ' . $status_current, __FILE__, __LINE__);
+		}
+	}
+	
+	return FALSE;
+}
+
+function Printer_resumePrint() {
+	$CI = &get_instance();
+	$CI->load->helper(array('corestatus', 'printerstate'));
+
+	$cr = CoreStatus_checkInIdle($status_current);
+	if ($cr == FALSE && $status_current == CORESTATUS_VALUE_PRINT) {
+		if (CoreStatus_checkInPause()) {
+			$cr = PrinterState_resumePrinting();
+			if ($cr == ERROR_OK) {
+				CoreStatus_setInPause(FALSE);
+				return TRUE;
+			}
+			else {
+				$CI->load->helper('printerlog');
+				PrinterLog_logError('resume printing error', __FILE__, __LINE__);
+			}
+		}
+		else {
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('call resume when not in pausing', __FILE__, __LINE__);
+			return TRUE;
+		}
+	}
+	else {
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('call resume when not in printing: ' . $status_current, __FILE__, __LINE__);
+	}
+	
+	return FALSE;
+}
+
 // function Printer_startPrintingStatusFromModel($id_model) {
 // 	$gcode_path = NULL;
 // 	$ret_val = 0;
@@ -492,9 +554,7 @@ function Printer_checkPrintStatus(&$return_data) {
 	return TRUE;
 }
 
-
 function Printer_checkCancelStatus() {
-	global $CFG;
 	$data_status = array();
 	$temper_status = array();
 
@@ -510,6 +570,22 @@ function Printer_checkCancelStatus() {
 	}
 	
 	return TRUE;
+}
+
+function Printer_checkPauseStatus() {
+	$status_current = NULL;
+	$temper_status = array();
+
+	$CI = &get_instance();
+	$CI->load->helper('corestatus');
+
+	// check status if we are not in canceling
+	CoreStatus_checkInIdle($status_current);
+	if ($status_current == CORESTATUS_VALUE_PRINT && CoreStatus_checkInPause()) {
+		return TRUE;
+	}
+	
+	return FALSE;
 }
 
 // internal function

@@ -41,6 +41,7 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_FILE_LEVEL_MESSAGE',	'_Level_Message.tmp');
 	define('CORESTATUS_FILE_LEVEL_ERROR',	'_Level_Error.tmp');
 	define('CORESTATUS_FILE_LEVEL_NONE',	'_Level_None.tmp');
+	define('CORESTATUS_FILENAME_PAUSE',		'_Printer_inPause.tmp');
 }
 
 function CoreStatus_initialFile() {
@@ -67,17 +68,15 @@ function CoreStatus_initialFile() {
 		if ($cr == ERROR_NORMAL_RC_OK) {
 			$sdcard = TRUE;
 			$command = CORESTATUS_CMD_CHECK_SD . $CI->config->item('temp') . CORESTATUS_FILE_SD_ON;
-			exec($command);
 		}
 		else {
 			$command = CORESTATUS_CMD_CHECK_SD . $CI->config->item('temp') . CORESTATUS_FILE_SD_OFF;
-			exec($command);
 		}
 	}
 	else {
 		$command = CORESTATUS_CMD_CHECK_SD . $CI->config->item('temp') . CORESTATUS_FILE_SD_OFF;
-		exec($command);
 	}
+	exec($command);
 	
 	$array_change = array(
 			'conf'			=> CORESTATUS_SUFFIX_CONF,
@@ -199,6 +198,17 @@ function CoreStatus_checkInConnection() {
 	else {
 		return TRUE;
 	}
+}
+
+function CoreStatus_checkInPause() {
+	$CI = &get_instance();
+	$status_file = $CI->config->item('temp') . CORESTATUS_FILENAME_PAUSE;
+	
+	if (file_exists($status_file)) {
+		return TRUE;
+	}
+	
+	return FALSE;
 }
 
 function CoreStatus_checkCallREST() {
@@ -345,7 +355,8 @@ function CoreStatus_setInIdle($last_error = FALSE) {
 	if ($ret_val == TRUE) {
 		return TRUE; // we are already in idle
 	}
-	else if ($status_previous == CORESTATUS_VALUE_PRINT) {
+	else if ($status_previous == CORESTATUS_VALUE_PRINT
+			|| $status_previous == CORESTATUS_VALUE_CANCEL) {
 		// stop camera http live streaming
 		$ret_val = 0;
 		
@@ -355,6 +366,8 @@ function CoreStatus_setInIdle($last_error = FALSE) {
 		if ($ret_val != TRUE) {
 			return FALSE;
 		}
+		
+		CoreStatus_setInPause(FALSE); // not necessary in any case, just a safty
 	}
 // 	else if ($status_previous == CORESTATUS_VALUE_UNLOAD_FILA_L
 // 			|| $status_previous == CORESTATUS_VALUE_UNLOAD_FILA_R) {
@@ -445,6 +458,41 @@ function CoreStatus_setInPrinting($stop_printing = FALSE) {
 
 function CoreStatus_setInCanceling() {
 	return CoreStatus_setInPrinting(TRUE);
+}
+
+function CoreStatus_setInPause($value = TRUE) {
+	$CI = &get_instance();
+	$status_file = $CI->config->item('temp') . CORESTATUS_FILENAME_PAUSE;
+	
+	if ($value == TRUE) {
+		try {
+			$fp = fopen($status_file, 'w');
+			if ($fp) {
+				fwrite($fp, 'pause');
+				fclose($fp);
+			}
+			else {
+				$CI->load->helper('printerlog');
+				PrinterLog_logError('open pause status file error', __FILE__, __LINE__);
+				return FALSE;
+			}
+		} catch (Exception $e) {
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('write pause status file error', __FILE__, __LINE__);
+			return FALSE;
+		}
+	}
+	else {
+		if (file_exists($status_file)) {
+			@unlink($status_file);
+		}
+		else {
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('call get out pause when not in pause', __FILE__, __LINE__);
+		}
+	}
+	
+	return TRUE;
 }
 
 function CoreStatus_setInLoading($abb_filament) {
@@ -595,7 +643,7 @@ function CoreStatus_setDebugLevel($level = 1) {
 			$CI = &get_instance();
 			$CI->load->helper('printerlog');
 			PrinterLog_logError('unknown debug level', __FILE__, __LINE__);
-			return ERROR_INTERNAL;
+			return FALSE;
 			break; // never reach here
 	}
 	
@@ -613,16 +661,16 @@ function CoreStatus_setDebugLevel($level = 1) {
 			$CI = &get_instance();
 			$CI->load->helper('printerlog');
 			PrinterLog_logError('open debug level file error', __FILE__, __LINE__);
-			return ERROR_INTERNAL;
+			return FALSE;
 		}
 	} catch (Exception $e) {
 		$CI = &get_instance();
 		$CI->load->helper('printerlog');
 		PrinterLog_logError('write debug level file error', __FILE__, __LINE__);
-		return ERROR_INTERNAL;
+		return FALSE;
 	}
 	
-	return ERROR_OK;
+	return TRUE;
 }
 
 // internal function
