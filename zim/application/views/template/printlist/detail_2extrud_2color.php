@@ -5,6 +5,7 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
+		<form action="/printdetail/printmodel?id={model_id}" method=POST>
 			<h2 style="text-align: center;">{title}</h2>
 			<div data-role="collapsible" data-collapsed="false">
 				<h4>{desp_title}</h4>
@@ -25,6 +26,13 @@
 				</div><br>
 				<p>{time}</p>
 			</div>
+			<div data-role="collapsible" data-collapsed="false">
+				<h4>Gestion des températures</h4>
+						<label>Température tête gauche</label>
+						<input type="range" name="slider-1" id="slider-1" value="{temper_filament_l}" min="160" max="260">
+						<label>Température tête droite</label>
+						<input type="range" name="slider-2" id="slider-2" value="{temper_filament_r}" min="160" max="260">
+			</div>
 			<div data-role="collapsible" data-collapsed="false" style="text-align: center;">
 				<h4>{title_current}</h4>
 				<div style="width: 50%; float: left; text-align: center;">
@@ -44,8 +52,22 @@
 <!-- 				<a href="/print?id={model_id}" class="ui-btn ui-btn-inline ui-icon-action ui-btn-icon-left">{print_model}</a> -->
 			</div>
 			<div style="clear: both;">
-				<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh" onclick="window.location.href='/printdetail/printmodel?id={model_id}'">{print_model}</button>
+				<!--<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh" onclick="window.location.href='/printdetail/printmodel?id={model_id}'">{print_model}</button>-->
+				<input type="submit" value="{print_model}" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh" />
 			</div>
+			</form>
 		</div>
 	</div>
 </div>
+
+<script>
+	var tmp = $("#slider-2").val();
+
+	$("#slider-2").attr('min', tmp - 10); 
+	$("#slider-2").attr('max', parseInt(tmp) + 10);
+
+	tmp = $("#slider-1").val();
+
+	$("#slider-1").attr('min', tmp - 10); 
+	$("#slider-1").attr('max', parseInt(tmp) + 10);
+</script>
