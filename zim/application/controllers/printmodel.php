@@ -76,6 +76,8 @@ class Printmodel extends MY_Controller {
 		$color_right_filament = '';
 		$change_left_filament = '';
 		$change_right_filament = '';
+		$temper_left_filament = 0;
+		$temper_right_filament = 0;
 		$time_estimation = '';
 		$body_page = NULL;
 		$mono_color = FALSE;
@@ -145,6 +147,7 @@ class Printmodel extends MY_Controller {
 		}
 		if (($cr != ERROR_MISS_RIGT_CART) && ($cr != ERROR_INTERNAL)) {
 			$color_right_filament = $cartridge_data[PRINTERSTATE_TITLE_COLOR];
+			$temper_right_filament = $cartridge_data[PRINTERSTATE_TITLE_EXT_TEMPER];
 		}
 		else {
 			$color_right_filament = PRINTERSTATE_VALUE_DEFAULT_COLOR;
@@ -187,6 +190,7 @@ class Printmodel extends MY_Controller {
 			}
 			if (($cr != ERROR_MISS_LEFT_CART) && ($cr != ERROR_INTERNAL)) {
 				$color_left_filament = $cartridge_data[PRINTERSTATE_TITLE_COLOR];
+				$temper_left_filament = $cartridge_data[PRINTERSTATE_TITLE_EXT_TEMPER];
 			}
 			else {
 				$color_left_filament = PRINTERSTATE_VALUE_DEFAULT_COLOR;
@@ -216,6 +220,8 @@ class Printmodel extends MY_Controller {
 // 				'need_filament_l'	=> $model_data[PRINTLIST_TITLE_LENG_F2],
 // 				'need_filament_l'	=> 0,
 				'need_filament_r'	=> $model_data[PRINTLIST_TITLE_LENG_F1],
+// 				'temper_filament_l'	=> $temper_left_filament,
+				'temper_filament_r'	=> $temper_right_filament,
 				'print_model'		=> t('Print'),
 				'back'				=> t('back'),
 				'preview_title'		=> t('Preview'),
@@ -225,6 +231,7 @@ class Printmodel extends MY_Controller {
 			$template_data['state_c_l'] = $color_left_filament;
 			$template_data['state_f_l'] = $check_left_filament;
 			$template_data['change_filament_l'] = $change_left_filament;
+			$template_data['temper_filament_l'] = $temper_left_filament;
 			
 			if ($mono_color == FALSE) {
 				$template_data['model_c_l'] = $model_data[PRINTLIST_TITLE_COLOR_F2];
