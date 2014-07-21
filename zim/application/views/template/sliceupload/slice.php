@@ -91,6 +91,18 @@ function getPreview(var_control) {
 			theta: var_current_theta,
 			},
 		cache: false,
+		/*beforeSend: function() {
+			console.log("start");
+			$.mobile.loader.prototype.options.text = "loading";
+			$.mobile.loader.prototype.options.textVisible = false;
+			$.mobile.loader.prototype.options.theme = "a";
+			$.mobile.loader.prototype.options.html = "";
+			$.mobile.loading("show");
+          },
+          success: function() {
+        	console.log("fini");
+        	$.mobile.loading("hide");
+          },*/
 		timeout: 1000*60*10,
 	})
 	.done(function(html) {

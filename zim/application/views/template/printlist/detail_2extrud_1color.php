@@ -10,7 +10,7 @@
 				<h4>{desp_title}</h4>
 				<p>{desp}</p>
 			</div>
-			<div data-role="collapsible" data-collapsed="false" style="text-align: center;">
+			<div data-role="collapsible" data-collapsed="true" style="text-align: center;">
 				<h4>{preview_title}</h4>
 				<img src="{image}" style="max-width: 100%;"><br>
 				<div style="text-align: center;">
@@ -19,6 +19,16 @@
 					</div>
 				</div><br>
 				<p>{time}</p>
+			</div>
+			<div data-role="collapsible" data-collapsed="false">
+				<h4>Gestion des températures</h4>
+					<form action="" method=POST>
+						<label>Température tête gauche</label>
+						<input type="range" name="slider-1" id="slider-1" value="160" min="160" max="260">
+						<label>Température tête droite</label>
+						<input type="range" name="slider-2" id="slider-2" value="160" min="160" max="260">
+					</form>
+				</div>
 			</div>
 			<div data-role="collapsible" data-collapsed="false" style="text-align: center;">
 				<h4>{title_current}</h4>
