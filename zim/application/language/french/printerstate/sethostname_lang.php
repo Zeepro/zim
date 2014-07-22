@@ -12,8 +12,8 @@ $lang['set_button']
 $lang['no_input']
 	= 'Saisie d\'utilisateur non trouvable';
 $lang['set_error']
-	= 'Assignation erreur';
+	= 'Erreur d\'assignation';
 $lang['finish_hint']
-	= 'Le nouveau nom entrera en vigueur après un redémarrage de l\'imprimante ou de l\'interface réseau';
+	= 'Le nouveau nom entrera en vigueur après un redémarrage de l\'imprimante ou une réinitialisation de l\'interface réseau';
 $lang['home_button']
-	= 'Acceuil';
+	= 'Accueil';

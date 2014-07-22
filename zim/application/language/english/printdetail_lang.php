@@ -7,7 +7,7 @@ $lang['Time remaining: ']
 $lang['unknown']
 	= 'unknown';
 $lang['under calculating']
-	= 'under calculating';
+	= 'Calculating...';
 $lang['Control your printing']
 	= 'Control your printing';
 $lang['Printing details']
@@ -27,7 +27,7 @@ $lang['Waiting for starting...']
 $lang['Printing details']
 	= 'Printing details';
 $lang['Congratulation, your printing is complete!']
-	= 'Congratulation, your printing is complete!';
+	= 'Congratulations, your printing is complete!';
 $lang['Home']
 	= 'Home';
 $lang['Restart?']

@@ -1,7 +1,7 @@
 <?php
 // general page
 $lang['back']
-	= 'retour';
+	= 'Retour';
 
 $lang['printerstate_index_pagetitle']
 	= 'Zim - Configuration';
@@ -12,9 +12,9 @@ $lang['change_left']
 $lang['change_right']
 	= 'Changer la cartouche droite';
 $lang['printer_info']
-	= 'Information de l\'imprimante';
+	= 'Informations de l\'imprimante';
 $lang['set_hostname']
-	= 'Assigner le nom de l\'imprimante';
+	= 'Assigner un nom à l\'imprimante';
 $lang['strip_led']
 	= 'LED';
 $lang['head_led']
@@ -22,6 +22,6 @@ $lang['head_led']
 $lang['led_on']
 	= 'Allumé';
 $lang['led_off']
-	= 'Eteint';
+	= 'Éteint';
 $lang['set_preset']
-	= 'Gestion de préset de slicer';
+	= 'Gestion des préset de slicing';

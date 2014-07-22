@@ -2,23 +2,23 @@
 $lang['home']
 	= 'Accueil';
 $lang['select_hint']
-	= 'Selectionner une configuration préset à slicer le modèle';
+	= 'Sélectionner une configuration préset pour slicer le modèle';
 $lang['slice_button']
 	= 'Slicer';
 $lang['goto_preset']
 	= 'Aller sur la page de configuration de préset';
 $lang['goto_hint']
-	= 'Est-ce que vous êtes sûr d\'aller sur la page de configuration de préset ?';
+	= 'Êtes-vous sûr de vouloir aller sur la page de configuration de préset ?';
 $lang['wait_preview']
-	= 'Attente de lecture d\'image de rendering';
+	= 'Attente de lecture d\'une image de rendering';
 $lang['wait_slice']
-	= 'Commencé à slicer le modèle';
+	= 'Slicing du modèle commencé...';
 $lang['wait_in_slice']
-	= 'Attente de slicing, pourcentage: ';
+	= 'Slicing en cours, pourcentage: ';
 $lang['near_button']
-	= 'Zoomer';
+	= 'Zoom';
 $lang['far_button']
-	= 'Zoomer arrière';
+	= 'Zoom arrière';
 $lang['small_button']
 	= 'Taille -';
 $lang['big_button']

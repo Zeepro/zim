@@ -27,7 +27,7 @@ $lang['Waiting for starting...']
 $lang['Printing details']
 	= 'Details de l\'impression';
 $lang['Congratulation, your printing is complete!']
-	= 'Félicitation, votre impression est terminée !';
+	= 'Félicitations, votre impression est terminée !';
 $lang['Home']
 	= 'Accueil';
 $lang['Restart?']
