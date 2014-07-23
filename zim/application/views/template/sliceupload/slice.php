@@ -1,4 +1,5 @@
 <div data-role="page" data-url="/sliceupload/slice">
+	<div id="overlay"></div>
 	<header data-role="header" class="page-header">
 		<a href="#" onclick="javascript:window.location.href='/';" data-icon="home" data-ajax="false">{home}</a>
 	</header>
@@ -91,18 +92,22 @@ function getPreview(var_control) {
 			theta: var_current_theta,
 			},
 		cache: false,
-		/*beforeSend: function() {
-			console.log("start");
-			$.mobile.loader.prototype.options.text = "loading";
+		beforeSend: function()
+		{
+			$("#overlay").addClass("gray-overlay");
+			$(".ui-loader").css("display", "block");
+		/*	$.mobile.loader.prototype.options.text = "loading";
 			$.mobile.loader.prototype.options.textVisible = false;
 			$.mobile.loader.prototype.options.theme = "a";
 			$.mobile.loader.prototype.options.html = "";
-			$.mobile.loading("show");
-          },
-          success: function() {
-        	console.log("fini");
-        	$.mobile.loading("hide");
-          },*/
+			$.mobile.loading("show");*/
+        },
+        complete: function()
+        {	
+			$("#overlay").removeClass("gray-overlay");
+			$(".ui-loader").css("display", "none");
+			//$.mobile.loading("hide");
+        },
 		timeout: 1000*60*10,
 	})
 	.done(function(html) {
