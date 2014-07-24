@@ -1,4 +1,5 @@
 <div data-role="page" data-url="/manage">
+	<div id="overlay"></div>
 	<header data-role="header" class="page-header">
 		<a href="javascript:history.back();" data-icon="back" data-ajax="false">{back}</a>
 	</header>
@@ -42,7 +43,7 @@
 					<div class="grid_2">
 						<a href="#" data-role="button" data-icon="arrow-r" data-iconpos="left" onclick="move('X', 50);">50</a>
 					</div>
-					<div class="grid_2 suffix_5"">
+					<div class="grid_2 suffix_5">
 						<a href="#" data-role="button" data-icon="home" data-iconpos="left" onclick="home('X');">X</a>
 					</div>
 					<div class="grid_2 suffix_7">
@@ -157,6 +158,16 @@ function move(var_axis, var_value) {
 		url: var_url,
 		type: "GET",
 		cache: false,
+		beforeSend: function()
+		{
+			$("#overlay").addClass("gray-overlay");
+			$(".ui-loader").css("display", "block");
+        },
+        complete: function()
+        {	
+			$("#overlay").removeClass("gray-overlay");
+			$(".ui-loader").css("display", "none");
+        },
 	})
 	.done(function(html) {
 		$("#gcode_detail_info").html('OK');

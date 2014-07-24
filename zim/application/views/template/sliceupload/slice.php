@@ -96,17 +96,11 @@ function getPreview(var_control) {
 		{
 			$("#overlay").addClass("gray-overlay");
 			$(".ui-loader").css("display", "block");
-		/*	$.mobile.loader.prototype.options.text = "loading";
-			$.mobile.loader.prototype.options.textVisible = false;
-			$.mobile.loader.prototype.options.theme = "a";
-			$.mobile.loader.prototype.options.html = "";
-			$.mobile.loading("show");*/
         },
         complete: function()
         {	
 			$("#overlay").removeClass("gray-overlay");
 			$(".ui-loader").css("display", "none");
-			//$.mobile.loading("hide");
         },
 		timeout: 1000*60*10,
 	})
