@@ -72,6 +72,8 @@ use constant CMD_SET_EXTRUD2   => 'T1';
 use constant CMD_GET_EXTRUD    => 'M1601';
 use constant CMD_GET_RIGHT_LAB => 'M1602';
 use constant CMD_GET_LEFT_LAB  => 'M1603';
+use constant CMD_SET_RIGHT_LAB => 'M1610';
+use constant CMD_SET_LEFT_LAB  => 'M1611';
 
 use constant CMD_LOAD_RIGHT_FILA     => 'M1604';
 use constant CMD_LOAD_LEFT_FILA      => 'M1605';
@@ -1148,9 +1150,11 @@ else {
 			|| $command eq CMD_UNIN_FILA_PLUS
 			|| $command eq CMD_ALLOW_COLD_E
 			|| $command eq CMD_SET_RFID_OFF
-			|| $command eq CMD_SET_RFID_ON ) {
+			|| $command eq CMD_SET_RFID_ON
+			|| $command eq CMD_SET_RIGHT_LAB
+			|| $command eq CMD_SET_LEFT_LAB ) {
 
-		#cmd: move / extrude / special g99
+		#cmd: move / extrude / special g99 / etc.
 		exit(RC_OK);
 	}
 	elsif ( $command eq CMD_GET_SPEED ) {

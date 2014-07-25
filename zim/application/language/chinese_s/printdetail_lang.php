@@ -37,4 +37,24 @@ $lang['Yes']
 $lang['No']
 	= '否';
 
+//printdetail cancel()
+$lang['printdetail_cancel_pagetitle']
+	= 'Zim - 取消详情';
+$lang['wait_hint_cancel']
+	= '等待取消…';
+$lang['finish_hint_cancel']
+	= '恭喜，您的打印取消了！';
+
+//printdetail recovery()
+$lang['printdetail_recovery_pagetitle']
+	= 'Zim - 恢复详情';
+$lang['wait_hint_recovery']
+	= '等待获取恢复信息…';
+$lang['finish_hint_recovery']
+	= '恭喜，您的打印机已恢复！';
+$lang['wait_hint_recovery_printing']
+	= '等待从打印状态中恢复…';
+$lang['wait_hint_recovery_unknown']
+	= '等待从未知状态中恢复…';
+
 ?>

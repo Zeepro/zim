@@ -1,6 +1,9 @@
 <?php
 $lang['home']
 	= 'home';
+
+$lang['sliceupload_slice_pagetitle']
+	= 'Zim - Model slicing';
 $lang['select_hint']
 	= 'Select one preset setting to slice model';
 $lang['slice_button']

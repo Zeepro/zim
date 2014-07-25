@@ -4,10 +4,13 @@
 define('BASEPATH', '/var/www/');
 require("../application/config/config.php");
 
+// global $config;
+
 define('ERROR_OK',				0);
-define('ERROR_FILE_READ',		-1);
-define('ERROR_FILE_STRUCTURE',	-2);
-define('ERROR_FILE_WRITE',		-3);
+define('ERROR_FILE_READ',		1);
+define('ERROR_FILE_STRUCTURE',	2);
+define('ERROR_FILE_WRITE',		3);
+define('ERROR_NO_PRM',			4);
 
 // define('ERROR_OK',				200);
 define('ERROR_MISS_PRM',		432);
@@ -49,13 +52,18 @@ define('PRINTERSTATE_MAGIC_NUMBER_V4',	23570); //v1.3
 define('PRINTERSTATE_OFFSET_TEMPER',	100);
 define('PRINTERSTATE_OFFSET_TEMPER_V2',	150);
 
-define('CORESTATUS_TITLE_STATUS',	'State');
-define('CORESTATUS_VALUE_PRINT',	'printing');
+define('CORESTATUS_TITLE_STATUS',		'State');
+define('CORESTATUS_VALUE_PRINT',		'printing');
+define('CORESTATUS_TITLE_SUBSTATUS',	'Substate');
+define('CORESTATUS_VALUE_RECOVERY',		'recovery');
+define('CORESTATUS_VALUE_IDLE',			'idle');
 
+// define('RECOVER_FILE_CARTRIDGE_R',	'C:/wamp/sites/zim/data/hardconf/EXTRUDER_R_IN_PRINTING');
+// define('RECOVER_FILE_CARTRIDGE_L',	'C:/wamp/sites/zim/data/hardconf/EXTRUDER_L_IN_PRINTING');
 define('RECOVER_FILE_CARTRIDGE_R',	'/config/hardconf/EXTRUDER_R_IN_PRINTING');
 define('RECOVER_FILE_CARTRIDGE_L',	'/config/hardconf/EXTRUDER_L_IN_PRINTING');
 define('RECOVER_FILENAME_STATUS',	'Work.json');
-define('RECOVER_FILENAME_RUNCODE',	'_PrinterRecovery.gcode');
+define('RECOVER_FILENAME_RUNCODE',	'_printer_recovery.gcode');
 define('RECOVER_CMD_PREHEAT',		'M104 S');
 define('RECOVER_CMD_WAITHEAT',		'M109 S');
 define('RECOVER_CMD_EXTRUDE',		'G1 E50 F50');
@@ -63,7 +71,7 @@ define('RECOVER_OFFSET_ADDTEMPER',	30);
 define('RECOVER_VALUE_DEFAUTHEAT',	240);
 
 
-function PrinterLog__logToDebugFile($file, $msg, $prefix, $need_trim) {
+function PrinterLog__logToDebugFile($file, $msg, $prefix, $suffix, $need_trim) {
 	if ($need_trim == TRUE) {
 		$msg = trim($msg, " \t\n\r\0\x0B");
 	}
@@ -80,12 +88,39 @@ function PrinterLog__logToDebugFile($file, $msg, $prefix, $need_trim) {
 	}
 }
 
-function PrinterLog_logMessage($msg, $need_trim = TRUE) {
-	return PrinterLog__logToDebugFile($CFG->config['log_file'], $msg, "MSG: ", $need_trim);
+function PrinterLog__filterAppPath($filepath) {
+	$return_path = str_replace('/var/www/', '', $filepath);
+	return $return_path;
 }
 
-function PrinterLog_logError($msg, $need_trim = TRUE) {
-	return PrinterLog__logToDebugFile($CFG->config['log_file'], $msg, "ERR: ", $need_trim);
+function PrinterLog_logDebug($msg, $file = NULL, $line = NULL, $need_trim = TRUE) {
+	global $config;
+	$location = '';
+	if (!is_null($file) && !is_null($line)) {
+		$location = "\t(" . PrinterLog__filterAppPath($file) . ' ' . $line . ')';
+	}
+
+	return PrinterLog__logToDebugFile($config['log_file'], $msg, "DBG: ", $location, $need_trim);
+}
+
+function PrinterLog_logMessage($msg, $file = NULL, $line = NULL, $need_trim = TRUE) {
+	global $config;
+	$location = '';
+	if (!is_null($file) && !is_null($line)) {
+		$location = "\t(" . PrinterLog__filterAppPath($file) . ' ' . $line . ')';
+	}
+
+	return PrinterLog__logToDebugFile($config['log_file'], $msg, "MSG: ", $location, $need_trim);
+}
+
+function PrinterLog_logError($msg, $file = NULL, $line = NULL, $need_trim = TRUE) {
+	global $config;
+	$location = '';
+	if (!is_null($file) && !is_null($line)) {
+		$location = "\t(" . PrinterLog__filterAppPath($file) . ' ' . $line . ')';
+	}
+
+	return PrinterLog__logToDebugFile($config['log_file'], $msg, "ERR: ", $location, $need_trim);
 }
 
 function PrinterState_filterOutput(&$output, $trim_ok = TRUE) {
@@ -126,7 +161,7 @@ function PrinterState_filterOutput(&$output, $trim_ok = TRUE) {
 		}
 
 		if (empty($output)) {
-			PrinterLog_logMessage('no arduino return');
+			PrinterLog_logMessage('no arduino return', __FILE__, __LINE__);
 			return TRUE;
 		}
 
@@ -140,6 +175,7 @@ function PrinterState_filterOutput(&$output, $trim_ok = TRUE) {
 }
 
 function PrinterState_setRFIDPower($on = TRUE) {
+	global $config;
 	$arcontrol_fullpath = $config['arcontrol_c'];
 	$output = array();
 	$command = '';
@@ -156,9 +192,8 @@ function PrinterState_setRFIDPower($on = TRUE) {
 	if (!PrinterState_filterOutput($output)) {
 		return ERROR_INTERNAL;
 	}
-	PrinterLog_logArduino($command, $output);
 	if ($ret_val != ERROR_NORMAL_RC_OK) {
-		PrinterLog_logError('rfid power control command error');
+		PrinterLog_logError('rfid power control command error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
 
@@ -166,6 +201,7 @@ function PrinterState_setRFIDPower($on = TRUE) {
 }
 
 function PrinterState_getCartridgeCode(&$code_cartridge, $abb_cartridge, $power_off = TRUE) {
+	global $config;
 	$arcontrol_fullpath = $config['arcontrol_c'];
 	$command = '';
 	$output = array();
@@ -189,9 +225,8 @@ function PrinterState_getCartridgeCode(&$code_cartridge, $abb_cartridge, $power_
 	if (!PrinterState_filterOutput($output)) {
 		return ERROR_INTERNAL;
 	}
-	PrinterLog_logArduino($command, $output);
 	if ($ret_val != ERROR_NORMAL_RC_OK) {
-		PrinterLog_logError('rfid read command error');
+		PrinterLog_logError('rfid read command error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
 	else {
@@ -236,7 +271,7 @@ function PrinterState_getCartridgeTemper(&$temper_cartridge, $abb_cartridge, $po
 		}
 		$hex_checksum = hexdec(substr($last_output, 30, 2));
 		if ($hex_cal != $hex_checksum) {
-			PrinterLog_logError('checksum error, $hex_cal: ' . $hex_cal . ', $hex_data: ' . $hex_checksum);
+			PrinterLog_logError('checksum error, $hex_cal: ' . $hex_cal . ', $hex_data: ' . $hex_checksum, __FILE__, __LINE__);
 			return ERROR_INTERNAL; // checksum failed
 		}
 
@@ -260,7 +295,7 @@ function PrinterState_getCartridgeTemper(&$temper_cartridge, $abb_cartridge, $po
 				break;
 
 			default:
-				PrinterLog_logError('magic number error');
+				PrinterLog_logError('magic number error', __FILE__, __LINE__);
 				return ERROR_INTERNAL;
 				break;
 		}
@@ -285,13 +320,13 @@ function PrinterState_getCartridgeTemper(&$temper_cartridge, $abb_cartridge, $po
 		// normal extrusion temperature
 		$string_tmp = substr($last_output, $offset_temp, $length_temp);
 		if ($version_rfid == 3) {
-			$temp_cartridge = hexdec($string_tmp) + PRINTERSTATE_OFFSET_TEMPER_V2;
+			$temper_cartridge = hexdec($string_tmp) + PRINTERSTATE_OFFSET_TEMPER_V2;
 		}
 		else {
-			$temp_cartridge = hexdec($string_tmp) + PRINTERSTATE_OFFSET_TEMPER;
+			$temper_cartridge = hexdec($string_tmp) + PRINTERSTATE_OFFSET_TEMPER;
 		}
 	} else {
-		PrinterLog_logMessage('missing cartridge');
+		PrinterLog_logMessage('missing cartridge', __FILE__, __LINE__);
 		$temp_cartridge = NULL;
 		if ($abb_cartridge == 'l') {
 			return ERROR_MISS_LEFT_CART;
@@ -320,6 +355,21 @@ $array_common_start = array(
 	'G28 X', 'G28 Y', 'G90', 'M83', 'G1 X75 Y75 Z150'
 );
 $array_action = array();
+$parameter = NULL;
+
+
+if (empty($_GET) && !empty($argv)) {
+	$parameter = $argv[1];
+}
+else if (!empty($_GET)) {
+	$parameter = $_GET['p'];
+}
+else {
+	exit(ERROR_NO_PRM);
+}
+
+// delete old recovery gcode file if we have it
+@unlink($config['temp'] . RECOVER_FILENAME_RUNCODE);
 
 // check sd status and assign the right status json file to be checked
 if (is_writable($config['sdcard'])) {
@@ -353,18 +403,18 @@ if (file_exists($status_file)) {
 			--$retry;
 		}
 		else {
-			$json_status = json_decode($content);
+			$json_status = json_decode($content, TRUE);
 			break;
 		}
 	}
 	
 	if ($retry < 0) {
-		PrinterLog_logError('read json file error');
+		PrinterLog_logError('read json file error with retry ' . $status_file, __FILE__, __LINE__);
 		exit(ERROR_FILE_READ);
 	}
 }
 else {
-	PrinterLog_logError('read json file error');
+	PrinterLog_logError('read json file error ' . $status_file, __FILE__, __LINE__);
 	exit(ERROR_FILE_READ);
 }
 
@@ -373,14 +423,33 @@ if ($json_status === FALSE) {
 	exit(ERROR_FILE_STRUCTURE);
 }
 
+if ($parameter == 'stop') {
+	// change the status in work json file back to idle
+	$fp = fopen($status_file, 'w');
+	if ($fp) {
+		$json_status[CORESTATUS_TITLE_SUBSTATUS] = NULL;
+		$json_status[CORESTATUS_TITLE_STATUS] = CORESTATUS_VALUE_IDLE;
+		fwrite($fp, json_encode($json_status));
+		fclose($fp);
+	}
+	else {
+		PrinterLog_logError('status file error', __FILE__, __LINE__);
+		exit(ERROR_FILE_WRITE);
+	}
+	
+	exit(ERROR_OK);
+}
+
 // exit if not in printing when closing printer
-if ($json_status[CORESTATUS_TITLE_STATUS] != CORESTATUS_VALUE_PRINT) {
+if ($json_status[CORESTATUS_TITLE_STATUS] != CORESTATUS_VALUE_PRINT
+		&& ($json_status[CORESTATUS_TITLE_STATUS] == CORESTATUS_VALUE_RECOVERY
+				&& $json_status[CORESTATUS_TITLE_SUBSTATUS] != CORESTATUS_VALUE_PRINT)) {
 	exit(ERROR_OK);
 }
 
 // get the extruder array to do recovery action
 foreach ($array_checkfile as $abb => $checkfile) {
-	if (!file_exists($checkfile)) {
+	if (file_exists($checkfile)) {
 		$temper_cartridge = NULL;
 		$ret_val = PrinterState_getCartridgeTemper($temper_cartridge, $abb);
 		if ($ret_val == ERROR_OK) {
@@ -396,7 +465,17 @@ if (count($array_action)) {
 	$fp = NULL;
 	
 	// change the status in work json file to recovery
-	//TODO finish this part
+	$fp = fopen($status_file, 'w');
+	if ($fp) {
+		$json_status[CORESTATUS_TITLE_SUBSTATUS] = CORESTATUS_VALUE_PRINT;
+		$json_status[CORESTATUS_TITLE_STATUS] = CORESTATUS_VALUE_RECOVERY;
+		fwrite($fp, json_encode($json_status));
+		fclose($fp);
+	}
+	else {
+		PrinterLog_logError('status file error', __FILE__, __LINE__);
+		exit(ERROR_FILE_WRITE);
+	}
 	
 	// generate common part
 	$fp = fopen($config['temp'] . RECOVER_FILENAME_RUNCODE, 'w');
@@ -412,18 +491,20 @@ if (count($array_action)) {
 		// try to prime a fixed length to recover for each extruder
 		foreach ($array_action as $abb => $temper_cartridge) {
 			$command_extruder = $array_extruder[$abb];
-			// wait temperature
-			fwrite($fp, RECOVER_CMD_WAITHEAT . $temper_cartridge . $command_extruder . "\n");
 			// change extruder
 			fwrite($fp, trim($command_extruder) . "\n");
+			// wait temperature
+			fwrite($fp, RECOVER_CMD_WAITHEAT . $temper_cartridge . $command_extruder . "\n");
 			// extrude length
 			fwrite($fp, RECOVER_CMD_EXTRUDE . "\n");
 		}
 		
 		fclose($fp);
+		
+		exit(ERROR_OK);
 	}
 	else {
-		PrinterLog_logError('write gcode file error');
+		PrinterLog_logError('write gcode file error', __FILE__, __LINE__);
 		exit(ERROR_FILE_WRITE);
 	}
 }

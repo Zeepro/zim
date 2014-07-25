@@ -37,4 +37,24 @@ $lang['Yes']
 $lang['No']
 	= 'Non';
 
+//printdetail cancel()
+$lang['printdetail_cancel_pagetitle']
+	= 'Zim - Détails de l\'annulation';
+$lang['wait_hint_cancel']
+	= 'En attente d\'annulation...';
+$lang['finish_hint_cancel']
+	= 'Félicitations, votre impression est annulée !';
+
+//printdetail recovery()
+$lang['printdetail_recovery_pagetitle']
+	= 'Zim - Détails de la récupération';
+$lang['wait_hint_recovery']
+	= 'En attante de l\'imformation de récupération...';
+$lang['finish_hint_recovery']
+	= 'Félicitations, votre imprimante est récupérée!';
+$lang['wait_hint_recovery_printing']
+	= 'En attante de la récupération de l\'impression...';
+$lang['wait_hint_recovery_unknown']
+	= 'En attante de la récupération d\'un état inconnu...';
+
 ?>

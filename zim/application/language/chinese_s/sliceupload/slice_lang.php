@@ -1,6 +1,9 @@
 <?php
 $lang['home']
 	= '首页';
+
+$lang['sliceupload_slice_pagetitle']
+	= 'Zim - 分层分析模型';
 $lang['select_hint']
 	= '请选择一个预设用来分层分析模型';
 $lang['slice_button']

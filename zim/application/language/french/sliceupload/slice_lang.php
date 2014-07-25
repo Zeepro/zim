@@ -1,6 +1,9 @@
 <?php
 $lang['home']
 	= 'Accueil';
+
+$lang['sliceupload_slice_pagetitle']
+	= 'Zim - Slicing de modèle';
 $lang['select_hint']
 	= 'Sélectionner une configuration préset pour slicer le modèle';
 $lang['slice_button']

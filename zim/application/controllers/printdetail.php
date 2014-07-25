@@ -84,6 +84,36 @@ class Printdetail extends MY_Controller {
 		return;
 	}
 	
+	public function printmodel_temp() {
+		$mid = NULL;
+		$cr = 0;
+		$temperature_r = (int) $this->input->post('r');
+		$temperature_l = (int) $this->input->post('l');
+		$array_temper = array();
+		if ($temperature_r > 0) $array_temper['r'] = $temperature_r;
+		if ($temperature_l > 0) $array_temper['l'] = $temperature_l;
+		
+		// check model id, and then send it to print command
+		$this->load->helper('printer');
+		$mid = $this->input->get('id');
+		
+		if ($mid) {
+			$cr = Printer_printFromModel($mid, $array_temper);
+			if ($cr != ERROR_OK) {
+				$this->output->set_header('Location: /printmodel/listmodel');
+				return;
+			}
+		}
+		else {
+			$this->output->set_header('Location: /printmodel/listmodel');
+			return;
+		}
+		
+		$this->output->set_header('Location: /printdetail/status?id=' . $mid);
+		
+		return;
+	}
+	
 	public function printslice() {
 		$cr = 0;
 		
@@ -103,14 +133,15 @@ class Printdetail extends MY_Controller {
 	
 	public function printslice_temp() {
 		$cr = 0;
-		$temperature_r = $this->input->get('r');
-		$temperature_l = $this->input->get('l');
-		
-		//TODO change temperature here
+		$temperature_r = (int) $this->input->post('r');
+		$temperature_l = (int) $this->input->post('l');
+		$array_temper = array();
+		if ($temperature_r > 0) $array_temper['r'] = $temperature_r;
+		if ($temperature_l > 0) $array_temper['l'] = $temperature_l;
 		
 		$this->load->helper('printer');
 		
-		$cr = Printer_printFromSlice();
+		$cr = Printer_printFromSlice($array_temper);
 		if ($cr != ERROR_OK) {
 			$this->output->set_header('Location: /sliceupload/slice?callback');
 			return;
@@ -272,8 +303,8 @@ class Printdetail extends MY_Controller {
 			// parse the main body
 			$template_data = array(
 					'title'			=> t('Control your printing'),
-					'wait_info'		=> t('Waiting for canceling...'),
-					'finish_info'	=> t('Congratulation, your printing is canceled!'),
+					'wait_info'		=> t('wait_hint_cancel'),
+					'finish_info'	=> t('finish_hint_cancel'),
 					'return_button'	=> t('Home'),
 					'return_url'	=> '/',
 					'video_url'		=> $this->config->item('video_url'),
@@ -284,7 +315,7 @@ class Printdetail extends MY_Controller {
 			// parse all page
 			$template_data = array(
 					'lang'			=> $this->config->item('language_abbr'),
-					'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Calceling details') . '</title>',
+					'headers'		=> '<title>' . t('printdetail_cancel_pagetitle') . '</title>',
 					'contents'		=> $body_page,
 			);
 			
@@ -302,18 +333,50 @@ class Printdetail extends MY_Controller {
 		return;
 	}
 	
+	public function recovery() {
+		$ret_val = NULL;
+		//TODO finish me for canceling
+		$this->load->helper('printer');
+		$this->load->library('parser');
+		$this->lang->load('printdetail', $this->config->item('language'));
+		
+		// parse the main body
+		$template_data = array(
+				'title'			=> t('Control your printing'),
+				'wait_info'		=> t('wait_hint_recovery'),
+				'finish_info'	=> t('finish_hint_recovery'),
+				'return_button'	=> t('Home'),
+				'return_url'	=> '/',
+		);
+		
+		$body_page = $this->parser->parse('template/printdetail/recovery', $template_data, TRUE);
+		
+		// parse all page
+		$template_data = array(
+				'lang'			=> $this->config->item('language_abbr'),
+				'headers'		=> '<title>' . t('printdetail_recovery_pagetitle') . '</title>',
+				'contents'		=> $body_page,
+		);
+		
+		$this->parser->parse('template/basetemplate', $template_data);
+		
+		return;
+	}
+	
 	public function cancel_ajax() {
 		//TODO finish me for canceling
 		$template_data = array();
 		$ret_val = 0;
-		$data_status = array();
+// 		$data_status = array();
 		
-		$this->load->helper(array('printer', 'timedisplay'));
+// 		$this->load->helper(array('printer', 'timedisplay'));
+		$this->load->helper('printer');
 		$this->load->library('parser');
 		$this->lang->load('printdetail', $this->config->item('language'));
-		$this->lang->load('timedisplay', $this->config->item('language'));
+// 		$this->lang->load('timedisplay', $this->config->item('language'));
 		
-		$ret_val = Printer_checkCancelStatus($data_status);
+// 		$ret_val = Printer_checkCancelStatus($data_status);
+		$ret_val = Printer_checkCancelStatus();
 		if ($ret_val == FALSE) {
 			$this->load->helper('corestatus');
 			$ret_val = CoreStatus_setInIdle();
@@ -348,9 +411,59 @@ class Printdetail extends MY_Controller {
 		
 		// parse the ajax part
 		$template_data = array(
-				'wait_info'	=> t('In canceling'),
+				'wait_info'	=> t('wait_hint_cancel'),
 		);
 		$this->parser->parse('template/printdetail/cancel_ajax', $template_data);
+		
+		$this->output->set_content_type('text/plain; charset=UTF-8');
+		
+		return;
+	}
+	
+	public function recovery_ajax() {
+		//TODO finish me for recovery
+		$template_data = array();
+		$ret_val = 0;
+		$status_current = NULL;
+		$data_status = array();
+		
+		$this->load->helper('corestatus');
+		$this->load->library('parser');
+		$this->lang->load('printdetail', $this->config->item('language'));
+		
+		$template_data = array(
+				'wait_info'	=> t('wait_hint_recovery'),
+		);
+		
+		$ret_val = CoreStatus_checkInIdle($status_current, $data_status);
+		if ($ret_val == TRUE) {
+			// log recovery finish
+			$this->load->helper('printerlog');
+			PrinterLog_logMessage('recovery status finish', __FILE__, __LINE__);
+			
+			$this->output->set_status_header(202);
+			return;
+		}
+		else if ($status_current == CORESTATUS_VALUE_RECOVERY) {
+			if ($data_status[CORESTATUS_TITLE_SUBSTATUS] == CORESTATUS_VALUE_PRINT) {
+				$template_data['wait_info'] = t('wait_hint_recovery_printing');
+			}
+			else {
+				$template_data['wait_info'] = t('wait_hint_recovery_unknown');
+				$this->load->helper('printerlog');
+				PrinterLog_logError('unknown substatus value in recovery ' . $data_status[CORESTATUS_TITLE_SUBSTATUS], __FILE__, __LINE__);
+			}
+		}
+		else {
+			$this->output->set_status_header(403);
+			
+			$this->load->helper('printerlog');
+			PrinterLog_logError('call recovery status check when not in recovery', __FILE__, __LINE__);
+			return;
+		}
+		
+		// parse the ajax part
+		$this->parser->parse('template/printdetail/cancel_ajax', $template_data); // we can use the same view for recovery
 		
 		$this->output->set_content_type('text/plain; charset=UTF-8');
 		

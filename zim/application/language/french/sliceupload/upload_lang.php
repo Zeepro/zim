@@ -4,6 +4,8 @@ $lang['back']
 	= 'retour';
 
 // upload
+$lang['sliceupload_upload_pagetitle']
+	= 'Zim - Chargement de modèle';
 $lang['select_hint']
 	= 'Selectionner et charger un fichier (.stl, .obj, .amf)';
 $lang['upload_button']

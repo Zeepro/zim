@@ -4,6 +4,8 @@ $lang['back']
 	= 'back';
 
 // upload
+$lang['sliceupload_upload_pagetitle']
+	= 'Zim - Upload model';
 $lang['select_hint']
 	= 'Select and upload a file (.stl, .obj, .amf)';
 $lang['upload_button']

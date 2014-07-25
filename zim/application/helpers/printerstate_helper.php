@@ -796,6 +796,105 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge, $pow
 	return ERROR_OK;
 }
 
+function PrinterState_setCartridgeAsArray($abb_cartridge, $data_json = array()) {
+	$temp_hex = NULL;
+	$time_code = NULL;
+	$time_offset = NULL;
+	$time_rfid = NULL;
+	$code_write = dechex(PRINTERSTATE_MAGIC_NUMBER_V4); // use always the latest version
+	
+	// check necessary key
+	foreach (array(PRINTERSTATE_TITLE_INITIAL, PRINTERSTATE_TITLE_EXT_TEMPER) as $test_key) {
+		if (!array_key_exists($test_key, $data_json)) {
+			return ERROR_MISS_PRM;
+		}
+	}
+	
+	// type of cartridge
+	if (array_key_exists(PRINTERSTATE_TITLE_TYPE, $data_json)) {
+		$code_write .= dechex($data_json[PRINTERSTATE_TITLE_TYPE]);
+	}
+	else {
+		$code_write .= dechex(PRINTERSTATE_VALUE_CARTRIDGE_NORMAL); // normal as default
+	}
+	// type of  material
+	if (array_key_exists(PRINTERSTATE_TITLE_MATERIAL, $data_json)) {
+		$code_write .= dechex($data_json[PRINTERSTATE_TITLE_MATERIAL]);
+	}
+	else {
+		$code_write .= dechex(PRINTERSTATE_VALUE_MATERIAL_ABS); // abs as default
+	}
+	// color
+	if (array_key_exists(PRINTERSTATE_TITLE_COLOR, $data_json)) {
+		$code_write .= $data_json[PRINTERSTATE_TITLE_COLOR];
+	}
+	else {
+		$code_write .= 'FFFFFF'; // white as default
+	}
+	// inital quantity
+	$temp_hex = dechex($data_json[PRINTERSTATE_TITLE_INITIAL]);
+	while (strlen($temp_hex) < 5) {
+		$temp_hex = '0' . $temp_hex;
+	}
+	$code_write .= $temp_hex;
+	// used quantity
+	if (array_key_exists(PRINTERSTATE_TITLE_USED, $data_json)) {
+		$code_write .= dechex($data_json[PRINTERSTATE_TITLE_USED]);
+	}
+	else {
+		$code_write .= '00000'; // 0 as default
+	}
+	// normal extrusion temperature
+	$temp_hex = dechex($data_json[PRINTERSTATE_TITLE_EXT_TEMPER] - PRINTERSTATE_OFFSET_TEMPER);
+	if (strlen($temp_hex) == 1) {
+		$temp_hex = '0' . $temp_hex;
+	}
+	$code_write .= $temp_hex;
+	// first layer extrusion temperature
+	$temp_hex = dechex($data_json[PRINTERSTATE_TITLE_EXT_TEMPER] - PRINTERSTATE_OFFSET_TEMPER + 10);
+	if (strlen($temp_hex) == 1) {
+		$temp_hex = '0' . $temp_hex;
+	}
+	$code_write .= $temp_hex;
+	// package date
+	if (array_key_exists(PRINTERSTATE_TITLE_SETUP_DATE, $data_json)) {
+		$time_code = dechex($data_json[PRINTERSTATE_TITLE_SETUP_DATE]);
+	}
+	else {
+		$time_code = gmmktime(); // use current date as default
+	}
+	$time_offset = gmmktime(0, 0, 0, 1, 1, PRINTERSTATE_OFFSET_YEAR_SETUP_DATE);
+	$time_rfid = ($time_code - $time_offset) / 60 / 60 / 24;
+	$temp_hex = strtoupper(dechex($time_rfid));
+	while (strlen($temp_hex) < 4) {
+		$temp_hex = '0' . $temp_hex;
+	}
+	$code_write .= $temp_hex;
+	
+	// check length
+	if (strlen($code_write) != 30) {
+		return ERROR_INTERNAL;
+	}
+	
+	// Checksum
+	$temp_hex = 0;
+	for($i=0; $i<=14; $i++) {
+		$string_tmp = substr($code_write, $i*2, 2);
+		$hex_tmp = hexdec($string_tmp);
+		$temp_hex = $temp_hex ^ $hex_tmp;
+	}
+	$temp_hex = dechex($temp_hex);
+	if (strlen($temp_hex) == 1) {
+		$temp_hex = '0' . $temp_hex;
+	}
+	$code_write .= $temp_hex;
+	
+	// change to uppercase
+	$code_write = strtoupper($code_write);
+	
+	return PrinterState_setCartridgeCode($code_write, $abb_cartridge);
+}
+
 function PrinterState_checkFilaments($array_filament = array(
 		PRINTERSTATE_SET_EXTRUDR => 0, PRINTERSTATE_SET_EXTRUDL => 0),
 		&$data_json_array = array()) {

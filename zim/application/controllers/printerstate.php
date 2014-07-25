@@ -74,6 +74,23 @@ class Printerstate extends MY_Controller {
 		return;
 	}
 	
+	private function _display_changecartridge_write_cartridge($next_phase = PRINTERSTATE_CHANGECART_WAIT_F_C, $need_filament = 0) {
+		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
+		$template_data = array (
+				'next_phase'	=> $next_phase,
+				'color_label'	=> t('color_label'),
+				'temper_label'	=> t('temper_label'),
+				'length_label'	=> t('length_label'),
+				'write_button'	=> t('write_button'),
+				'length_min'	=> ceil($need_filament / 1000) + 2,
+		);
+		$this->_display_changecartridge_base('template/printerstate/changecartridge_ajax/cartridge', $template_data);
+		
+		$this->output->set_status_header(202); // disable checking
+		
+		return;
+	}
+	
 	private function _display_changecartridge_wait_load_filament($change_able = FALSE, $id_model = NULL, $abb_cartridge = NULL) {
 		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
 		if ($change_able == TRUE) {
@@ -622,7 +639,16 @@ class Printerstate extends MY_Controller {
 				
 				$ret_val = PrinterState_checkFilament($abb_cartridge, $need_filament, $temp_data, FALSE);
 				if ($ret_val == $code_miss_filament) {
-					$this->_display_changecartridge_wait_load_filament(FALSE);
+					//TODO add a new temporary page here
+// 					$this->_display_changecartridge_wait_load_filament(FALSE);
+// 					if ($temp_data[PRINTERSTATE_TITLE_CARTRIDGE] == PRINTERSTATE_DESP_CARTRIDGE_REFILL) {
+// 						$this->_display_changecartridge_write_cartridge();
+// 					}
+// 					else {
+// 						$this->_display_changecartridge_wait_load_filament(FALSE);
+// 					}
+					$this->_display_changecartridge_write_cartridge(PRINTERSTATE_CHANGECART_WAIT_F, $need_filament);
+					
 					
 					// turn off RFID power after changing
 					$ret_val = PrinterState_setRFIDPower(FALSE);
@@ -742,6 +768,42 @@ class Printerstate extends MY_Controller {
 			case 'detail':
 				$id_model = $this->input->get('id');
 				$this->_display_changecartridge_cartridge_detail($abb_cartridge, $id_model);
+				break;
+				
+			case 'write':
+				$ret_val = 0;
+				$array_data = array();
+				$color = $this->input->get('c');
+				$temper = (int) $this->input->get('t');
+				$length = (int) $this->input->get('l') * 1000;
+				$abb_cartridge = $this->input->get('v');
+				
+				//TODO finish here to write RFID card
+				// change color from name to hex code
+				$this->load->helper('printlist');
+				$ret_val = ModelList__changeColorName($color);
+				if ($ret_val == ERROR_WRONG_PRM) {
+					$this->output->set_status_header(404);
+					
+					$this->load->helper('printerlog');
+					PrinterLog_logMessage('unknown color name: ' . $color, __FILE__, __LINE__);
+					break;
+				}
+				$color = str_replace('#', '', $color);
+				$array_data = array(
+						PRINTERSTATE_TITLE_COLOR		=> $color,
+						PRINTERSTATE_TITLE_EXT_TEMPER	=> $temper,
+						PRINTERSTATE_TITLE_INITIAL		=> $length,
+				);
+				$ret_val = PrinterState_setCartridgeAsArray($abb_cartridge, $array_data);
+				if ($ret_val != ERROR_OK) {
+					$this->output->set_status_header(403);
+					
+					$this->load->helper('printerlog');
+					PrinterLog_logMessage('write rfid error: ' . $ret_val, __FILE__, __LINE__);
+					break;
+				}
+				
 				break;
 				
 			default:

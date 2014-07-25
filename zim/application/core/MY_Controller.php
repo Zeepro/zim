@@ -66,6 +66,12 @@ class MY_Controller extends CI_Controller {
 			// check working issue
 			else if (!CoreStatus_checkInIdle($status_current)) {
 				switch($status_current) {
+					case CORESTATUS_VALUE_RECOVERY: //TODO finish and test me
+						if (CoreStatus_checkCallRecovery($url_redirect)) {
+							return; // we are calling the right page
+						}
+						break;
+						
 					case CORESTATUS_VALUE_PRINT:
 						if (CoreStatus_checkCallPrinting($url_redirect)) {
 							return; // we are calling the right page
@@ -92,7 +98,6 @@ class MY_Controller extends CI_Controller {
 						break;
 						
 					case CORESTATUS_VALUE_SLICE:
-						//TODO finish here
 						if (CoreStatus_checkCallSlicing($url_redirect)) {
 							return;
 						}

@@ -19,6 +19,7 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_TITLE_STARTTIME',	'StartDate');
 // 	define('CORESTATUS_TITLE_LASTERROR',	'LastError');
 // 	define('CORESTATUS_TITLE_LASTSTATUS',	'LastState');
+	define('CORESTATUS_TITLE_SUBSTATUS',	'Substate');
 	
 	define('CORESTATUS_VALUE_IDLE',				'idle');
 	define('CORESTATUS_VALUE_PRINT',			'printing');
@@ -31,6 +32,7 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_VALUE_SLICE',			'slicing');
 	define('CORESTATUS_VALUE_SLICED',			'sliced');
 // 	define('CORESTATUS_VALUE_UPGRADE',			'upgrading');
+	define('CORESTATUS_VALUE_RECOVERY',			'recovery');
 	
 	define('CORESTATUS_CMD_CHECK_SD',		'echo writable > ');
 	define('CORESTATUS_SUFFIX_CONF',		'conf/');
@@ -121,7 +123,7 @@ function CoreStatus_initialFile() {
 		if ($fp) {
 			fwrite($fp, json_encode($data_json));
 			fclose($fp);
-			chmod($fp, 0777);
+			chmod($fp, '0777');
 		}
 		else {
 			return FALSE;
@@ -228,7 +230,7 @@ function CoreStatus_checkCallConnection(&$url_redirect = '') {
 }
 
 function CoreStatus_checkCallPrinting(&$url_redirect = '') {
-	$url_redirect = '/printdetail/status';
+	$url_redirect = '/printdetail/recovery';
 	
 	return CoreStatus__checkCallURI(array(
 			'/printdetail/status'		=> NULL,
@@ -266,6 +268,16 @@ function CoreStatus_checkCallUnloading(&$url_redirect = '') {
 			),
 			'/printerstate/changecartridge_ajax'	=> NULL,
 			'/printerstate/changecartridge_action'	=> NULL,
+	));
+}
+
+function CoreStatus_checkCallRecovery(&$url_redirect = '') {
+	//TODO finish and test me
+	$url_redirect = '/printdetail/recovery';
+	
+	return CoreStatus__checkCallURI(array(
+			'/printdetail/recovery'			=> NULL,
+			'/printdetail/recovery_ajax'	=> NULL,
 	));
 }
 

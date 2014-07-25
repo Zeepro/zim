@@ -95,7 +95,7 @@ function ZimAPI_initialFile() {
 		if ($fp) {
 			fwrite($fp, json_encode($data_json));
 			fclose($fp);
-			chmod($fp, 0777);
+			chmod($fp, '0777');
 		}
 		else {
 			return FALSE;

@@ -1,4 +1,4 @@
-<div data-role="page" data-url="/printerstate/changecartridge">
+<div data-role="page" id="home" data-url="/printerstate/changecartridge">
 	<header data-role="header" class="page-header">
 		<a href="javascript:history.back();" data-icon="back" data-ajax="false">{back}</a>
 	</header>
@@ -102,6 +102,20 @@ function inputUserChoice(action) {
 			checkChangeStatus();
 			break;
 
+		case 'write':
+			var_action = $.ajax({
+				url: "/printerstate/changecartridge_action/write",
+				type: "GET",
+				data: {
+					c: $("#showPaletteOnly").val(),
+					t: $("#temper_input").val(),
+					l: $("#length_input").val(),
+					v: "{abb_cartridge}"
+					},
+				cache: false,
+			});
+			break;
+
 		default:
 // 			alert("unknown action");
 			return false;
@@ -110,6 +124,9 @@ function inputUserChoice(action) {
 
 	if (var_action) {
 		var_action.done(function() {
+			if ($('#showPaletteOnly').length > 0) {
+				$('#showPaletteOnly').spectrum('destroy');
+			}
 // 			alert("done choice");
 			checkChangeStatus();
 		}).fail(function() {

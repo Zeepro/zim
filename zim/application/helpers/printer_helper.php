@@ -129,26 +129,30 @@ function Printer_printFromPrime($abb_extruder, $first_run = TRUE) {
 	return $ret_val;
 }
 
-function Printer_printFromModel($id_model, $stop_printing = FALSE) {
+// function Printer_printFromModel($id_model, $stop_printing = FALSE) {
+function Printer_printFromModel($id_model, $array_temper = array()) {
 	$gcode_path = NULL;
 	$ret_val = 0;
 	
 	$ret_val = Printer__getFileFromModel($id_model, $gcode_path);
 	if (($ret_val == ERROR_OK) && $gcode_path) {
-		// modify the temperature of gcode file according to cartridge info
-		//TODO test me
-		$ret_val = Printer__changeTemperature($gcode_path);
+		// temporary change - modify the temperature of gcode file according to cartridge info
+		//TODO test me and remove me if it is necessary
+// 		$ret_val = Printer__changeTemperature($gcode_path);
+		$ret_val = Printer__changeTemperature($gcode_path, $array_temper);
+		// temporary change end
 		if ($ret_val != ERROR_OK) {
 			return $ret_val;
 		}
 		
-		$ret_val = Printer_printFromFile($gcode_path, TRUE, $stop_printing);
+// 		$ret_val = Printer_printFromFile($gcode_path, TRUE, $stop_printing);
+		$ret_val = Printer_printFromFile($gcode_path, TRUE);
 	}
 	
 	return $ret_val;
 }
 
-function Printer_printFromSlice() {
+function Printer_printFromSlice($array_temper = array()) {
 	$ret_val = 0;
 	
 	$CI = &get_instance();
@@ -158,6 +162,16 @@ function Printer_printFromSlice() {
 	if (!file_exists($gcode_path)) {
 		return ERROR_NO_SLICED;
 	}
+	
+	// temporary change
+	//TODO remove me if it is necessary
+	if (count($array_temper)) {
+		$ret_val = Printer__changeTemperature($gcode_path, $array_temper);
+		if ($ret_val != ERROR_OK) {
+			return $ret_val;
+		}
+	}
+	// temporary change end
 	
 	$ret_val = Printer_printFromFile($gcode_path);
 	
@@ -308,17 +322,17 @@ function Printer_stopPrint() {
 				return FALSE;
 			}
 			
-			// start to call printing of a special model to reset printer
-			$cr = Printer_printFromModel(ModelList_codeModelHash(PRINTLIST_MODEL_CANCEL), TRUE);
-			if ($cr == ERROR_OK) {
-				return TRUE;
-			}
-			else {
-				// log error here
-				$CI->load->helper('printerlog');
-				PrinterLog_logError('start printing canceling model failed', __FILE__, __LINE__);
-				return FALSE;
-			}
+// 			// start to call printing of a special model to reset printer
+// 			$cr = Printer_printFromModel(ModelList_codeModelHash(PRINTLIST_MODEL_CANCEL), TRUE);
+// 			if ($cr == ERROR_OK) {
+// 				return TRUE;
+// 			}
+// 			else {
+// 				// log error here
+// 				$CI->load->helper('printerlog');
+// 				PrinterLog_logError('start printing canceling model failed', __FILE__, __LINE__);
+// 				return FALSE;
+// 			}
 		}
 	}
 	else {
@@ -589,36 +603,36 @@ function Printer_checkPauseStatus() {
 }
 
 // internal function
-function Printer__getStartTemperatureFromModel($id_model, &$array_temper) {
-	$gcode_path = NULL;
-	$ret_val = 0;
-	
-	$ret_val = Printer__getFileFromModel($id_model, $gcode_path);
-	if (($ret_val == ERROR_OK) && $gcode_path) {
-		$ret_val = Printer__getStartTemperatureFromFile($gcode_path, $temper_l, $temper_r);
-	}
-	
-	return $ret_val;
-}
-
-function Printer__getStartTemperatureFromFile($gcode_path, &$array_temper) {
-// 	$command = '';
-// 	$output = array();
+// function Printer__getStartTemperatureFromModel($id_model, &$array_temper) {
+// 	$gcode_path = NULL;
 // 	$ret_val = 0;
 	
-	//TODO get the right start temperature here
-	$lines = @file($gcode_path, FILE_SKIP_EMPTY_LINES);
-	if (count($lines) == 0) {
-		return ERROR_INTERNAL; // file not found
-	}
+// 	$ret_val = Printer__getFileFromModel($id_model, $gcode_path);
+// 	if (($ret_val == ERROR_OK) && $gcode_path) {
+// 		$ret_val = Printer__getStartTemperatureFromFile($gcode_path, $temper_l, $temper_r);
+// 	}
+	
+// 	return $ret_val;
+// }
+
+// function Printer__getStartTemperatureFromFile($gcode_path, &$array_temper) {
+// // 	$command = '';
+// // 	$output = array();
+// // 	$ret_val = 0;
+	
+// 	//TO/DO get the right start temperature here
+// 	$lines = @file($gcode_path, FILE_SKIP_EMPTY_LINES);
+// 	if (count($lines) == 0) {
+// 		return ERROR_INTERNAL; // file not found
+// 	}
 	
 	
 	
-	$temper_l = 200;
-	$temper_r = 210;
+// 	$temper_l = 200;
+// 	$temper_r = 210;
 	
-	return ERROR_OK;
-}
+// 	return ERROR_OK;
+// }
 
 function Printer__getFileFromModel($id_model, &$gcode_path, $filename = NULL) {
 	$model_path = NULL;
@@ -662,11 +676,11 @@ function Printer__getFileFromModel($id_model, &$gcode_path, $filename = NULL) {
 	return ERROR_OK; // never reach here
 }
 
-function Printer__changeTemperature(&$gcode_path) {
-	$temp_r = 0;
-	$temp_rs = 0;
-	$temp_l = 0;
-	$temp_ls = 0;
+function Printer__changeTemperature(&$gcode_path, $array_temper = array()) {
+	$temp_r = 0; // right normal temper
+	$temp_rs = 0; // right start temper
+	$temp_l = 0; // left normal temper
+	$temp_ls = 0; // left start temper
 	$cr = 0;
 	$command = '';
 	$output = array();
@@ -680,6 +694,15 @@ function Printer__changeTemperature(&$gcode_path) {
 		$temp_r = $json_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER];
 		$temp_rs = $json_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1];
 	}
+	// temporary change - make it possible to change temperature not according to cartridge
+	//TODO remove me when it is necessary
+	if (array_key_exists('r', $array_temper)) {
+		$temp_r = $array_temper['r'];
+		if ($temp_r > $temp_rs) {
+			$temp_rs = $temp_r;
+		}
+	}
+	// temporary change end
 	if ($temp_r * $temp_rs == 0) {
 		// we have at least one value not initialised to call change temper program
 		return ($cr == ERROR_OK) ? ERROR_INTERNAL : $cr;
@@ -694,6 +717,15 @@ function Printer__changeTemperature(&$gcode_path) {
 		else if ($cr == ERROR_MISS_LEFT_CART) {
 			$temp_l = $temp_ls = PRINTER_VALUE_DEFAULT_TEMPER;
 		}
+		// temporary change - make it possible to change temperature not according to cartridge
+		//TODO remove me when it is necessary
+		if (array_key_exists('l', $array_temper)) {
+			$temp_l = $array_temper['l'];
+			if ($temp_l > $temp_ls) {
+				$temp_ls = $temp_l;
+			}
+		}
+		// temporary change end
 		if ($temp_l * $temp_ls == 0) {
 			// we have at least one value not initialised to call change temper program
 			return ($cr == ERROR_OK) ? ERROR_INTERNAL : $cr;
@@ -704,6 +736,7 @@ function Printer__changeTemperature(&$gcode_path) {
 			. PRINTER_PRM_TEMPER_R_F . $temp_rs . PRINTER_PRM_TEMPER_R_N . $temp_r
 			. PRINTER_PRM_TEMPER_L_F . $temp_ls . PRINTER_PRM_TEMPER_L_N . $temp_l
 			. PRINTER_PRM_FILE . $gcode_path . ' > ' . $gcode_path . '.new';
+	
 	//TODO remove the debug message after test
 	$CI->load->helper('printerlog');
 	PrinterLog_logDebug('change temperature: ' . $command, __FILE__, __LINE__);

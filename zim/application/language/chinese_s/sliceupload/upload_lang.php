@@ -4,6 +4,8 @@ $lang['back']
 	= '返回';
 
 // upload
+$lang['sliceupload_upload_pagetitle']
+	= 'Zim - 上传模型';
 $lang['select_hint']
 	= '选择并上传一个文件（.stl .obj .amf）';
 $lang['upload_button']
