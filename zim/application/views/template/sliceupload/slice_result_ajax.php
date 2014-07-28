@@ -5,7 +5,6 @@
 						</div>
 						<p>{state_f_l}</p>
 						<p>{temper_l} °C</p>
-						<input type="range" value="{temper_l}" />
 					</div></div>
 					<div class="ui-block-b"><div id="right_cartridge" class="ui-bar ui-bar-f">
 						<div style="width: 75px; height: 75px; background-color: {cartridge_c_r}; margin: 0 auto;">
@@ -13,8 +12,15 @@
 						</div>
 						<p>{state_f_r}</p>
 						<p>{temper_r} °C</p>
-						<input type="range" value="{temper_r}" />
 					</div></div>
+				</div>
+				<div id="temper_l">
+					<label>Left temperature</label>
+					<input type="range" id="slider_left" value="{temper_l}" min="160" max="260" />
+				</div>
+				<div id="temper_r">
+					<label>Right temperature</label>
+					<input type="range" id="slider_right" value="{temper_r}" min="160" max="260" />
 				</div>
 				<p style="text-align: left;">{error_msg}</p>
 
@@ -33,6 +39,24 @@ $('<button>').appendTo('#detail_zone')
 .attr({'id': 'print_slice', 'onclick': 'javascript: window.location.href="/printdetail/printslice";'}).html('{print_button}')
 .button().button('refresh');
 
+console.log("1");
+if ($("#slider_left").attr('value') == "---")
+	$("#temper_l").css('display', 'none');
+if ($("#slider_right").attr('value') == "---")
+	$("#temper_r").css('display', 'none');
+
+var tmp = $("#slider_right").val();
+
+$("#slider_right").attr('min', tmp - 10); 
+$("#slider_right").attr('max', parseInt(tmp) + 10);
+
+tmp = $("#slider_left").val();
+
+$("#slider_left").attr('min', tmp - 10); 
+$("#slider_left").attr('max', parseInt(tmp) + 10);
+
+$('#detail_zone').trigger("create");
+	
 if (var_enable_print == false) {
 	$("button#print_slice").button("disable");
 }

@@ -108,7 +108,7 @@ $lang['save_as_title']
 $lang['layer_height']
 	= 'Layer height';
 $lang['first_layer_height']
-	= 'First layer height';
+	= 'First layer height (mm or %)';
 $lang['perimeters']
 	= 'Perimeters (minimum)';
 $lang['spiral_vase']
