@@ -39,7 +39,6 @@ $('<button>').appendTo('#detail_zone')
 .attr({'id': 'print_slice', 'onclick': 'javascript: window.location.href="/printdetail/printslice";'}).html('{print_button}')
 .button().button('refresh');
 
-console.log("1");
 if ($("#slider_left").attr('value') == "---")
 	$("#temper_l").css('display', 'none');
 if ($("#slider_right").attr('value') == "---")
