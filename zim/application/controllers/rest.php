@@ -1347,44 +1347,9 @@ class Rest extends MY_Controller {
 	
 	public function platformprint() {
 		$cr = 0;
-		$file_temp_data = NULL;
 		
-		$this->load->helper(array('printerstate', 'slicer', 'json'));
-		
-		$file_temp_data = $this->config->item('temp') . SLICER_FILE_TEMP_DATA;
-		$temp_json = json_read($file_temp_data, TRUE);
-		if (isset($temp_json['error'])) {
-			$this->load->helper('printerlog');
-			PrinterLog_logError('read temp data file error', __FILE__, __LINE__);
-			$cr = ERROR_INTERNAL;
-		}
-		else {
-			$data_json = $temp_json['json'];
-			$cr = ERROR_OK;
-			foreach ($data_json as $abb_filament => $array_temp) {
-				$data_cartridge = array();
-				$tmp_ret = 0;
-				$volume_need = $array_temp[PRINTERSTATE_TITLE_NEED_L];
-				
-				$tmp_ret = PrinterState_checkFilament($abb_filament, $volume_need, $data_cartridge);
-				$array_data[$abb_filament] = array(
-						PRINTERSTATE_TITLE_COLOR		=> $data_cartridge[PRINTERSTATE_TITLE_COLOR],
-						PRINTERSTATE_TITLE_EXT_TEMPER	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER],
-						PRINTERSTATE_TITLE_EXT_TEMP_1	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1],
-						PRINTERSTATE_TITLE_NEED_L		=> $volume_need,
-				);
-				// only assign return code when success to make a tour of used cartridges
-				if ($cr == ERROR_OK) {
-					$cr = $tmp_ret;
-				}
-			}
-		}
-		
-		if ($cr == ERROR_OK) {
-			$this->load->helper('printer');
-			
-			$cr = Printer_printFromSlice();
-		}
+		$this->load->helper('printer');
+		$cr = Printer_printFromSlice();
 		
 		$this->_return_cr($cr);
 		

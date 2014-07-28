@@ -10,18 +10,6 @@ $CI->load->helper(array (
 		'json',
 ));
 
-// if (!defined('PRINTER_PRINTING_JSON')) {
-// 	define('PRINTER_PRINTING_JSON',	'printing.json');
-	
-// 	define('PRINTER_TITLE_FILE',		'file');
-// 	define('PRINTER_TITLE_STATUS',		'status');
-// 	define('PRINTER_TITLE_START_T_L',	'left_start_temperature');
-// 	define('PRINTER_TITLE_START_T_R',	'right_start_temperature');
-	
-// 	define('PRINTER_VALUE_STATUS_HEAT',		'heat');
-// 	define('PRINTER_VALUE_STATUS_PRINT',	'print');
-	
-// }
 if (!defined('PRINTER_FN_CHARGE')) {
 	define('PRINTER_FN_CHARGE',			'_charge.gcode');
 	define('PRINTER_FN_RETRACT',		'_retract.gcode');
@@ -64,20 +52,20 @@ function Printer_preparePrint($need_prime = TRUE) {
 		@unlink($CI->config->item('temp') . PRINTER_FN_PRINTPRIME_R);
 	}
 	
-	$cr = Printer__getFileFromModel(ModelList_codeModelHash(PRINTLIST_MODEL_CHARGE),
-			$gcode_path, PRINTER_FN_CHARGE);
-	if ($cr != ERROR_OK) {
-		$CI->load->helper('printerlog');
-		PrinterLog_logError('prepare charge gcode error', __FILE__, __LINE__);
-		return $cr;
-	}
-	$cr = Printer__getFileFromModel(ModelList_codeModelHash(PRINTLIST_MODEL_RETRACT),
-			$gcode_path, PRINTER_FN_RETRACT);
-	if ($cr != ERROR_OK) {
-		$CI->load->helper('printerlog');
-		PrinterLog_logError('prepare retract gcode error', __FILE__, __LINE__);
-		return $cr;
-	}
+// 	$cr = Printer__getFileFromModel(ModelList_codeModelHash(PRINTLIST_MODEL_CHARGE),
+// 			$gcode_path, PRINTER_FN_CHARGE);
+// 	if ($cr != ERROR_OK) {
+// 		$CI->load->helper('printerlog');
+// 		PrinterLog_logError('prepare charge gcode error', __FILE__, __LINE__);
+// 		return $cr;
+// 	}
+// 	$cr = Printer__getFileFromModel(ModelList_codeModelHash(PRINTLIST_MODEL_RETRACT),
+// 			$gcode_path, PRINTER_FN_RETRACT);
+// 	if ($cr != ERROR_OK) {
+// 		$CI->load->helper('printerlog');
+// 		PrinterLog_logError('prepare retract gcode error', __FILE__, __LINE__);
+// 		return $cr;
+// 	}
 	
 	return ERROR_OK;
 }
@@ -87,6 +75,7 @@ function Printer_printFromPrime($abb_extruder, $first_run = TRUE) {
 	$gcode_path = NULL;
 	$ret_val = 0;
 	$id_model = '';
+	$array_info = array();
 	
 	$CI = &get_instance();
 	$CI->load->helper('printlist');
@@ -114,8 +103,10 @@ function Printer_printFromPrime($abb_extruder, $first_run = TRUE) {
 	}
 	$id_model = ModelList_codeModelHash($name_prime);
 	
-	$ret_val = Printer__getFileFromModel($id_model, $gcode_path);
+	$ret_val = Printer__getFileFromModel($id_model, $gcode_path, NULL, $array_info);
 	if (($ret_val == ERROR_OK) && $gcode_path) {
+		$array_filament = array();
+		
 		// modify the temperature of gcode file according to cartridge info
 		//TODO test me
 		$ret_val = Printer__changeTemperature($gcode_path);
@@ -123,7 +114,12 @@ function Printer_printFromPrime($abb_extruder, $first_run = TRUE) {
 			return $ret_val;
 		}
 		
-		$ret_val = Printer_printFromFile($gcode_path, FALSE);
+		if (Printer__getLengthFromJson($array_info, $array_filament)) {
+			$ret_val = Printer_printFromFile($gcode_path, FALSE, $array_filament);
+		}
+		else {
+			$ret_val = ERROR_INTERNAL;
+		}
 	}
 	
 	return $ret_val;
@@ -133,9 +129,12 @@ function Printer_printFromPrime($abb_extruder, $first_run = TRUE) {
 function Printer_printFromModel($id_model, $array_temper = array()) {
 	$gcode_path = NULL;
 	$ret_val = 0;
+	$array_info = array();
 	
-	$ret_val = Printer__getFileFromModel($id_model, $gcode_path);
+	$ret_val = Printer__getFileFromModel($id_model, $gcode_path, NULL, $array_info);
 	if (($ret_val == ERROR_OK) && $gcode_path) {
+		$array_filament = array();
+		
 		// temporary change - modify the temperature of gcode file according to cartridge info
 		//TODO test me and remove me if it is necessary
 // 		$ret_val = Printer__changeTemperature($gcode_path);
@@ -146,7 +145,12 @@ function Printer_printFromModel($id_model, $array_temper = array()) {
 		}
 		
 // 		$ret_val = Printer_printFromFile($gcode_path, TRUE, $stop_printing);
-		$ret_val = Printer_printFromFile($gcode_path, TRUE);
+		if (Printer__getLengthFromJson($array_info, $array_filament)) {
+			$ret_val = Printer_printFromFile($gcode_path, TRUE, $array_filament);
+		}
+		else {
+			$ret_val = ERROR_INTERNAL;
+		}
 	}
 	
 	return $ret_val;
@@ -154,6 +158,8 @@ function Printer_printFromModel($id_model, $array_temper = array()) {
 
 function Printer_printFromSlice($array_temper = array()) {
 	$ret_val = 0;
+	$file_temp_data = NULL;
+	$temp_json = array();
 	
 	$CI = &get_instance();
 	$CI->load->helper('slicer');
@@ -161,6 +167,33 @@ function Printer_printFromSlice($array_temper = array()) {
 	
 	if (!file_exists($gcode_path)) {
 		return ERROR_NO_SLICED;
+	}
+	
+	// check filaments
+	//TODO test me
+	$CI->load->helper(array('printerstate', 'json'));
+	
+	$file_temp_data = $CI->config->item('temp') . SLICER_FILE_TEMP_DATA;
+	$temp_json = json_read($file_temp_data, TRUE);
+	if (isset($temp_json['error'])) {
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('read temp data file error', __FILE__, __LINE__);
+		$ret_val = ERROR_INTERNAL;
+	}
+	else {
+		//TODO move all the verification of filament into printFromFile by array_filament
+		$data_json = $temp_json['json'];
+		$ret_val = ERROR_OK;
+		foreach ($data_json as $abb_filament => $array_temp) {
+			$tmp_ret = PrinterState_checkFilament($abb_filament, $array_temp[PRINTERSTATE_TITLE_NEED_L]);
+			// only assign return code when success to make a tour of used cartridges
+			if ($ret_val == ERROR_OK) {
+				$ret_val = $tmp_ret;
+			}
+		}
+	}
+	if ($ret_val != ERROR_OK) {
+		return $ret_val; // directly return when having error
 	}
 	
 	// temporary change
@@ -178,7 +211,8 @@ function Printer_printFromSlice($array_temper = array()) {
 	return $ret_val;
 }
 
-function Printer_printFromFile($gcode_path, $need_prime = TRUE, $stop_printing = FALSE) {
+// function Printer_printFromFile($gcode_path, $need_prime = TRUE, $stop_printing = FALSE) {
+function Printer_printFromFile($gcode_path, $need_prime = TRUE, $array_filament = array()) {
 	global $CFG;
 	$command = '';
 	$output = array();
@@ -193,7 +227,7 @@ function Printer_printFromFile($gcode_path, $need_prime = TRUE, $stop_printing =
 	}
 
 	// only check if we are in printing when we are not called stopping printing
-	if ($stop_printing == FALSE) {
+// 	if ($stop_printing == FALSE) {
 		// check if in printing
 		$ret_val = PrinterState_checkInPrint();
 		if ($ret_val == TRUE) {
@@ -201,7 +235,7 @@ function Printer_printFromFile($gcode_path, $need_prime = TRUE, $stop_printing =
 			PrinterLog_logMessage('already in printing', __FILE__, __LINE__);
 			return ERROR_BUSY_PRINTER;
 		}
-	}
+// 	}
 	
 	// check extruder number
 	if (PrinterState_getNbExtruder() < 2) {
@@ -221,11 +255,10 @@ function Printer_printFromFile($gcode_path, $need_prime = TRUE, $stop_printing =
 	}
 
 	// check if having enough filament
-	//TODO get the quantity of filament needed by file
-// 	$ret_val = PrinterState_checkFilaments();
-// 	if ($ret_val != ERROR_OK) {
-// 		return $ret_val;
-// 	}
+	$ret_val = PrinterState_checkFilaments($array_filament);
+	if ($ret_val != ERROR_OK) {
+		return $ret_val;
+	}
 	
 	// prepare subprinting gcode files
 	$ret_val = Printer_preparePrint($need_prime);
@@ -233,7 +266,7 @@ function Printer_printFromFile($gcode_path, $need_prime = TRUE, $stop_printing =
 		return $ret_val;
 	}
 	
-	if ($stop_printing == FALSE) {
+// 	if ($stop_printing == FALSE) {
 		if ($CFG->config['simulator']) {
 			// just set temperature for simulation
 			PrinterState_setExtruder('r');
@@ -245,10 +278,10 @@ function Printer_printFromFile($gcode_path, $need_prime = TRUE, $stop_printing =
 	
 		// change status json file
 		$ret_val = CoreStatus_setInPrinting();
-	}
-	else {
-		$ret_val = CoreStatus_setInCanceling();
-	}
+// 	}
+// 	else {
+// 		$ret_val = CoreStatus_setInCanceling();
+// 	}
 	if ($ret_val == FALSE) {
 		return ERROR_INTERNAL;
 	}
@@ -322,6 +355,12 @@ function Printer_stopPrint() {
 				return FALSE;
 			}
 			
+			// set status in cancelling
+			if (!CoreStatus_setInCanceling()) {
+				$CI->load->helper('printerlog');
+				PrinterLog_logError('can not set status in cancel', __FILE__, __LINE__);
+				return FALSE;
+			}
 // 			// start to call printing of a special model to reset printer
 // 			$cr = Printer_printFromModel(ModelList_codeModelHash(PRINTLIST_MODEL_CANCEL), TRUE);
 // 			if ($cr == ERROR_OK) {
@@ -406,117 +445,6 @@ function Printer_resumePrint() {
 	
 	return FALSE;
 }
-
-// function Printer_startPrintingStatusFromModel($id_model) {
-// 	$gcode_path = NULL;
-// 	$ret_val = 0;
-	
-// 	$ret_val = Printer__getFileFromModel($id_model, $gcode_path);
-// 	if (($ret_val == ERROR_OK) && $gcode_path) {
-// 		$ret_val = Printer_startPrintingStatusFromFile($gcode_path);
-// 	}
-	
-// 	return $ret_val;
-// }
-
-// function Printer_startPrintingStatusFromFile($gcode_path) {
-// 	global $CFG;
-// 	$start_temper_l = 0;
-// 	$start_temper_r = 0;
-// 	$fh = 0;
-// 	$ret_val = 0;
-// 	$json_data = array();
-// 	$CI = NULL;
-	
-// 	// get start temperature
-// 	// need update because of Printer__getStartTemperature
-// 	$ret_val = Printer__getStartTemperatureFromFile($gcode_path, $start_temper_l, $start_temper_r);
-// 	if ($ret_val != ERROR_OK) {
-// 		return $ret_val;
-// 	}
-	
-// 	// start to heat extruder
-// 	$CI = &get_instance();
-// 	$CI->load->helper('printerstate');
-// 	$ret_val = PrinterState_setExtruder('r');
-// 	if ($ret_val != ERROR_OK) {
-// 		return $ret_val;
-// 	}
-// 	$ret_val = PrinterState_setTemperature($start_temper_r, 'e');
-// 	if ($ret_val != ERROR_OK) {
-// 		return $ret_val;
-// 	}
-// 	$ret_val = PrinterState_setExtruder('l');
-// 	if ($ret_val != ERROR_OK) {
-// 		return $ret_val;
-// 	}
-// 	$ret_val = PrinterState_setTemperature($start_temper_l, 'e');
-// 	if ($ret_val != ERROR_OK) {
-// 		return $ret_val;
-// 	}
-	
-// 	// generate and write json file data
-// 	$json_data = array (
-// 			PRINTER_TITLE_FILE		=> $gcode_path,
-// 			PRINTER_TITLE_STATUS	=> PRINTER_VALUE_STATUS_HEAT,
-// 			PRINTER_TITLE_START_T_L	=> $start_temper_l,
-// 			PRINTER_TITLE_START_T_R	=> $start_temper_r,
-// 	);
-	
-// 	$fh = fopen($CFG->config ['conf'] . PRINTER_PRINTING_JSON, 'w');
-// 	fwrite($fh, json_encode($json_data));
-// 	fclose($fh);
-	
-// 	return ERROR_OK;
-// }
-
-// // return TRUE only when we have reached extruder's start temperature 
-// function Printer_checkStartTemperature(&$return_data) {
-// 	global $CFG;
-// 	$json_data = array();
-// 	$temper_status = array();
-// 	$printing_status = '';
-// 	$ret_val = 0;
-	
-// 	$CI = &get_instance();
-// 	$CI->load->helper('printerstate');
-
-// 	// check if we are in heating phase in printing json status file
-// 	$ret_val = Printer_getStatus($printing_status, $json_data);
-// 	if ($ret_val == FALSE) {
-// 		return FALSE;
-// 	}
-// 	if ($printing_status != PRINTER_VALUE_STATUS_HEAT) {
-// 		return FALSE;
-// 	}
-	
-// 	$temper_status = PrinterState_getExtruderTemperaturesAsArray();
-	
-// 	// generate return data array
-// 	$return_data = array(
-// 			'left_current'	=> $temper_status[PRINTERSTATE_LEFT_EXTRUD],
-// 			'left_goal'		=> $json_data[PRINTER_TITLE_START_T_L],
-// 			'right_current'	=> $temper_status[PRINTERSTATE_RIGHT_EXTRUD],
-// 			'right_goal'	=> $json_data[PRINTER_TITLE_START_T_R],
-// 	);
-	
-// 	if ($temper_status[PRINTERSTATE_LEFT_EXTRUD] == $json_data[PRINTER_TITLE_START_T_L]
-// 			&& $temper_status[PRINTERSTATE_RIGHT_EXTRUD] == $json_data[PRINTER_TITLE_START_T_R]) {
-// 		// generate and overwrite new printing status json file
-// 		$json_data[PRINTER_TITLE_STATUS] = PRINTER_VALUE_STATUS_PRINT;
-// 		unset($json_data[PRINTER_TITLE_START_T_L]);
-// 		unset($json_data[PRINTER_TITLE_START_T_R]);
-
-// 		$fh = fopen($CFG->config ['conf'] . PRINTER_PRINTING_JSON, 'w');
-// 		fwrite($fh, json_encode($json_data));
-// 		fclose($fh);
-		
-// 		return TRUE;
-// 	}
-// 	else {
-// 		return FALSE;
-// 	}
-// }
 
 // return TRUE only when we are in printing
 function Printer_checkPrintStatus(&$return_data) {
@@ -603,38 +531,7 @@ function Printer_checkPauseStatus() {
 }
 
 // internal function
-// function Printer__getStartTemperatureFromModel($id_model, &$array_temper) {
-// 	$gcode_path = NULL;
-// 	$ret_val = 0;
-	
-// 	$ret_val = Printer__getFileFromModel($id_model, $gcode_path);
-// 	if (($ret_val == ERROR_OK) && $gcode_path) {
-// 		$ret_val = Printer__getStartTemperatureFromFile($gcode_path, $temper_l, $temper_r);
-// 	}
-	
-// 	return $ret_val;
-// }
-
-// function Printer__getStartTemperatureFromFile($gcode_path, &$array_temper) {
-// // 	$command = '';
-// // 	$output = array();
-// // 	$ret_val = 0;
-	
-// 	//TO/DO get the right start temperature here
-// 	$lines = @file($gcode_path, FILE_SKIP_EMPTY_LINES);
-// 	if (count($lines) == 0) {
-// 		return ERROR_INTERNAL; // file not found
-// 	}
-	
-	
-	
-// 	$temper_l = 200;
-// 	$temper_r = 210;
-	
-// 	return ERROR_OK;
-// }
-
-function Printer__getFileFromModel($id_model, &$gcode_path, $filename = NULL) {
+function Printer__getFileFromModel($id_model, &$gcode_path, $filename = NULL, &$array_info = NULL) {
 	$model_path = NULL;
 	$bz2_path = NULL;
 	$command = '';
@@ -648,6 +545,21 @@ function Printer__getFileFromModel($id_model, &$gcode_path, $filename = NULL) {
 	if (($model_cr == ERROR_OK) && $model_path) {
 		$ret_val = 0;
 		
+		// get json info
+		if (is_array($array_info)) {
+			$json_data = array();
+			
+			try {
+				$json_data = json_read($model_path . PRINTLIST_FILE_JSON, TRUE);
+				if ($json_data['error']) {
+					throw new Exception('read json error');
+				}
+			} catch (Exception $e) {
+				return ERROR_INTERNAL;
+			}
+			
+			$array_info = $json_data['json'];
+		}
 //		//if we don't fix the filename of gcode
 // 		try {
 // 			$json_data = json_read($model_path . PRINTLIST_FILE_JSON);
@@ -674,6 +586,27 @@ function Printer__getFileFromModel($id_model, &$gcode_path, $filename = NULL) {
 	}
 	
 	return ERROR_OK; // never reach here
+}
+
+function Printer__getLengthFromJson($array_info, &$array_filament) {
+	$CI = &get_instance();
+	$CI->load->helper('printlist');
+	
+	if (!is_array($array_info)
+			|| !array_key_exists(PRINTLIST_TITLE_LENG_F1, $array_info)
+			|| !array_key_exists(PRINTLIST_TITLE_LENG_F2, $array_info)) {
+		return FALSE;
+	}
+	$array_filament = array();
+	
+	if ($array_info[PRINTLIST_TITLE_LENG_F1] > 0) {
+		$array_filament['r'] = $array_info[PRINTLIST_TITLE_LENG_F1];
+	}
+	if ($array_info[PRINTLIST_TITLE_LENG_F2] > 0) {
+		$array_filament['l'] = $array_info[PRINTLIST_TITLE_LENG_F2];
+	}
+	
+	return TRUE;
 }
 
 function Printer__changeTemperature(&$gcode_path, $array_temper = array()) {

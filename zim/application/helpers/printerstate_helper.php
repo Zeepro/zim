@@ -895,9 +895,7 @@ function PrinterState_setCartridgeAsArray($abb_cartridge, $data_json = array()) 
 	return PrinterState_setCartridgeCode($code_write, $abb_cartridge);
 }
 
-function PrinterState_checkFilaments($array_filament = array(
-		PRINTERSTATE_SET_EXTRUDR => 0, PRINTERSTATE_SET_EXTRUDL => 0),
-		&$data_json_array = array()) {
+function PrinterState_checkFilaments($array_filament = array(), &$data_json_array = array()) {
 	$ret_val = 0;
 	$need_filament = 0;
 	$data_json = array();
@@ -920,7 +918,8 @@ function PrinterState_checkFilaments($array_filament = array(
 	
 	foreach($array_abb as $abb_cartridge) {
 		$need_filament = ($abb_cartridge == 'r')
-		? $array_filament[PRINTERSTATE_SET_EXTRUDR] : $array_filament[PRINTERSTATE_SET_EXTRUDL];
+		? (array_key_exists('r', $array_filament) ? $array_filament['r'] : 0)
+		: (array_key_exists('l', $array_filament) ? $array_filament['l'] : 0);
 		
 		// jump checking if not needed
 		if ($need_filament == 0) {
