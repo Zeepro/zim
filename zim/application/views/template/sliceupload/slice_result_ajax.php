@@ -5,6 +5,7 @@
 						</div>
 						<p>{state_f_l}</p>
 						<p>{temper_l} °C</p>
+						<input type="range" value="{temper_l}" />
 					</div></div>
 					<div class="ui-block-b"><div id="right_cartridge" class="ui-bar ui-bar-f">
 						<div style="width: 75px; height: 75px; background-color: {cartridge_c_r}; margin: 0 auto;">
@@ -12,6 +13,7 @@
 						</div>
 						<p>{state_f_r}</p>
 						<p>{temper_r} °C</p>
+						<input type="range" value="{temper_r}" />
 					</div></div>
 				</div>
 				<p style="text-align: left;">{error_msg}</p>
