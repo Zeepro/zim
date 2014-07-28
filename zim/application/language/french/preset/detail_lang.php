@@ -9,227 +9,227 @@ $lang['switch_on']
 	= 'Allumé';
 
 $lang['preset_detail_pagetitle']
-	= 'Zim - Détail de slicer preset';
+	= 'Zim - Jeu de paramètres';
 $lang['new_preset_title']
-	= 'Nouveau preset';
+	= 'Nouveau jeu de paramètres';
 $lang['submit_button']
 	= 'Enregistrer';
 
 $lang['fill_pattern1']
-= 'rectilinear';
+= 'croisé';
 $lang['fill_pattern2']
-= 'line';
+= 'parallèles';
 $lang['fill_pattern3']
-= 'concentric';
+= 'concentrique';
 $lang['fill_pattern4']
-= 'honeycomb';
+= 'nid d\'abeille';
 $lang['fill_pattern5']
-= 'hilbertcurve';
+= 'hilbert';
 $lang['fill_pattern6']
-= 'archimedeanchords (slow)';
+= 'parabolique (lent)';
 $lang['fill_pattern7']
-= 'octagramspiral (slow)';
+= 'octogonal (lent)';
 $lang['solid_fill_pattern1']
-= 'rectilinear';
+= 'croisé';
 $lang['solid_fill_pattern2']
-= 'concentric';
+= 'concentrique';
 $lang['solid_fill_pattern3']
-= 'hilbertcurve (slow)';
+= 'hilbert (lent)';
 $lang['solid_fill_pattern4']
-= 'archimedeanchords (slow)';
+= 'parabolique (lent)';
 $lang['solid_fill_pattern5']
-= 'octagramspiral (slow)';
+= 'octogonal (lent)';
 $lang['support_material_pattern1']
-= 'rectilinear';
+= 'croisé';
 $lang['support_material_pattern2']
-= 'rectilinear grid';
+= 'grille';
 $lang['support_material_pattern3']
-= 'honeycomb';
+= 'nid d\abeille';
 
 $lang['layer_perimeter_title']
-	= 'Layers and perimeters';
+	= 'Couche et périmètres';
 $lang['layer_perimeter_subtitle1']
-	= 'Layer height';
+	= 'Epaisseur';
 $lang['layer_perimeter_subtitle2']
-	= 'Vertical shells';
+	= 'Surfaces verticales';
 $lang['layer_perimeter_subtitle3']
-	= 'Horizontal shells';
+	= 'Surfaces horizontales';
 $lang['layer_perimeter_subtitle4']
-	= 'Quality (slower slicing)';
+	= 'Qualité (calcul plus lent)';
 $lang['layer_perimeter_subtitle5']
-	= 'Advanced';
+	= 'Avancé';
 $lang['infill_title']
-	= 'Infill';
+	= 'Remplissage';
 $lang['infill_subtitle1']
-	= 'Infill';
+	= 'Remplissage';
 $lang['infill_subtitle2']
-	= 'Reducing printing time';
+	= 'Réduction du temps d\'impression';
 $lang['infill_subtitle3']
-	= 'Advanced';
+	= 'Avancé';
 $lang['speed_title']
-	= 'Speed';
+	= 'Vitesse';
 $lang['speed_subtitle1']
-	= 'Speed for print moves';
+	= 'Déplacements en cours d\'impression';
 $lang['speed_subtitle2']
-	= 'Speed for non-print moves';
+	= 'Déplacements sans impression';
 $lang['speed_subtitle3']
 	= 'Modifiers';
 $lang['skirt_brim_title']
-	= 'Skirt and brim';
+	= 'Jupe et tapis';
 $lang['skirt_brim_subtitle1']
-	= 'Skirt';
+	= 'Jupe';
 $lang['skirt_brim_subtitle2']
-	= 'Brim';
+	= 'Tapis';
 $lang['support_material_title']
-	= 'Support Material';
+	= 'Matériel de support';
 $lang['support_material_subtitle1']
-	= 'Support Material';
+	= 'Matériel de support';
 $lang['support_material_subtitle2']
-	= 'Raft';
+	= 'Base';
 $lang['support_material_subtitle3']
-	= 'Options for support material and raft';
+	= 'Options pour les supports et la base';
 $lang['mutiple_extruder_title']
-	= 'Multiple extruders';
+	= 'Extrudeurs multiples';
 $lang['mutiple_extruder_subtitle1']
-	= 'Extruders';
+	= 'Extrudeurs';
 $lang['mutiple_extruder_subtitle2']
-	= 'Ooze prevention';
+	= 'Limitation des écoulements';
 $lang['advanced_title']
-	= 'Advanced';
+	= 'Avancé';
 $lang['advanced_subtitle1']
-	= 'Extrusion width';
+	= 'Largeur d\'extrusion';
 $lang['advanced_subtitle2']
-	= 'Flow';
+	= 'Flux';
 $lang['advanced_subtitle3']
-	= 'Other';
+	= 'Autre';
 $lang['save_as_title']
-	= 'Save as';
+	= 'Sauver sous';
 
 $lang['layer_height']
-	= 'Layer height';
+	= 'Epaisseur';
 $lang['first_layer_height']
-	= 'First layer height';
+	= 'Epaisseur de la première couche';
 $lang['perimeters']
-	= 'Perimeters (minimum)';
+	= 'Périmètres (minimum)';
 $lang['spiral_vase']
-	= 'Spiral vase';
+	= 'Elévation en spiral';
 $lang['top_solid_layers']
-	= 'Top';
+	= 'Couches de renfort supérieures';
 $lang['bottom_solid_layers']
-	= 'Bottom';
+	= 'Couches de renfort inférieures';
 $lang['extra_perimeters']
-	= 'Extra perimeters if needed';
+	= 'Périmètres supplémentaires en cas de besoin';
 $lang['avoid_crossing_perimeters']
-	= 'Avoid crossing perimeters';
+	= 'Eviter les croisements de périmètres';
 $lang['start_perimeters_at_concave_points']
-	= 'Concave points';
+	= 'Zones concaves';
 $lang['start_perimeters_at_non_overhang']
-	= 'Non-overhang points';
+	= 'Eviter les zones en surplomb';
 $lang['thin_walls']
-	= 'Detect thin walls';
+	= 'Détection des murs fins';
 $lang['overhangs']
-	= 'Detect bridging perimeters';
+	= 'Détection des périmètres en surplomb';
 $lang['randomize_start']
-	= 'Randomize starting points';
+	= 'Point de départ aléatoire';
 $lang['external_perimeters_first']
-	= 'External perimeters first';
+	= 'Périmètre extérieur en premier';
 $lang['fill_density']
-	= 'Fill density';
+	= 'Densité de remplissage';
 $lang['fill_pattern']
-	= 'Fill pattern';
+	= 'Remplissage';
 $lang['solid_fill_pattern']
-	= 'Top/bottom fill pattern';
+	= 'Remplissage des zones de renfort';
 $lang['infill_every_layers']
 	= 'Combine infill every (layers)';
 $lang['infill_only_where_needed']
-	= 'Only infill where needed';
+	= 'Remplissage seulement lorque c\'est nécessaire';
 $lang['solid_infill_every_layers']
-	= 'Solid infill every (layers)';
+	= 'Couche de renfort chaque (nb couches)';
 $lang['fill_angle']
-	= 'Fill angle (°)';
+	= 'Angle de remplissage (°)';
 $lang['solid_infill_below_area']
-	= 'Solid infill threshold area (mm²)';
+	= 'Surface de remplissage minimum (mm²)';
 $lang['only_retract_when_crossing_perimeters']
-	= 'Only retract when crossing perimeters';
+	= 'Rétraction limité au passage de périmètres';
 $lang['infill_first']
-	= 'Infill before perimeters';
+	= 'Création du remplissage avant celle des périmètres';
 $lang['perimeter_speed']
-	= 'Perimeters (mm/s)';
+	= 'Périmètres (mm/s)';
 $lang['small_perimeter_speed']
-	= 'Small perimeters (mm/s or %%)';
+	= 'Petits périmètres (mm/s or %%)';
 $lang['external_perimeter_speed']
-	= 'External perimeters (mm/s or %%)';
+	= 'Périmètres externes (mm/s or %%)';
 $lang['infill_speed']
-	= 'Infill (mm/s)';
+	= 'Remplissage (mm/s)';
 $lang['solid_infill_speed']
-	= 'Solid infill (mm/s or %%)';
+	= 'Couches de renfort (mm/s or %%)';
 $lang['top_solid_infill_speed']
-	= 'Top solid infill (mm/s or %%)';
+	= 'Surfaces (mm/s or %%)';
 $lang['support_material_speed']
-	= 'Support material (mm/s)';
+	= 'Matériau de support (mm/s)';
 $lang['bridge_speed']
-	= 'Bridges (mm/s)';
+	= 'Ponts (mm/s)';
 $lang['gap_fill_speed']
-	= 'Gap fill (mm/s)';
+	= 'Espaces (mm/s)';
 $lang['travel_speed']
-	= 'Travel (mm/s)';
+	= 'Déplacement (mm/s)';
 $lang['first_layer_speed']
-	= 'First layer speed (mm/s or %%)';
+	= 'Première couche (mm/s or %%)';
 $lang['skirts']
-	= 'Loops';
+	= 'Tours';
 $lang['skirt_distance']
-	= 'Distance from object (mm)';
+	= 'Distance audu modèle (mm)';
 $lang['skirt_height']
-	= 'Skirt height (layers)';
+	= 'Hauteur (nb couches)';
 $lang['min_skirt_length']
-	= 'Minimum extrusion length (mm)';
+	= 'Longueur minimum (mm)';
 $lang['brim_width']
-	= 'Brim width (mm)';
+	= 'Largeur du tapis (mm)';
 $lang['support_material']
-	= 'Generate support material';
+	= 'Génération des supports';
 $lang['support_material_threshold']
-	= 'Overhang threshold (°)';
+	= 'Angle limite (°)';
 $lang['support_material_enforce_layers']
-	= 'Enforce support for the first (layers)';
+	= 'Renforcement des premiers supports (nb couches)';
 $lang['raft_layers']
-	= 'Raft layers (layers)';
+	= 'Epaisseur de la base (nb couches)';
 $lang['support_material_pattern']
-	= 'Pattern';
+	= 'Type de support';
 $lang['support_material_spacing']
-	= 'Pattern spacing (mm)';
+	= 'Espacement (mm)';
 $lang['support_material_angle']
-	= 'Pattern angle (°)';
+	= 'Angle (°)';
 $lang['support_material_interface_layers']
-	= 'Interface layers (layers)';
+	= 'Couches intermédiaires (nb couches)';
 $lang['support_material_interface_spacing']
-	= 'Interface pattern spacing (mm)';
+	= 'Espace intermédiaire (mm)';
 $lang['perimeter_extruder']
-	= 'Perimeter extruder';
+	= 'Extrudeur des périmètres';
 $lang['infill_extruder']
-	= 'Infill extruder';
+	= 'Extrudeur du replissage';
 $lang['support_material_extruder']
-	= 'Support material extruder';
+	= 'Extrudeur des supports';
 $lang['support_material_interface_extruder']
-	= 'Support material interface extruder';
+	= 'Extrudeur des couches intermédiaires';
 $lang['ooze_prevention']
-	= 'Enable';
+	= 'Activé';
 $lang['standby_temperature_delta']
-	= 'Temperature variation (∆°C)';
+	= 'Variation de température (∆°C)';
 $lang['extrusion_width']
-	= 'Default extrusion width (mm or %%, leave 0 for auto)';
+	= 'Largeur d\'extrusion par défaut (mm or %%, leave 0 for auto)';
 $lang['first_layer_extrusion_width']
-	= 'First layer (mm or %%, leave 0 for default)';
+	= 'Premier niveau (mm or %%, leave 0 for default)';
 $lang['perimeter_extrusion_width']
-	= 'Perimeters (mm or %%, leave 0 for default)';
+	= 'Périmètres (mm or %%, leave 0 for default)';
 $lang['infill_extrusion_width']
-	= 'Infill (mm or %%, leave 0 for default)';
+	= 'Remplissage (mm or %%, leave 0 for default)';
 $lang['solid_infill_extrusion_width']
-	= 'Solid infill (mm or %%, leave 0 for default)';
+	= 'Surfaces (mm or %%, leave 0 for default)';
 $lang['top_infill_extrusion_width']
-	= 'Top solid infill (mm or %%, leave 0 for default)';
+	= 'Renforts (mm or %%, leave 0 for default)';
 $lang['support_material_extrusion_width']
-	= 'Support material (mm or %%, leave 0 for default)';
+	= 'Supports (mm or %%, leave 0 for default)';
 $lang['bridge_flow_ratio']
-	= 'Bridge flow ratio';
+	= 'Ratio de pont';
 $lang['resolution']
-	= 'Resolution (mm)';
+	= 'Résolution (mm)';
