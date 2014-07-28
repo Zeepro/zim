@@ -1,4 +1,4 @@
-<div data-role="page">
+<div id="detailPage" data-role="page">
 	<header data-role="header" class="page-header">
 		<a href="javascript:history.back();" data-icon="back" data-ajax="false">{back}</a>
 	</header>

@@ -8,7 +8,7 @@
 <!-- 			<h2>{title}</h2> -->
 			<ul data-role="listview" id="listview" class="shadowBox" data-inset="true" data-filter="true" data-filter-placeholder="{search_hint}" data-filter-theme="d">
 				{model_lists}
-				<li><a href="{baseurl_detail}?id={id}">
+				<li><a href="{baseurl_detail}?id={id}" data-ajax=false>
 					<img src="{image}">
 					<h2>{name}</h2></a>
 				</li>
