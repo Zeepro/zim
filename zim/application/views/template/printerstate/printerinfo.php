@@ -11,6 +11,7 @@
 				<div class="ui-block-b"><div class="ui-bar ui-bar-c" style="height:2em;">{value}</div></div>
 				{/array_info}
 			</div>
+			<a href="/activation" data-role="button">{button_sso}</a>
 		</div>
 	</div>
 </div>

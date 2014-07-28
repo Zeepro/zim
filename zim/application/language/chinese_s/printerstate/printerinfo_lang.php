@@ -17,3 +17,7 @@ $lang['extruder_title']
 	= '打印头数量';
 $lang['marlin_title']
 	= '硬件版本';
+$lang['button_active_sso']
+	= '激活您的打印机';
+$lang['button_rename_sso']
+	= '重命名您的打印机';

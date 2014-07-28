@@ -382,15 +382,22 @@ class Connection extends MY_Controller {
 	public function confirmation() {
 		$template_data = array();
 		$body_page = NULL;
+		$hostname = NULL;
 		
 		$this->load->library('parser');
+		$this->load->helper('zimapi');
 		$this->lang->load('connection/master', $this->config->item('language'));
 		$this->lang->load('connection/confirmation', $this->config->item('language'));
+		
+		if (ERROR_OK != ZimAPI_getHostname($hostname)) {
+			$this->load->helper('printerlog');
+			PrinterLog_logError('can not get hostname', __FILE__, __LINE__);
+		}
 		
 		// parse the main body
 		$template_data = array(
 				'thank_you'	=> t('thank you'),
-				'confirm'	=> t("confirmation text"),
+				'confirm'	=> t("confirmation text", array($hostname, $hostname)),
 		);
 		
 		$body_page = $this->parser->parse('template/connection/confirmation', $template_data, TRUE);

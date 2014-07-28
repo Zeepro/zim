@@ -15,6 +15,9 @@ $lang['serial_title']
 	= 'Numéro série de l\'imprimante';
 $lang['extruder_title']
 	= 'Nombre des extrudeurs';
-
 $lang['marlin_title']
 	= 'Version de firmware';
+$lang['button_active_sso']
+	= 'Activer votre imprimante';
+$lang['button_rename_sso']
+	= 'Renomer votre imprimante';

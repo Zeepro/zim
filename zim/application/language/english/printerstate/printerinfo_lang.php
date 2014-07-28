@@ -17,3 +17,7 @@ $lang['extruder_title']
 	= 'Number of extruders';
 $lang['marlin_title']
 	= 'Firmware version';
+$lang['button_active_sso']
+	= 'Activate your printer';
+$lang['button_rename_sso']
+	= 'Rename your printer';
