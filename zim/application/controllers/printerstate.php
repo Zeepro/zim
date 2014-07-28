@@ -348,10 +348,12 @@ class Printerstate extends MY_Controller {
 		$body_page = NULL;
 		$temp_info = array();
 		$array_info = array();
+		$sso_name = NULL;
 		
-		$this->load->helper('printerstate');
+		$this->load->helper(array('printerstate', 'zimapi'));
 		$this->load->library('parser');
 		$this->lang->load('printerstate/printerinfo', $this->config->item('language'));
+		ZimAPI_getPrinterSSOName($sso_name);
 		
 		$temp_info = PrinterState_getInfoAsArray();
 		$array_info = array(
@@ -385,6 +387,7 @@ class Printerstate extends MY_Controller {
 		$template_data = array(
 				'array_info'	=> $array_info,
 				'back'			=> t('back'),
+				'button_sso'	=> ($sso_name == NULL) ? t('button_active_sso') : t('button_rename_sso'),
 		);
 		
 		$body_page = $this->parser->parse('template/printerstate/printerinfo', $template_data, TRUE);
