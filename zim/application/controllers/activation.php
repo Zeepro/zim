@@ -7,12 +7,12 @@ class Activation extends MY_Controller
 		$network_ok = false;
 		$this->load->library('parser');
 
-		if (!(file_get_contents("http://sso.zeepro.com/login.ashx") === FALSE))
+		if (!(@file_get_contents("http://sso.zeepro.com/login.ashx") === FALSE))
 		{
 			$network_ok = true;
 		}
 		
-		$body_page = $this->parser->parse('/template/activation/' . ($network_ok ? 'index' : 'error'), array(), TRUE);
+		$body_page = $this->parser->parse('/template/activation/' . ($network_ok ? 'index' : 'network_error'), array(), TRUE);
 		// parse all page
 		$template_data = array(
 				'lang'			=> $this->config->item('language_abbr'),
