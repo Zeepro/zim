@@ -19,6 +19,7 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_CMD_SERIAL',			'ifconfig -a | grep eth0 | awk \'{print $5}\'');
 	define('ZIMAPI_CMD_VERSION',		'zfw_printenv version`zfw_printenv last_good`');
 	define('ZIMAPI_CMD_SETHOSTNAME',	ZIMAPI_CMD_CONFIG_NET . '-n ');
+	define('ZIMAPI_CMD_GETHOSTNAME',	'cat /etc/hostname');
 	
 	define('ZIMAPI_TITLE_TOPOLOGY',	'topology');
 	define('ZIMAPI_TITLE_MEDIUM',	'medium');
@@ -46,10 +47,10 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_FILENAME_SOFTWARE',	'Software.json');
 	define('ZIMAPI_FILEPATH_CAPTURE',	'/var/www/tmp/capture.jpg');
 	define('ZIMAPI_PRM_CAMERA_PRINTSTART',
-			' -v quiet -r 25 -s 320x240 -f video4linux2 -i /dev/video0 -vf "crop=240:240:40:0,transpose=2" -minrate 256k -maxrate 256k -bufsize 256k -map 0 -force_key_frames "expr:gte(t,n_forced*2)" -c:v libx264 -crf 35 -profile:v baseline -b:v 256k -pix_fmt yuv420p -flags -global_header -f segment -segment_list /var/www/tmp/zim.m3u8 -segment_time 1 -segment_format mpeg_ts -segment_list_type m3u8 -segment_list_flags live -segment_list_size 5 -segment_wrap 5 /var/www/tmp/zim%d.ts');
+			' -v quiet -r 25 -s 320x240 -f video4linux2 -i /dev/video0 -minrate 256k -maxrate 256k -bufsize 256k -map 0 -force_key_frames "expr:gte(t,n_forced*2)" -c:v libx264 -crf 35 -profile:v baseline -b:v 256k -pix_fmt yuv420p -flags -global_header -f segment -segment_list /var/www/tmp/zim.m3u8 -segment_time 1 -segment_format mpeg_ts -segment_list_type m3u8 -segment_list_flags live -segment_list_size 5 -segment_wrap 5 /var/www/tmp/zim%d.ts');
 	define('ZIMAPI_PRM_CAMERA_STOP',	' stop ');
 	define('ZIMAPI_PRM_CAMERA_CAPTURE',
-			' -v quiet -f video4linux2 -i /dev/video0 -y -vf "transpose=2" -vframes 1 /var/www/tmp/capture.jpg');
+			' -v quiet -f video4linux2 -i /dev/video0 -y -vframes 1 /var/www/tmp/capture.jpg');
 // 	define('ZIMAPI_TITLE_MODE',			'mode');
 	define('ZIMAPI_TITLE_COMMAND',		'command');
 	define('ZIMAPI_VALUE_MODE_OFF',		'off');
@@ -494,6 +495,37 @@ function ZimAPI_setHostname($hostname) {
 	}
 	else {
 		return ERROR_WRONG_PRM;
+	}
+	
+	return ERROR_INTERNAL; // never reach here
+}
+
+function ZimAPI_getHostname(&$hostname) {
+	$output = array();
+	$ret_val = 0;
+	$hostname = "zim";
+	
+	// do nothing for windows
+	if (DectectOS_checkWindows()) {
+		return ERROR_OK;
+	}
+	
+	try {
+		exec(ZIMAPI_CMD_GETHOSTNAME, $output, $ret_val);
+			
+		if ($ret_val != ERROR_NORMAL_RC_OK) {
+			return ERROR_INTERNAL;
+		}
+		else {
+			if (count($output) <= 0) {
+				return ERROR_INTERNAL;
+			}
+			$hostname = $output[0];
+			
+			return ERROR_OK;
+		}
+	} catch (Exception $e) {
+		return ERROR_INTERNAL;
 	}
 	
 	return ERROR_INTERNAL; // never reach here
