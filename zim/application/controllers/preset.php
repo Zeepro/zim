@@ -4,7 +4,7 @@ if (!defined('BASEPATH'))
 	exit('No direct script access allowed');
 
 //TODO move the define value into helper
-if (defined('CLASS_PRESET_EXTRUDER_RIGHT')) {
+if (!defined('CLASS_PRESET_EXTRUDER_RIGHT')) {
 	define('CLASS_PRESET_EXTRUDER_RIGHT',	1);
 	define('CLASS_PRESET_EXTRUDER_LEFT',	2);
 }
