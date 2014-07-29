@@ -1589,7 +1589,8 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 	{
 		$tmp = $array_setting['extrusion_width'];
 		$pos = strpos($tmp, "%");
-		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 50 || substr($tmp, 0, $pos) > 150)) || ($pos === FALSE && ($tmp < 0.25 || $tmp > 0.5)))
+		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 50 || substr($tmp, 0, $pos) > 150))
+				|| ($pos === FALSE && ($tmp != 0 && ($tmp < 0.25 || $tmp > 0.5))))
 		{
 			return (FALSE);
 		}
@@ -1601,7 +1602,8 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 	{
 		$tmp = $array_setting['first_layer_extrusion_width'];
 		$pos = strpos($tmp, "%");
-		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 50 || substr($tmp, 0, $pos) > 150)) || ($pos === FALSE && ($tmp < 0.25 || $tmp > 0.5)))
+		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 50 || substr($tmp, 0, $pos) > 150))
+				|| ($pos === FALSE && ($tmp != 0 && ($tmp < 0.25 || $tmp > 0.5))))
 		{
 			return (FALSE);
 		}
@@ -1613,7 +1615,8 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 	{
 		$tmp = $array_setting['perimeter_extrusion_width'];
 		$pos = strpos($tmp, "%");
-		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 50 || substr($tmp, 0, $pos) > 150)) || ($pos === FALSE && ($tmp < 0.25 || $tmp > 0.5)))
+		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 50 || substr($tmp, 0, $pos) > 150))
+		|| ($pos === FALSE && ($tmp != 0 && ($tmp < 0.25 || $tmp > 0.5))))
 		{
 			return (FALSE);
 		}
@@ -1625,7 +1628,8 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 	{
 		$tmp = $array_setting['infill_extrusion_width'];
 		$pos = strpos($tmp, "%");
-		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 50 || substr($tmp, 0, $pos) > 150)) || ($pos === FALSE && ($tmp < 0.25 || $tmp > 0.5)))
+				if (($pos !== FALSE && (substr($tmp, 0, $pos) < 50 || substr($tmp, 0, $pos) > 150))
+				|| ($pos === FALSE && ($tmp != 0 && ($tmp < 0.25 || $tmp > 0.5))))
 		{
 			return (FALSE);
 		}
@@ -1637,7 +1641,8 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 	{
 		$tmp = $array_setting['solid_infill_extrusion_width'];
 		$pos = strpos($tmp, "%");
-		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 50 || substr($tmp, 0, $pos) > 150)) || ($pos === FALSE && ($tmp < 0.25 || $tmp > 0.5)))
+				if (($pos !== FALSE && (substr($tmp, 0, $pos) < 50 || substr($tmp, 0, $pos) > 150))
+				|| ($pos === FALSE && ($tmp != 0 && ($tmp < 0.25 || $tmp > 0.5))))
 		{
 			return (FALSE);
 		}
@@ -1649,7 +1654,8 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 	{
 		$tmp = $array_setting['top_infill_extrusion_width'];
 		$pos = strpos($tmp, "%");
-		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 50 || substr($tmp, 0, $pos) > 150)) || ($pos === FALSE && ($tmp < 0.25 || $tmp > 0.5)))
+		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 50 || substr($tmp, 0, $pos) > 150))
+				|| ($pos === FALSE && ($tmp != 0 && ($tmp < 0.25 || $tmp > 0.5))))
 		{
 			return (FALSE);
 		}
@@ -1661,7 +1667,8 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 	{
 		$tmp = $array_setting['support_material_extrusion_width'];
 		$pos = strpos($tmp, "%");
-		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 50 || substr($tmp, 0, $pos) > 150)) || ($pos === FALSE && ($tmp < 0.25 || $tmp > 0.5)))
+		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 50 || substr($tmp, 0, $pos) > 150))
+				|| ($pos === FALSE && ($tmp != 0 && ($tmp < 0.25 || $tmp > 0.5))))
 		{
 			return (FALSE);
 		}
