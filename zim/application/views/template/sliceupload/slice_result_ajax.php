@@ -14,15 +14,18 @@
 						<p>{temper_r} °C</p>
 					</div></div>
 				</div>
-				<div id="temper_l">
-					<label>Left temperature</label>
-					<input type="range" id="slider_left" value="{temper_l}" min="160" max="260" />
-				</div>
-				<div id="temper_r">
-					<label>Right temperature</label>
-					<input type="range" id="slider_right" value="{temper_r}" min="160" max="260" />
-				</div>
 				<p style="text-align: left;">{error_msg}</p>
+				<form action="/printdetail/printslice_temp" method="POST" data-ajax="false">
+					<div id="temper_l">
+						<label>Left temperature</label>
+						<input type="range" id="slider_left" name="l" value="{temper_l}" min="160" max="260" />
+					</div>
+					<div id="temper_r">
+						<label>Right temperature</label>
+						<input type="range" id="slider_right" name="r" value="{temper_r}" min="160" max="260" />
+					</div>
+					<input type="submit" id="print_slice" value="{print_button}">
+				</form>
 
 <script type="text/javascript">
 var var_enable_print = {enable_print};
@@ -34,9 +37,9 @@ $('<button>').appendTo('#left_cartridge')
 $('<button>').appendTo('#right_cartridge')
 .attr({'id': 'change_right', 'data-icon': 'refresh', 'data-iconpos':'right', 'onclick': 'javascript: window.location.href="/printerstate/changecartridge?v=r&f={need_filament_r}&id=slice";'}).html('{change_right}')
 .button().button('refresh');
-$('<button>').appendTo('#detail_zone')
-.attr({'id': 'print_slice', 'onclick': 'javascript: window.location.href="/printdetail/printslice";'}).html('{print_button}')
-.button().button('refresh');
+// $('<button>').appendTo('#detail_zone')
+// .attr({'id': 'print_slice', 'onclick': 'javascript: window.location.href="/printdetail/printslice";'}).html('{print_button}')
+// .button().button('refresh');
 
 if ($("#slider_left").attr('value') == "---")
 	$("#temper_l").css('display', 'none');

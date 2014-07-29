@@ -164,6 +164,12 @@ class Printdetail extends MY_Controller {
 		$this->load->library('parser');
 		$this->lang->load('printdetail', $this->config->item('language'));
 		
+		$this->load->helper('zimapi');
+		if (!ZimAPI_cameraOn(ZIMAPI_PRM_CAMERA_PRINTSTART)) {
+			$this->load->helper('printerlog');
+			PrinterLog_logError('can not set camera', __FILE__, __LINE__);
+		}
+		
 		$callback = $this->input->get('cb');
 		$abb_cartridge = $this->input->get('v');
 		$id = $this->input->get('id');
@@ -299,6 +305,12 @@ class Printdetail extends MY_Controller {
 			
 			$this->load->library('parser');
 			$this->lang->load('printdetail', $this->config->item('language'));
+			
+			$this->load->helper('zimapi');
+			if (!ZimAPI_cameraOn(ZIMAPI_PRM_CAMERA_PRINTSTART)) {
+				$this->load->helper('printerlog');
+				PrinterLog_logError('can not set camera', __FILE__, __LINE__);
+			}
 			
 			// parse the main body
 			$template_data = array(

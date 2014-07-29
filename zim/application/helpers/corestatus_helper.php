@@ -372,12 +372,12 @@ function CoreStatus_setInIdle($last_error = FALSE) {
 		// stop camera http live streaming
 		$ret_val = 0;
 		
-		$CI = &get_instance();
-		$CI->load->helper('zimapi');
-		$ret_val = ZimAPI_cameraOff();
-		if ($ret_val != TRUE) {
-			return FALSE;
-		}
+// 		$CI = &get_instance();
+// 		$CI->load->helper('zimapi');
+// 		$ret_val = ZimAPI_cameraOff();
+// 		if ($ret_val != TRUE) {
+// 			return FALSE;
+// 		}
 		
 		CoreStatus_setInPause(FALSE); // not necessary in any case, just a safty
 	}
@@ -448,13 +448,13 @@ function CoreStatus_setInPrinting($stop_printing = FALSE) {
 		// start camera http live streaming
 		$ret_val = 0;
 		
-		$CI = &get_instance();
-		$CI->load->helper('zimapi');
-		$ret_val = ZimAPI_cameraOn(ZIMAPI_PRM_CAMERA_PRINTSTART);
-		if ($ret_val == FALSE) {
-			return FALSE;
-		}
-	
+// 		$CI = &get_instance();
+// 		$CI->load->helper('zimapi');
+// 		$ret_val = ZimAPI_cameraOn(ZIMAPI_PRM_CAMERA_PRINTSTART);
+// 		if ($ret_val == FALSE) {
+// 			return FALSE;
+// 		}
+		
 		return CoreStatus__setInStatus(CORESTATUS_VALUE_PRINT,
 				array(CORESTATUS_TITLE_STARTTIME => time())
 		);
@@ -500,7 +500,7 @@ function CoreStatus_setInPause($value = TRUE) {
 		}
 		else {
 			$CI->load->helper('printerlog');
-			PrinterLog_logError('call get out pause when not in pause', __FILE__, __LINE__);
+			PrinterLog_logMessage('call get out pause when not in pause', __FILE__, __LINE__);
 		}
 	}
 	

@@ -21,11 +21,10 @@
 				</div><br>
 				<p>{time}</p>
 			</div>
-			<div data-role="collapsible" data-collapsed="false">
-				<h4>Gestion des températures</h4>
-						<label>Température tête droite</label>
-						<input type="range" name="r" id="slider-2" value="{temper_filament_r}" min="160" max="260">
-			</div>
+<!-- 			<div data-role="collapsible" data-collapsed="false"> -->
+<!-- 				<h4>Gestion des températures</h4> -->
+<!-- 						<label>Température tête droite</label> -->
+<!-- 			</div> -->
 			<div data-role="collapsible" data-collapsed="false" style="text-align: center;">
 				<h4>{title_current}</h4>
 				<div style="width: 50%; float: left; text-align: center;">
@@ -34,15 +33,16 @@
 					</div>
 					<p>{state_f_l}</p>
 <!-- 					<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh" onclick="window.location.href='/printerstate/changecartridge?v=l&f={need_filament_l}&id={model_id}'">{change_filament_l}</button> -->
-					<a href="/printerstate/changecartridge?v=l&f={need_filament_l}&id={model_id}" data-role="button" data-ajax="false" class="ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh">{change_filament_l}</a>
+					<a href="/printerstate/changecartridge?v=l&f={need_filament_l}&id={model_id}" data-role="button" data-ajax="false" data-icon="refresh" class="ui-shadow ui-corner-all">{change_filament_l}</a>
 				</div>
-				<div style="width: 50%; float: left; text-align: center;">
+				<div style="width: 50%; float: right; text-align: center;">
 					<div style="width: 75px; height: 75px; background-color: {state_c_r}; margin: 0 auto;">
 						<img src="/images/cartridge.png" style="width: 100%">
 					</div>
 					<p>{state_f_r}</p>
 <!-- 					<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh" onclick="window.location.href='/printerstate/changecartridge?v=r&f={need_filament_r}&id={model_id}'">{change_filament_r}</button> -->
-					<a href="/printerstate/changecartridge?v=r&f={need_filament_r}&id={model_id}" data-role="button" data-ajax="false" class="ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh">{change_filament_r}</a>
+					<a href="/printerstate/changecartridge?v=r&f={need_filament_r}&id={model_id}" data-role="button" data-ajax="false" data-icon="refresh" class="ui-shadow ui-corner-all">{change_filament_r}</a>
+					<input type="range" name="r" id="slider-2" value="{temper_filament_r}" min="160" max="260">
 				</div>
 <!-- 				<a href="/print?id={model_id}" class="ui-btn ui-btn-inline ui-icon-action ui-btn-icon-left">{print_model}</a> -->
 			</div>

@@ -7,6 +7,10 @@ $lang['switch_off']
 	= '关';
 $lang['switch_on']
 	= '开';
+$lang['extruder_left']
+	= '左墨盒';
+$lang['extruder_right']
+	= '右墨盒';
 
 $lang['preset_detail_pagetitle']
 	= 'Zim - 分层分析的预设详细';

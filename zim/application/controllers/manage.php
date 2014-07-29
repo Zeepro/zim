@@ -56,7 +56,7 @@ class Manage extends MY_Controller {
 			$axis = strtoupper($axis);
 			$cr = PrinterState_relativePositioning(TRUE);
 			if ($cr == ERROR_OK) {
-				$cr = PrinterState_move($axis, (int)$value, (int)$speed);
+				$cr = PrinterState_move($axis, (int)$value, (int)$speed * 60);
 			}
 			if ($cr == ERROR_OK) {
 				$cr = PrinterState_relativePositioning(FALSE);

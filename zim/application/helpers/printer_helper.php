@@ -138,11 +138,16 @@ function Printer_printFromModel($id_model, $array_temper = array()) {
 		// temporary change - modify the temperature of gcode file according to cartridge info
 		//TODO test me and remove me if it is necessary
 // 		$ret_val = Printer__changeTemperature($gcode_path);
-		$ret_val = Printer__changeTemperature($gcode_path, $array_temper);
-		// temporary change end
-		if ($ret_val != ERROR_OK) {
-			return $ret_val;
+		if (count($array_temper)) {
+			$ret_val = Printer__changeTemperature($gcode_path, $array_temper);
+			if ($ret_val != ERROR_OK) {
+				return $ret_val;
+			}
 		}
+		else if (file_exists($gcode_path . '.new')) {
+			$gcode_path .= '.new';
+		}
+		// temporary change end
 		
 // 		$ret_val = Printer_printFromFile($gcode_path, TRUE, $stop_printing);
 		if (Printer__getLengthFromJson($array_info, $array_filament)) {
@@ -160,6 +165,7 @@ function Printer_printFromSlice($array_temper = array()) {
 	$ret_val = 0;
 	$file_temp_data = NULL;
 	$temp_json = array();
+	$array_filament = array();
 	
 	$CI = &get_instance();
 	$CI->load->helper('slicer');
@@ -178,22 +184,14 @@ function Printer_printFromSlice($array_temper = array()) {
 	if (isset($temp_json['error'])) {
 		$CI->load->helper('printerlog');
 		PrinterLog_logError('read temp data file error', __FILE__, __LINE__);
-		$ret_val = ERROR_INTERNAL;
+		return ERROR_INTERNAL;
 	}
 	else {
-		//TODO move all the verification of filament into printFromFile by array_filament
+		// move all the verification of filament into printFromFile by array_filament
 		$data_json = $temp_json['json'];
-		$ret_val = ERROR_OK;
 		foreach ($data_json as $abb_filament => $array_temp) {
-			$tmp_ret = PrinterState_checkFilament($abb_filament, $array_temp[PRINTERSTATE_TITLE_NEED_L]);
-			// only assign return code when success to make a tour of used cartridges
-			if ($ret_val == ERROR_OK) {
-				$ret_val = $tmp_ret;
-			}
+			$array_filament[$abb_filament] = $array_temp[PRINTERSTATE_TITLE_NEED_L];
 		}
-	}
-	if ($ret_val != ERROR_OK) {
-		return $ret_val; // directly return when having error
 	}
 	
 	// temporary change
@@ -204,9 +202,12 @@ function Printer_printFromSlice($array_temper = array()) {
 			return $ret_val;
 		}
 	}
+	else if (file_exists($gcode_path . '.new')) {
+		$gcode_path .= '.new';
+	}
 	// temporary change end
 	
-	$ret_val = Printer_printFromFile($gcode_path);
+	$ret_val = Printer_printFromFile($gcode_path, TRUE, $array_filament);
 	
 	return $ret_val;
 }
