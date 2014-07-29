@@ -31,7 +31,7 @@
 						<a href="#" data-role="button" data-icon="arrow-l" data-iconpos="left" onclick="move('X', -1);">1</a>
 					</div>
 					<div class="grid_3">
-						<input type="number" data-clear-btn="false" name="xy_speed" id="xy_speed" value="3000">
+						<input type="number" data-clear-btn="false" name="xy_speed" id="xy_speed" value="3000" min="10" min="200" />
 					</div>
 					<div class="grid_1" style="">mm/s</div>
 					<div class="grid_2">
@@ -76,7 +76,7 @@
 						<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" onclick="move('Z', -1);">1</a>
 					</div>
 					<div class="grid_3 prefix_6">
-						<input type="number" data-clear-btn="false" name="z_speed" id="z_speed" value="400">
+						<input type="number" data-clear-btn="false" name="z_speed" id="z_speed" value="400" />
 					</div>
 					<div class="grid_1 suffix_6">
 						mm/s

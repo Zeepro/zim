@@ -25,13 +25,13 @@
 							<label for="layer_height">{layer_height}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" step="0.01" min="0" data-clear-btn="false" name="layer_height" id="layer_height" value="{layer_height_value}">
+							<input type="number" step="0.01" min="0" data-clear-btn="false" name="layer_height" id="layer_height" value="{layer_height_value}" min="0.025" max="0.2">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="first_layer_height">{first_layer_height}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="text" data-clear-btn="false" name="first_layer_height" id="first_layer_height" value="{first_layer_height_value}">
+							<input type="text" data-clear-btn="false" name="first_layer_height" id="first_layer_height" value="{first_layer_height_value}" min="0.05" max="0.4">
 						</div></div>
 					</div>
 				</div>
@@ -42,7 +42,7 @@
 							<label for="perimeters">{perimeters}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="perimeters" id="perimeters" value="{perimeters_value}">
+							<input type="number" data-clear-btn="false" name="perimeters" id="perimeters" value="{perimeters_value}" min="1" max="10">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="spiral_vase">{spiral_vase}</label>
@@ -65,13 +65,13 @@
 							<label for="top_solid_layers" style="padding-left: 2em;">{top_solid_layers}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="top_solid_layers" id="top_solid_layers" value="{top_solid_layers_value}">
+							<input type="number" data-clear-btn="false" name="top_solid_layers" id="top_solid_layers" value="{top_solid_layers_value}" min="1" max="20">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="bottom_solid_layers" style="padding-left: 2em;">{bottom_solid_layers}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="bottom_solid_layers" id="bottom_solid_layers" value="{bottom_solid_layers_value}">
+							<input type="number" data-clear-btn="false" name="bottom_solid_layers" id="bottom_solid_layers" value="{bottom_solid_layers_value}" min="1" max="20">
 						</div></div>
 					</div>
 				</div>
@@ -170,7 +170,7 @@
 							<label for="fill_density">{fill_density}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="fill_density" id="fill_density" value="{fill_density_value}">
+							<input type="number" data-clear-btn="false" name="fill_density" id="fill_density" value="{fill_density_value}" min="0" max="100" step="0.01">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="fill_pattern">{fill_pattern}</label>
@@ -211,7 +211,7 @@
 							<label for="infill_every_layers">{infill_every_layers}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="infill_every_layers" id="infill_every_layers" value="{infill_every_layers_value}">
+							<input type="number" data-clear-btn="false" name="infill_every_layers" id="infill_every_layers" value="{infill_every_layers_value}" min="0" max="20">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="infill_only_where_needed">{infill_only_where_needed}</label>
@@ -231,19 +231,19 @@
 							<label for="solid_infill_every_layers">{solid_infill_every_layers}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="solid_infill_every_layers" id="solid_infill_every_layers" value="{solid_infill_every_layers_value}">
+							<input type="number" data-clear-btn="false" name="solid_infill_every_layers" id="solid_infill_every_layers" value="{solid_infill_every_layers_value}" min="0" max="100">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="fill_angle">{fill_angle}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="fill_angle" id="fill_angle" value="{fill_angle_value}">
+							<input type="number" data-clear-btn="false" name="fill_angle" id="fill_angle" value="{fill_angle_value}" min="0" max="90">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="solid_infill_below_area">{solid_infill_below_area}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="solid_infill_below_area" id="solid_infill_below_area" value="{solid_infill_below_area_value}">
+							<input type="number" data-clear-btn="false" name="solid_infill_below_area" id="solid_infill_below_area" value="{solid_infill_below_area_value}" min="0" max="100">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="only_retract_when_crossing_perimeters">{only_retract_when_crossing_perimeters}</label>
@@ -275,7 +275,7 @@
 							<label for="perimeter_speed">{perimeter_speed}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="perimeter_speed" id="perimeter_speed" value="{perimeter_speed_value}">
+							<input type="number" data-clear-btn="false" name="perimeter_speed" id="perimeter_speed" value="{perimeter_speed_value}" min="10" max="200">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="small_perimeter_speed">{small_perimeter_speed}</label>
@@ -293,7 +293,7 @@
 							<label for="infill_speed">{infill_speed}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="infill_speed" id="infill_speed" value="{infill_speed_value}">
+							<input type="number" data-clear-btn="false" name="infill_speed" id="infill_speed" value="{infill_speed_value}" min="10" max="200">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="solid_infill_speed">{solid_infill_speed}</label>
@@ -311,19 +311,19 @@
 							<label for="support_material_speed">{support_material_speed}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="support_material_speed" id="support_material_speed" value="{support_material_speed_value}">
+							<input type="number" data-clear-btn="false" name="support_material_speed" id="support_material_speed" value="{support_material_speed_value}" min="10" max="200">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="bridge_speed">{bridge_speed}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="bridge_speed" id="bridge_speed" value="{bridge_speed_value}">
+							<input type="number" data-clear-btn="false" name="bridge_speed" id="bridge_speed" value="{bridge_speed_value}" min="10" max="200">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="gap_fill_speed">{gap_fill_speed}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="gap_fill_speed" id="gap_fill_speed" value="{gap_fill_speed_value}">
+							<input type="number" data-clear-btn="false" name="gap_fill_speed" id="gap_fill_speed" value="{gap_fill_speed_value}" min="10" max="200">
 						</div></div>
 					</div>
 				</div>
@@ -334,7 +334,7 @@
 							<label for="travel_speed">{travel_speed}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="travel_speed" id="travel_speed" value="{travel_speed_value}">
+							<input type="number" data-clear-btn="false" name="travel_speed" id="travel_speed" value="{travel_speed_value}" min="10" max="300">
 						</div></div>
 					</div>
 				</div>
@@ -359,25 +359,25 @@
 							<label for="skirts">{skirts}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="skirts" id="skirts" value="{skirts_value}">
+							<input type="number" data-clear-btn="false" name="skirts" id="skirts" value="{skirts_value}" min="0" max="10">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="skirt_distance">{skirt_distance}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="skirt_distance" id="skirt_distance" value="{skirt_distance_value}">
+							<input type="number" data-clear-btn="false" name="skirt_distance" id="skirt_distance" value="{skirt_distance_value}" min="1" max="20">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="skirt_height">{skirt_height}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="skirt_height" id="skirt_height" value="{skirt_height_value}">
+							<input type="number" data-clear-btn="false" name="skirt_height" id="skirt_height" value="{skirt_height_value}" min="0" max="1000">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="min_skirt_length">{min_skirt_length}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="min_skirt_length" id="min_skirt_length" value="{min_skirt_length_value}">
+							<input type="number" data-clear-btn="false" name="min_skirt_length" id="min_skirt_length" value="{min_skirt_length_value}" min="0" max="100">
 						</div></div>
 					</div>
 				</div>
@@ -388,7 +388,7 @@
 							<label for="brim_width">{brim_width}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="brim_width" id="brim_width" value="{brim_width_value}">
+							<input type="number" data-clear-btn="false" name="brim_width" id="brim_width" value="{brim_width_value}" min="0" max="20">
 						</div></div>
 					</div>
 				</div>
@@ -411,13 +411,13 @@
 							<label for="support_material_threshold">{support_material_threshold}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="support_material_threshold" id="support_material_threshold" value="{support_material_threshold_value}">
+							<input type="number" data-clear-btn="false" name="support_material_threshold" id="support_material_threshold" value="{support_material_threshold_value}" min="0" max="90">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="support_material_enforce_layers">{support_material_enforce_layers}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="support_material_enforce_layers" id="support_material_enforce_layers" value="{support_material_enforce_layers_value}">
+							<input type="number" data-clear-btn="false" name="support_material_enforce_layers" id="support_material_enforce_layers" value="{support_material_enforce_layers_value}" min="0" max="1000">
 						</div></div>
 					</div>
 				</div>
@@ -428,7 +428,7 @@
 							<label for="raft_layers">{raft_layers}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="raft_layers" id="raft_layers" value="{raft_layers_value}">
+							<input type="number" data-clear-btn="false" name="raft_layers" id="raft_layers" value="{raft_layers_value}" min="0" max="10">
 						</div></div>
 					</div>
 				</div>
@@ -451,25 +451,25 @@
 							<label for="support_material_spacing">{support_material_spacing}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="support_material_spacing" id="support_material_spacing" value="{support_material_spacing_value}">
+							<input type="number" data-clear-btn="false" name="support_material_spacing" id="support_material_spacing" value="{support_material_spacing_value}" min="1" max="10" step="0.01">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="support_material_angle">{support_material_angle}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="support_material_angle" id="support_material_angle" value="{support_material_angle_value}">
+							<input type="number" data-clear-btn="false" name="support_material_angle" id="support_material_angle" value="{support_material_angle_value}" min="0" max="90">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="support_material_interface_layers">{support_material_interface_layers}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="support_material_interface_layers" id="support_material_interface_layers" value="{support_material_interface_layers_value}">
+							<input type="number" data-clear-btn="false" name="support_material_interface_layers" id="support_material_interface_layers" value="{support_material_interface_layers_value}" min="0" max="10">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="support_material_interface_spacing">{support_material_interface_spacing}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="support_material_interface_spacing" id="support_material_interface_spacing" value="{support_material_interface_spacing_value}">
+							<input type="number" data-clear-btn="false" name="support_material_interface_spacing" id="support_material_interface_spacing" value="{support_material_interface_spacing_value}" min="0" max="10">
 						</div></div>
 					</div>
 				</div>
@@ -483,25 +483,41 @@
 							<label for="perimeter_extruder">{perimeter_extruder}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="perimeter_extruder" id="perimeter_extruder" value="{perimeter_extruder_value}">
+						<!--<input type="number" data-clear-btn="false" name="perimeter_extruder" id="perimeter_extruder" value="{perimeter_extruder_value}">-->
+							<select name="perimeter_extruder" id="perimeter_extruder">
+								<option value="{extruder_left_val}" {perimeter_extruder_value_left}>{extruder_left}</option>
+								<option value="{extruder_right_val}" {perimeter_extruder_value_right}>{extruder_right}</option>
+							</select>
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="infill_extruder">{infill_extruder}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="infill_extruder" id="infill_extruder" value="{infill_extruder_value}">
+<!-- 							<input type="number" data-clear-btn="false" name="infill_extruder" id="infill_extruder" value="{infill_extruder_value}"> -->
+							<select name="infill_extruder" id="infill_extruder">
+								<option value="{extruder_left_val}" {infill_extruder_value_left}>{extruder_left}</option>
+								<option value="{extruder_right_val}" {infill_extruder_value_right}>{extruder_right}</option>
+							</select>
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="support_material_extruder">{support_material_extruder}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="support_material_extruder" id="support_material_extruder" value="{support_material_extruder_value}">
+<!-- 							<input type="number" data-clear-btn="false" name="support_material_extruder" id="support_material_extruder" value="{support_material_extruder_value}"> -->
+						<select name="support_material_extruder" id="support_material_extruder">
+								<option value="{extruder_left_val}" {support_material_extruder_value_left}>{extruder_left}</option>
+								<option value="{extruder_right_val}" {support_material_extruder_value_right}>{extruder_right}</option>
+							</select>
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="support_material_interface_extruder">{support_material_interface_extruder}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="support_material_interface_extruder" id="support_material_interface_extruder" value="{support_material_interface_extruder_value}">
+<!-- 							<input type="number" data-clear-btn="false" name="support_material_interface_extruder" id="support_material_interface_extruder" value="{support_material_interface_extruder_value}"> -->
+						<select name="support_material_interface_extruder" id="support_material_interface_extruder">
+								<option value="{extruder_left_val}" {support_material_interface_extruder_value_left}>{extruder_left}</option>
+								<option value="{extruder_right_val}" {support_material_interface_extruder_value_right}>{extruder_right}</option>
+							</select>
 						</div></div>
 					</div>
 				</div>
@@ -521,7 +537,7 @@
 							<label for="standby_temperature_delta">{standby_temperature_delta}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="standby_temperature_delta" id="standby_temperature_delta" value="{standby_temperature_delta_value}">
+							<input type="number" data-clear-btn="false" name="standby_temperature_delta" id="standby_temperature_delta" value="{standby_temperature_delta_value}" min="-20" max="0">
 						</div></div>
 					</div>
 				</div>
@@ -582,7 +598,7 @@
 							<label for="bridge_flow_ratio">{bridge_flow_ratio}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="bridge_flow_ratio" id="bridge_flow_ratio" value="{bridge_flow_ratio_value}">
+							<input type="number" data-clear-btn="false" name="bridge_flow_ratio" id="bridge_flow_ratio" value="{bridge_flow_ratio_value}" min="0.75" max="1.5" step="0.01">
 						</div></div>
 					</div>
 				</div>
@@ -593,7 +609,7 @@
 							<label for="resolution">{resolution}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" data-clear-btn="false" name="resolution" id="resolution" value="{resolution_value}">
+							<input type="number" data-clear-btn="false" name="resolution" id="resolution" value="{resolution_value}" min="0" max="1" step="0.01">
 						</div></div>
 					</div>
 				</div>
