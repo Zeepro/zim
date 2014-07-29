@@ -3,6 +3,13 @@
 if (!defined('BASEPATH'))
 	exit('No direct script access allowed');
 
+//TODO move the define value into helper
+if (defined('CLASS_PRESET_EXTRUDER_RIGHT')) {
+	define('CLASS_PRESET_EXTRUDER_RIGHT',	1);
+	define('CLASS_PRESET_EXTRUDER_LEFT',	2);
+}
+
+
 class Preset extends MY_Controller {
 	function __construct() {
 		parent::__construct ();
@@ -450,10 +457,18 @@ class Preset extends MY_Controller {
 				'support_material_angle_value'					=> $array_setting['support_material_angle'],
 				'support_material_interface_layers_value'		=> $array_setting['support_material_interface_layers'],
 				'support_material_interface_spacing_value'		=> $array_setting['support_material_interface_spacing'],
-				'perimeter_extruder_value'						=> $array_setting['perimeter_extruder'],
-				'infill_extruder_value'							=> $array_setting['infill_extruder'],
-				'support_material_extruder_value'				=> $array_setting['support_material_extruder'],
-				'support_material_interface_extruder_value'		=> $array_setting['support_material_interface_extruder'],
+// 				'perimeter_extruder_value'						=> $array_setting['perimeter_extruder'],
+				'perimeter_extruder_value_left'					=> NULL,
+				'perimeter_extruder_value_right'				=> NULL,
+// 				'infill_extruder_value'							=> $array_setting['infill_extruder'],
+				'infill_extruder_value_left'					=> NULL,
+				'infill_extruder_value_right'					=> NULL,
+// 				'support_material_extruder_value'				=> $array_setting['support_material_extruder'],
+				'support_material_extruder_value_left'			=> NULL,
+				'support_material_extruder_value_right'			=> NULL,
+// 				'support_material_interface_extruder_value'		=> $array_setting['support_material_interface_extruder'],
+				'support_material_interface_extruder_value_left'	=> NULL,
+				'support_material_interface_extruder_value_right'	=> NULL,
 				'ooze_prevention_value'							=> ($array_setting['ooze_prevention'] == TRUE) ? $option_selected : NULL,
 				'standby_temperature_delta_value'				=> $array_setting['standby_temperature_delta'],
 				'extrusion_width_value'							=> $array_setting['extrusion_width'],
@@ -475,7 +490,64 @@ class Preset extends MY_Controller {
 				'hide_delete'	=> ($system_preset || $new_preset) ? $display_hide : NULL,
 				'error'			=> $error,
 				'disable_all'	=> $system_preset ? $change_disable : NULL,
+				// hint for select option of extruder
+				'extruder_left'			=> t('extruder_left'),
+				'extruder_right'		=> t('extruder_right'),
+				'extruder_left_val'		=> CLASS_PRESET_EXTRUDER_LEFT,
+				'extruder_right_val'	=> CLASS_PRESET_EXTRUDER_RIGHT,
 		);
+		
+		switch ($array_setting['perimeter_extruder']) {
+			case CLASS_PRESET_EXTRUDER_LEFT:
+				$template_data['perimeter_extruder_value_left'] = $option_selected;
+				break;
+				
+			case CLASS_PRESET_EXTRUDER_RIGHT:
+				$template_data['perimeter_extruder_value_right'] = $option_selected;
+				break;
+				
+			default:
+				break;
+		}
+		
+		switch ($array_setting['infill_extruder']) {
+			case CLASS_PRESET_EXTRUDER_LEFT:
+				$template_data['infill_extruder_value_left'] = $option_selected;
+				break;
+				
+			case CLASS_PRESET_EXTRUDER_RIGHT:
+				$template_data['infill_extruder_value_right'] = $option_selected;
+				break;
+				
+			default:
+				break;
+		}
+		
+		switch ($array_setting['support_material_extruder']) {
+			case CLASS_PRESET_EXTRUDER_LEFT:
+				$template_data['support_material_extruder_value_left'] = $option_selected;
+				break;
+				
+			case CLASS_PRESET_EXTRUDER_RIGHT:
+				$template_data['support_material_extruder_value_right'] = $option_selected;
+				break;
+				
+			default:
+				break;
+		}
+		
+		switch ($array_setting['support_material_interface_extruder']) {
+			case CLASS_PRESET_EXTRUDER_LEFT:
+				$template_data['support_material_interface_extruder_value_left'] = $option_selected;
+				break;
+				
+			case CLASS_PRESET_EXTRUDER_RIGHT:
+				$template_data['support_material_interface_extruder_value_right'] = $option_selected;
+				break;
+				
+			default:
+				break;
+		}
 		
 		switch ($array_setting['fill_pattern']) {
 			case 'rectilinear':
