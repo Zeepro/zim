@@ -25,7 +25,6 @@
 				<p style="text-align: left;">{error_msg}</p>
 
 <script type="text/javascript">
-<!--
 var var_enable_print = {enable_print};
 var var_reslice = {enable_reslice};
 
@@ -64,5 +63,4 @@ if (var_reslice == true) {
 	.attr({'id': 'reslice_button', 'onclick': 'javascript: startSlice();'}).html('{reslice_button}')
 	.button().button('refresh');
 }
--->
 </script>
