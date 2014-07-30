@@ -26,7 +26,9 @@ class Sliceupload extends MY_Controller {
 		$this->load->library('parser');
 		$this->lang->load('sliceupload/upload', $this->config->item('language'));
 		
-		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+		if ($_SERVER['REQUEST_METHOD'] == 'POST')
+		{
+			extract($_POST);
 			$upload_config = array (
 					'upload_path'	=> $this->config->item('temp'),
 					'allowed_types'	=> '*',
@@ -36,7 +38,13 @@ class Sliceupload extends MY_Controller {
 			);
 			$this->load->library('upload', $upload_config);
 			
-			if ($this->upload->do_upload('file')) {
+			if (!empty($file1))
+				$ret = $this->upload->do_upload('file');
+			else
+				$ret = $this->upload->do_upload('file_c1') && $this->upload->do_upload('file_c2');
+			
+			if ($ret)
+			{
 				$model = $this->upload->data();
 				
 				// load a wait page for adding model into slicer
@@ -78,6 +86,9 @@ class Sliceupload extends MY_Controller {
 		$template_data = array(
 				'back'			=> t('back'),
 				'select_hint'	=> t('select_hint'),
+				'select_hint_multi'	=> t('select_hint_multi'),
+				'header_single' => t('header_single'),
+				'header_multi'	=> t('header_multi'),
 				'upload_button'	=> t('upload_button'),
 				'goto_slice'	=> $button_goto_slice,
 				'error'			=> $error,

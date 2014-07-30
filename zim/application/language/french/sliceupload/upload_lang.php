@@ -7,11 +7,17 @@ $lang['back']
 $lang['sliceupload_upload_pagetitle']
 	= 'Zim - Chargement de modèle';
 $lang['select_hint']
-	= 'Selectionner et charger un fichier (.stl, .obj, .amf)';
+	= 'Sélectionner et charger un fichier (.stl, .obj, .amf)';
+$lang['select_hint_multi']
+	= 'Sélectionner et charger un fichier (.stl)';
 $lang['upload_button']
 	= 'Charger';
 $lang['button_goto_slice']
 	= 'Utiliser ancien modèle';
+$lang['header_single']
+	= 'Charger un fichier unique';
+$lang['header_multi']
+	= 'Charger un modèle en plusieurs fichiers';
 
 // upload_wait
 $lang['wait_message']

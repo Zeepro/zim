@@ -8,10 +8,16 @@ $lang['sliceupload_upload_pagetitle']
 	= 'Zim - Upload model';
 $lang['select_hint']
 	= 'Select and upload a file (.stl, .obj, .amf)';
+$lang['select_hint_multi']
+	= 'Select and upload a file (.stl)';
 $lang['upload_button']
 	= 'Upload';
 $lang['button_goto_slice']
 	= 'Use precedent model';
+$lang['header_single']
+	= 'Upload a signle file';
+$lang['header_multi']
+	= 'Upload a multi-part model';
 
 // upload_wait
 $lang['wait_message']
