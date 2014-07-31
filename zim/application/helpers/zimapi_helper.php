@@ -18,6 +18,7 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_CMD_DNS',			'grep nameserver /etc/resolv.conf | awk \'{print $2}\'');
 	define('ZIMAPI_CMD_SERIAL',			'ifconfig -a | grep eth0 | awk \'{print $5}\'');
 	define('ZIMAPI_CMD_VERSION',		'zfw_printenv version`zfw_printenv last_good`');
+	define('ZIMAPI_CMD_VERSION_REBOOT',	'zfw_printenv version`zfw_printenv update` || zfw_printenv version`zfw_printenv last_good`');
 	define('ZIMAPI_CMD_SETHOSTNAME',	ZIMAPI_CMD_CONFIG_NET . '-n ');
 	define('ZIMAPI_CMD_GETHOSTNAME',	'cat /etc/hostname');
 	
@@ -1065,8 +1066,11 @@ function ZimAPI_getVersion($next_boot = FALSE) {
 	$CI = &get_instance();
 	$CI->load->helper('detectos');
 	
-	if ($next_boot == TRUE || DectectOS_checkWindows()) {
+	if (DectectOS_checkWindows()) {
 		$version = trim(@file_get_contents($CI->config->item('version_file')));
+	}
+	else if ($next_boot == TRUE) {
+		$version = trim(shell_exec(ZIMAPI_CMD_VERSION_REBOOT));
 	}
 	else {
 		$version = trim(shell_exec(ZIMAPI_CMD_VERSION));
