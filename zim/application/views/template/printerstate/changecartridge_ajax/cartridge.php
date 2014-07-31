@@ -10,16 +10,26 @@
 		<input name="c" id="showPaletteOnly" value="black" data-role="none" />
 	</div></div>
 	<div class="grid_5"><div class="ui-bar ui-bar-d" style="height: 3em;">
+		<label for="material_input">{material_label}</label>
+	</div></div>
+	<div class="grid_11"><div class="ui-bar ui-bar-c" style="height: 3em;">
+		<select name="m" id="material_input">
+			{material_array}
+				<option value="{value}">{name}</option>
+			{/material_array}
+		</select>
+	</div></div>
+	<div class="grid_5"><div class="ui-bar ui-bar-d" style="height: 3em;">
 		<label for="temper_input">{temper_label}</label>
 	</div></div>
 	<div class="grid_11"><div class="ui-bar ui-bar-c" style="height: 3em;">
-		<input type='range' name="t" id="temper_input" value="200" min="160" max="260" />
+		<input type='range' name="t" id="temper_input" value="{temper_value}" min="160" max="260" />
 	</div></div>
 	<div class="grid_5"><div class="ui-bar ui-bar-d" style="height: 3em;">
 		<label for="length_input">{length_label}</label>
 	</div></div>
 	<div class="grid_11"><div class="ui-bar ui-bar-c" style="height: 3em;">
-		<input type='range' name="l" id="length_input" value="10" min="{length_min}" max="200" />
+		<input type='range' name="l" id="length_input" value="{length_value}" min="{length_min}" max="200" />
 	</div></div>
 </div>
 

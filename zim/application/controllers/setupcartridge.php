@@ -128,9 +128,13 @@ class Setupcartridge extends CI_Controller {
 		
 		if ($times > 0
 				&& $this->_get_final_code($code_write, $year, $month, $day, $type)) {
-			$cr = PrinterState_setCartridgeCode($code_write, 'r');
+			$cr = PrinterState_setCartridgeCode($code_write, 'r', FALSE);
 			if ($cr == ERROR_OK) {
-				$cr = PrinterState_getCartridgeCode($code_read, 'r');
+				$power_off = FALSE;
+				if ($times == 1) {
+					$power_off = TRUE;
+				}
+				$cr = PrinterState_getCartridgeCode($code_read, 'r', $power_off);
 				if ($cr == ERROR_OK) {
 					if ($code_write != $code_read) {
 						$cr = ERROR_WRONG_FORMAT;

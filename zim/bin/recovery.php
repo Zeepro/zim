@@ -442,7 +442,7 @@ if ($parameter == 'stop') {
 
 // exit if not in printing when closing printer
 if ($json_status[CORESTATUS_TITLE_STATUS] != CORESTATUS_VALUE_PRINT
-		&& ($json_status[CORESTATUS_TITLE_STATUS] == CORESTATUS_VALUE_RECOVERY
+		|| ($json_status[CORESTATUS_TITLE_STATUS] == CORESTATUS_VALUE_RECOVERY
 				&& $json_status[CORESTATUS_TITLE_SUBSTATUS] != CORESTATUS_VALUE_PRINT)) {
 	exit(ERROR_OK);
 }

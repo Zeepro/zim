@@ -46,5 +46,15 @@ $lang['Insert the cartridge above']
 	= 'Insérer la cartouche dessus';
 $lang['prime_button']
 	= 'Amorcer le filament';
+$lang['color_label']
+	= 'Couleur';
+$lang['material_label']
+	= 'Matériel';
+$lang['temper_label']
+	= 'Température';
+$lang['length_label']
+	= 'Longueur';
+$lang['write_button']
+	= 'Ecrire RFID';
 
 ?>

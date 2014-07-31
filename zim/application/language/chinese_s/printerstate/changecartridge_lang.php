@@ -46,5 +46,15 @@ $lang['Insert the cartridge above']
 	= '插入上方所示的墨盒';
 $lang['prime_button']
 	= '校正打印丝';
+$lang['color_label']
+	= '颜色';
+$lang['material_label']
+	= '材料';
+$lang['temper_label']
+	= '温度';
+$lang['length_label']
+	= '长度';
+$lang['write_button']
+	= '写入RFID';
 
 ?>

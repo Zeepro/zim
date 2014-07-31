@@ -74,15 +74,44 @@ class Printerstate extends MY_Controller {
 		return;
 	}
 	
-	private function _display_changecartridge_write_cartridge($next_phase = PRINTERSTATE_CHANGECART_WAIT_F_C, $need_filament = 0) {
+	private function _display_changecartridge_write_cartridge($abb_cartridge, $next_phase = PRINTERSTATE_CHANGECART_WAIT_F_C, $need_filament = 0) {
+		$cr = 0;
+		$cartridge_data = array();
+		$length_value = 0;
+		$temper_value = 0;
+		
 		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
+		$cr = PrinterState_getCartridgeAsArray($cartridge_data, $abb_cartridge);
+		if ($cr != ERROR_OK) {
+			$length_value = 10;
+			$temper_value = 200;
+		}
+		else {
+			$length_value = floor(($cartridge_data[PRINTERSTATE_TITLE_INITIAL] - $cartridge_data[PRINTERSTATE_TITLE_USED]) / 1000);
+// 			if ($length_value < 10) {
+// 				$length_value = 10;
+// 			}
+			$temper_value = $cartridge_data[PRINTERSTATE_TITLE_EXT_TEMPER];
+// 			if ($temper_value < 160) {
+// 				$temper_value = 160;
+// 			}
+		}
+		
 		$template_data = array (
-				'next_phase'	=> $next_phase,
-				'color_label'	=> t('color_label'),
-				'temper_label'	=> t('temper_label'),
-				'length_label'	=> t('length_label'),
-				'write_button'	=> t('write_button'),
-				'length_min'	=> ceil($need_filament / 1000) + 2,
+				'next_phase'		=> $next_phase,
+				'color_label'		=> t('color_label'),
+				'temper_label'		=> t('temper_label'),
+				'length_label'		=> t('length_label'),
+				'write_button'		=> t('write_button'),
+				'material_label'	=> t('material_label'),
+				'material_array'	=> array(
+						array('name' => 'PLA', 'value' => PRINTERSTATE_VALUE_MATERIAL_PLA),
+						array('name' => 'ABS', 'value' => PRINTERSTATE_VALUE_MATERIAL_ABS),
+						array('name' => 'PVA', 'value' => PRINTERSTATE_VALUE_MATERIAL_PVA),
+				),
+				'length_min'		=> ceil($need_filament / 1000) + 2,
+				'length_value'		=> $length_value,
+				'temper_value'		=> $temper_value,
 		);
 		$this->_display_changecartridge_base('template/printerstate/changecartridge_ajax/cartridge', $template_data);
 		
@@ -650,7 +679,7 @@ class Printerstate extends MY_Controller {
 // 					else {
 // 						$this->_display_changecartridge_wait_load_filament(FALSE);
 // 					}
-					$this->_display_changecartridge_write_cartridge(PRINTERSTATE_CHANGECART_WAIT_F, $need_filament);
+					$this->_display_changecartridge_write_cartridge($abb_cartridge, PRINTERSTATE_CHANGECART_WAIT_F, $need_filament);
 					
 					
 					// turn off RFID power after changing
@@ -776,12 +805,23 @@ class Printerstate extends MY_Controller {
 			case 'write':
 				$ret_val = 0;
 				$array_data = array();
+				$array_old = array();
 				$color = $this->input->get('c');
 				$temper = (int) $this->input->get('t');
+				$material = (int) $this->input->get('m');
 				$length = (int) $this->input->get('l') * 1000;
 				$abb_cartridge = $this->input->get('v');
 				
 				//TODO finish here to write RFID card
+				// get cartridge type from old RFID
+				$ret_val = PrinterState_getCartridgeAsArray($array_old, $abb_cartridge, FALSE);
+				if ($ret_val != ERROR_OK) {
+					$this->output->set_status_header(403);
+					
+					$this->load->helper('printerlog');
+					PrinterLog_logMessage('read rfid error: ' . $ret_val, __FILE__, __LINE__);
+					break;
+				}
 				// change color from name to hex code
 				$this->load->helper('printlist');
 				$ret_val = ModelList__changeColorName($color);
@@ -797,6 +837,8 @@ class Printerstate extends MY_Controller {
 						PRINTERSTATE_TITLE_COLOR		=> $color,
 						PRINTERSTATE_TITLE_EXT_TEMPER	=> $temper,
 						PRINTERSTATE_TITLE_INITIAL		=> $length,
+						PRINTERSTATE_TITLE_MATERIAL		=> $material,
+						PRINTERSTATE_TITLE_CARTRIDGE	=> $array_old[PRINTERSTATE_TITLE_CARTRIDGE],
 				);
 				$ret_val = PrinterState_setCartridgeAsArray($abb_cartridge, $array_data);
 				if ($ret_val != ERROR_OK) {

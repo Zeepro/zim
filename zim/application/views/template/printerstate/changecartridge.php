@@ -110,6 +110,7 @@ function inputUserChoice(action) {
 					c: $("#showPaletteOnly").val(),
 					t: $("#temper_input").val(),
 					l: $("#length_input").val(),
+					m: $("#material_input").val(),
 					v: "{abb_cartridge}"
 					},
 				cache: false,

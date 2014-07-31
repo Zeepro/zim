@@ -453,7 +453,7 @@ function PrinterState_checkInPrint() {
 	return FALSE;
 }
 
-function PrinterState_setCartridgeCode($code_cartridge, $abb_cartridge) {
+function PrinterState_setCartridgeCode($code_cartridge, $abb_cartridge, $power_off = TRUE) {
 	global $CFG;
 	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
 	$command = '';
@@ -796,7 +796,7 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge, $pow
 	return ERROR_OK;
 }
 
-function PrinterState_setCartridgeAsArray($abb_cartridge, $data_json = array()) {
+function PrinterState_setCartridgeAsArray($abb_cartridge, $data_json = array(), $power_off = TRUE) {
 	$temp_hex = NULL;
 	$time_code = NULL;
 	$time_offset = NULL;
@@ -892,7 +892,7 @@ function PrinterState_setCartridgeAsArray($abb_cartridge, $data_json = array()) 
 	// change to uppercase
 	$code_write = strtoupper($code_write);
 	
-	return PrinterState_setCartridgeCode($code_write, $abb_cartridge);
+	return PrinterState_setCartridgeCode($code_write, $abb_cartridge, $power_off);
 }
 
 function PrinterState_checkFilaments($array_filament = array(), &$data_json_array = array()) {
