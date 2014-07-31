@@ -31,7 +31,7 @@
 						<a href="#" data-role="button" data-icon="arrow-l" data-iconpos="left" onclick="move('X', -1);">1</a>
 					</div>
 					<div class="grid_3">
-						<input type="number" data-clear-btn="false" name="xy_speed" id="xy_speed" value="3000" min="10" max="35" />
+						<input type="number" data-clear-btn="false" name="xy_speed" id="xy_speed" value="30" min="10" max="35" />
 					</div>
 					<div class="grid_1" style="">mm/s</div>
 					<div class="grid_2">
