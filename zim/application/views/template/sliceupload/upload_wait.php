@@ -32,7 +32,7 @@ function add_model() {
 	})
 	.fail(function() { // not in printing
 		$('#wait_message').html("{fail_message}");
-		$('<button>').appendTo('#container')
+		$('<div>').appendTo('#container')
 		.attr({'id': 'return_button', 'onclick': 'javascript: window.location.href="/sliceupload/upload";'}).html('{return_button}')
 		.button().button('refresh');
 	});

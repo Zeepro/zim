@@ -159,7 +159,7 @@ function getPreview(var_control) {
 			$('button#model_zrotminus_button').button().button('refresh');
 			$('button#model_zrotadd_button').button().button('refresh');
 			
-// 			$('<button>').appendTo('#cartridge_detail_info')
+// 			$('<div>').appendTo('#cartridge_detail_info')
 // 			.attr({'id': 'prime_button', 'onclick': 'javascript: window.location.href="/printdetail/printprime?v={abb_cartridge}";'})
 // 			.html('{prime_button}').button().button('refresh');
 		}
