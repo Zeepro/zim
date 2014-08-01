@@ -3,15 +3,35 @@
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
-class MY_Controller extends CI_Controller {
-
+class MY_Controller extends CI_Controller
+{	
+	function errorToSSO($level, $msg, $file, $line, $context)
+	{
+		$this->load->helper('zimapi');
+		$json_context = json_encode($context);
+		$url = 'https://sso.zeepro.com/errorlog.ashx';
+		$data = array(	'printersn' => ZimAPI_getSerial(),
+				'printertime' => date("Y-m-d H:i:s\Z", time()),
+				'level' => $level,
+				'code' => 500,
+				'message' => $msg . " in $file at $line with $json_context");
+	
+		$options = array('http' => array('header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+				'method'  => 'POST',
+				'content' => http_build_query($data)));
+		$context  = stream_context_create($options);
+		file_get_contents($url, false, $context);
+		return ;
+	}
+	
 	public function __construct() {
 		global $CFG;
 		
 		parent::__construct();
 // 		$this->load->helper(array('corestatus', 'url'));
 		$this->load->helper('corestatus');
-		
+
+		set_error_handler(array($this, 'errorToSSO'));
 		// initialisation status files
 		if (!CoreStatus_initialFile()) {
 			$this->load->helper('printerlog');
@@ -139,5 +159,4 @@ class MY_Controller extends CI_Controller {
 		}
 
 	}
-
 }

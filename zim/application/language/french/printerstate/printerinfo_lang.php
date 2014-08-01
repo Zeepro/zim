@@ -20,4 +20,4 @@ $lang['marlin_title']
 $lang['button_active_sso']
 	= 'Activer votre imprimante';
 $lang['button_rename_sso']
-	= 'Renomer votre imprimante';
+	= 'Renommer votre imprimante';

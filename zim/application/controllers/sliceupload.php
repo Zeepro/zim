@@ -25,10 +25,8 @@ class Sliceupload extends MY_Controller {
 		
 		$this->load->library('parser');
 		$this->lang->load('sliceupload/upload', $this->config->item('language'));
-		
 		if ($_SERVER['REQUEST_METHOD'] == 'POST')
 		{
-			extract($_POST);
 			$upload_config = array (
 					'upload_path'	=> $this->config->item('temp'),
 					'allowed_types'	=> '*',
@@ -38,7 +36,7 @@ class Sliceupload extends MY_Controller {
 			);
 			$this->load->library('upload', $upload_config);
 			
-			if (!empty($file1))
+			if (!empty($_FILES['file']))
 				$ret = $this->upload->do_upload('file');
 			else
 				$ret = $this->upload->do_upload('file_c1') && $this->upload->do_upload('file_c2');

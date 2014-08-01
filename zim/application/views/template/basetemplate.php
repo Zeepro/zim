@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 	{headers}
-	<link rel="stylesheet" href="/styles/jquery.mobile-1.3.0.min.css" />
-	<link rel="stylesheet" href="/styles/Custom-zim.min.css" />
+	<link rel="stylesheet" href="/styles/jquery.mobile-1.4.0.min.css" />
+<!-- 	<link rel="stylesheet" href="/styles/Custom-zim.min.css" /> -->
 	<script src="/scripts/jquery-1.9.1.min.js"></script>
 	<script>
 		$(document).bind("mobileinit", function() {
 			$.mobile.defaultPageTransition = 'slide';
 		});
 	</script>
-<script src="/scripts/jquery.mobile-1.3.0.min.js"></script>
+<script src="/scripts/jquery.mobile-1.4.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, target-densitydpi=medium-dpi, user-scalable=0" />
 
 <!-- <link rel="stylesheet" href="/assets/css/4.css"> -->
@@ -30,14 +30,14 @@
 		height: 100px;
 		cursor: pointer;
 	}
-	.ui-body-c{
+	.ui-page-theme-a{
 		color:#575749;
 		background:url("/assets/images/page-backgrounds/back-4.jpg") 0 -100px repeat-x  #f9f7f3;
 		background-size: 79px 245px; 
 	}
 	.page-header { 
-		background:url("/assets/images/headerBack.png") bottom repeat-x;
-		border:0px;
+		background:url("/assets/images/headerBack.png") bottom repeat-x !important;
+		border:0px;!important
 		color:#333;
 		height:38px;
 		text-shadow: 0 -1px 1px #fff;

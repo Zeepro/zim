@@ -54,6 +54,8 @@ function PrinterLog_logError($msg, $file = NULL, $line = NULL, $need_trim = TRUE
 			$location = "\t(" . PrinterLog__filterAppPath($file) . ' ' . $line . ')';
 		}
 		
+		
+		
 		return PrinterLog__logToDebugFile($CFG->config['log_file'], $msg, "ERR: ", $location, $need_trim);
 	}
 	else {

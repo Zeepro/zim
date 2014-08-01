@@ -19,7 +19,8 @@ class Menu_home extends MY_Controller {
 		$this->load->library('parser');
 		$this->lang->load('menu_home', $this->config->item('language'));
 		$this->load->helper('zimapi');
-		
+
+		echo($ZBRAH);
 		if (!ZimAPI_cameraOff()) {
 			$this->load->helper('printerlog');
 			PrinterLog_logError('can not turn off camera', __FILE__, __LINE__);
@@ -52,7 +53,6 @@ class Menu_home extends MY_Controller {
 		);
 		
 		$this->parser->parse('template/basetemplate', $template_data);
-		
 		return;
 	}
 	

@@ -29,6 +29,10 @@
 </div>
 
 <script>
+/*
+ 
+ SCRIPT FOR JQUERY MOBILE 1.3
+ 
 	$("#tab1").bind("expand", function(event)
 	{
 		$("#file_upload2").val("");
@@ -38,4 +42,17 @@
 	{
 		$("#file_upload1").val("");
 	});
+*/
+
+$("#tab1").on("collapsibleexpand", function(event)
+{
+	$("#file_upload2").val("");
+	$("#file_upload3").val("");
+}); 
+
+$("#tab2").on("collapsibleexpand", function(event)
+{
+	$("#file_upload1").val("");
+});
+
 </script>

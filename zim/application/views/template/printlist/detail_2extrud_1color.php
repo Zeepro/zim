@@ -27,6 +27,7 @@
 <!-- 			</div> -->
 			<div data-role="collapsible" data-collapsed="false" style="text-align: center;">
 				<h4>{title_current}</h4>
+				<div style="height:210px">
 				<div style="width: 50%; float: left; text-align: center;">
 					<div style="width: 75px; height: 75px; background-color: {state_c_l}; margin: 0 auto;">
 						<img src="/images/cartridge.png" style="width: 100%">
@@ -43,6 +44,7 @@
 <!-- 					<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh" onclick="window.location.href='/printerstate/changecartridge?v=r&f={need_filament_r}&id={model_id}'">{change_filament_r}</button> -->
 					<a href="/printerstate/changecartridge?v=r&f={need_filament_r}&id={model_id}" data-role="button" data-ajax="false" data-icon="refresh" class="ui-shadow ui-corner-all">{change_filament_r}</a>
 					<input type="range" name="r" id="slider-2" value="{temper_filament_r}" min="160" max="260">
+				</div>
 				</div>
 <!-- 				<a href="/print?id={model_id}" class="ui-btn ui-btn-inline ui-icon-action ui-btn-icon-left">{print_model}</a> -->
 			</div>

@@ -144,8 +144,8 @@ function finishAction() {
 	$('button#print_action').html('{return_button}');
 
 	// add restart button for print again
-	$('<button>').appendTo('#container')
-	.attr({'id': 'again_button', 'onclick': 'javascript: window.location.href="{restart_url}";'}).html('{again_button}')
+	$('<div>').appendTo('#container')
+	.attr({'id': 'again_button', 'onclick': 'javascript: window.location.href="{restart_url}";', 'data-icon' : 'refresh'}).html('{again_button}')
 	.button().button('refresh');
 
 	return;

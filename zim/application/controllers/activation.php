@@ -1,5 +1,8 @@
 <?php
 
+if (!defined('BASEPATH'))
+	exit('No direct script access allowed');
+
 class Activation extends MY_Controller
 {
 	public function index()
@@ -34,7 +37,7 @@ class Activation extends MY_Controller
 			{
 				$this->load->helper('zimapi');
 				extract($_POST);
-				$url = 'http://sso.zeepro.com/addprinter.ashx';
+				$url = 'https://sso.zeepro.com/addprinter.ashx';
 				$data = array('email' => $email, 'password' => $password, 'printersn' => ZimAPI_getSerial(), 'printername' => $printer_name);
 		
 				$options = array('http' => array('header'  => "Content-type: application/x-www-form-urlencoded\r\n",
@@ -43,7 +46,6 @@ class Activation extends MY_Controller
 				$context  = stream_context_create($options);
 				file_get_contents($url, false, $context);
 				$result = substr($http_response_header[0], 9, 3);
-				echo '<script>console.log("'.$result.'");</script>';
 				if ($result == 200)
 				{
 					ZimAPI_setPrinterSSOName($printer_name);
