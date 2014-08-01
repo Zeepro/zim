@@ -1,6 +1,7 @@
 <div id="detailPage" data-role="page">
 	<header data-role="header" class="page-header">
 		<a href="javascript:history.back();" data-icon="back" data-ajax="false">{back}</a>
+		<a href="/" data-icon="home" data-ajax="false">Home</a>
 	</header>
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">

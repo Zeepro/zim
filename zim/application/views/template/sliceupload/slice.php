@@ -109,10 +109,10 @@ function getPreview(var_control) {
 		var var_html = '<img src="' + html + '"><br>';
 		var_html = var_html
 		+ '<div id="control_general_group">'
-			+ '<button id="preview_near_button" data-inline="true" data-icon="minus" data-iconpos="left"'
-			+ ' onclick="javascript: getPreviewNear(' + var_control + ');" class="ui-btn-hidden" data-disabled="false">{near_button}</button>'
-			+ '<button id="preview_far_button" data-inline="true" data-icon="plus" data-iconpos="left"'
-			+ ' onclick="javascript: getPreviewFar(' + var_control + ');" class="ui-btn-hidden" data-disabled="false">{far_button}</button>'
+			+ '<div id="preview_near_button" data-inline="true" data-icon="minus" data-iconpos="left"'
+			+ ' onclick="javascript: getPreviewNear(' + var_control + ');" class="ui-btn-hidden" data-disabled="false">{near_button}</div>'
+			+ '<div id="preview_far_button" data-inline="true" data-icon="plus" data-iconpos="left"'
+			+ ' onclick="javascript: getPreviewFar(' + var_control + ');" class="ui-btn-hidden" data-disabled="false">{far_button}</div>'
 		+ '</div>';
 		if (var_control == true) {
 			var_html = var_html + '<div class="ui-grid-b" id="control_grid">'
@@ -141,17 +141,18 @@ function getPreview(var_control) {
 		}
 		$("#preview_zone").html(var_html);
 		$("a#slice_button").removeClass("ui-disabled");
-		$('button#preview_near_button').button().button('refresh');
-		$('button#preview_far_button').button().button('refresh');
+
+		$('div#preview_near_button').button().button('refresh');
+		$('div#preview_far_button').button().button('refresh');
 		if (var_control == true) {
 			$('#control_general_group').append(
-					'<button id="model_small_button" data-inline="true" data-icon="minus" data-iconpos="left"'
-					+ ' onclick="javascript: changeModel(\'s-\');" class="ui-btn-hidden" data-disabled="false">{small_button}</button>'
-					+ '<button id="model_big_button" data-inline="true" data-icon="plus" data-iconpos="left"'
-					+ ' onclick="javascript: changeModel(\'s+\');" class="ui-btn-hidden" data-disabled="false">{big_button}</button>'
+					'<div id="model_small_button" data-inline="true" data-icon="minus" data-iconpos="left"'
+					+ ' onclick="javascript: changeModel(\'s-\');" class="ui-btn-hidden" data-disabled="false">{small_button}</div>'
+					+ '<div id="model_big_button" data-inline="true" data-icon="plus" data-iconpos="left"'
+					+ ' onclick="javascript: changeModel(\'s+\');" class="ui-btn-hidden" data-disabled="false">{big_button}</div>'
 					);
-			$('button#model_small_button').button().button('refresh');
-			$('button#model_big_button').button().button('refresh');
+			$('div#model_small_button').button().button('refresh');
+			$('div#model_big_button').button().button('refresh');
 			$('button#model_xrotminus_button').button().button('refresh');
 			$('button#model_xrotadd_button').button().button('refresh');
 			$('button#model_yrotminus_button').button().button('refresh');
