@@ -21,3 +21,5 @@ $lang['button_active_sso']
 	= 'Activate your printer';
 $lang['button_rename_sso']
 	= 'Rename your printer';
+$lang['Home']
+	= 'Home';

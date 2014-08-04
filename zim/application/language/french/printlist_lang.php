@@ -38,5 +38,6 @@ $lang['Description']
 	= 'Description';
 $lang['error']
 	= 'erreur';
-
+$lang['Home']
+= 'Home';
 ?>

@@ -55,6 +55,7 @@ $lang['temper_label']
 $lang['length_label']
 	= 'Longueur';
 $lang['write_button']
-	= 'Ecrire RFID';
-
+	= 'Ecrire sur la RFID';
+$lang['Home']
+= 'Accueil';
 ?>

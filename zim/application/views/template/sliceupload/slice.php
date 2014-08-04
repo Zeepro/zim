@@ -121,11 +121,11 @@ function getPreview(var_control) {
 		if (var_control == true) {
 			var_html = var_html + '<div class="ui-grid-b" id="control_grid">'
 			+ '<div class="ui-block-a"><div class="ui-bar ui-bar-f" id="xrot_grid">'
-				+ '<button id="model_xrotminus_button" data-inline="true" data-icon="minus" data-iconpos="notext"'
-				+ ' onclick="javascript: changeModel(\'xrot-\');" class="ui-btn-hidden" data-disabled="false">xrot add</button>'
+			+ '<div id="model_xrotminus_button" data-inline="true" data-icon="minus"'
+				+ ' onclick="javascript: changeModel(\'xrot-\');" class="ui-btn-hidden" data-disabled="false">xrot add</div>'
 				+ '<br><br>X<br><br>'
-				+ '<button id="model_xrotadd_button" data-inline="true" data-icon="plus" data-iconpos="notext"'
-				+ ' onclick="javascript: changeModel(\'xrot+\');" class="ui-btn-hidden" data-disabled="false">xrot minus</button>'
+				+ '<div id="model_xrotadd_button" data-inline="true" data-icon="plus" data-iconpos="notext"'
+				+ ' onclick="javascript: changeModel(\'xrot+\');" class="ui-btn-hidden" data-disabled="false">xrot minus</div>'
 			+ '</div></div>'
 			+ '<div class="ui-block-b"><div class="ui-bar ui-bar-f" id="yrot_grid">'
 				+ '<button id="model_yrotminus_button" data-inline="true" data-icon="minus" data-iconpos="notext"'
@@ -157,8 +157,8 @@ function getPreview(var_control) {
 					);
 			$('div#model_small_button').button().button('refresh');
 			$('div#model_big_button').button().button('refresh');
-			$('button#model_xrotminus_button').button().button('refresh');
-			$('button#model_xrotadd_button').button().button('refresh');
+			$('div#model_xrotminus_button').button().button('refresh');
+			$('div#model_xrotadd_button').button().button('refresh');
 			$('button#model_yrotminus_button').button().button('refresh');
 			$('button#model_yrotadd_button').button().button('refresh');
 			$('button#model_zrotminus_button').button().button('refresh');

@@ -46,6 +46,7 @@ class Preset extends MY_Controller {
 		
 		// parse the main body
 		$template_data = array(
+				'home'				=> t('Home'),
 				'back'				=> t('back'),
 				'search_hint'		=> t('search_hint'),
 				'baseurl_detail'	=> '/preset/detail',
@@ -282,6 +283,7 @@ class Preset extends MY_Controller {
 				'back'			=> t('back'),
 				'switch_off'	=> t('switch_off'),
 				'switch_on'		=> t('switch_on'),
+				'home'			=> t('Home'),
 				// title
 				'layer_height'							=> t('layer_height'),
 				'first_layer_height'					=> t('first_layer_height'),

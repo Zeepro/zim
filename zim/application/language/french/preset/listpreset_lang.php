@@ -11,3 +11,5 @@ $lang['submit_button']
 	= 'Créer';
 $lang['preset_list_title']
 	= 'Zim - Liste de préset';
+$lang['Home']
+	= 'Accueil';

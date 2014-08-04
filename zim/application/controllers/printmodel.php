@@ -203,6 +203,7 @@ class Printmodel extends MY_Controller {
 		
 		// show detail page if valid, parse the body of page
 		$template_data = array(
+				'home'				=> t('Home'),
 				'title'				=> $model_data[PRINTLIST_TITLE_NAME],
 				'image'				=> $model_data[PRINTLIST_TITLE_PIC][0],
 				'model_c_r'			=> $model_data[PRINTLIST_TITLE_COLOR_F1],

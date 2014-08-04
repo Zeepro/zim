@@ -416,6 +416,7 @@ class Printerstate extends MY_Controller {
 		$template_data = array(
 				'array_info'	=> $array_info,
 				'back'			=> t('back'),
+				'home'			=> t('Home'),
 				'button_sso'	=> ($sso_name == NULL) ? t('button_active_sso') : t('button_rename_sso'),
 		);
 		
@@ -458,6 +459,7 @@ class Printerstate extends MY_Controller {
 		$template_data = array(
 				'title'			=> ($abb_cartridge == 'l') ? t('Left cartridge change') : t('Right cartridge change'),
 				'wait_info'		=> t('Waiting for getting information...'),
+				'home'		=> t('Home'),
 				'first_status'	=> PRINTERSTATE_CHANGECART_UNLOAD_F,
 				'insert_status'	=> PRINTERSTATE_CHANGECART_INSERT_C,
 				'back'			=> t('back'),
@@ -904,6 +906,7 @@ class Printerstate extends MY_Controller {
 				'reset_button'	=> t('Reset the printer\'s network'),
 				'error'			=> $error,
 				'back'			=> t('back'),
+				'home'			=> t('Home')
 		);
 		
 		$body_page = $this->parser->parse('template/printerstate/resetnetwork', $template_data, TRUE);
@@ -969,6 +972,7 @@ class Printerstate extends MY_Controller {
 				'set_button'	=> t('set_button'),
 				'error'			=> $error,
 				'back'			=> t('back'),
+				'home_button'	=> t('home_button'),
 		);
 	
 		$body_page = $this->parser->parse('template/printerstate/sethostname', $template_data, TRUE);

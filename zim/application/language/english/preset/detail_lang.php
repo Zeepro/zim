@@ -233,3 +233,5 @@ $lang['bridge_flow_ratio']
 	= 'Bridge flow ratio';
 $lang['resolution']
 	= 'Resolution (mm)';
+$lang['Home']
+	= 'Home';

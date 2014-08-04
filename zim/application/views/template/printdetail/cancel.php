@@ -86,7 +86,7 @@ function finishAction() {
 	// display info
 	$("#cancel_detail_info").html('<p>{finish_info}</p>');
 	// add return button for Home
-	$('<button>').appendTo('#container')
+	$('<div>').appendTo('#container')
 	.attr({'id': 'print_action', 'onclick': 'javascript: window.location.href="{return_url}";'}).html('{return_button}')
 	.button().button('refresh');
 

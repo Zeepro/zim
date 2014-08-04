@@ -21,3 +21,5 @@ $lang['button_active_sso']
 	= 'Activer votre imprimante';
 $lang['button_rename_sso']
 	= 'Renommer votre imprimante';
+$lang['Home']
+	= 'Accueil';
