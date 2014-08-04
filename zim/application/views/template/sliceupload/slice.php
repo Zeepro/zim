@@ -39,8 +39,12 @@ var var_interval_rho = 100;
 
 var var_model_scale = 100;
 var var_model_zrot = 0;
+var var_model_xrot = 0;
+var var_model_yrot = 0;
 var var_interval_scale = 50;
 var var_interval_zrot = 30;
+var var_interval_xrot = 30;
+var var_interval_yrot = 30;
 
 
 $(document).ready(prepareDisplay());
@@ -222,6 +226,26 @@ function changeModel(var_action) {
 			var_ajax_data['zrot'] = var_model_zrot;
 			break;
 			
+		case 'xrot+':
+			var_model_xrot += var_interval_xrot;
+			var_ajax_data['xrot'] = var_model_xrot;
+			break;
+			
+		case 'xrot-':
+			var_model_xrot -= var_interval_xrot;
+			var_ajax_data['xrot'] = var_model_xrot;
+			break;
+			
+		case 'yrot+':
+			var_model_yrot += var_interval_yrot;
+			var_ajax_data['yrot'] = var_model_yrot;
+			break;
+			
+		case 'yrot-':
+			var_model_yrot -= var_interval_yrot;
+			var_ajax_data['yrot'] = var_model_yrot;
+			break;
+			
 		case 's+':
 			var_model_scale += var_interval_scale;
 			var_ajax_data['s'] = var_model_scale;
@@ -259,6 +283,22 @@ function changeModel(var_action) {
 				
 			case 'zrot-':
 				var_model_zrot += var_interval_zrot;
+				break;
+				
+			case 'xrot+':
+				var_model_xrot -= var_interval_xrot;
+				break;
+				
+			case 'xrot-':
+				var_model_xrot += var_interval_xrot;
+				break;
+				
+			case 'yrot+':
+				var_model_yrot -= var_interval_yrot;
+				break;
+				
+			case 'yrot-':
+				var_model_yrot += var_interval_yrot;
 				break;
 				
 			case 's+':
