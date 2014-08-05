@@ -414,11 +414,24 @@ function PrinterState_getExtruderTemperaturesAsArray() {
 	PrinterLog_logArduino($command, $output);
 	
 	if (count($output) > 0) {
+		$ret_val = ERROR_OK;
 		$explode_array = explode('-', $output[0]);
+		if (count($explode_array) == 0) {
+			$ret_val = ERROR_INTERNAL;
+			PrinterLog_logError('no extruder detected, context: ' . $output[0], __FILE__, __LINE__);
+		}
 		foreach ($explode_array as $key_value) {
 			$tmp_array = explode(':', $key_value);
+			if (count($tmp_array) != 2) {
+				$ret_val = ERROR_INTERNAL;
+				PrinterLog_logError('no correct structure detected, context: ' . $key_value, __FILE__, __LINE__);
+				break;
+			}
 			$abb_filament = PrinterState_temperatureAbb2Number(trim($tmp_array[0]));
 			$data_array[$abb_filament] = ceil($tmp_array[1]);
+		}
+		if ($ret_val != ERROR_OK) {
+			return $ret_val;
 		}
 	}
 
