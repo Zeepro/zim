@@ -1,7 +1,7 @@
 <?php
 
-$lang['title'] = "Votre compte Zeepro";
-$lang['create_account'] = "Créez un compte Zeepro";
-$lang['password'] = "Mot de passe";
-$lang['sign_in'] = "Se connecter";
-$lang['sign_up'] = "Créer un compte";
+$lang['title'] = "Your Zeepro account";
+$lang['create_account'] = "Create a Zeepro account";
+$lang['password'] = "Password";
+$lang['sign_in'] = "Sign in";
+$lang['sign_up'] = "Sign up";
