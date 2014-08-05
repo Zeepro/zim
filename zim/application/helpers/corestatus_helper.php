@@ -230,7 +230,7 @@ function CoreStatus_checkCallConnection(&$url_redirect = '') {
 }
 
 function CoreStatus_checkCallPrinting(&$url_redirect = '') {
-	$url_redirect = '/printdetail/recovery';
+	$url_redirect = '/printdetail/status';
 	
 	return CoreStatus__checkCallURI(array(
 			'/printdetail/status'		=> NULL,
