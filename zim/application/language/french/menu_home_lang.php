@@ -8,8 +8,8 @@ $lang['Configuration']
 $lang['ZeePro Personal Printer 21 - Home']
 	= 'Zim - Accueil';
 $lang['manage']
-	= 'Gérer l\'imprimante';
+	= 'Gestion de l\'imprimante';
 $lang['upload']
-	= 'Charger un fichier';
+	= 'Impression d\'un fichier';
 $lang['activate_printer']
-= "Activez l'imprimante";
+	= "Activez l'imprimante";

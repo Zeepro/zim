@@ -6,20 +6,20 @@ $lang['back']
 $lang['printerstate_printerinfo_pagetitle']
 	= 'Zim - Information';
 $lang['version_title']
-	= 'Printer image version';
+	= 'Image version';
 $lang['next_version_title']
-	= 'Printer image version (After reboot)';
+	= 'Image version (After reboot)';
 $lang['type_title']
-	= 'Printer type';
+	= 'Type';
 $lang['serial_title']
-	= 'Printer serial number';
+	= 'Serial number';
 $lang['extruder_title']
 	= 'Number of extruders';
 $lang['marlin_title']
 	= 'Firmware version';
 $lang['button_active_sso']
-	= 'Activate your printer';
+	= 'Activate';
 $lang['button_rename_sso']
-	= 'Rename your printer';
+	= 'Rename';
 $lang['Home']
 	= 'Home';

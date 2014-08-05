@@ -6,7 +6,7 @@ $lang['back']
 $lang['ZeePro Personal Printer 21 - Reset connection']
 	= 'Zim - Reset connection';
 $lang['Reset the printer\'s network']
-	= 'Reset the printer\'s network';
+	= 'Reset';
 // $lang['Press to reset network']
 // 	= 'Press to reset network';
 $lang['Reset error']

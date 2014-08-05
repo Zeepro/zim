@@ -6,22 +6,22 @@ $lang['back']
 $lang['printerstate_index_pagetitle']
 	= 'Zim - Configuration';
 $lang['reset_network']
-	= 'Reset printer\'s network';
+	= 'Reset network\'s config.';
 $lang['change_left']
 	= 'Change left cartridge';
 $lang['change_right']
 	= 'Change right cartridge';
 $lang['printer_info']
-	= 'Printer information';
+	= 'Informations';
 $lang['set_hostname']
-	= 'Set hostname';
+	= 'FQDN';
 $lang['strip_led']
-	= 'LED';
+	= 'Platform lighting';
 $lang['head_led']
-	= 'Head LED';
+	= 'LED';
 $lang['led_on']
 	= 'On';
 $lang['led_off']
 	= 'Off';
 $lang['set_preset']
-	= 'Slicer';
+	= 'Slicer presets';

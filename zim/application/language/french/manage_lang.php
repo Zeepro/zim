@@ -5,6 +5,8 @@ $lang['back']
 
 $lang['manage_index_pagetitle']
 	= 'Zim - Gestion';
+$lang['reset_title']
+  = 'Remise à l\'origine';
 $lang['head_title']
 	= 'Tête';
 $lang['platform_title']
@@ -12,6 +14,8 @@ $lang['platform_title']
 $lang['filament_title']
 	= 'Filament';
 $lang['manage_left']
-	= 'Gestion du filament gauche';
+	= 'Cartouche de gauche';
 $lang['manage_right']
-	= 'Gestion du filament droit';
+	= 'Cartouche de droite';
+$lang['activate_printer']
+	= "Activez l'imprimante";
