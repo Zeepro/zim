@@ -4,12 +4,12 @@ $lang['back']
 	= 'retour';
 
 $lang['search_hint']
-	= 'Selectionner un préset';
+	= 'Préselection';
 $lang['new_preset_label']
-	= 'Nouveau préset basé sur';
+	= 'Nouvelle préselection basée sur';
 $lang['submit_button']
 	= 'Créer';
 $lang['preset_list_title']
-	= 'Zim - Liste de préset';
+	= 'Zim - Liste de préselection';
 $lang['Home']
 	= 'Accueil';

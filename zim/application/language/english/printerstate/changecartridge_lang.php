@@ -43,7 +43,7 @@ $lang['Error']
 $lang['Remove the cartridge above']
 	= 'Remove the cartridge above';
 $lang['Insert the cartridge above']
-	= 'Insert the cartridge above';
+	= 'Load the cartridge';
 $lang['prime_button']
 	= 'Prime the filament';
 $lang['color_label']
