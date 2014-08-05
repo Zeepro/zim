@@ -116,10 +116,10 @@ function home(var_axis) {
 
 	var_axis = typeof var_axis !== 'undefined' ? var_axis : 'all';
 	if (var_axis == 'all') {
-		var_url = "/pronterface/home";
+		var_url = "/manage/home";
 	}
 	else {
-		var_url = "/pronterface/home/" + var_axis;
+		var_url = "/manage/home/" + var_axis;
 	}
 	var_ajax = $.ajax({
 		url: var_url,
@@ -152,7 +152,7 @@ function move(var_axis, var_value) {
 		else {
 			var_speed = $("#xy_speed").val();
 		}
-		var_url = "/pronterface/move/" + var_axis + '/' + var_value + '/' + var_speed;
+		var_url = "/manage/move/" + var_axis + '/' + var_value + '/' + var_speed;
 	}
 	var_ajax = $.ajax({
 		url: var_url,
