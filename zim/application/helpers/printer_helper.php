@@ -373,6 +373,7 @@ function Printer_stopPrint() {
 // 				PrinterLog_logError('start printing canceling model failed', __FILE__, __LINE__);
 // 				return FALSE;
 // 			}
+			return TRUE;
 		}
 	}
 	else {
