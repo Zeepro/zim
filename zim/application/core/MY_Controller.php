@@ -21,7 +21,7 @@ class MY_Controller extends CI_Controller
 				'content' => http_build_query($data)));
 		$context  = stream_context_create($options);
 		file_get_contents($url, false, $context);
-		return ;
+		header('Location: /error');
 	}
 	
 	public function __construct() {

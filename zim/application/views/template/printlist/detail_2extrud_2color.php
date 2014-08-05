@@ -1,3 +1,4 @@
+<div id="overlay"></div>
 <div data-role="page">
 	<header data-role="header" class="page-header">
 		<a href="javascript:history.back();" data-icon="back" data-ajax="false">{back}</a>
@@ -75,4 +76,10 @@
 
 	$("#slider-1").attr('min', tmp - 10); 
 	$("#slider-1").attr('max', parseInt(tmp) + 10);
+	
+	$("input[type=submit]").on('click', function()
+	{
+		$("#overlay").addClass("gray-overlay");
+		$(".ui-loader").css("display", "block");
+	});
 </script>

@@ -10,7 +10,7 @@ class Activation extends MY_Controller
 		$network_ok = false;
 		$this->load->library('parser');
 
-		if (!(@file_get_contents("http://sso.zeepro.com/login.ashx") === FALSE))
+		if (!(@file_get_contents("https://sso.zeepro.com/login.ashx") === FALSE))
 		{
 			$network_ok = true;
 		}

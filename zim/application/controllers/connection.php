@@ -404,7 +404,6 @@ class Connection extends MY_Controller {
 				
 		// parse all page
 		$this->_generate_framePage($body_page);
-		
 		return;
 	}
 }

@@ -19,7 +19,7 @@ class Menu_home extends MY_Controller {
 		$this->load->library('parser');
 		$this->lang->load('menu_home', $this->config->item('language'));
 		$this->load->helper('zimapi');
-
+		
 		if (!ZimAPI_cameraOff()) {
 			$this->load->helper('printerlog');
 			PrinterLog_logError('can not turn off camera', __FILE__, __LINE__);
@@ -48,7 +48,7 @@ class Menu_home extends MY_Controller {
 		$template_data = array(
 				'lang'			=> $this->config->item('language_abbr'),
 				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Home') . '</title>',
-				'contents'		=> $body_page,
+				'contents'		=> $body_page
 		);
 		
 		$this->parser->parse('template/basetemplate', $template_data);

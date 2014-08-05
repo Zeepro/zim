@@ -10,42 +10,24 @@ class Error extends MY_Controller {
         $this->load->helper(array('form', 'url', 'json'));
     }
 
-    public function index() {
-        global $CFG;
-
-        $this->lang->load('master', $this->config->item('language'));
-        $this->lang->load('home', $this->config->item('language'));
-        $this->lang->load('error', $this->config->item('language'));
-
-        $this->template->set('lang', $CFG->config['language_abbr']);
-        $this->template->set('header', "<title>" . t('ZeePro Personal Printer 21 - Error') . "</title>");
-
-        $arr = json_read($CFG->config['conf'] . 'Work.json');
-
-        if ($arr["error"]) {
-            // Json decoding error
-            $data['message'] = message($arr["error"]);
-        } else {
-            if (!array_key_exists("Version", $arr["json"])) {
-                // Malformed file
-                $data['message'] = t("Internal error #7 (if this message persists, thank you to contact our maintenance service)");
-            } else {
-                switch ($arr["json"]["Version"]) {
-                    case "1.0":
-                        if (array_key_exists("Message", $arr["json"])) {
-                            $data['message'] = message($arr["json"]["Message"]);
-                        } else {
-                            // Malformed 1.0 file
-                            $data['message'] = t("Internal error #8 (if this message persists, thank you to contact our maintenance service)");
-                        }
-                        break;
-                    default:
-                        // Not supported version
-                        $data['message'] = t("Internal error #9 (if this message persists, thank you to contact our maintenance service)");
-                }
-            }
-        }
-        $this->template->load('master', 'error', $data);
+    public function index()
+    {
+   		$this->load->library('parser');
+   		$this->lang->load('error', $this->config->item('language'));
+   		
+   		$data = array(
+   			'title'	=>	t('title'),
+   			'error'	=>	t('error'),
+   			'home'	=>	t('home')
+   		);
+   		
+   		$body_page = $this->parser->parse('error.php', $data, TRUE);
+		$template_data = array(
+				'lang'			=> $this->config->item('language_abbr'),
+				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Home') . '</title>',
+				'contents'		=> $body_page,
+		);
+		$this->parser->parse('template/basetemplate', $template_data);
     }
 
 }

@@ -17,7 +17,7 @@ class Account extends MY_Controller
 			if ($this->form_validation->run())
 			{
 				extract($_POST);
-				$url = 'http://sso.zeepro.com/login.ashx';
+				$url = 'https://sso.zeepro.com/login.ashx';
 				$data = array('email' => $email, 'password' => $password);
 
 				$options = array('http' => array('header'  => "Content-type: application/x-www-form-urlencoded\r\n",
@@ -34,7 +34,7 @@ class Account extends MY_Controller
 				else
 				{
 					$this->load->helper('url');
-					redirect('activation');
+					redirect('menu_home');
 				}
 			}
 			else
@@ -69,7 +69,7 @@ class Account extends MY_Controller
 			if ($this->form_validation->run())
 			{
 				extract($_POST);
-				$url = 'http://sso.zeepro.com/confirmaccount.ashx';
+				$url = 'https://sso.zeepro.com/confirmaccount.ashx';
 				$data = array('email' => $email, 'code' => $code);
 			
 				$options = array('http' => array('header'  => "Content-type: application/x-www-form-urlencoded\r\n",
@@ -112,7 +112,7 @@ class Account extends MY_Controller
 			if ($this->form_validation->run())
 			{
 				extract($_POST);
-				$url = 'http://sso.zeepro.com/createaccount.ashx';
+				$url = 'https://sso.zeepro.com/createaccount.ashx';
 				$data = array('email' => $email, 'password' => $password);
 		
 				$options = array('http' => array('header'  => "Content-type: application/x-www-form-urlencoded\r\n",
