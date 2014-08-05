@@ -12,9 +12,9 @@
 			<form action="/activation/activation_form" data-ajax="false" method="POST">
 				<input type="hidden" name="email" value='{email}' />
 				<input type="hidden" name="password" value='{password}' />
-				<label for="printer_name">Give a name to your printer : </label>
+				<label for="printer_name">{give_name}</label>
 				<input type="text" name="printer_name" value="" />
-				<input type="submit" name="submit" value="Activate my printer" />
+				<input type="submit" name="submit" value="{activate}" />
 			</form>
 		</div>
 	</div>

@@ -1,3 +1,4 @@
+
 				<div class="ui-grid-a">
 					<div class="ui-block-a"><div id="left_cartridge" class="ui-bar ui-bar-f">
 						<div style="width: 75px; height: 75px; background-color: {cartridge_c_l}; margin: 0 auto;">
@@ -31,10 +32,15 @@
 var var_enable_print = {enable_print};
 var var_reslice = {enable_reslice};
 
-$('<button>').appendTo('#left_cartridge')
+$("input[type=submit]").on('click', function()
+{
+	$("#overlay").addClass("gray-overlay");
+	$(".ui-loader").css("display", "block");
+});
+$('<div>').appendTo('#left_cartridge')
 .attr({'id': 'change_left', 'data-icon': 'refresh', 'data-iconpos':'right', 'onclick': 'javascript: window.location.href="/printerstate/changecartridge?v=l&f={need_filament_l}&id=slice";'}).html('{change_left}')
 .button().button('refresh');
-$('<button>').appendTo('#right_cartridge')
+$('<div>').appendTo('#right_cartridge')
 .attr({'id': 'change_right', 'data-icon': 'refresh', 'data-iconpos':'right', 'onclick': 'javascript: window.location.href="/printerstate/changecartridge?v=r&f={need_filament_r}&id=slice";'}).html('{change_right}')
 .button().button('refresh');
 // $('<button>').appendTo('#detail_zone')
@@ -59,10 +65,10 @@ $("#slider_left").attr('max', parseInt(tmp) + 10);
 $('#detail_zone').trigger("create");
 	
 if (var_enable_print == false) {
-	$("button#print_slice").button("disable");
+	$("#print_slice").button("disable");
 }
 if (var_reslice == true) {
-	$('<button>').appendTo('#detail_zone')
+	$('<div>').appendTo('#detail_zone')
 	.attr({'id': 'reslice_button', 'onclick': 'javascript: startSlice();'}).html('{reslice_button}')
 	.button().button('refresh');
 }

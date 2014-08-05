@@ -20,10 +20,10 @@ $.ajax({
 	alert('failed');
 });
 
-$('<button>').appendTo('#cartridge_detail_info')
+$('<div>').appendTo('#cartridge_detail_info')
 .attr({'id': 'load_button', 'onclick': 'javascript: inputUserChoice("load");'}).html('{load_button}')
 .button().button('refresh');
-$('<button>').appendTo('#cartridge_detail_info')
+$('<div>').appendTo('#cartridge_detail_info')
 .attr({'id': 'change_button', 'onclick': 'javascript: inputUserChoice("change");'}).html('{change_button}')
 .button().button('refresh');
 </script>

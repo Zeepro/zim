@@ -2,6 +2,7 @@
 <link rel="stylesheet" type="text/css" href="/styles/spectrum.css" />
 <link rel="stylesheet" type="text/css" href="/assets/jquery-mobile-fluid960.min.css" />
 
+<div id="overlay"></div>
 <div class="container_16">
 	<div class="grid_5"><div class="ui-bar ui-bar-d" style="height: 2em;">
 		<label for="showPaletteOnly">{color_label}</label>

@@ -11,3 +11,5 @@ $lang['manage']
 	= 'Manage printer';
 $lang['upload']
 	= 'Upload file';
+$lang['activate_printer']
+= 'Activate the printer';

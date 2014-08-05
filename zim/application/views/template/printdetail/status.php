@@ -1,4 +1,5 @@
 <div data-role="page" data-url="/printdetail/status">
+	<div id="overlay"></div>
 	<header data-role="header" class="page-header">
 	</header>
 	<div class="logo"><div id="link_logo"></div></div>
@@ -44,6 +45,13 @@ var var_prime = {var_prime};
 var var_ajax_lock = false;
 
 $(document).ready(checkPrintStatus());
+
+function again()
+{
+	$("#overlay").addClass("gray-overlay");
+	$(".ui-loader").css("display", "block");
+	window.location.href="{restart_url}";
+};
 
 function checkPrintStatus() {
 	refreshPrintStatus();
@@ -145,7 +153,7 @@ function finishAction() {
 
 	// add restart button for print again
 	$('<div>').appendTo('#container')
-	.attr({'id': 'again_button', 'onclick': 'javascript: window.location.href="{restart_url}";', 'data-icon' : 'refresh'}).html('{again_button}')
+	.attr({'id': 'again_button', 'onclick' : 'again()', 'data-icon' : 'refresh'}).html('{again_button}')
 	.button().button('refresh');
 
 	return;

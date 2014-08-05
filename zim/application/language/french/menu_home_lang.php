@@ -11,3 +11,5 @@ $lang['manage']
 	= 'Gérer l\'imprimante';
 $lang['upload']
 	= 'Charger un fichier';
+$lang['activate_printer']
+= "Activez l'imprimante";
