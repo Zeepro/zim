@@ -1040,6 +1040,7 @@ function PrinterState_afterFileCommand() {
 function PrinterState_checkBusyStatus(&$status_current, &$array_data = array(), $printafterslice = TRUE) {
 	$ret_val = 0;
 	$time_wait = NULL;
+	$time_max = NULL;
 	
 	//FIXME add timeout for checking loading / unloading
 	switch ($status_current) {
@@ -1164,10 +1165,12 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array(), 
 		case CORESTATUS_VALUE_LOAD_FILA_L:
 		case CORESTATUS_VALUE_LOAD_FILA_R:
 			$time_wait = PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD;
+			$time_max = PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_LOAD;
 			
 		case CORESTATUS_VALUE_UNLOAD_FILA_L:
 		case CORESTATUS_VALUE_UNLOAD_FILA_R:
 			$time_wait = $time_wait ? $time_wait : PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD;
+			$time_max = $time_max ? $time_max : PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_UNLOAD;
 			
 			// wait the time for arduino before checking filament when loading / unloading filament
 			if (CoreStatus_checkInWaitTime($time_wait)) {
@@ -1197,7 +1200,13 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array(), 
 					? TRUE : FALSE;
 			
 			$ret_val = PrinterState_getFilamentStatus($abb_filament);
-			if ($ret_val == $status_fin_filament) {
+			if ($ret_val == $status_fin_filament
+					|| !CoreStatus_checkInWaitTime($time_max)) {
+				if ($ret_val != $status_fin_filament) {
+					$CI = &get_instance();
+					$CI->load->helper('printerlog');
+					PrinterLog_logError('we pass timeout when we are in changing catridge, status: ' . $status_current, __FILE__, __LINE__);
+				}
 				$ret_val = CoreStatus_setInIdle();
 				if ($ret_val == TRUE) {
 					$status_current = CORESTATUS_VALUE_IDLE;
