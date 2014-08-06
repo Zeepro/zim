@@ -5,10 +5,6 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
-			<style>
-				div.ui-slider-switch div.ui-slider-inneroffset a.ui-slider-handle-snapping {display: none;}
-/* 				div.ui-slider-switch {width: 150px;} */
-			</style>
 			<div class="ui-grid-a">
 				<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;">
 					<label for="slider"><h2>{strip_led}</h2></label>
