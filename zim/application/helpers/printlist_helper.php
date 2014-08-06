@@ -425,6 +425,10 @@ function ModelList__listAsArray($set_localization = FALSE) {
 		if ($model_name[0] == PRINTLIST_MODEL_PREFIX_S) {
 			continue;
 		}
+		// jump through the files (no folder object)
+		if (!is_dir($model_path)) {
+			continue;
+		}
 		
 		try {
 			$tmp_array = json_read($model_path . PRINTLIST_FILE_JSON, TRUE);
