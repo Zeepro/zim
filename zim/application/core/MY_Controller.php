@@ -20,8 +20,14 @@ class MY_Controller extends CI_Controller
 				'method'  => 'POST',
 				'content' => http_build_query($data)));
 		$context  = stream_context_create($options);
-		file_get_contents($url, false, $context);
-		header('Location: /error');
+		if ($this->config->item('simulator')) {
+			var_dump($data);
+			die("error");
+		}
+		else {
+			file_get_contents($url, false, $context);
+			header('Location: /error');
+		}
 	}
 	
 	public function __construct() {
