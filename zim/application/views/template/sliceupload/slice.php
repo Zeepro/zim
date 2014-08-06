@@ -100,12 +100,12 @@ function getPreview(var_control) {
 		{
 			$("#overlay").addClass("gray-overlay");
 			$(".ui-loader").css("display", "block");
-        },
-        complete: function()
-        {	
+		},
+		complete: function()
+		{	
 			$("#overlay").removeClass("gray-overlay");
 			$(".ui-loader").css("display", "none");
-        },
+		},
 		timeout: 1000*60*10,
 	})
 	.done(function(html) {
@@ -113,19 +113,25 @@ function getPreview(var_control) {
 		var var_html = '<img src="' + html + '"><br>';
 		var_html = var_html
 		+ '<div id="control_general_group">'
-			+ '<div id="preview_near_button" data-inline="true" data-icon="minus" data-iconpos="left"'
-			+ ' onclick="javascript: getPreviewNear(' + var_control + ');" class="ui-btn-hidden" data-disabled="false">{near_button}</div>'
-			+ '<div id="preview_far_button" data-inline="true" data-icon="plus" data-iconpos="left"'
-			+ ' onclick="javascript: getPreviewFar(' + var_control + ');" class="ui-btn-hidden" data-disabled="false">{far_button}</div>'
-		+ '</div>';
+			+ '<button id="preview_near_button" data-inline="true" data-icon="minus" data-iconpos="left"'
+			+ ' onclick="javascript: getPreviewNear(' + var_control + ');" class="ui-btn-hidden" data-disabled="false">{near_button}</button>'
+			+ '<button id="preview_far_button" data-inline="true" data-icon="plus" data-iconpos="left"'
+			+ ' onclick="javascript: getPreviewFar(' + var_control + ');" class="ui-btn-hidden" data-disabled="false">{far_button}</button>';
+		
 		if (var_control == true) {
-			var_html = var_html + '<div class="ui-grid-b" id="control_grid">'
+			var_html = var_html
+				+ '<button id="model_small_button" data-inline="true" data-icon="minus" data-iconpos="left"'
+				+ ' onclick="javascript: changeModel(\'s-\');" class="ui-btn-hidden" data-disabled="false">{small_button}</button>'
+				+ '<button id="model_big_button" data-inline="true" data-icon="plus" data-iconpos="left"'
+				+ ' onclick="javascript: changeModel(\'s+\');" class="ui-btn-hidden" data-disabled="false">{big_button}</button>'
+			+ '</div>'
+			+ '<div class="ui-grid-b" id="control_grid">'
 			+ '<div class="ui-block-a"><div class="ui-bar ui-bar-f" id="xrot_grid">'
-			+ '<div id="model_xrotminus_button" data-inline="true" data-icon="minus"'
-				+ ' onclick="javascript: changeModel(\'xrot-\');" class="ui-btn-hidden" data-disabled="false">xrot add</div>'
+				+ '<button id="model_xrotminus_button" data-inline="true" data-icon="minus" data-iconpos="notext"'
+				+ ' onclick="javascript: changeModel(\'xrot-\');" class="ui-btn-hidden" data-disabled="false">xrot add</button>'
 				+ '<br><br>X<br><br>'
-				+ '<div id="model_xrotadd_button" data-inline="true" data-icon="plus" data-iconpos="notext"'
-				+ ' onclick="javascript: changeModel(\'xrot+\');" class="ui-btn-hidden" data-disabled="false">xrot minus</div>'
+				+ '<button id="model_xrotadd_button" data-inline="true" data-icon="plus" data-iconpos="notext"'
+				+ ' onclick="javascript: changeModel(\'xrot+\');" class="ui-btn-hidden" data-disabled="false">xrot minus</button>'
 			+ '</div></div>'
 			+ '<div class="ui-block-b"><div class="ui-bar ui-bar-f" id="yrot_grid">'
 				+ '<button id="model_yrotminus_button" data-inline="true" data-icon="minus" data-iconpos="notext"'
@@ -143,31 +149,29 @@ function getPreview(var_control) {
 			+ '</div></div>'
 			+ '</div>';
 		}
+		else {
+			var_html += '</div>';
+		}
 		$("#preview_zone").html(var_html);
 		$("a#slice_button").removeClass("ui-disabled");
 
-		$('div#preview_near_button').button().button('refresh');
-		$('div#preview_far_button').button().button('refresh');
-		if (var_control == true) {
-			$('#control_general_group').append(
-					'<div id="model_small_button" data-inline="true" data-icon="minus" data-iconpos="left"'
-					+ ' onclick="javascript: changeModel(\'s-\');" class="ui-btn-hidden" data-disabled="false">{small_button}</div>'
-					+ '<div id="model_big_button" data-inline="true" data-icon="plus" data-iconpos="left"'
-					+ ' onclick="javascript: changeModel(\'s+\');" class="ui-btn-hidden" data-disabled="false">{big_button}</div>'
-					);
-			$('div#model_small_button').button().button('refresh');
-			$('div#model_big_button').button().button('refresh');
-			$('div#model_xrotminus_button').button().button('refresh');
-			$('div#model_xrotadd_button').button().button('refresh');
-			$('button#model_yrotminus_button').button().button('refresh');
-			$('button#model_yrotadd_button').button().button('refresh');
-			$('button#model_zrotminus_button').button().button('refresh');
-			$('button#model_zrotadd_button').button().button('refresh');
+		$("#preview_zone").trigger("create");
+// 		$('div#preview_near_button').button().button('refresh');
+// 		$('div#preview_far_button').button().button('refresh');
+// 		if (var_control == true) {
+// 			$('div#model_small_button').button().button('refresh');
+// 			$('div#model_big_button').button().button('refresh');
+// 			$('div#model_xrotminus_button').button().button('refresh');
+// 			$('div#model_xrotadd_button').button().button('refresh');
+// 			$('div#model_yrotminus_button').button().button('refresh');
+// 			$('div#model_yrotadd_button').button().button('refresh');
+// 			$('div#model_zrotminus_button').button().button('refresh');
+// 			$('div#model_zrotadd_button').button().button('refresh');
 			
-// 			$('<div>').appendTo('#cartridge_detail_info')
-// 			.attr({'id': 'prime_button', 'onclick': 'javascript: window.location.href="/printdetail/printprime?v={abb_cartridge}";'})
-// 			.html('{prime_button}').button().button('refresh');
-		}
+// // 			$('<div>').appendTo('#cartridge_detail_info')
+// // 			.attr({'id': 'prime_button', 'onclick': 'javascript: window.location.href="/printdetail/printprime?v={abb_cartridge}";'})
+// // 			.html('{prime_button}').button().button('refresh');
+// 		}
 	})
 	.fail(function() { // not allowed
 		alert("failed preview");
@@ -204,7 +208,7 @@ function getPreviewFar(var_control) {
 
 function changeModel(var_action) {
 	var var_model_id = 0;
-	var var_ajax_data = {};
+// 	var var_ajax_data = {};
 	
 	var_action = typeof var_action !== 'undefined' ? var_action : 'error';
 	
@@ -218,55 +222,71 @@ function changeModel(var_action) {
 	switch (var_action) {
 		case 'zrot+':
 			var_model_zrot += var_interval_zrot;
-			var_ajax_data['zrot'] = var_model_zrot;
+// 			var_ajax_data['zrot'] = var_model_zrot;
 			break;
 			
 		case 'zrot-':
 			var_model_zrot -= var_interval_zrot;
-			var_ajax_data['zrot'] = var_model_zrot;
+// 			var_ajax_data['zrot'] = var_model_zrot;
 			break;
 			
 		case 'xrot+':
 			var_model_xrot += var_interval_xrot;
-			var_ajax_data['xrot'] = var_model_xrot;
+// 			var_ajax_data['xrot'] = var_model_xrot;
 			break;
 			
 		case 'xrot-':
 			var_model_xrot -= var_interval_xrot;
-			var_ajax_data['xrot'] = var_model_xrot;
+// 			var_ajax_data['xrot'] = var_model_xrot;
 			break;
 			
 		case 'yrot+':
 			var_model_yrot += var_interval_yrot;
-			var_ajax_data['yrot'] = var_model_yrot;
+// 			var_ajax_data['yrot'] = var_model_yrot;
 			break;
 			
 		case 'yrot-':
 			var_model_yrot -= var_interval_yrot;
-			var_ajax_data['yrot'] = var_model_yrot;
+// 			var_ajax_data['yrot'] = var_model_yrot;
 			break;
 			
 		case 's+':
 			var_model_scale += var_interval_scale;
-			var_ajax_data['s'] = var_model_scale;
+// 			var_ajax_data['s'] = var_model_scale;
 			break;
 			
 		case 's-':
 			var_model_scale -= var_interval_scale;
-			var_ajax_data['s'] = var_model_scale;
+// 			var_ajax_data['s'] = var_model_scale;
 			break;
 			
 		case 'error':
 		default:
 			return; 
 	}
-	var_ajax_data['id'] = var_model_id;
+// 	var_ajax_data['id'] = var_model_id;
 	
 	var_model_change = $.ajax({
 		url: "/sliceupload/preview_change_ajax",
 		type: "GET",
 		cache: false,
-		data: var_ajax_data,
+		data: {
+			id:		var_model_id,
+			s:		var_model_scale,
+			xrot:	var_model_xrot,
+			yrot:	var_model_yrot,
+			zrot:	var_model_zrot,
+		},
+		beforeSend: function()
+		{
+			$("#overlay").addClass("gray-overlay");
+			$(".ui-loader").css("display", "block");
+		},
+		complete: function()
+		{	
+			$("#overlay").removeClass("gray-overlay");
+			$(".ui-loader").css("display", "none");
+		},
 	})
 	.done(function(html) {
 		var_slice_status_lock = false;
