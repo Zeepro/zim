@@ -7,6 +7,11 @@ class MY_Controller extends CI_Controller
 {	
 	function errorToSSO($level, $msg, $file, $line, $context)
 	{
+		// do nothing when level is 0 or with @ (we don't care about error)
+		if (0 == ($level & error_reporting())) {
+			return;
+		}
+		
 		$this->load->helper('zimapi');
 		$json_context = json_encode($context);
 		$url = 'https://sso.zeepro.com/errorlog.ashx';
@@ -14,20 +19,23 @@ class MY_Controller extends CI_Controller
 				'printertime' => date("Y-m-d H:i:s\Z", time()),
 				'level' => $level,
 				'code' => 500,
-				'message' => $msg . " in $file at $line with $json_context");
-	
+				'message' => $msg . " in $file at $line with $json_context"
+		);
+		
+		// just display error for simulator (develop staff), and return 503 for ajax call
+		if ($this->config->item('simulator')) {
+			$protocol = (isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0');
+			header($protocol . ' 503');
+			var_dump($data);
+			die("error");
+		}
+		
 		$options = array('http' => array('header'  => "Content-type: application/x-www-form-urlencoded\r\n",
 				'method'  => 'POST',
 				'content' => http_build_query($data)));
 		$context  = stream_context_create($options);
-		if ($this->config->item('simulator')) {
-			var_dump($data);
-			die("error");
-		}
-		else {
-			file_get_contents($url, false, $context);
-			header('Location: /error');
-		}
+		file_get_contents($url, false, $context);
+		header('Location: /error');
 	}
 	
 	public function __construct() {
