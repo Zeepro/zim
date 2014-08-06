@@ -112,7 +112,7 @@ $lang['first_layer_height']
 $lang['perimeters']
 	= 'Périmètres (minimum)';
 $lang['spiral_vase']
-	= 'Elévation en spiral';
+	= 'Élévation en spirale';
 $lang['top_solid_layers']
 	= 'Couches de renfort supérieures';
 $lang['bottom_solid_layers']

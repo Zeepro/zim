@@ -503,7 +503,7 @@ a.ui-link-inherit {
 /* Active class used as the "on" state across all themes
 -----------------------------------------------------------------------------------------------------------*/
 .ui-btn-active {
-	border: 1px solid #2373a5 /*{global-active-border}*/;
+	/*border: 1px solid #2373a5;*/ /*{global-active-border}*/
 	background: #387bbe /*{global-active-background-color}*/;
 	font-weight: bold;
 	color: #ffffff /*{global-active-color}*/;
