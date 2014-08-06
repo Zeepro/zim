@@ -1,12 +1,16 @@
 <?php
 
+if (!defined('BASEPATH'))
+	exit('No direct script access allowed');
+
 class Account extends MY_Controller
 {  
 	public function signin()
 	{
 		$this->load->library('parser');
 		$data = array();
-		$file = 'template/activation/activation_form';
+		$file = 'template/activation/index.php';
+		$this->lang->load('activation/activation_form', $this->config->item('language'));
 		
 		if ($this->input->server('REQUEST_METHOD') == 'POST')
 		{
@@ -24,23 +28,21 @@ class Account extends MY_Controller
         										'method'  => 'POST',
         										'content' => http_build_query($data)));
 				$context  = stream_context_create($options);
-				file_get_contents($url, false, $context);
+				try
+				{
+					@file_get_contents($url, false, $context);
+				}
+				catch (Exception $e)
+				{
+					die();
+				}
+				
 				$result = substr($http_response_header[0], 9, 3);
 				if ($result == 202)
 				{
 					$file = 'template/activation/activation_form';
 					$data = array('email' =>$email, 'password' => $password);
 				}
-				else
-				{
-					$this->load->helper('url');
-					redirect('menu_home');
-				}
-			}
-			else
-			{
-				var_dump('form fail');
-				redirect('activation');
 			}
 		}
 		
@@ -51,6 +53,8 @@ class Account extends MY_Controller
 				'lang'			=> $this->config->item('language_abbr'),
 				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Home') . '</title>',
 				'contents'		=> $body_page,
+				'give_name'		=> t('give_name'),
+				'activate'		=> t('activate')
 		);
 		$this->parser->parse('template/basetemplate', $template_data);
 		return;

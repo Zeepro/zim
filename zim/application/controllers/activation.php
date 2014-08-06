@@ -34,8 +34,7 @@ class Activation extends MY_Controller
 	public function activation_form()
 	{
 		$this->load->library('parser');
-		$this->lang->load('activation/activation_form', $this->config->item('language'));
-		
+		$this->lang->load('activation/activation_confirm', $this->config->item('language'));
 		$file = 'template/activation/activation_form';
 		if ($this->input->server('REQUEST_METHOD') == 'POST')
 		{
@@ -69,8 +68,8 @@ class Activation extends MY_Controller
 				'lang'			=> $this->config->item('language_abbr'),
 				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Home') . '</title>',
 				'contents'		=> $body_page,
-				'give_name'		=> t('give_name'),
-				'activate'		=> t('activate')
+				'congrats'		=> t('congrats'),
+				'confirmation_message'	=> t('confirmation_message')
 		);
 		$this->parser->parse('template/basetemplate', $template_data);
 	}
