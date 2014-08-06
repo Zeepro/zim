@@ -45,7 +45,7 @@
 						<a href="#" data-role="button" data-icon="arrow-l" data-iconpos="left" onclick="move('X', -10);">10</a>
 					</div>
 					<div class="grid_4">
-						<input type="number" data-clear-btn="false" name="xy_speed" id="xy_speed" value="30" min="10" max="35" style="text-align:right"/><center style="padding-left:22px">mm/s</center>
+						<input type="number" style="text-align:right;" data-clear-btn="false" name="xy_speed" id="xy_speed" value="30" min="10" max="35"/><center style="padding-left:22px">mm/s</center>
 					</div>
 					<div class="grid_4 prefix_1 suffix_1">
 						<a href="#" data-role="button" data-icon="arrow-r" data-iconpos="left" onclick="move('X', 10);">10</a>
@@ -80,7 +80,7 @@
 						<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" onclick="move('Z', -50);">50</a>
 					</div>
 					<div class="grid_4 prefix_6 suffix_6">
-						<input type="number" data-clear-btn="false" name="z_speed" id="z_speed" value="10" min="1" max="10" style="text-align:right"/><center style="padding-left:22px">mm/s</center>
+						<input type="number" style="text-align:right;" data-clear-btn="false" name="z_speed" id="z_speed" value="10" min="1" max="10"/><center style="padding-left:22px">mm/s</center>
 					</div>
 					<div class="grid_4 prefix_6 suffix_6">
 						<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" onclick="move('Z', 1);">1</a>

@@ -108,7 +108,7 @@ $lang['save_as_title']
 $lang['layer_height']
 	= 'Layer height';
 $lang['first_layer_height']
-	= 'First layer height (mm or %)';
+	= 'First layer height (mm or %%)';
 $lang['perimeters']
 	= 'Perimeters (minimum)';
 $lang['spiral_vase']
@@ -211,6 +211,10 @@ $lang['support_material_extruder']
 	= 'Support material extruder';
 $lang['support_material_interface_extruder']
 	= 'Support material interface extruder';
+$lang['extruder_right']
+	= 'Right';
+$lang['extruder_left']
+	= 'Left';
 $lang['ooze_prevention']
 	= 'Enable';
 $lang['standby_temperature_delta']

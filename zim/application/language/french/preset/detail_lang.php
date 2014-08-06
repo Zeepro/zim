@@ -4,9 +4,9 @@ $lang['back']
 	= 'retour';
 
 $lang['switch_off']
-	= 'Eteint';
+	= 'Non';
 $lang['switch_on']
-	= 'Allumé';
+	= 'Oui';
 
 $lang['preset_detail_pagetitle']
 	= 'Zim - Jeu de paramètres';
@@ -44,7 +44,7 @@ $lang['support_material_pattern1']
 $lang['support_material_pattern2']
 = 'grille';
 $lang['support_material_pattern3']
-= 'nid d\abeille';
+= 'nid d\'abeille';
 
 $lang['layer_perimeter_title']
 	= 'Couche et périmètres';
@@ -211,6 +211,10 @@ $lang['support_material_extruder']
 	= 'Extrudeur des supports';
 $lang['support_material_interface_extruder']
 	= 'Extrudeur des couches intermédiaires';
+$lang['extruder_right']
+	= 'Droit';
+$lang['extruder_left']
+	= 'Gauche';
 $lang['ooze_prevention']
 	= 'Activé';
 $lang['standby_temperature_delta']

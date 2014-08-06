@@ -30,11 +30,11 @@
 					<td><a href="#" data-role="button" data-icon="arrow-l" data-iconpos="left" data-inline="true" onclick="move('X', -50);">50</a></td>
 					<td><a href="#" data-role="button" data-icon="arrow-l" data-iconpos="left" data-inline="true" onclick="move('X', -10);">10</a></td>
 					<td><a href="#" data-role="button" data-icon="arrow-l" data-iconpos="left" data-inline="true" onclick="move('X', -1);">1</a></td>
-					<td><input type="number" data-clear-btn="false" name="xy_speed" id="xy_speed" value="6000"></td>
+					<td><input type="number" style="text-align:right;" data-clear-btn="false" name="xy_speed" id="xy_speed" value="6000"></td>
 					<td><a href="#" data-role="button" data-icon="arrow-r" data-iconpos="left" data-inline="true" onclick="move('X', 1);">1</a></td>
 					<td><a href="#" data-role="button" data-icon="arrow-r" data-iconpos="left" data-inline="true" onclick="move('X', 10);">10</a></td>
 					<td><a href="#" data-role="button" data-icon="arrow-r" data-iconpos="left" data-inline="true" onclick="move('X', 50);">50</a></td>
-					<td><input type="number" data-clear-btn="false" name="z_speed" id="z_speed" value="400"></td>
+					<td><input type="number" style="text-align:right;" data-clear-btn="false" name="z_speed" id="z_speed" value="400"></td>
 				</tr>
 				<tr>
 					<td><a href="#" data-role="button" data-icon="home" data-iconpos="left" data-inline="true" onclick="home('X');">X</a></td>
@@ -89,7 +89,7 @@
 								<input type="text" data-clear-btn="false" name="temper_l_current" id="temper_l_current" value="0" disabled>
 							</div>
 							<div style="width:60px;float:left;margin-right:10px;">
-								<input type="number" data-clear-btn="false" name="temper_l" id="temper_l" value="200">
+								<input type="number" style="text-align:right;" data-clear-btn="false" name="temper_l" id="temper_l" value="200">
 							</div>
 							<a href="#" data-role="button" data-icon="check" data-iconpos="left" data-inline="true" onclick="heat('l');">Set</a>
 							<a href="#" data-role="button" data-icon="delete" data-iconpos="left" data-inline="true" onclick="heat('l', 0);">Stop</a>
@@ -103,7 +103,7 @@
 								<input type="text" data-clear-btn="false" name="temper_r_current" id="temper_r_current" value="0" disabled>
 							</div>
 							<div style="width:60px;float:left;margin-right:10px;">
-								<input type="number" data-clear-btn="false" name="temper_r" id="temper_r" value="200">
+								<input type="number" style="text-align:right;" data-clear-btn="false" name="temper_r" id="temper_r" value="200">
 							</div>
 							<a href="#" data-role="button" data-icon="check" data-iconpos="left" data-inline="true" onclick="heat('r');">Set</a>
 							<a href="#" data-role="button" data-icon="delete" data-iconpos="left" data-inline="true" onclick="heat('r', 0);">Stop</a>
@@ -124,10 +124,10 @@
 							<a href="#" data-role="button" data-icon="refresh" data-iconpos="left" data-inline="true" onclick="refreshRfid();">Refresh</a>
 							<br style="clear:left;" />
 							<div style="width:60px;float:left;margin-right:10px;">
-								<input type="number" data-clear-btn="false" name="extrude_l" id="extrude_l" value="20"> mm
+								<input type="number" style="text-align:right;" data-clear-btn="false" name="extrude_l" id="extrude_l" value="20"> mm
 							</div>
 							<div style="width:60px;float:left;margin-right:10px;">
-								<input type="number" data-clear-btn="false" name="speed_l" id="speed_l" value="100"> mm/s
+								<input type="number" style="text-align:right;" data-clear-btn="false" name="speed_l" id="speed_l" value="100"> mm/s
 							</div>
 							<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" data-inline="true" onclick="extrude('l', '-');">Reverse</a>
 							<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" data-inline="true" onclick="extrude('l', '+');">Extrude</a>
@@ -142,10 +142,10 @@
 							<a href="#" data-role="button" data-icon="refresh" data-iconpos="left" data-inline="true" onclick="refreshRfid();">Refresh</a>
 							<br style="clear:left;" />
 							<div style="width:60px;float:left;margin-right:10px;">
-								<input type="number" data-clear-btn="false" name="extrude_r" id="extrude_r" value="20"> mm
+								<input type="number" style="text-align:right;" data-clear-btn="false" name="extrude_r" id="extrude_r" value="20"> mm
 							</div>
 							<div style="width:60px;float:left;margin-right:10px;">
-								<input type="number" data-clear-btn="false" name="speed_r" id="speed_r" value="100"> mm/s
+								<input type="number" style="text-align:right;" data-clear-btn="false" name="speed_r" id="speed_r" value="100"> mm/s
 							</div>
 							<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" data-inline="true" onclick="extrude('r', '-');">Reverse</a>
 							<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" data-inline="true" onclick="extrude('r', '+');">Extrude</a>

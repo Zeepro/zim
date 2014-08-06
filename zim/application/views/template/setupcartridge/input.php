@@ -9,11 +9,11 @@
 				<div data-role="fieldcontain">
 					<div>UTC Date UTC日期</div>
 					<label for="year">Year 年</label>
-					<input type="number" id="year" name="year" value="">
+					<input type="number" style="text-align:right;" id="year" name="year" value="">
 					<label for="month">Month 月</label>
-					<input type="number" id="month" name="month" value="">
+					<input type="number" style="text-align:right;" id="month" name="month" value="">
 					<label for="day">Day 日</label>
-					<input type="number" id="day" name="day" value="">
+					<input type="number" style="text-align:right;" id="day" name="day" value="">
 				</div>
 				<div data-role="fieldcontain">
 					<label for="type">Filament type 打印丝种类</label>
@@ -23,7 +23,7 @@
 						{/types}
 					</select>
 					<label for="times">Number of tags to be printed 标签写入次数</label>
-					<input type="number" id="times" name="times" value="1">
+					<input type="number" style="text-align:right;" id="times" name="times" value="1">
 				</div>
 				<input type="submit" value="ok 确认">
 			</form>

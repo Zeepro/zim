@@ -30,7 +30,7 @@
 						<a href="#" data-role="button" data-icon="arrow-l" data-iconpos="left">1</a>
 					</div>
 					<div class="grid_3">
-						<input type="number" data-clear-btn="false" name="xy_speed" id="xy_speed" value="3000">
+						<input type="number" style="text-align:right;" data-clear-btn="false" name="xy_speed" id="xy_speed" value="3000">
 					</div>
 					<div class="grid_1" style="">mm/s</div>
 					<div class="grid_2">
@@ -125,9 +125,9 @@
 				<label for="text-6">Text hint:</label>
 				<input type="text" name="text-6" id="text-6" value="" placeholder="hint here">
 				<label for="number-1">Number:</label>
-				<input type="number" data-clear-btn="false" name="number-1" id="number-1" value="">
+				<input type="number" style="text-align:right;" data-clear-btn="false" name="number-1" id="number-1" value="">
 				<label for="number-2">Number with clear:</label>
-				<input type="number" data-clear-btn="true" name="number-2" id="number-2" value="">
+				<input type="number" style="text-align:right;" data-clear-btn="true" name="number-2" id="number-2" value="">
 			</form>
 			<a href="#" data-role="button" data-icon="plus" data-iconpos="notext" data-theme="c" data-inline="true">Plus</a>
 			<a href="#" data-role="button" data-icon="minus" data-iconpos="notext" data-theme="c" data-inline="true">Minus</a>
