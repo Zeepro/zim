@@ -1,11 +1,10 @@
-<style type="text/css">
+<div data-role="page" data-url="/printerstate/printerinfo">
+	<style type="text/css">
 	.ui-table-columntoggle-btn
 	{
     	display: none !important;
 	}
 </style>
-
-<div data-role="page" data-url="/printerstate/printerinfo">
 	<header data-role="header" class="page-header">
 		<a href="javascript:history.back();" data-icon="back" data-ajax="false">{back}</a>
 		<a href="/" data-icon="home" data-ajax="false">{home}</a>

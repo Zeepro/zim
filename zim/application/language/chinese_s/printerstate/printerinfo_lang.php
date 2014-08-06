@@ -21,3 +21,5 @@ $lang['button_active_sso']
 	= '激活您的打印机';
 $lang['button_rename_sso']
 	= '重命名您的打印机';
+$lang['ip_address']
+	= 'IP 地址';

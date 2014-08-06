@@ -23,3 +23,5 @@ $lang['button_rename_sso']
 	= 'Rename';
 $lang['Home']
 	= 'Home';
+$lang['ip_address']
+	= 'Local IP';

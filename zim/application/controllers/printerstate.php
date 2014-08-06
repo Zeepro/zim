@@ -410,6 +410,10 @@ class Printerstate extends MY_Controller {
 						'title'	=> t('marlin_title'),
 						'value'	=> $temp_info[PRINTERSTATE_TITLE_VER_MARLIN],
 				),
+				array(
+						'title' => t('ip_address'),
+						'value'	=>	$temp_info[ZIMAPI_TITLE_IP]
+				)
 		);
 		
 		// parse the main body

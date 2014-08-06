@@ -2014,7 +2014,8 @@ function PrinterState_getInfoAsArray() {
 	if ($cr != ERROR_OK) {
 		$version_marlin = 'N/A';
 	}
-	
+	$network_data = array();
+	$cr = ZimAPI_getNetworkInfoAsArray($network_data);
 	$array_return = array(
 			PRINTERSTATE_TITLE_VERSION		=> ZimAPI_getVersion(),
 			PRINTERSTATE_TITLE_VERSION_N	=> ZimAPI_getVersion(TRUE),
@@ -2022,6 +2023,7 @@ function PrinterState_getInfoAsArray() {
 			PRINTERSTATE_TITLE_SERIAL		=> ZimAPI_getSerial(),
 			PRINTERSTATE_TITLE_NB_EXTRUD	=> PrinterState_getNbExtruder(),
 			PRINTERSTATE_TITLE_VER_MARLIN	=> $version_marlin,
+			ZIMAPI_TITLE_IP					=> $cr == ERROR_OK ? $network_data[ZIMAPI_TITLE_IP] : 'N/A'
 	);
 
 	$cr = ZimAPI_getPrinterSSOName($name_sso);
