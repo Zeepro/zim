@@ -21,6 +21,7 @@ class Manage extends MY_Controller {
 		// parse the main body
 		$template_data = array(
 				'back'			=> t('back'),
+				'reset'			=> t('reset_title'),
 				'head'			=> t('head_title'),
 				'platform'		=> t('platform_title'),
 				'filament'		=> t('filament_title'),

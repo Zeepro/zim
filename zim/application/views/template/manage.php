@@ -7,87 +7,88 @@
 	<div data-role="content">
 		<div id="container">
 			<div data-role="collapsible" style="align: center;">
-				<h4>{head}</h4>
+				<h4>{reset}</h4>
 				<div class="container_16">
-					<div class="grid_2 suffix_5">
+					<div class="grid_6 prefix_5 suffix_5">
 						<a href="#" data-role="button" data-icon="home" data-iconpos="left" onclick="home();">XYZ</a>
 					</div>
-					<div class="grid_2 suffix_7">
-						<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" onclick="move('Y', 50);">50</a>
-					</div>
-					<div class="grid_2 prefix_7 suffix_7">
-						<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" onclick="move('Y', 10);">10</a>
-					</div>
-					<div class="grid_2 prefix_7 suffix_7">
-						<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" onclick="move('Y', 1);">1</a>
-					</div>
-					<div class="grid_2">
-						<a href="#" data-role="button" data-icon="arrow-l" data-iconpos="left" onclick="move('X', -50);">50</a>
-					</div>
-					<div class="grid_2">
-						<a href="#" data-role="button" data-icon="arrow-l" data-iconpos="left" onclick="move('X', -10);">10</a>
-					</div>
-					<div class="grid_2">
-						<a href="#" data-role="button" data-icon="arrow-l" data-iconpos="left" onclick="move('X', -1);">1</a>
-					</div>
-					<div class="grid_3">
-						<input type="number" data-clear-btn="false" name="xy_speed" id="xy_speed" value="30" min="10" max="35" />
-					</div>
-					<div class="grid_1" style="">mm/s</div>
-					<div class="grid_2">
-						<a href="#" data-role="button" data-icon="arrow-r" data-iconpos="left" onclick="move('X', 1);">1</a>
-					</div>
-					<div class="grid_2">
-						<a href="#" data-role="button" data-icon="arrow-r" data-iconpos="left" onclick="move('X', 10);">10</a>
-					</div>
-					<div class="grid_2">
-						<a href="#" data-role="button" data-icon="arrow-r" data-iconpos="left" onclick="move('X', 50);">50</a>
-					</div>
-					<div class="grid_2 suffix_5">
+					<div class="grid_6 prefix_5 suffix_5">
 						<a href="#" data-role="button" data-icon="home" data-iconpos="left" onclick="home('X');">X</a>
 					</div>
-					<div class="grid_2 suffix_7">
+					<div class="grid_6 prefix_5 suffix_5">
+						<a href="#" data-role="button" data-icon="home" data-iconpos="left" onclick="home('Y');">Y</a>
+					</div>
+					<div class="grid_6 prefix_5 suffix_5">
+						<a href="#" data-role="button" data-icon="home" data-iconpos="left" onclick="home('Z');">Z</a>
+					</div>
+				</div>
+			</div>
+			<div data-role="collapsible" style="align: center;">
+				<h4>{head}</h4>
+				<div class="container_16">
+					<div class="grid_4 prefix_6 suffix_6">
+						<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" onclick="move('Y', 1);">1</a>
+					</div>
+					<div class="grid_4 prefix_6 suffix_6">
+						<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" onclick="move('Y', 10);">10</a>
+					</div>
+					<div class="grid_4 prefix_6 suffix_6">
+						<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" onclick="move('Y', 50);">50</a>
+					</div>
+					<div class="grid_4 prefix_1 suffix_3" style="margin-bottom:13px;">
+						<a href="#" data-role="button" data-icon="arrow-l" data-iconpos="left" onclick="move('X', -1);">1</a>
+					</div>
+					<div class="grid_4 prefix_3 suffix_1" style="margin-bottom:13px;">
+						<a href="#" data-role="button" data-icon="arrow-r" data-iconpos="left" onclick="move('X', 1);">1</a>
+					</div>
+					<div class="grid_4 prefix_1 suffix_1">
+						<a href="#" data-role="button" data-icon="arrow-l" data-iconpos="left" onclick="move('X', -10);">10</a>
+					</div>
+					<div class="grid_4">
+						<input type="number" data-clear-btn="false" name="xy_speed" id="xy_speed" value="30" min="10" max="35" style="text-align:right"/><center style="padding-left:22px">mm/s</center>
+					</div>
+					<div class="grid_4 prefix_1 suffix_1">
+						<a href="#" data-role="button" data-icon="arrow-r" data-iconpos="left" onclick="move('X', 10);">10</a>
+					</div>
+					<div class="grid_4 prefix_1 suffix_3">
+						<a href="#" data-role="button" data-icon="arrow-l" data-iconpos="left" onclick="move('X', -50);">50</a>
+					</div>
+					<div class="grid_4 prefix_3 suffix_1">
+						<a href="#" data-role="button" data-icon="arrow-r" data-iconpos="left" onclick="move('X', 50);">50</a>
+					</div>
+					<div class="grid_4 prefix_6 suffix_6">
 						<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" onclick="move('Y', -1);">1</a>
 					</div>
-					<div class="grid_2 prefix_7 suffix_7">
+					<div class="grid_4 prefix_6 suffix_6">
 						<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" onclick="move('Y', -10);">10</a>
 					</div>
-					<div class="grid_2 prefix_7 suffix_1">
+					<div class="grid_4 prefix_6 suffix_6">
 						<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" onclick="move('Y', -50);">50</a>
-					</div>
-					<div class="grid_2 suffix_4">
-						<a href="#" data-role="button" data-icon="home" data-iconpos="left" onclick="home('Y');">Y</a>
 					</div>
 				</div>
 			</div>
 			<div data-role="collapsible" style="align: center;">
 				<h4>{platform}</h4>
 				<div class="container_16">
-					<div class="grid_2 prefix_7 suffix_5">
-						<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" onclick="move('Z', -50);">50</a>
-					</div>
-					<div class="grid_2">
-						<a href="#" data-role="button" data-icon="home" data-iconpos="left" onclick="home('Z');">Z</a>
-					</div>
-					<div class="grid_2 prefix_7 suffix_7">
-						<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" onclick="move('Z', -10);">10</a>
-					</div>
-					<div class="grid_2 prefix_7 suffix_7">
+					<div class="grid_4 prefix_6 suffix_6">
 						<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" onclick="move('Z', -1);">1</a>
 					</div>
-					<div class="grid_3 prefix_6">
-						<input type="number" data-clear-btn="false" name="z_speed" id="z_speed" value="10" min="1" max="10" />
+					<div class="grid_4 prefix_6 suffix_6">
+						<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" onclick="move('Z', -10);">10</a>
 					</div>
-					<div class="grid_1 suffix_6">
-						mm/s
+					<div class="grid_4 prefix_6 suffix_6">
+						<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" onclick="move('Z', -50);">50</a>
 					</div>
-					<div class="grid_2 prefix_7 suffix_7">
+					<div class="grid_4 prefix_6 suffix_6">
+						<input type="number" data-clear-btn="false" name="z_speed" id="z_speed" value="10" min="1" max="10" style="text-align:right"/><center style="padding-left:22px">mm/s</center>
+					</div>
+					<div class="grid_4 prefix_6 suffix_6">
 						<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" onclick="move('Z', 1);">1</a>
 					</div>
-					<div class="grid_2 prefix_7 suffix_7">
+					<div class="grid_4 prefix_6 suffix_6">
 						<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" onclick="move('Z', 10);">10</a>
 					</div>
-					<div class="grid_2 prefix_7 suffix_7">
+					<div class="grid_4 prefix_6 suffix_6">
 						<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" onclick="move('Z', 50);">50</a>
 					</div>
 				</div>
