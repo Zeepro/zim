@@ -60,10 +60,18 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 // 	define('SLICER_FILENAME_ZIPMODEL',	'_model_slicer.zip');
 }
 
-function Slicer_addModel($model_path) {
+function Slicer_addModel($models_path) {
 	$cr = 0;
 	$CI = &get_instance();
-	$ret_val = Slicer__requestSlicer(SLICER_URL_ADD_MODEL . $model_path, FALSE);
+	$ret_val = 0;
+	
+	if (!is_array($models_path)) {
+		$CI->load->helper('printerlog');
+		PrinterLog_logDebug("add slicer model api error");
+		return ERROR_INTERNAL;
+	}
+	
+	$ret_val = Slicer__requestSlicer(SLICER_URL_ADD_MODEL . json_encode($models_path), FALSE);
 	
 	switch ($ret_val) {
 		case SLICER_RESPONSE_OK:
@@ -316,18 +324,23 @@ function Slicer_checkPlatformColor(&$array_cartridge = array()) {
 		$array_color = array_unique($array_color);
 		foreach ($array_color as $number_color) {
 			$abb_cartridge = PrinterState_cartridgeNumber2Abbreviate($number_color);
+			if ($abb_cartridge == 'error') {
+				$cr = ERROR_WRONG_PRM;
+				break;
+			}
 			$array_cartridge[] = $abb_cartridge;
-			if (PrinterState_getFilamentStatus($abb_cartridge)) {
-				continue;
-			}
-			else if ($abb_cartridge == 'l') {
-				$cr = ERROR_MISS_LEFT_FILA;
-				break;
-			}
-			else {
-				$cr = ERROR_MISS_RIGT_FILA;
-				break;
-			}
+			// we do not check filament status when starting slicing 20140807
+// 			if (PrinterState_getFilamentStatus($abb_cartridge)) {
+// 				continue;
+// 			}
+// 			else if ($abb_cartridge == 'l') {
+// 				$cr = ERROR_MISS_LEFT_FILA;
+// 				break;
+// 			}
+// 			else {
+// 				$cr = ERROR_MISS_RIGT_FILA;
+// 				break;
+// 			}
 		}
 	}
 	

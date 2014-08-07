@@ -1287,8 +1287,32 @@ class Rest extends MY_Controller {
 				$model_path = $model['full_path'];
 				
 				$this->load->helper('slicer');
-				$cr = Slicer_addModel($model_path);
-			} else {
+				$cr = Slicer_addModel(array($model_path));
+			}
+			else if ($this->upload->do_upload('s1')) {
+				$array_model = array();
+				$first_combine = TRUE;
+				$model = $this->upload->data();
+				$array_model[] = $model['full_path'];
+				
+				$cr = ERROR_OK;
+				foreach (array('s2') as $file_key) {
+					if ($this->upload->do_upload($file_key)) {
+						$first_combine = FALSE;
+						$model = $this->upload->data();
+						$array_model[] = $model['full_path'];
+					}
+					else if ($first_combine == TRUE) {
+						$cr = ERROR_MISS_PRM;
+						break;
+					}
+				}
+				if ($cr == ERROR_OK) {
+					$this->load->helper('slicer');
+					$cr = Slicer_addModel($array_model);
+				}
+			}
+			else {
 				// treat error - missing gcode file
 				$cr = ERROR_MISS_PRM;
 			}

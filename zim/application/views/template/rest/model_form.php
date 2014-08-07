@@ -14,6 +14,12 @@
             <?php echo form_upload('f'); ?><br />
             <?php echo form_submit('submit', 'submit'); ?><br />
             <?php echo form_close('<br />'); ?>
+            <form action="/rest/upload" method="post" accept-charset="utf-8" enctype="multipart/form-data">
+            <?php echo form_label('SubModel', 'L_SubModel'); ?><br />
+            <?php echo form_upload('s1'); ?><br />
+            <?php echo form_upload('s2'); ?><br />
+            <?php echo form_submit('submit', 'submit'); ?><br />
+            <?php echo form_close('<br />'); ?>
 	</body> 
 </html>
 

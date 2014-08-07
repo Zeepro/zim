@@ -27,6 +27,7 @@ class Sliceupload extends MY_Controller {
 		$this->lang->load('sliceupload/upload', $this->config->item('language'));
 		if ($_SERVER['REQUEST_METHOD'] == 'POST')
 		{
+			$array_model = array();
 			$upload_config = array (
 					'upload_path'	=> $this->config->item('temp'),
 					'allowed_types'	=> '*',
@@ -36,20 +37,44 @@ class Sliceupload extends MY_Controller {
 			);
 			$this->load->library('upload', $upload_config);
 			
-			if (!empty($_FILES['file']))
-				$ret = $this->upload->do_upload('file');
-			else
-				$ret = $this->upload->do_upload('file_c1') && $this->upload->do_upload('file_c2');
+// 			if (!empty($_FILES['file']))
+// 				$ret = $this->upload->do_upload('file');
+// 			else
+// 				$ret = $this->upload->do_upload('file_c1') && $this->upload->do_upload('file_c2');
 			
-			if ($ret)
+			if ($this->upload->do_upload('file'))
 			{
 				$model = $this->upload->data();
+				$array_model[] = $model['file_name'];
+			}
+			else if ($this->upload->do_upload('file_c1')) {
+				$first_combine = TRUE;
+				$model = $this->upload->data();
+				$array_model[] = $model['file_name'];
 				
+				foreach (array('file_c2') as $file_key) {
+					if ($this->upload->do_upload($file_key)) {
+						$first_combine = FALSE;
+						$model = $this->upload->data();
+						$array_model[] = $model['file_name'];
+					}
+					else if ($first_combine == TRUE) {
+						$error = t('upload_miss_fail');
+						break;
+					}
+				}
+			}
+			else {
+				// treat error - missing gcode file
+				$error = t('upload_miss_fail');
+			}
+			
+			if (is_null($error) && count($array_model)) {
 				// load a wait page for adding model into slicer
 				$template_data = array(
 						'wait_message'	=> t('wait_message'),
 						'return_button'	=> t('return_button'),
-						'model_name'	=> $model['file_name'],
+						'model_name'	=> json_encode($array_model),
 						'fail_message'	=> t('fail_message'),
 						'fin_message'	=> t('fin_message'),
 				);
@@ -64,9 +89,6 @@ class Sliceupload extends MY_Controller {
 				$this->parser->parse('template/basetemplate', $template_data);
 				
 				return;
-			} else {
-				// treat error - missing gcode file
-				$error = t('upload_miss_fail');
 			}
 		}
 		
@@ -214,15 +236,23 @@ class Sliceupload extends MY_Controller {
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$filename = $this->input->post('file');
 			if ($filename) {
-				$model_path = $this->config->item('temp') . $filename;
-				
-				if (file_exists($model_path)) {
+				$array_model = json_decode($filename, TRUE);
+				$number_model = count($array_model);
+				if ($number_model) {
+					$tmp_i = 0;
+					$cr = ERROR_OK;
+					for ($tmp_i = 0; $tmp_i < $number_model; $tmp_i++) {
+						$array_model[$tmp_i] = $this->config->item('temp') . $array_model[$tmp_i];
+						if (!file_exists($array_model[$tmp_i])) {
+							$cr = ERROR_WRONG_PRM;
+							break;
+						}
+					}
 					
-					$this->load->helper('slicer');
-					$cr = Slicer_addModel($model_path);
-				}
-				else {
-					$cr = ERROR_WRONG_PRM;
+					if ($cr == ERROR_OK) {
+						$this->load->helper('slicer');
+						$cr = Slicer_addModel($array_model);
+					}
 				}
 			}
 			else {
@@ -414,23 +444,23 @@ class Sliceupload extends MY_Controller {
 				$cr = ERROR_INTERNAL;
 			}
 			
-			// save data info into temp json file
-			if ($cr != ERROR_INTERNAL) {
-				try {
-					$fp = fopen($file_temp_data, 'w');
-					if ($fp) {
-						fwrite($fp, json_encode($array_data));
-						fclose($fp);
-					}
-					else {
-						throw new Exception('can not open file');
-					}
-				} catch (Exception $e) {
-					$this->load->helper('printerlog');
-					PrinterLog_logError('can not save temp json file', __FILE__, __LINE__);
-					$cr = ERROR_INTERNAL;
-				}
-			}
+// 			// save data info into temp json file
+// 			if ($cr != ERROR_INTERNAL) {
+// 				try {
+// 					$fp = fopen($file_temp_data, 'w');
+// 					if ($fp) {
+// 						fwrite($fp, json_encode($array_data));
+// 						fclose($fp);
+// 					}
+// 					else {
+// 						throw new Exception('can not open file');
+// 					}
+// 				} catch (Exception $e) {
+// 					$this->load->helper('printerlog');
+// 					PrinterLog_logError('can not save temp json file', __FILE__, __LINE__);
+// 					$cr = ERROR_INTERNAL;
+// 				}
+// 			}
 			
 // 			// assign the same value for real temperature
 // 			foreach(array_keys($array_data) as $abb_filament) {

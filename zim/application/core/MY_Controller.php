@@ -12,6 +12,7 @@ class MY_Controller extends CI_Controller
 			return;
 		}
 		
+		//TODO move this log function to printerlog helper
 		$this->load->helper('zimapi');
 		$json_context = json_encode($context);
 		$url = 'https://sso.zeepro.com/errorlog.ashx';

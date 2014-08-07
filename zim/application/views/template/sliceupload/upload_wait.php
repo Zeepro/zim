@@ -19,7 +19,7 @@ function add_model() {
 		url: "/sliceupload/add_model_ajax",
 		type: "POST",
 		data: {
-			file: "{model_name}",
+			file: '{model_name}',
 			},
 		cache: false,
 		timeout: 1000*60*10,
