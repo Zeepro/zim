@@ -18,6 +18,7 @@
 				<script type="text/javascript">
 					jwplayer("myVideo").setup({
 						file: "{video_url}",
+						width: "100%",
 						autostart: true,
 					});
 				</script>
