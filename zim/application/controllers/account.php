@@ -53,6 +53,7 @@ class Account extends MY_Controller
 				'lang'			=> $this->config->item('language_abbr'),
 				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Home') . '</title>',
 				'contents'		=> $body_page,
+				'back'			=> t('back'),
 				'give_name'		=> t('give_name'),
 				'activate'		=> t('activate')
 		);

@@ -9,25 +9,39 @@ class Activation extends MY_Controller
 	{
 		$network_ok = false;
 		$this->load->library('parser');
-		$this->lang->load('activation/activation', $this->config->item('language'));
 
 		if (!(@file_get_contents("https://sso.zeepro.com/login.ashx") === FALSE))
 		{
 			$network_ok = true;
 		}
-		
-		$body_page = $this->parser->parse('/template/activation/' . ($network_ok ? 'index' : 'network_error'), array(), TRUE);
-		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Home') . '</title>',
-				'contents'		=> $body_page,
-				'title'			=> t('title'),
-				'password'		=> t('password'),
-				'sign_in'		=> t('sign_in'),
-				'sign_up'		=> t('sign_up'),
-				'create_account'=> t('create_account')
-		);
+		if ($network_ok)
+		{
+			$body_page = $this->parser->parse('/template/activation/index', array(), TRUE);
+			$this->lang->load('activation/activation', $this->config->item('language'));
+			$template_data = array(
+					'lang'			=> $this->config->item('language_abbr'),
+					'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Home') . '</title>',
+					'contents'		=> $body_page,
+					'title'			=> t('title'),
+					'password'		=> t('password'),
+					'sign_in'		=> t('sign_in'),
+					'sign_up'		=> t('sign_up'),
+					'back'			=> t('back'),
+					'create_account'=> t('create_account')
+			);
+		}
+		else
+		{
+			$body_page = $this->parser->parse('/template/activation/network_error', array(), TRUE);
+			$this->lang->load('activation/network_error', $this->config->item('language'));
+			$template_data = array(
+					'lang'			=> $this->config->item('language_abbr'),
+					'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Home') . '</title>',
+					'contents'		=> $body_page,
+					'back'			=> t('back'),
+					'network_err_msg'=> t('network_err_msg')
+			);
+		}
 		$this->parser->parse('template/basetemplate', $template_data);
 	}
 	
@@ -68,6 +82,7 @@ class Activation extends MY_Controller
 				'lang'			=> $this->config->item('language_abbr'),
 				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Home') . '</title>',
 				'contents'		=> $body_page,
+				'back'			=> t('back'),
 				'congrats'		=> t('congrats'),
 				'confirmation_message'	=> t('confirmation_message')
 		);

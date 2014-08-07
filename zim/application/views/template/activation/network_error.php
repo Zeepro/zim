@@ -5,8 +5,8 @@
 	</div>
 	<div data-role="content">
 		<div id="container">
-			<p>You must be connected to the Internet to activate your printer.</p>
-			<a href="/">Back</a>
+			<p>{networ_error_msg}</p>
+			<a href="/">{back}</a>
 		</div>
 	</div>
 </div>
