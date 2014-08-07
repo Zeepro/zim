@@ -20,7 +20,6 @@
 			?>
 		</div>
 		<h2>{create_account}</h2>
-		<a href="/account/signup" data-role="button" data-
-		ajax="false" data-theme="b">{sign_up}</a>
+		<a href="/account/signup" data-role="button" data-ajax="false">{sign_up}</a>
 	</div>
 </div>
