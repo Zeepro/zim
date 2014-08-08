@@ -629,6 +629,9 @@ function Printer__changeTemperature(&$gcode_path, $array_temper = array()) {
 		$temp_r = $json_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER];
 		$temp_rs = $json_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1];
 	}
+	else if ($cr == ERROR_MISS_RIGT_CART) {
+		$temp_r = $temp_rs = PRINTER_VALUE_DEFAULT_TEMPER;
+	}
 	// temporary change - make it possible to change temperature not according to cartridge
 	//TODO remove me when it is necessary
 	if (array_key_exists('r', $array_temper)) {

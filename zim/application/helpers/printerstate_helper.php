@@ -879,7 +879,7 @@ function PrinterState_setCartridgeAsArray($abb_cartridge, $data_json = array(), 
 		$time_code = dechex($data_json[PRINTERSTATE_TITLE_SETUP_DATE]);
 	}
 	else {
-		$time_code = gmmktime(); // use current date as default
+		$time_code = time(); // use current date as default
 	}
 	$time_offset = gmmktime(0, 0, 0, 1, 1, PRINTERSTATE_OFFSET_YEAR_SETUP_DATE);
 	$time_rfid = ($time_code - $time_offset) / 60 / 60 / 24;
