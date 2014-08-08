@@ -11,7 +11,7 @@ function yes_func()
 }
 
 $('<div>').appendTo('#cartridge_detail_info')
-.attr({'id': 'yes_button', 'onclick': 'yes_func'}).html('{yes_button}')
+.attr({'id': 'yes_button', 'onclick': 'yes_func()'}).html('{yes_button}')
 .button().button('refresh');
 $('#cartridge_detail_info').append("<br />");
 $('<div>').appendTo('#cartridge_detail_info')
