@@ -41,7 +41,7 @@ var var_model_scale = 100;
 var var_model_zrot = 0;
 var var_model_xrot = 0;
 var var_model_yrot = 0;
-var var_interval_scale = 50;
+var var_factor_scale = 2;
 var var_interval_zrot = 30;
 var var_interval_xrot = 30;
 var var_interval_yrot = 30;
@@ -251,12 +251,12 @@ function changeModel(var_action) {
 			break;
 			
 		case 's+':
-			var_model_scale += var_interval_scale;
+			var_model_scale *= var_factor_scale;
 // 			var_ajax_data['s'] = var_model_scale;
 			break;
 			
 		case 's-':
-			var_model_scale -= var_interval_scale;
+			var_model_scale /= var_factor_scale;
 // 			var_ajax_data['s'] = var_model_scale;
 			break;
 			
@@ -322,11 +322,11 @@ function changeModel(var_action) {
 				break;
 				
 			case 's+':
-				var_model_scale -= var_interval_scale;
+				var_model_scale /= var_factor_scale;
 				break;
 				
 			case 's-':
-				var_model_scale += var_interval_scale;
+				var_model_scale *= var_factor_scale;
 				break;
 				
 			case 'error':
