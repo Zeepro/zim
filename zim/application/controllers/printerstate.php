@@ -20,7 +20,7 @@ class Printerstate extends MY_Controller {
 		return;
 	}
 	
-	private function _display_changecartridge_wait_unload_filament($abb_cartridge, $id_model) {
+	private function _display_changecartridge_wait_unload_filament($abb_cartridge, $id_model, $wait_unload) {
 		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
 		$template_data = array (
 				'next_phase'	=> PRINTERSTATE_CHANGECART_UNLOAD_F,
@@ -28,6 +28,7 @@ class Printerstate extends MY_Controller {
 				'prime_button'	=> t('prime_button'),
 				'abb_cartridge'	=> $abb_cartridge,
 				'id_model'		=> $id_model,
+				'enable_unload'	=> ($wait_unload == TRUE) ? 'false' : 'true',
 		);
 		$template_name = 'template/printerstate/changecartridge_ajax/wait_unload_filament';
 		$this->_display_changecartridge_base($template_name, $template_data);
@@ -412,7 +413,7 @@ class Printerstate extends MY_Controller {
 				),
 				array(
 						'title' => t('ip_address'),
-						'value'	=>	$temp_info[ZIMAPI_TITLE_IP]
+						'value'	=> $temp_info[ZIMAPI_TITLE_IP],
 				)
 		);
 		
@@ -545,7 +546,16 @@ class Printerstate extends MY_Controller {
 					
 					if (CoreStatus_checkInIdle($status_current)) {
 						// in idle
-						$this->_display_changecartridge_wait_unload_filament($abb_cartridge, $id_model);
+						$ret_val = PrinterState_getTemperature($temp_data, 'e', $abb_cartridge);
+						if ($ret_val != ERROR_OK) {
+							$this->load->helper('printerlog');
+							PrinterLog_logError('can not get temperature: ' . $abb_cartridge, __FILE__, __LINE__);
+							$this->output->set_status_header(202); // disable checking
+						}
+						else {
+							$this->_display_changecartridge_wait_unload_filament($abb_cartridge, $id_model, 
+									($temp_data >= PRINTERSTATE_VALUE_MAXTEMPER_BEFORE_UNLOAD));
+						}
 					}
 					else if ($status_current == $status_correct) {
 						// in busy (normally only unloading is possible)
@@ -677,7 +687,7 @@ class Printerstate extends MY_Controller {
 				
 				$ret_val = PrinterState_checkFilament($abb_cartridge, $need_filament, $temp_data, FALSE);
 				if ($ret_val == $code_miss_filament) {
-					//TODO add a new temporary page here
+					//TODO added a new temporary page here, need to remove when not needed
 // 					$this->_display_changecartridge_wait_load_filament(FALSE);
 // 					if ($temp_data[PRINTERSTATE_TITLE_CARTRIDGE] == PRINTERSTATE_DESP_CARTRIDGE_REFILL) {
 // 						$this->_display_changecartridge_write_cartridge();
@@ -818,7 +828,6 @@ class Printerstate extends MY_Controller {
 				$length = (int) $this->input->get('l') * 1000;
 				$abb_cartridge = $this->input->get('v');
 				
-				//TODO finish here to write RFID card
 				// get cartridge type from old RFID
 				$ret_val = PrinterState_getCartridgeAsArray($array_old, $abb_cartridge, FALSE);
 				if ($ret_val != ERROR_OK) {
@@ -839,6 +848,7 @@ class Printerstate extends MY_Controller {
 					break;
 				}
 				$color = str_replace('#', '', $color);
+				// write RFID card
 				$array_data = array(
 						PRINTERSTATE_TITLE_COLOR		=> $color,
 						PRINTERSTATE_TITLE_EXT_TEMPER	=> $temper,
@@ -861,6 +871,25 @@ class Printerstate extends MY_Controller {
 				$this->output->set_status_header(403); // unknown request
 				break;
 		}
+		
+		return;
+	}
+	
+	public function changecartridge_temper() {
+		$ret_val = 0;
+		$temp_data = 0;
+		$abb_cartridge = $this->input->get('v');
+		
+		if (!$abb_cartridge && !in_array($abb_cartridge, array('l', 'r'))) {
+			$this->output->set_status_header(403); // invalid request
+			return;
+		}
+		
+		$ret_val = PrinterState_getTemperature($temp_data, 'e', $abb_cartridge);
+		if ($ret_val == ERROR_OK && $temp_data < PRINTERSTATE_VALUE_MAXTEMPER_BEFORE_UNLOAD) {
+			$ret_val = 202; // change status header to stop signal
+		}
+		$this->output->set_status_header($ret_val);
 		
 		return;
 	}

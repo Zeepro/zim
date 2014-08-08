@@ -18,6 +18,8 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 // 	define('PRINTERSTATE_GET_TEMPEREXT',	' M1300');
 	define('PRINTERSTATE_GET_TEMPEREXT_R',	' M1300');
 	define('PRINTERSTATE_GET_TEMPEREXT_L',	' M1301');
+	define('PRINTERSTATE_GET_TEMPEREXT_C',	' M1401');
+	define('PRINTERSTATE_GET_ALL_TEMPER',	' M1402');
 	define('PRINTERSTATE_SET_TEMPEREXT',	' M104\ '); // add space in the last
 	define('PRINTERSTATE_GET_CARTRIDGER',	' M1602');
 	define('PRINTERSTATE_GET_CARTRIDGEL',	' M1603');
@@ -66,7 +68,6 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_GET_RFID_POWER',	' M1618');
 	define('PRINTERSTATE_SET_CARTRIDGER',	' M1610\ ');
 	define('PRINTERSTATE_SET_CARTRIDGEL',	' M1611\ ');
-	define('PRINTERSTATE_GET_ALL_TEMPER',	' M1402');
 	
 // 	define('PRINTERSTATE_TEMP_PRINT_FILENAME',	'/tmp/printer_percentage'); // fix the name on SD card
 	define('PRINTERSTATE_FILE_PRINTLOG',	'/tmp/printlog.log');
@@ -138,6 +139,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_LOAD',		180);
 	define('PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_UNLOAD',	180);
 	define('PRINTERSTATE_VALUE_ENDSTOP_OPEN',				'open');
+	define('PRINTERSTATE_VALUE_MAXTEMPER_BEFORE_UNLOAD',	50);
 	
 	define('PRINTERSTATE_PRM_EXTRUDER',			'extruder');
 	define('PRINTERSTATE_PRM_TEMPER',			'temp');
@@ -260,23 +262,26 @@ function PrinterState_setExtruder($abb_extruder = 'r') {
 	return ERROR_OK;
 }
 
-function PrinterState_getTemperature(&$val_temperature, $type = 'e') {
+function PrinterState_getTemperature(&$val_temperature, $type = 'e', $abb_extruder = NULL) {
 	global $CFG;
 	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
 	$command = '';
 	$output = array();
 	$last_output = NULL;
 	$ret_val = 0;
-	$abb_extruder = '';
+// 	$abb_extruder = '';
 	
 	switch ($type) {
 		case 'e':
+			if ($abb_extruder == NULL) {
 			// get current extruder
-			$ret_val = PrinterState_getExtruder($abb_extruder);
-			if ($ret_val != ERROR_OK) {
-				return $ret_val;
+				$command = $arcontrol_fullpath . PRINTERSTATE_GET_TEMPEREXT_C;
 			}
-			if ($abb_extruder == 'l') {
+// 			$ret_val = PrinterState_getExtruder($abb_extruder);
+// 			if ($ret_val != ERROR_OK) {
+// 				return $ret_val;
+// 			}
+			else if ($abb_extruder == 'l') {
 				if (PrinterState_getNbExtruder() <= 1) {
 					return ERROR_WRONG_PRM; //ERROR_INTERNAL
 				}
@@ -2009,12 +2014,14 @@ function PrinterState_getInfoAsArray() {
 	$CI->load->helper('zimapi');
 	$version_marlin = NULL;
 	$name_sso = NULL;
+	$network_data = array();
 	$array_return= array();
 	$cr = PrinterState_getMarlinVersion($version_marlin);
+	
 	if ($cr != ERROR_OK) {
 		$version_marlin = 'N/A';
 	}
-	$network_data = array();
+	
 	$cr = ZimAPI_getNetworkInfoAsArray($network_data);
 	$array_return = array(
 			PRINTERSTATE_TITLE_VERSION		=> ZimAPI_getVersion(),
@@ -2023,7 +2030,7 @@ function PrinterState_getInfoAsArray() {
 			PRINTERSTATE_TITLE_SERIAL		=> ZimAPI_getSerial(),
 			PRINTERSTATE_TITLE_NB_EXTRUD	=> PrinterState_getNbExtruder(),
 			PRINTERSTATE_TITLE_VER_MARLIN	=> $version_marlin,
-			ZIMAPI_TITLE_IP					=> $cr == ERROR_OK ? $network_data[ZIMAPI_TITLE_IP] : 'N/A'
+			ZIMAPI_TITLE_IP					=> ($cr == ERROR_OK) ? $network_data[ZIMAPI_TITLE_IP] : 'N/A'
 	);
 
 	$cr = ZimAPI_getPrinterSSOName($name_sso);

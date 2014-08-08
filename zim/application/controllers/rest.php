@@ -594,11 +594,12 @@ class Rest extends MY_Controller {
 							$cr = ERROR_WRONG_PRM;
 						}
 						else if (in_array($has_v, array('l', 'r'))) {
-							$tmp_array = PrinterState_getExtruderTemperaturesAsArray();
-							$cr = ERROR_OK;
-							$display = ($has_v == 'l')
-									? $tmp_array[PRINTERSTATE_LEFT_EXTRUD]
-									: $tmp_array[PRINTERSTATE_RIGHT_EXTRUD];
+// 							$tmp_array = PrinterState_getExtruderTemperaturesAsArray();
+// 							$cr = ERROR_OK;
+// 							$display = ($has_v == 'l')
+// 									? $tmp_array[PRINTERSTATE_LEFT_EXTRUD]
+// 									: $tmp_array[PRINTERSTATE_RIGHT_EXTRUD];
+							$cr = PrinterState_getTemperature($display, 'e', $has_v);
 						}
 						else {
 							$cr = ERROR_WRONG_PRM;
