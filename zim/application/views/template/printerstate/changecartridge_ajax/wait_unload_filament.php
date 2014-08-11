@@ -15,20 +15,41 @@ function prime() {
 	
 $('#cartridge_detail_info').trigger("create");
 
-if (var_enable_unload == true) {
+if (var_enable_unload == true)
+{
 // 	$('#unload_button').button("enable");
 	$('#unload_button').attr('enable', 'enable');
 }
 else {
 // 	$('#unload_button').button().disable();
 	$('#unload_button').attr('disabled', 'disabled');
-	<?php
-	//TODO add an ajax to check temperature here
-	/*  /printerstate/changecartridge_temper?v={abb_cartridge}
-	 *  200 => maintain disable lock; 202 => release disable lock
-	 *  403 => invalid abb cartridge; 500 => internal error
-	 */
-	?>
+
+	var check_temp_interval = setInterval(function ()
+	{
+		$.ajax
+		({
+			url:"/printerstate/changecartridge_temper?v={abb_cartridge}",
+			type: "GET",
+			cache: false,
+			statusCode:	{
+				200: function (response) {
+					$('#unload_button').removeAttr('enabled');
+					$('#unload_button').attr('disabled', 'disabled');
+				},
+				202: function (response) {
+					$('#unload_button').removeAttr('disabled');
+					$('#unload_button').attr('enable', 'enable');
+					clearInterval(check_temp_interval);
+				},
+				403: function (response) {
+					window.location.href = "/error";
+				},
+				500: function (response) {
+					window.location.href = "/error";
+				}
+			}
+		})
+	}, 5000);
 }
 -->
 </script>
