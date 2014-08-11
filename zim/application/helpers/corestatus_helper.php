@@ -202,6 +202,13 @@ function CoreStatus_checkInConnection() {
 	}
 }
 
+function CoreStatus_checkInUSB() {
+	$CI = &get_instance();
+	$CI->load->helper('zimapi');
+	
+	return ZimAPI_checkUSB();
+}
+
 function CoreStatus_checkInPause() {
 	$CI = &get_instance();
 	$status_file = $CI->config->item('temp') . CORESTATUS_FILENAME_PAUSE;
@@ -227,6 +234,12 @@ function CoreStatus_checkCallConnection(&$url_redirect = '') {
 	$url_redirect = '/connection';
 	
 	return CoreStatus__checkCallController('connection');
+}
+
+function CoreStatus_checkCallUSB(&$url_redirect = '') {
+	$url_redirect = '/usb';
+	
+	return CoreStatus__checkCallController('usb');
 }
 
 function CoreStatus_checkCallPrinting(&$url_redirect = '') {

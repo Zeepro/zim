@@ -85,6 +85,15 @@ class MY_Controller extends CI_Controller
 				$url_redirect = '/';
 			}
 			// check connection issue
+			else if (CoreStatus_checkInUSB()) {
+				if (CoreStatus_checkCallUSB($url_redirect)) {
+					return; // we are calling the right page
+				}
+			}
+			else if (CoreStatus_checkCallUSB()) {
+				$url_redirect = '/';
+			}
+			// check connection issue
 			else if (CoreStatus_checkInConnection()) {
 				if (CoreStatus_checkCallConnection($url_redirect)) {
 					return; // we are calling the right page

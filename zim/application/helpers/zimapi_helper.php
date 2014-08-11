@@ -21,6 +21,7 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_CMD_VERSION_REBOOT',	'zfw_printenv version`zfw_printenv update` || zfw_printenv version`zfw_printenv last_good`');
 	define('ZIMAPI_CMD_SETHOSTNAME',	ZIMAPI_CMD_CONFIG_NET . '-n ');
 	define('ZIMAPI_CMD_GETHOSTNAME',	'cat /etc/hostname');
+	define('ZIMAPI_CMD_USB_CONNECT',	'[ `cat /sys/class/gpio/gpio3_pg9/value` == 0 ]');
 	
 	define('ZIMAPI_TITLE_TOPOLOGY',	'topology');
 	define('ZIMAPI_TITLE_MEDIUM',	'medium');
@@ -1136,6 +1137,26 @@ function ZimAPI_setPrinterSSOName($value) {
 	}
 	
 	return ERROR_OK;
+}
+
+function ZimAPI_checkUSB() {
+	$ret_val = 0;
+	$output = array();
+	$CI = &get_instance();
+	
+	if ($CI->config->item('simulator')) {
+		return FALSE;
+	}
+	
+	exec(ZIMAPI_CMD_USB_CONNECT, $output, $ret_val);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
+	
+	return TRUE; // never reach here
 }
 
 function ZimAPI_getPresetInfoAsArray($preset_id, &$array_info, &$system_preset = NULL) {

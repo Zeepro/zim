@@ -138,13 +138,11 @@ function Printer_printFromModel($id_model, $array_temper = array()) {
 		// temporary change - modify the temperature of gcode file according to cartridge info
 		//TODO test me and remove me if it is necessary
 // 		$ret_val = Printer__changeTemperature($gcode_path);
-		if (count($array_temper)) {
-			$ret_val = Printer__changeTemperature($gcode_path, $array_temper);
-			if ($ret_val != ERROR_OK) {
-				return $ret_val;
-			}
+		$ret_val = Printer__changeTemperature($gcode_path, $array_temper);
+		if ($ret_val != ERROR_OK) {
+			return $ret_val;
 		}
-		else if (file_exists($gcode_path . '.new')) {
+		if (file_exists($gcode_path . '.new')) {
 			$gcode_path .= '.new';
 		}
 		// temporary change end
@@ -196,13 +194,11 @@ function Printer_printFromSlice($array_temper = array()) {
 	
 	// temporary change
 	//TODO remove me if it is necessary
-	if (count($array_temper)) {
-		$ret_val = Printer__changeTemperature($gcode_path, $array_temper);
-		if ($ret_val != ERROR_OK) {
-			return $ret_val;
-		}
+	$ret_val = Printer__changeTemperature($gcode_path, $array_temper);
+	if ($ret_val != ERROR_OK) {
+		return $ret_val;
 	}
-	else if (file_exists($gcode_path . '.new')) {
+	if (file_exists($gcode_path . '.new')) {
 		$gcode_path .= '.new';
 	}
 	// temporary change end
@@ -679,6 +675,7 @@ function Printer__changeTemperature(&$gcode_path, $array_temper = array()) {
 	$CI->load->helper('printerlog');
 	PrinterLog_logDebug('change temperature: ' . $command, __FILE__, __LINE__);
 	
+	@unlink($gcode_path . '.new');
 	exec($command, $output, $cr);
 	if ($cr != ERROR_NORMAL_RC_OK) {
 		$CI->load->helper('printerlog');

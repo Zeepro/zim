@@ -906,17 +906,20 @@ class Rest extends MY_Controller {
 						}
 					}
 					else if ($set_status && $set_status == 'on') {
-						if ($parameter) {
+						// temporary change - jump out of verification if we have no parameter 20140811
+						if (!$parameter) {
+							$parameter = ZIMAPI_PRM_CAMERA_PRINTSTART;
+						}
 							if (ZimAPI_cameraOn($parameter)) {
 								$cr = ERROR_OK;
 							}
 							else {
 								$cr = ERROR_INTERNAL;
 							}
-						}
-						else {
-							$cr = ERROR_MISS_PRM;
-						}
+// 						}
+// 						else {
+// 							$cr = ERROR_MISS_PRM;
+// 						}
 					}
 					else if ($set_status) {
 						$cr = ERROR_WRONG_PRM;
