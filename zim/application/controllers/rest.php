@@ -1135,7 +1135,14 @@ class Rest extends MY_Controller {
 			switch ($abb_cartridge) {
 				case 'l':
 				case 'r':
-					$cr = PrinterState_unloadFilament($abb_cartridge);
+					$temper = 0;
+					$cr = PrinterState_getTemperature($temper, 'e', $abb_cartridge);
+					if ($cr == ERROR_OK && $temper < PRINTERSTATE_VALUE_MAXTEMPER_BEFORE_UNLOAD) {
+						$cr = PrinterState_unloadFilament($abb_cartridge);
+					}
+					else if ($cr == ERROR_OK) {
+						$cr = ERROR_BUSY_PRINTER;
+					}
 					break;
 					
 				default:

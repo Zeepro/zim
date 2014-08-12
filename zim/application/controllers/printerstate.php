@@ -960,6 +960,8 @@ class Printerstate extends MY_Controller {
 		$template_data = array();
 		$body_page = NULL;
 		$error = '';
+		$ret_val = 0;
+		$hostname = NULL;
 	
 		$this->load->library('parser');
 		$this->lang->load('printerstate/sethostname', $this->config->item('language'));
@@ -998,7 +1000,12 @@ class Printerstate extends MY_Controller {
 				$error = t('no_input');
 			}
 		}
-	
+		
+		$ret_val = ZimAPI_getHostname($hostname);
+		if ($ret_val != ERROR_OK) {
+			$hostname = 'zim';
+		}
+		
 		// parse the main body
 		$template_data = array(
 				'hint'			=> t('set_hint'),
@@ -1006,6 +1013,7 @@ class Printerstate extends MY_Controller {
 				'error'			=> $error,
 				'back'			=> t('back'),
 				'home_button'	=> t('home_button'),
+				'hostname'		=> $hostname,
 		);
 	
 		$body_page = $this->parser->parse('template/printerstate/sethostname', $template_data, TRUE);
