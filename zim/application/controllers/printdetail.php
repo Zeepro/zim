@@ -192,6 +192,7 @@ class Printdetail extends MY_Controller {
 				'var_prime'		=> 'false',
 				'again_button'	=> t('Print again'),
 				'video_url'		=> $this->config->item('video_url'),
+				//'video_error'	=> t('video_error')
 		);
 		
 		if ($print_slice == TRUE) {

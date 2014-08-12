@@ -7,21 +7,10 @@
 		<div id="container" style="text-align: center;">
 			<div data-role="collapsible" data-collapsed="false" style="align: center;">
 				<h4>{title}</h4>
-<!--				<video width="320" height="240" autoplay controls>
-					<source src="http://88.175.62.75/zim.m3u8" type="application/x-mpegURL" />
-					Your browser does not support HTML5 streaming!
-				</video> -->
 				<script type="text/javascript" src="/assets/jwplayer/jwplayer.js"></script>
 	 			<script type="text/javascript">jwplayer.key="Jh6aqwb1m2vKLCoBtS7BJxRWHnF/Qs3LMjnt13P9D6A=";</script>
 	 			<style type="text/css">div#myVideo_wrapper {margin: 0 auto;}</style>
 				<div id="myVideo">Loading the player...</div>
-				<script type="text/javascript">
-					jwplayer("myVideo").setup({
-						file: "{video_url}",
-						width: "100%",
-						autostart: true,
-					});
-				</script>
 			</div>
 			<div data-role="collapsible" data-collapsed="false" style="align: center;">
 				<h4>{print_detail}</h4>
@@ -34,6 +23,21 @@
 		</div>
 	</div>
 </div>
+
+<script>
+	var player = jwplayer("myVideo").setup({
+							file: "{video_url}",
+							width: "100%",
+							autostart: true,
+							fallback: false,
+							androidhls: true
+						});
+						player.onSetupError(function()
+						{
+							$("#myVideo").empty().append('<img src="http://192.168.1.201/error.png" height="280" width="280" />' +
+														"<p>{video_error}</p>");
+						});
+</script>
 
 <script type="text/javascript">
 var var_refreshPrintStatus;
@@ -63,7 +67,7 @@ function checkPrintStatus() {
 		}
 		else {
 			var_ajax_lock = true;
-			refreshVideoURL();
+			//refreshVideoURL();
 		}
 		
 		var_ajax = $.ajax({

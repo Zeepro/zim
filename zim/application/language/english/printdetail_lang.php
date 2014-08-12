@@ -12,6 +12,8 @@ $lang['Control your printing']
 	= 'Control your printing';
 $lang['Printing details']
 	= 'Printing details';
+$lang['video_error']
+	= 'We\'re sorry, but your device is not compatible with HLS video streaming.';
 
 //printdetail status_ajax()
 $lang['Percentage: %d%%']

@@ -12,6 +12,8 @@ $lang['Control your printing']
 	= 'Contrôler votre impression';
 $lang['Printing details']
 	= 'Détail de l\'impression';
+$lang['video_error']
+	= 'Nous sommes désolés, mais votre terminal ne supporte pas le streaming vidéo HLS.';
 
 //printdetail status_ajax()
 $lang['Percentage: %d%%']
