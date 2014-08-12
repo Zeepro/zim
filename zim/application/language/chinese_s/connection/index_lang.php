@@ -12,5 +12,5 @@ $lang['Option 2'] =
 $lang['Option 3'] =
         "WIFI无线热点模式（点对点）";
 $lang['set_hostname'] =
-		'更改打印机名称';
+		'更改打印机完整网络名称（FQDN）';
 ?>

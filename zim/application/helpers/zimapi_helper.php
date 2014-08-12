@@ -21,7 +21,7 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_CMD_VERSION_REBOOT',	'zfw_printenv version`zfw_printenv update` || zfw_printenv version`zfw_printenv last_good`');
 	define('ZIMAPI_CMD_SETHOSTNAME',	ZIMAPI_CMD_CONFIG_NET . '-n ');
 	define('ZIMAPI_CMD_GETHOSTNAME',	'cat /etc/hostname');
-	define('ZIMAPI_CMD_USB_CONNECT',	'[ `cat /sys/class/gpio/gpio3_pg9/value` == 0 ]');
+	define('ZIMAPI_CMD_USB_CONNECT',	'[ `cat /sys/class/gpio/gpio3_pg9/value` -eq 0 ]');
 	
 	define('ZIMAPI_TITLE_TOPOLOGY',	'topology');
 	define('ZIMAPI_TITLE_MEDIUM',	'medium');
