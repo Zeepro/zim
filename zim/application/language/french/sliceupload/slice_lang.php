@@ -1,17 +1,19 @@
 <?php
 $lang['home']
 	= 'Accueil';
+$lang['back']
+	= 'Retour';
 
 $lang['sliceupload_slice_pagetitle']
 	= 'Zim - Slicing de modèle';
 $lang['select_hint']
-	= 'Sélectionner une configuration préset pour slicer le modèle';
+	= 'Paramètres du slicer :';
 $lang['slice_button']
 	= 'Slicer';
 $lang['goto_preset']
-	= 'Aller sur la page de configuration de préset';
+	= 'Page de présélection';
 $lang['goto_hint']
-	= 'Êtes-vous sûr de vouloir aller sur la page de configuration de préset ?';
+	= 'Êtes-vous sûr(e) de vouloir aller sur la page de configuration de préset ?';
 $lang['wait_preview']
 	= 'Attente de lecture d\'une image de rendering';
 $lang['wait_slice']

@@ -1,7 +1,8 @@
 <div data-role="page" data-url="/sliceupload/slice">
 	<div id="overlay"></div>
 	<header data-role="header" class="page-header">
-		<a href="#" onclick="javascript:window.location.href='/';" data-icon="home" data-ajax="false">{home}</a>
+		<a href="#" data-icon="back" data-ajax="false" style="visibility:hidden">{back}</a>
+		<a href="#" onclick="javascript:window.location.href='/';" data-icon="home" data-ajax="false" style="float:right">{home}</a>
 	</header>
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">

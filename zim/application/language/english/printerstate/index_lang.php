@@ -12,7 +12,7 @@ $lang['change_left']
 $lang['change_right']
 	= 'Change right cartridge';
 $lang['printer_info']
-	= 'Informations';
+	= 'Information';
 $lang['set_hostname']
 	= 'Change FQDN';
 $lang['strip_led']

@@ -10,6 +10,6 @@ $lang['ZeePro Personal Printer 21 - Home']
 $lang['manage']
 	= 'Printer Management';
 $lang['upload']
-	= 'File Print';
+	= 'File print';
 $lang['activate_printer']
 	= 'Activate the printer';

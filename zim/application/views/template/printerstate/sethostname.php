@@ -9,6 +9,7 @@
 			<h2 style="text-align: center;">{hint}</h2>
 			<form method="post" accept-charset="utf-8">
 				<input type="text" name="hostname" id="hostname" value="{hostname}" data-clear-btn="true"/>
+				<p>{info_text}</p>
 				<div>
 					<input type="submit" value="{set_button}" />
 				</div>
@@ -17,3 +18,16 @@
 		</div>
 	</div>
 </div>
+
+<script>
+	var pattern;
+	var string = $("p").text();
+
+	$("p").text(string.replace(new RegExp('xxx', 'g'), $("#hostname").val()));
+	pattern = $("#hostname").val();
+	$("#hostname").on('keyup', function()
+	{
+		$("p").text(string.replace(new RegExp(pattern+'|'+'xxx', 'g'), $("#hostname").val()));
+		pattern = $("#hostname").val();
+	});
+</script>

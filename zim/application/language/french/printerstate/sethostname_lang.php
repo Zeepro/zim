@@ -17,3 +17,5 @@ $lang['finish_hint']
 	= 'Le nouveau nom entrera en vigueur après un redémarrage de l\'imprimante ou une réinitialisation de l\'interface réseau';
 $lang['home_button']
 	= 'Accueil';
+$lang['info_text']
+	= 'Depuis votre réseau local, votre imprimante sera accessible à l\'adresse "http://xxx.local" si vous utilisez un périphérique Apple, Android ou Linux, et à l\'adresse "http://xxx" si vous utilisez Windows.';

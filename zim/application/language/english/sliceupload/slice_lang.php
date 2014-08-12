@@ -1,17 +1,19 @@
 <?php
 $lang['home']
 	= 'home';
+$lang['back']
+	= 'Back';
 
 $lang['sliceupload_slice_pagetitle']
 	= 'Zim - Model slicing';
 $lang['select_hint']
-	= 'Select one preset setting to slice model';
+	= 'Slicer settings preset :';
 $lang['slice_button']
 	= 'Slice';
 $lang['goto_preset']
-	= 'Go to preset setting page';
+	= 'Settings presets';
 $lang['goto_hint']
-	= 'Are you sure to go to preset setting page?';
+	= 'Are you sure to go to the settings presets page?';
 $lang['wait_preview']
 	= 'Wait for loading preview image';
 $lang['wait_slice']

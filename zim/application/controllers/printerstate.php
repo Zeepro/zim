@@ -1014,6 +1014,7 @@ class Printerstate extends MY_Controller {
 				'back'			=> t('back'),
 				'home_button'	=> t('home_button'),
 				'hostname'		=> $hostname,
+				'info_text'		=> t('info_text')
 		);
 	
 		$body_page = $this->parser->parse('template/printerstate/sethostname', $template_data, TRUE);
