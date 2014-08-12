@@ -599,6 +599,8 @@ function ZimAPI_resetNetwork() {
 			$output = NULL;
 			$ret_val = 0;
 			
+			ZimAPI_setHostname("zim");
+			
 			exec(ZIMAPI_CMD_RESET_NETWORK, $output, $ret_val);
 			if ($ret_val != ERROR_NORMAL_RC_OK) {
 				return ERROR_INTERNAL;

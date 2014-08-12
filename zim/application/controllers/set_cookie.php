@@ -3,7 +3,7 @@
 if (!defined('BASEPATH'))
 	exit('No direct script access allowed');
 
-class Set_cookie extends MY_Controller
+class Set_cookie extends CI_Controller
 {
 	public function index()
 	{
