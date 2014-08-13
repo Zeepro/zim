@@ -14,6 +14,10 @@ $lang['ZeePro Personal Printer 21 - Printing details']
 	= 'Zim - Quick print detail';
 $lang['Time estimation: ']
 	= 'Time estimation: ';
+$lang['temp_adjustments']
+	= "Temperature fine adjustment :";
+$lang['color_suggestion']
+	= "Color suggestion :";
 $lang['unknown']
 	= 'unknown';
 $lang['ok']
@@ -38,8 +42,6 @@ $lang['Description']
 	= 'Description';
 $lang['error']
 	= 'error';
-$lang['error']
-= 'error';
 $lang['Home']
 	= 'Home';
 ?>

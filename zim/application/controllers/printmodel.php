@@ -227,6 +227,9 @@ class Printmodel extends MY_Controller {
 				'back'				=> t('back'),
 				'preview_title'		=> t('Preview'),
 				'desp_title'		=> t('Description'),
+				'color_suggestion'	=> t('color_suggestion'),
+				'temp_adjustments'	=> t('temp_adjustments'),
+				'error'				=> t('error')
 		);
 		if ($nb_extruder >= 2) {
 			$template_data['state_c_l'] = $color_left_filament;

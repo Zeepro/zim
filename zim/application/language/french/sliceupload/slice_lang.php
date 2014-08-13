@@ -21,10 +21,10 @@ $lang['wait_slice']
 $lang['wait_in_slice']
 	= 'Slicing en cours, pourcentage: ';
 $lang['near_button']
-	= 'Zoom';
+	= 'Zoom avant';
 $lang['far_button']
 	= 'Zoom arrière';
 $lang['small_button']
-	= 'Taille -';
+	= 'Réduire';
 $lang['big_button']
-	= 'Taille +';
+	= 'Agrandir';

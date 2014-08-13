@@ -12,8 +12,8 @@
 			</style>
 			<div style="clear: both;">
 				<h2>{preset_title}</h2>
-				<div style="float: right; margin-top: -3.5em; {hide_delete}" id="delete_container">
-					<a href="/preset/delete?id={preset_id}" data-role="button" data-icon="delete" data-ajax="false" data-inline="true" data-iconpos="notext">Delete</a> <!-- class="ui-disabled" -->
+				<div style="float: right; margin-top: -4.5em; {hide_delete}" id="delete_container">
+					<a href="/preset/delete?id={preset_id}" data-role="button" data-icon="delete" data-ajax="false" data-inline="true">Delete</a> <!-- class="ui-disabled" -->
 				</div>
 			</div>
 			<form action="/preset/detail?id={preset_id}{preset_newurl}" method="post">
@@ -617,7 +617,7 @@
 			</div> <!-- advanced -->
 			<div id="save_as_container" style="{hide_save_as}">
 				<h3><label for="save_as">{save_as_title}</label></h3>
-				<input type="text" style="text-align:right;" data-clear-btn="true" name="save_as" id="save_as">
+				<input type="text" data-clear-btn="true" name="save_as" id="save_as">
 			</div>
 			<div id="submit_container" style="{hide_submit}"><input type="submit" value="{submit_button}" data-ajax="false"></div>
 			</form>

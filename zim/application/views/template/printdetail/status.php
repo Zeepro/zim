@@ -34,7 +34,7 @@
 						});
 						player.onSetupError(function()
 						{
-							$("#myVideo").empty().append('<img src="http://192.168.1.201/error.png" height="280" width="280" />' +
+							$("#myVideo").empty().append('<img src=/images/error.png" height="280" width="280" />' +
 														"<p>{video_error}</p>");
 						});
 </script>

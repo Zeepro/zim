@@ -16,6 +16,7 @@
 			<div data-role="collapsible" data-collapsed="false" style="text-align: center;">
 				<h4>{preview_title}</h4>
 				<img src="{image}" style="max-width: 100%;"><br>
+				<p>{color_suggestion}</p>
 				<div style="width: 50%; float: left; text-align: center;">
 					<div style="width: 75px; height: 75px; background-color: {model_c_l}; margin: 0 auto;">
 						<img src="/images/cartridge.png" style="width: 100%">
@@ -35,7 +36,7 @@
 <!-- 			</div> -->
 			<div data-role="collapsible" data-collapsed="false" style="text-align: center;">
 				<h4>{title_current}</h4>
-				<div style="height:210px">
+				<div style="height:240px">
 					<div style="width: 50%; float: left; text-align: center;">
 						<div style="width: 75px; height: 75px; background-color: {state_c_l}; margin: 0 auto;">
 							<img src="/images/cartridge.png" style="width: 100%">
@@ -43,7 +44,6 @@
 						<p>{state_f_l}</p>
 <!-- 					<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh" onclick="window.location.href='/printerstate/changecartridge?v=l&f={need_filament_l}&id={model_id}'">{change_filament_l}</button> -->
 						<a href="/printerstate/changecartridge?v=l&f={need_filament_l}&id={model_id}" data-role="button" data-ajax="false" data-icon="refresh" class="ui-shadow ui-corner-all">{change_filament_l}</a>
-						<input type="range" name="l" id="slider-1" value="{temper_filament_l}" min="160" max="260">
 					</div>
 					<div style="width: 50%; float: left; text-align: center;">
 						<div style="width: 75px; height: 75px; background-color: {state_c_r}; margin: 0 auto;">
@@ -52,6 +52,12 @@
 						<p>{state_f_r}</p>
 <!-- 					<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh" onclick="window.location.href='/printerstate/changecartridge?v=l&f={need_filament_l}&id={model_id}'">{change_filament_l}</button> -->
 						<a href="/printerstate/changecartridge?v=r&f={need_filament_r}&id={model_id}" data-role="button" data-ajax="false" data-icon="refresh" class="ui-shadow ui-corner-all">{change_filament_r}</a>
+					</div>
+					<div>{temp_adjustments}</div>
+					<div style="width: 50%; float: left; text-align: center;">
+						<input type="range" name="l" id="slider-1" value="{temper_filament_l}" min="160" max="260">
+					</div>
+					<div style="width: 50%; float: left; text-align: center;">
 						<input type="range" name="r" id="slider-2" value="{temper_filament_r}" min="160" max="260">
 					</div>
 				</div>
@@ -67,19 +73,24 @@
 </div>
 
 <script>
-	var tmp = $("#slider-2").val();
+var tmp = $("#slider-2").val();
 
-	$("#slider-2").attr('min', tmp - 10); 
-	$("#slider-2").attr('max', parseInt(tmp) + 10);
+$("#slider-2").attr('min', tmp - 10); 
+$("#slider-2").attr('max', parseInt(tmp) + 10);
 
-	tmp = $("#slider-1").val();
+tmp = $("#slider-1").val();
 
-	$("#slider-1").attr('min', tmp - 10); 
-	$("#slider-1").attr('max', parseInt(tmp) + 10);
-	
-	$("input[type=submit]").on('click', function()
-	{
-		$("#overlay").addClass("gray-overlay");
-		$(".ui-loader").css("display", "block");
-	});
+$("#slider-1").attr('min', tmp - 10); 
+$("#slider-1").attr('max', parseInt(tmp) + 10);
+
+$("input[type=submit]").on('click', function()
+{
+	$("#overlay").addClass("gray-overlay");
+	$(".ui-loader").css("display", "block");
+});
+
+if ("{state_f_l}" == "{error}" || "{state_f_r}" == "{error}")
+{
+	$("#slider-" + ("{state_f_l}" == "{error}" ? "1" : "2")).attr("disabled", "disabled");
+}
 </script>
