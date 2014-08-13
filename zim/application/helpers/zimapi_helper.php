@@ -1089,7 +1089,7 @@ function ZimAPI_getVersion($next_boot = FALSE) {
 function ZimAPI_getType() {
 	global $CFG;
 	
-	return trim(@file_get_contents($CFG->config['type_file']));
+	return trim(@file_get_contents($CFG->config['type_file']), " \t\n\r\0\x0B\"");
 }
 
 function ZimAPI_getPrinterSSOName(&$value) {
