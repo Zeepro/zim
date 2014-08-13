@@ -14,6 +14,13 @@ $lang['no_input']
 $lang['set_error']
 	= '设置错误';
 $lang['finish_hint']
-	= '新的名称将在重新启动打印机或网络接口后生效';
+	= '您的打印机将重启以完成更改。</br>
+		</br>
+		请重新连接到您常用的网络，并使用以下链接访问您的打印机：</br>
+		</br>
+		<a href="http://%s.local/">http://%s.local/</a></br>
+		</br>
+		</br>
+		如果已有Zim打印机连接在您的网络中，您新的打印机地址将会是第一个可用的链接 http://zimXXX，例如： http://zim1 http://zim2 …</i>';
 $lang['home_button']
 	= '首页';

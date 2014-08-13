@@ -14,7 +14,14 @@ $lang['no_input']
 $lang['set_error']
 	= 'Erreur d\'assignation';
 $lang['finish_hint']
-	= 'Le nouveau nom entrera en vigueur après un redémarrage de l\'imprimante ou une réinitialisation de l\'interface réseau';
+	= 'Votre imprimante va redémarrer pour appliquer ses nouveaux paramètres.</br>
+		</br>
+		Reconnectez-vous à votre réseau habituel pour accéder à votre imprimante en cliquant sur le lien suivant :</br>
+		</br>
+		<a href="http://%s.local/">http://%s.local/</a></br>
+		</br>
+		</br>
+		Si plusieurs Zim sont connectées à votre réseau, votre imprimante sera accessible à la première adresse disponible http://zimXXX - e.g. http://zim1 http://zim2 ...';
 $lang['home_button']
 	= 'Accueil';
 $lang['info_text']

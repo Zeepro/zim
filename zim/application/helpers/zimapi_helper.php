@@ -470,7 +470,7 @@ function ZimAPI_setpEth() {
 	return ZimAPI_setcEth();
 }
 
-function ZimAPI_setHostname($hostname) {
+function ZimAPI_setHostname($hostname, $restart = TRUE) {
 	// check characters
 	if (preg_match('/^[A-Za-z0-9]+$/', $hostname)) {
 		$ret_val = 0;
@@ -489,6 +489,10 @@ function ZimAPI_setHostname($hostname) {
 				return ERROR_INTERNAL;
 			}
 			else {
+				if ($restart == TRUE) {
+					exec(ZIMAPI_CMD_RESTART_WEB);
+				}
+				
 				return ERROR_OK;
 			}
 		} catch (Exception $e) {

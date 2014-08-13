@@ -228,10 +228,10 @@ function Slicer_checkSlice(&$progress, &$array_extruder = array()) {
 		}
 	}
 	else if ($ret_val == SLICER_RESPONSE_ERROR) {
-		if (strpos($response, "InitalError" !== FALSE)) {
+		if (strpos($response, "InitalError") !== FALSE) {
 			$cr = ERROR_WRONG_PRM;
 		}
-		else if (strpos($response, "ExportError" !== FALSE)) {
+		else if (strpos($response, "ExportError") !== FALSE) {
 			$cr = ERROR_UNKNOWN_MODEL;
 		}
 		else {

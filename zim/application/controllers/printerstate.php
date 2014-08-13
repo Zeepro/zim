@@ -962,21 +962,30 @@ class Printerstate extends MY_Controller {
 		$error = '';
 		$ret_val = 0;
 		$hostname = NULL;
-	
+		$restart = NULL;
+		
 		$this->load->library('parser');
 		$this->lang->load('printerstate/sethostname', $this->config->item('language'));
-	
+		
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$hostname = $this->input->post('hostname');
+			$restart = $this->input->post('restart');
+			
+			if ((int) $restart == 0) {
+				$restart = FALSE;
+			}
+			else {
+				$restart = TRUE;
+			}
 			
 			if ($hostname) {
 				$this->load->helper('zimapi');
 				
-				if (ZimAPI_setHostname($hostname) == ERROR_OK) {
+				if (ZimAPI_setHostname($hostname, $restart) == ERROR_OK) {
 					// parse the main body
 					$template_data = array(
-							'hint'			=> t('finish_hint'),
-							'home_button'	=> t('home_button'),
+							'hint'			=> t('finish_hint', array($hostname, $hostname)),
+// 							'home_button'	=> t('home_button'),
 					);
 					
 					$body_page = $this->parser->parse('template/printerstate/sethostname_finish', $template_data, TRUE);
@@ -1001,6 +1010,15 @@ class Printerstate extends MY_Controller {
 			}
 		}
 		
+		if ($restart === NULL) {
+			if (FALSE === $this->input->get('norestart')) {
+				$restart = TRUE;
+			}
+			else {
+				$restart = FALSE;
+			}
+		}
+		
 		$ret_val = ZimAPI_getHostname($hostname);
 		if ($ret_val != ERROR_OK) {
 			$hostname = 'zim';
@@ -1014,7 +1032,8 @@ class Printerstate extends MY_Controller {
 				'back'			=> t('back'),
 				'home_button'	=> t('home_button'),
 				'hostname'		=> $hostname,
-				'info_text'		=> t('info_text')
+				'info_text'		=> t('info_text'),
+				'restart'		=> ($restart) ? 1 : 0,
 		);
 	
 		$body_page = $this->parser->parse('template/printerstate/sethostname', $template_data, TRUE);

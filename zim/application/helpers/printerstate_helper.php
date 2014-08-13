@@ -1332,7 +1332,7 @@ function PrinterState_checkStatusAsArray() {
 		$data_json[PRINTERSTATE_TITLE_STATUS] = CORESTATUS_VALUE_IDLE;
 		//TODO think about if we need to display last error as 200 (error_ok) or not
 		if (!is_null($status_json[CORESTATUS_TITLE_MESSAGE]) && $status_json[CORESTATUS_TITLE_MESSAGE] != ERROR_OK) {
-			$data_json[PRINTERSTATE_TITLE_LASTERROR] = $status_json[CORESTATUS_TITLE_MESSAGE];
+			$data_json[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_LASTERROR] = $status_json[CORESTATUS_TITLE_MESSAGE];
 		}
 		
 		// check if we need to change idle into sliced or not
@@ -1343,13 +1343,20 @@ function PrinterState_checkStatusAsArray() {
 // 	else if ($ret_val == FALSE && !in_array($status_current, array(CORESTATUS_VALUE_PRINT, CORESTATUS_VALUE_CANCEL))) {
 	else if ($ret_val == FALSE && $status_current != CORESTATUS_VALUE_PRINT) {
 		$temp_data = array();
-
+		$status_old = $status_current;
+		
 // 		PrinterState_checkBusyStatus($status_current, $data_json);
 		PrinterState_checkBusyStatus($status_current, $temp_data);
 		if ($status_current == CORESTATUS_VALUE_SLICE) {
 			$data_json[PRINTERSTATE_TITLE_PERCENT] = $temp_data[PRINTERSTATE_TITLE_PERCENT];
 		}
 		$data_json[PRINTERSTATE_TITLE_STATUS] = $status_current;
+		
+		// return error code in the first time when we have error from slicing=>idle
+		if ($status_old == CORESTATUS_VALUE_SLICE && $status_current == CORESTATUS_VALUE_IDLE
+				&& array_key_exists(PRINTERSTATE_TITLE_LASTERROR, $temp_data)) {
+			$data_json[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_LASTERROR] = $temp_data[CORESTATUS_TITLE_MESSAGE];
+		}
 		
 		// try to change idle into sliced if necessary
 		if ($status_current == CORESTATUS_VALUE_IDLE) {
