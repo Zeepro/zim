@@ -2680,6 +2680,10 @@ function PrinterState_setRFIDPower($on = TRUE) {
 	$command = '';
 	$ret_val = 0;
 	
+	// temporary change - disable all rfid reader power control
+	return ERROR_OK;
+	//FIXME change it as soon as possible
+	
 	if ($on == TRUE) {
 		$command = $arcontrol_fullpath . PRINTERSTATE_RFID_POWER_ON;
 	}

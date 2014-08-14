@@ -18,7 +18,7 @@
 				</li>
 			</ul>
 			<ul data-role="listview" id="listview" class="shadowBox" data-inset="true">
-				<li style="margin-top: 30px;"><a href="/printerstate">
+				<li style="margin-top: 30px;"><a href="/printerstate" data-ajax="false">
 					<h2>{menu_printerstate}</h2></a>
 				</li>
 			</ul>

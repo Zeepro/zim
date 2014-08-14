@@ -26,6 +26,12 @@ status_tomboning() {
 	return $?
 }
 
+restart_arcontrol() {
+	/etc/init.d/arcontrol stop
+	/etc/init.d/arcontrol start
+	arcontrol_cli M1400
+}
+
 
 # main program
 
@@ -46,8 +52,12 @@ case "$1" in
 		status_tomboning
 		;;
 		
+	restart_arcontrol)
+		restart_arcontrol
+		;;
+		
 	*)
-		echo "Usage: $0 {force_reco|start_tomboning|stop_romboning|status_tomboning|*}"
+		echo "Usage: $0 {force_reco|start_tomboning|stop_romboning|status_tomboning|restart_arcontrol|*}"
 		exit 1
 esac
 
