@@ -25,3 +25,5 @@ $lang['Home']
 	= 'Accueil';
 $lang['ip_address']
 	= 'IP locale';
+$lang['sso_name']
+	= 'Nom de l\'imprimante';

@@ -23,3 +23,5 @@ $lang['button_rename_sso']
 	= '重命名您的打印机';
 $lang['ip_address']
 	= 'IP 地址';
+$lang['sso_name']
+	= '打印机名称';

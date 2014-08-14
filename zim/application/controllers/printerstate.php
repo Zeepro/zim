@@ -428,7 +428,11 @@ class Printerstate extends MY_Controller {
 				array(
 						'title' => t('ip_address'),
 						'value'	=> $temp_info[ZIMAPI_TITLE_IP],
-				)
+				),
+				array(
+						'title' => t('sso_name'),
+						'value'	=> $sso_name ? $sso_name : 'N/A',
+				),
 		);
 		
 		// parse the main body
