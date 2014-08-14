@@ -108,11 +108,13 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_TITLE_EXT_TEMP_R',	'r_temperature');
 	define('PRINTERSTATE_TITLE_EXT_LENG_L',	'l_length');
 	define('PRINTERSTATE_TITLE_EXT_LENG_R',	'r_length');
+	define('PRINTERSTATE_TITLE_SLICE_ERR',	'slicing_error');
+	define('PRINTERSTATE_TITLE_DETAILMSG',	'Message');
 	
 	define('PRINTERSTATE_JSON_PRINTER', 		'Printer.json');
 	define('PRINTERSTATE_TITLE_JSON_NB_EXTRUD', 'ExtrudersNumber');
 	define('PRINTERSTATE_JSON_REFILL_TEMPER',	'RefillTemperature.json');
-
+	
 	define('PRINTERSTATE_MAGIC_NUMBER_V1',			23567); //v1.0
 	define('PRINTERSTATE_MAGIC_NUMBER_V2',			23568); //v1.1
 	define('PRINTERSTATE_MAGIC_NUMBER_V3',			23569); //v1.2
@@ -1094,31 +1096,38 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array(), 
 			$CI->load->helper('slicer');
 			$ret_val = Slicer_checkSlice($progress, $array_slicer);
 			if ($ret_val != ERROR_OK) {
+				$error_message = NULL;
+				
 				// handle error for slicing
 				$CI->load->helper('printerlog');
 				
-				CoreStatus_setInIdle($ret_val);
 				$array_data[PRINTERSTATE_TITLE_LASTERROR] = $ret_val;
 				$status_current = CORESTATUS_VALUE_IDLE;
 				switch ($ret_val) {
 					//TODO treat the error with api and ui
 					case ERROR_NO_PRINT:
-						PrinterLog_logMessage('not in slicing', __FILE__, __LINE__);
+						$error_message = 'not in slicing';
+						PrinterLog_logMessage($error_message, __FILE__, __LINE__);
 						break;
 						
 					case ERROR_WRONG_PRM:
-						PrinterLog_logMessage('slicer error, perhaps because of parameter', __FILE__, __LINE__);
+						$error_message = 'slicer error'; // perhaps because of parameter
+						PrinterLog_logMessage($error_message, __FILE__, __LINE__);
 						break;
 						
 					case ERROR_UNKNOWN_MODEL:
-						PrinterLog_logMessage('slicer export error, perhaps because of model', __FILE__, __LINE__);
+						$error_message = 'slicer export error'; // perhaps because of model
+						PrinterLog_logMessage($error_message, __FILE__, __LINE__);
 						break;
 						
 					default:
-						PrinterLog_logError('error return from slicer', __FILE__, __LINE__);
+						$error_message = 'slicer internal error'; // internal system error
+						PrinterLog_logError($error_message, __FILE__, __LINE__);
 						PrinterLog_logDebug('return: ' . $ret_val . ', progress: ' . $progress);
 						break;
 				}
+				CoreStatus_setInIdle($ret_val, $error_message);
+				$array_data[PRINTERSTATE_TITLE_DETAILMSG] = $error_message;
 				
 				return TRUE;
 			}
@@ -1318,7 +1327,7 @@ function PrinterState_checkStatusAsArray() {
 	$output = array();
 	$ret_val = 0;
 	$data_json = array();
-	$status_json = array();
+	$temp_data[PRINTERSTATE_TITLE_LASTERROR] = array();
 	$time_start = NULL;
 	$status_current = '';
 	
@@ -1331,8 +1340,12 @@ function PrinterState_checkStatusAsArray() {
 	if ($ret_val == TRUE) {
 		$data_json[PRINTERSTATE_TITLE_STATUS] = CORESTATUS_VALUE_IDLE;
 		//TODO think about if we need to display last error as 200 (error_ok) or not
-		if (!is_null($status_json[CORESTATUS_TITLE_MESSAGE]) && $status_json[CORESTATUS_TITLE_MESSAGE] != ERROR_OK) {
-			$data_json[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_LASTERROR] = $status_json[CORESTATUS_TITLE_MESSAGE];
+		if (array_key_exists(CORESTATUS_TITLE_LASTERROR, $status_json) && !is_null($status_json[CORESTATUS_TITLE_LASTERROR])
+				&& $status_json[CORESTATUS_TITLE_LASTERROR] != ERROR_OK) {
+// 			$data_json[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_LASTERROR] = $status_json[CORESTATUS_TITLE_LASTERROR];
+// 			$data_json[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_DETAILMSG] = $status_json[CORESTATUS_TITLE_MESSAGE];
+			$data_json[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_SLICE_ERR]
+					= $status_json[CORESTATUS_TITLE_LASTERROR] . ' ' . $status_json[CORESTATUS_TITLE_MESSAGE];
 		}
 		
 		// check if we need to change idle into sliced or not
@@ -1355,7 +1368,10 @@ function PrinterState_checkStatusAsArray() {
 		// return error code in the first time when we have error from slicing=>idle
 		if ($status_old == CORESTATUS_VALUE_SLICE && $status_current == CORESTATUS_VALUE_IDLE
 				&& array_key_exists(PRINTERSTATE_TITLE_LASTERROR, $temp_data)) {
-			$data_json[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_LASTERROR] = $temp_data[CORESTATUS_TITLE_MESSAGE];
+// 			$data_json[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_LASTERROR] = $temp_data[PRINTERSTATE_TITLE_LASTERROR];
+// 			$data_json[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_DETAILMSG] = $temp_data[PRINTERSTATE_TITLE_DETAILMSG];
+			$data_json[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_SLICE_ERR]
+					= $temp_data[PRINTERSTATE_TITLE_LASTERROR] . ' ' . $temp_data[PRINTERSTATE_TITLE_DETAILMSG];
 		}
 		
 		// try to change idle into sliced if necessary

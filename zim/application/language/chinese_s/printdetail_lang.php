@@ -43,7 +43,7 @@ $lang['printdetail_cancel_pagetitle']
 $lang['wait_hint_cancel']
 	= '等待取消…';
 $lang['finish_hint_cancel']
-	= '恭喜，您的打印取消了！';
+	= '您的打印已成功取消了！';
 
 //printdetail recovery()
 $lang['printdetail_recovery_pagetitle']

@@ -17,7 +17,7 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 // 	define('CORESTATUS_TITLE_URL_REDIRECT',	'RedirectURL');
 	define('CORESTATUS_TITLE_MESSAGE',		'Message');
 	define('CORESTATUS_TITLE_STARTTIME',	'StartDate');
-// 	define('CORESTATUS_TITLE_LASTERROR',	'LastError');
+	define('CORESTATUS_TITLE_LASTERROR',	'LastError');
 // 	define('CORESTATUS_TITLE_LASTSTATUS',	'LastState');
 	define('CORESTATUS_TITLE_SUBSTATUS',	'Substate');
 	
@@ -115,6 +115,7 @@ function CoreStatus_initialFile() {
 		$data_json = array(
 				CORESTATUS_TITLE_VERSION	=> '1.0',
 				CORESTATUS_TITLE_STATUS		=> CORESTATUS_VALUE_IDLE,
+				CORESTATUS_TITLE_LASTERROR	=> NULL,
 				CORESTATUS_TITLE_MESSAGE	=> NULL,
 		);
 		
@@ -374,7 +375,7 @@ function CoreStatus_checkCallNoBlockPage() {
 	));
 }
 
-function CoreStatus_setInIdle($last_error = FALSE) {
+function CoreStatus_setInIdle($last_error = FALSE, $error_message = FALSE) {
 	$status_previous = '';
 	$ret_val = CoreStatus_checkInIdle($status_previous);
 	if ($ret_val == TRUE) {
@@ -409,7 +410,8 @@ function CoreStatus_setInIdle($last_error = FALSE) {
 		return CoreStatus__setInStatus(CORESTATUS_VALUE_IDLE,
 				array(
 						CORESTATUS_TITLE_STARTTIME	=> NULL,
-						CORESTATUS_TITLE_MESSAGE	=> $last_error,
+						CORESTATUS_TITLE_LASTERROR	=> $last_error,
+						CORESTATUS_TITLE_MESSAGE	=> $error_message ? $error_message : NULL,
 				)
 		);
 	}
@@ -542,7 +544,10 @@ function CoreStatus_setInUnloading($abb_filament) {
 
 function CoreStatus_setInSlicing() {
 	return CoreStatus__setInStatus(CORESTATUS_VALUE_SLICE,
-			array(CORESTATUS_TITLE_MESSAGE => NULL)
+			array(
+					CORESTATUS_TITLE_LASTERROR	=> NULL,
+					CORESTATUS_TITLE_MESSAGE	=> NULL,
+			)
 	);
 }
 

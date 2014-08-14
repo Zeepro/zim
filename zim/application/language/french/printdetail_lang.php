@@ -45,7 +45,7 @@ $lang['printdetail_cancel_pagetitle']
 $lang['wait_hint_cancel']
 	= 'En attente d\'annulation...';
 $lang['finish_hint_cancel']
-	= 'Félicitations, votre impression est annulée !';
+	= 'Votre impression est bien annulée !';
 
 //printdetail recovery()
 $lang['printdetail_recovery_pagetitle']

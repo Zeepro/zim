@@ -298,6 +298,20 @@ class Printerstate extends MY_Controller {
 		return;
 	}
 	
+	private function _display_changecartridge_error_unloading() {
+		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
+		$template_data = array (
+				'next_phase'	=> PRINTERSTATE_CHANGECART_UNLOAD_F,
+				'home_button'	=> t('home'),
+		);
+		$template_name = 'template/printerstate/changecartridge_ajax/error_unloading';
+		$this->_display_changecartridge_base($template_name, $template_data);
+		
+		$this->output->set_status_header(202); // disable checking
+		
+		return;
+	}
+	
 	private function _deal_with_unloading_wait_time() {
 		// wait the time for arduino before checking filament when unloading filament
 		// we return TRUE only when finishing action or passing max wait time (Arduino is avaliable for command)
@@ -538,7 +552,6 @@ class Printerstate extends MY_Controller {
 					}
 				}
 				
-				
 				if (PrinterState_getFilamentStatus($abb_cartridge)) {
 					// have filament
 					$status_correct = ($abb_cartridge == 'r') ? CORESTATUS_VALUE_UNLOAD_FILA_R : CORESTATUS_VALUE_UNLOAD_FILA_L;
@@ -559,6 +572,19 @@ class Printerstate extends MY_Controller {
 					}
 					else if ($status_current == $status_correct) {
 						// in busy (normally only unloading is possible)
+						if (!CoreStatus_checkInWaitTime(PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_UNLOAD)) {
+							//TODO test me
+							// already passed the timeout of changement
+							// change status into idle
+							$ret_val = CoreStatus_setInIdle();
+							if ($ret_val == FALSE) {
+								$this->load->helper('printerlog');
+								PrinterLog_logError('can not set idle after unloading filament', __FILE__, __LINE__);
+								$this->output->set_status_header(202); // disable checking
+							}
+							$this->_display_changecartridge_error_unloading();
+							break;
+						}
 						$this->_display_changecartridge_in_unload_filament();
 					}
 					else if ($status_current == $status_changed) {
@@ -606,6 +632,20 @@ class Printerstate extends MY_Controller {
 					}
 					else if ($status_current == $status_correct) {
 						// in busy (normally only loading is possible)
+						//FIXME check timeout
+						if (!CoreStatus_checkInWaitTime(PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_LOAD)) {
+							//TODO test me
+							// already passed the timeout of changement
+							// change status into idle
+							$ret_val = CoreStatus_setInIdle();
+							if ($ret_val == FALSE) {
+								$this->load->helper('printerlog');
+								PrinterLog_logError('can not set idle after loading filament', __FILE__, __LINE__);
+								$this->output->set_status_header(202); // disable checking
+							}
+							$this->_display_changecartridge_error_loading();
+							break;
+						}
 						$this->_display_changecartridge_in_load_filament();
 					}
 					else if ($status_current == $status_changed) {
@@ -638,6 +678,20 @@ class Printerstate extends MY_Controller {
 				
 				if (PrinterState_getFilamentStatus($abb_cartridge)) {
 					// have filament
+					//FIXME check timeout
+						if (!CoreStatus_checkInWaitTime(PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_UNLOAD)) {
+							//TODO test me
+							// already passed the timeout of changement
+							// change status into idle
+							$ret_val = CoreStatus_setInIdle();
+							if ($ret_val == FALSE) {
+								$this->load->helper('printerlog');
+								PrinterLog_logError('can not set idle after unloading filament', __FILE__, __LINE__);
+								$this->output->set_status_header(202); // disable checking
+							}
+							$this->_display_changecartridge_error_unloading();
+							break;
+						}
 					$this->_display_changecartridge_in_unload_filament();
 				}
 				else {
