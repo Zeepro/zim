@@ -42,8 +42,7 @@
 			<img src="/assets/images/shadow2.png" class="shadow" alt="shadow">
 		</div>
 	</div>
-</div>
-
+	
 <script type="text/javascript">
 <!--
 var var_ajax;
@@ -86,3 +85,5 @@ $("#head_led").change(function() {
 });
 //-->
 </script>
+	
+</div>

@@ -18,8 +18,7 @@
 			<img src="/assets/images/shadow2.png" class="shadow" alt="shadow">
 		</div>
 	</div>
-</div>
-
+	
 <script type="text/javascript">
 <!--
 function load_wait() {
@@ -28,3 +27,5 @@ function load_wait() {
 }
 -->
 </script>
+
+</div>
