@@ -49,7 +49,7 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_FILENAME_SOFTWARE',	'Software.json');
 	define('ZIMAPI_FILEPATH_CAPTURE',	'/var/www/tmp/capture.jpg');
 	define('ZIMAPI_PRM_CAMERA_PRINTSTART',
-			' -v quiet -r 25 -s 320x240 -f video4linux2 -i /dev/video0 -minrate 256k -maxrate 256k -bufsize 256k -map 0 -force_key_frames "expr:gte(t,n_forced*2)" -c:v libx264 -crf 35 -profile:v baseline -b:v 256k -pix_fmt yuv420p -flags -global_header -f segment -segment_list /var/www/tmp/zim.m3u8 -segment_time 1 -segment_format mpeg_ts -segment_list_type m3u8 -segment_list_flags live -segment_list_size 5 -segment_wrap 5 /var/www/tmp/zim%d.ts');
+			' -v quiet -r 25 -s 320x240 -f video4linux2 -i /dev/video0 -minrate 256k -maxrate 256k -bufsize 256k -map 0 -force_key_frames "expr:gte(t,n_forced*2)" -c:v libx264 -crf 35 -profile:v baseline -b:v 256k -pix_fmt yuv420p -flags -global_header -f hls -hls_wrap 20 -hls_list_size 10 /var/www/tmp/zim.m3u8');
 	define('ZIMAPI_PRM_CAMERA_STOP',	' stop ');
 	define('ZIMAPI_PRM_CAMERA_CAPTURE',
 			' -v quiet -f video4linux2 -i /dev/video0 -y -vframes 1 /var/www/tmp/capture.jpg');
