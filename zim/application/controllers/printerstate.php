@@ -1040,14 +1040,18 @@ class Printerstate extends MY_Controller {
 				$this->load->helper('zimapi');
 				
 				if (ZimAPI_setHostname($hostname, $restart) == ERROR_OK) {
-					$key_translate = 'finish_hint';
-					if ($restart == FALSE) {
-						$key_translate = 'finish_hint_norestart';
+					$hint_message = NULL;
+					
+					if ($restart == TRUE) {
+						$hint_message = t('finish_hint', array($hostname, $hostname, $hostname, $hostname));
+					}
+					else {
+						$hint_message = t('finish_hint_norestart', array($hostname, $hostname));
 					}
 					
 					// parse the main body
 					$template_data = array(
-							'hint'			=> t($key_translate, array($hostname, $hostname)),
+							'hint'			=> $hint_message,
 // 							'home_button'	=> t('home_button'),
 					);
 					
