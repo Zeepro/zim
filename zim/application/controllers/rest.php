@@ -21,7 +21,8 @@ class Rest extends MY_Controller {
 		) );
 		
 		$status_current = '';
-		if (CoreStatus_checkInInitialization() || CoreStatus_checkInConnection()) {
+		if (CoreStatus_checkInInitialization() || CoreStatus_checkInConnection()
+				|| CoreStatus_checkInUSB()) {
 			// let no block REST web service go for setting network
 			if (CoreStatus_checkCallNoBlockRESTInConnection()) {
 				return;
@@ -1137,7 +1138,7 @@ class Rest extends MY_Controller {
 				case 'r':
 					$temper = 0;
 					$cr = PrinterState_getTemperature($temper, 'e', $abb_cartridge);
-					if ($cr == ERROR_OK && $temper < PRINTERSTATE_VALUE_MAXTEMPER_BEFORE_UNLOAD) {
+					if ($cr == ERROR_OK && $temper > PRINTERSTATE_VALUE_MAXTEMPER_BEFORE_UNLOAD) {
 						$cr = PrinterState_unloadFilament($abb_cartridge);
 					}
 					else if ($cr == ERROR_OK) {

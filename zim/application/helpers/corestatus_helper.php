@@ -33,6 +33,7 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_VALUE_SLICED',			'sliced');
 // 	define('CORESTATUS_VALUE_UPGRADE',			'upgrading');
 	define('CORESTATUS_VALUE_RECOVERY',			'recovery');
+	define('CORESTATUS_VALUE_USB',				'usb_connected');
 	
 	define('CORESTATUS_CMD_CHECK_SD',		'echo writable > ');
 	define('CORESTATUS_SUFFIX_CONF',		'conf/');

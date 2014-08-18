@@ -571,7 +571,7 @@ class Printerstate extends MY_Controller {
 						}
 						else {
 							$this->_display_changecartridge_wait_unload_filament($abb_cartridge, $id_model, 
-									($temp_data >= PRINTERSTATE_VALUE_MAXTEMPER_BEFORE_UNLOAD));
+									($temp_data < PRINTERSTATE_VALUE_MAXTEMPER_BEFORE_UNLOAD));
 						}
 					}
 					else if ($status_current == $status_correct) {
@@ -944,7 +944,7 @@ class Printerstate extends MY_Controller {
 		}
 		
 		$ret_val = PrinterState_getTemperature($temp_data, 'e', $abb_cartridge);
-		if ($ret_val == ERROR_OK && $temp_data < PRINTERSTATE_VALUE_MAXTEMPER_BEFORE_UNLOAD) {
+		if ($ret_val == ERROR_OK && $temp_data >= PRINTERSTATE_VALUE_MAXTEMPER_BEFORE_UNLOAD) {
 			$ret_val = 202; // change status header to stop signal
 		}
 		$this->output->set_status_header($ret_val);
@@ -1040,9 +1040,14 @@ class Printerstate extends MY_Controller {
 				$this->load->helper('zimapi');
 				
 				if (ZimAPI_setHostname($hostname, $restart) == ERROR_OK) {
+					$key_translate = 'finish_hint';
+					if ($restart == FALSE) {
+						$key_translate = 'finish_hint_norestart';
+					}
+					
 					// parse the main body
 					$template_data = array(
-							'hint'			=> t('finish_hint', array($hostname, $hostname)),
+							'hint'			=> t($key_translate, array($hostname, $hostname)),
 // 							'home_button'	=> t('home_button'),
 					);
 					

@@ -1336,6 +1336,12 @@ function PrinterState_checkStatusAsArray() {
 	$CI = &get_instance();
 	$CI->load->helper('corestatus');
 	
+	if (CoreStatus_checkInUSB()) {
+		$data_json[PRINTERSTATE_TITLE_STATUS] = CORESTATUS_VALUE_USB;
+		
+		return $data_json;
+	}
+	
 	$ret_val = CoreStatus_checkInIdle($status_current, $status_json);
 	if ($ret_val == TRUE) {
 		$data_json[PRINTERSTATE_TITLE_STATUS] = CORESTATUS_VALUE_IDLE;
