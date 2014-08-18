@@ -28,7 +28,7 @@ class Printerstate extends MY_Controller {
 				'prime_button'	=> t('prime_button'),
 				'abb_cartridge'	=> $abb_cartridge,
 				'id_model'		=> $id_model,
-				'enable_unload'	=> ($wait_unload == TRUE) ? 'false' : 'true',
+// 				'enable_unload'	=> ($wait_unload == TRUE) ? 'false' : 'true',
 		);
 		$template_name = 'template/printerstate/changecartridge_ajax/wait_unload_filament';
 		$this->_display_changecartridge_base($template_name, $template_data);
@@ -38,11 +38,17 @@ class Printerstate extends MY_Controller {
 		return;
 	}
 	
-	private function _display_changecartridge_in_unload_filament() {
+	private function _display_changecartridge_in_unload_filament($abb_cartridge) {
+		$ret_val = PrinterState_getTemperature($value_temper, 'e', $abb_cartridge);
+		if ($ret_val != ERROR_OK) {
+			$value_temper = 0; //TODO find a proper way to deal with error
+		}
+		
 		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
 		$template_data = array (
 				'next_phase'	=> PRINTERSTATE_CHANGECART_REMOVE_C,
 				'unload_info'	=> t('Wait for unloading...'),
+				'value_temper'	=> $value_temper,
 		);
 		$template_name = 'template/printerstate/changecartridge_ajax/in_unload_filament';
 		$this->_display_changecartridge_base($template_name, $template_data);
@@ -312,24 +318,53 @@ class Printerstate extends MY_Controller {
 		return;
 	}
 	
-	private function _deal_with_unloading_wait_time() {
-		// wait the time for arduino before checking filament when unloading filament
-		// we return TRUE only when finishing action or passing max wait time (Arduino is avaliable for command)
-		if (CoreStatus_checkInWaitTime(PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD)) {
-			// check if we have finished action within max wait time
-			$cr = PrinterState_checkAsynchronousResponse();
-			if ($cr == ERROR_INTERNAL) {
-				$this->load->helper('printerlog');
-				PrinterLog_logError('check asynchronous response error', __FILE__, __LINE__);
+	private function _deal_with_unloading_wait_time($abb_cartridge) {
+		if (file_exists(PRINTERSTATE_FILE_UNLOAD_HEAT)) {
+			$time_start = @file_get_contents(PRINTERSTATE_FILE_UNLOAD_HEAT);
+// 			PrinterLog_logDebug('start time: ' . $time_start, __FILE__, __LINE__);
+			if (is_null($time_start)) {
+				PrinterLog_logError('check unload heat status file error', __FILE__, __LINE__);
 				return FALSE;
 			}
-			else if ($cr != ERROR_OK) { // do not break if we have finished (ERROR_OK)
+			else if (time() - $time_start <= PRINTERSTATE_VALUE_TIMEOUT_UNLOAD_HEAT) {
+				// block the status if in timeout, and refresh the start time for the following state
+				CoreStatus_setInUnloading($abb_cartridge);
+// 				PrinterLog_logDebug('rewrite status', __FILE__, __LINE__);
 				return FALSE;
 			}
 			else {
-				$this->load->helper('printerlog');
-				PrinterLog_logDebug('finished asynchronous unloading within max wait time', __FILE__, __LINE__);
+				// always in heating when we passed timeout, we unlock the mobile site
+				PrinterLog_logError('always in heating process when we unload filament', __FILE__, __LINE__);
+				@unlink(PRINTERSTATE_FILE_UNLOAD_HEAT);
+				$ret_val = CoreStatus_setInIdle();
+				if ($ret_val == TRUE) {
+					$status_current = CORESTATUS_VALUE_IDLE;
+					return TRUE;
+				}
+				$CI = &get_instance();
+				$CI->load->helper('printerlog');
+				PrinterLog_logError('can not set status into idle', __FILE__, __LINE__);
+				return FALSE;
 			}
+		} else
+		
+		// wait the time for arduino before checking filament when unloading filament
+		// we return TRUE only when finishing action or passing max wait time (Arduino is avaliable for command)
+		if (CoreStatus_checkInWaitTime(PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD)) {
+// 			// check if we have finished action within max wait time
+// 			$cr = PrinterState_checkAsynchronousResponse();
+// 			if ($cr == ERROR_INTERNAL) {
+// 				$this->load->helper('printerlog');
+// 				PrinterLog_logError('check asynchronous response error', __FILE__, __LINE__);
+// 				return FALSE;
+// 			}
+// 			else if ($cr != ERROR_OK) { // do not break if we have finished (ERROR_OK)
+				return FALSE;
+// 			}
+// 			else {
+// 				$this->load->helper('printerlog');
+// 				PrinterLog_logDebug('finished asynchronous unloading within max wait time', __FILE__, __LINE__);
+// 			}
 		}
 		
 		return TRUE;
@@ -550,8 +585,8 @@ class Printerstate extends MY_Controller {
 				if (CoreStatus_checkInIdle($status_current) == FALSE
 						&& ($status_current == CORESTATUS_VALUE_UNLOAD_FILA_L
 								|| $status_current == CORESTATUS_VALUE_UNLOAD_FILA_R)) {
-					if (!$this->_deal_with_unloading_wait_time()) {
-						$this->_display_changecartridge_in_unload_filament();
+					if (!$this->_deal_with_unloading_wait_time($abb_cartridge)) {
+						$this->_display_changecartridge_in_unload_filament($abb_cartridge);
 						break;
 					}
 				}
@@ -571,7 +606,7 @@ class Printerstate extends MY_Controller {
 						}
 						else {
 							$this->_display_changecartridge_wait_unload_filament($abb_cartridge, $id_model, 
-									($temp_data < PRINTERSTATE_VALUE_MAXTEMPER_BEFORE_UNLOAD));
+									($temp_data > PRINTERSTATE_VALUE_MAXTEMPER_BEFORE_UNLOAD));
 						}
 					}
 					else if ($status_current == $status_correct) {
@@ -589,7 +624,7 @@ class Printerstate extends MY_Controller {
 							$this->_display_changecartridge_error_unloading();
 							break;
 						}
-						$this->_display_changecartridge_in_unload_filament();
+						$this->_display_changecartridge_in_unload_filament($abb_cartridge);
 					}
 					else if ($status_current == $status_changed) {
 						// in busy (but in idle, status is changed in real)
@@ -675,8 +710,8 @@ class Printerstate extends MY_Controller {
 			case PRINTERSTATE_CHANGECART_REMOVE_C:
 				// we call the page: in unload filament
 				//TODO test me
-				if (!$this->_deal_with_unloading_wait_time()) {
-					$this->_display_changecartridge_in_unload_filament();
+				if (!$this->_deal_with_unloading_wait_time($abb_cartridge)) {
+					$this->_display_changecartridge_in_unload_filament($abb_cartridge);
 					break;
 				}
 				
@@ -696,7 +731,7 @@ class Printerstate extends MY_Controller {
 							$this->_display_changecartridge_error_unloading();
 							break;
 						}
-					$this->_display_changecartridge_in_unload_filament();
+					$this->_display_changecartridge_in_unload_filament($abb_cartridge);
 				}
 				else {
 					// no filament
@@ -862,6 +897,18 @@ class Printerstate extends MY_Controller {
 				if ($ret_val != ERROR_OK) {
 					$this->output->set_status_header($ret_val, MyERRMSG($ret_val));
 				}
+				break;
+				
+			case 'cancel_unload':
+				$ret_val = 0;
+				@unlink(PRINTERSTATE_FILE_UNLOAD_HEAT);
+				$ret_val = CoreStatus_setInIdle();
+				if ($ret_val == FALSE) {
+					$this->load->helper('printerlog');
+					PrinterLog_logError('can not set idle after cancelling unloading', __FILE__, __LINE__);
+					$this->output->set_status_header(ERROR_INTERNAL);
+				}
+				
 				break;
 				
 			case 'load':

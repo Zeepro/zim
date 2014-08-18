@@ -27,6 +27,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_LOAD_FILAMENT_L',	' M1605');
 	define('PRINTERSTATE_UNIN_FILAMENT_R',	' M1606');
 	define('PRINTERSTATE_UNIN_FILAMENT_L',	' M1607');
+	define('PRINTERSTATE_UNLOAD_FILAMENT',	' unload ');
 	define('PRINTERSTATE_GET_FILAMENT_R',	' M1608');
 	define('PRINTERSTATE_GET_FILAMENT_L',	' M1609');
 	define('PRINTERSTATE_PRINT_FILE',		' -f '); // add space in the last
@@ -75,6 +76,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_FILE_STOPFILE',	'/tmp/printer_stop');
 	define('PRINTERSTATE_FILE_PAUSEFILE',	'/tmp/printer_pause');
 	define('PRINTERSTATE_FILE_RESUMEFILE',	'/tmp/printer_resume');
+	define('PRINTERSTATE_FILE_UNLOAD_HEAT',	'/tmp/printer_unload_heat');
 	
 	define('PRINTERSTATE_RIGHT_EXTRUD',	0);
 	define('PRINTERSTATE_LEFT_EXTRUD',	1);
@@ -137,9 +139,10 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	
 	define('PRINTERSTATE_VALUE_DEFAULT_EXTRUD',				5);
 	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD',		89);
-	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD',		90);
+	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD',		10);
 	define('PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_LOAD',		180);
 	define('PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_UNLOAD',	180);
+	define('PRINTERSTATE_VALUE_TIMEOUT_UNLOAD_HEAT',		600);
 	define('PRINTERSTATE_VALUE_ENDSTOP_OPEN',				'open');
 	define('PRINTERSTATE_VALUE_MAXTEMPER_BEFORE_UNLOAD',	50);
 	
@@ -1167,7 +1170,7 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array(), 
 				} catch (Exception $e) {
 					$this->load->helper('printerlog');
 					PrinterLog_logError('can not save temp json file', __FILE__, __LINE__);
-					$cr = ERROR_INTERNAL;
+// 					$cr = ERROR_INTERNAL;
 				}
 				
 				if ($ret_val != ERROR_OK) {
@@ -1196,32 +1199,63 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array(), 
 			
 		case CORESTATUS_VALUE_UNLOAD_FILA_L:
 		case CORESTATUS_VALUE_UNLOAD_FILA_R:
-			$time_wait = $time_wait ? $time_wait : PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD;
-			$time_max = $time_max ? $time_max : PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_UNLOAD;
-			
-			// wait the time for arduino before checking filament when loading / unloading filament
-			if (CoreStatus_checkInWaitTime($time_wait)) {
-				if ($time_wait == PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD) {
-					// check if we have finished action within max wait time only for unloading
-					$cr = PrinterState_checkAsynchronousResponse();
-					if ($cr == ERROR_INTERNAL) {
-						PrinterLog_logError('check asynchronous response error', __FILE__, __LINE__);
-						break;
-					}
-					else if ($cr != ERROR_OK) { // do not break if we have finished (ERROR_OK)
-						break;
-					}
-				}
-				else { // the loading filament case, we always wait the fixed time
-					break;
-				}
-			}
-			
-			// generate parameters by different status
 			$abb_filament =
 					(($status_current == CORESTATUS_VALUE_LOAD_FILA_L)
 							|| ($status_current == CORESTATUS_VALUE_UNLOAD_FILA_L))
 					? 'l' : 'r';
+// 			$time_wait = $time_wait ? $time_wait : PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD;
+// 			$time_max = $time_max ? $time_max : PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_UNLOAD;
+			if (is_null($time_wait) || is_null($time_max)) {
+				if (file_exists(PRINTERSTATE_FILE_UNLOAD_HEAT)) {
+					$time_start = @file_get_contents(PRINTERSTATE_FILE_UNLOAD_HEAT);
+					if (is_null($time_start)) {
+						PrinterLog_logError('check unload heat status file error', __FILE__, __LINE__);
+						break;
+					}
+					else if (time() - $time_start <= PRINTERSTATE_VALUE_TIMEOUT_UNLOAD_HEAT) {
+						// block the status if in timeout, and refresh the start time for the following state
+						CoreStatus_setInUnloading($abb_filament);
+						break;
+					}
+					else {
+						// always in heating when we passed timeout, we unlock the mobile site
+						PrinterLog_logError('always in heating process when we unload filament', __FILE__, __LINE__);
+						@unlink(PRINTERSTATE_FILE_UNLOAD_HEAT);
+						$ret_val = CoreStatus_setInIdle();
+						if ($ret_val == TRUE) {
+							$status_current = CORESTATUS_VALUE_IDLE;
+							return TRUE;
+						}
+						$CI = &get_instance();
+						$CI->load->helper('printerlog');
+						PrinterLog_logError('can not set status into idle', __FILE__, __LINE__);
+						break;
+					}
+				}
+				
+				$time_wait = PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD;
+				$time_max = PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_UNLOAD;
+			}
+			
+			// wait the time for arduino before checking filament when loading / unloading filament
+			if (CoreStatus_checkInWaitTime($time_wait)) {
+// 				if ($time_wait == PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD) {
+// 					// check if we have finished action within max wait time only for unloading
+// 					$cr = PrinterState_checkAsynchronousResponse();
+// 					if ($cr == ERROR_INTERNAL) {
+// 						PrinterLog_logError('check asynchronous response error', __FILE__, __LINE__);
+// 						break;
+// 					}
+// 					else if ($cr != ERROR_OK) { // do not break if we have finished (ERROR_OK)
+// 						break;
+// 					}
+// 				}
+// 				else { // the loading filament case, we always wait the fixed time
+					break;
+// 				}
+			}
+			
+			// generate parameters by different status
 			$status_fin_filament =
 					($status_current == CORESTATUS_VALUE_LOAD_FILA_L || $status_current == CORESTATUS_VALUE_LOAD_FILA_R)
 					? TRUE : FALSE;
@@ -1714,30 +1748,40 @@ function PrinterState_loadFilament($abb_filament) {
 
 function PrinterState_unloadFilament($abb_filament) {
 	$CI = &get_instance();
-	$arcontrol_fullpath = $CI->config->item('arcontrol_c');
+// 	$arcontrol_fullpath = $CI->config->item('arcontrol_c');
+	$arcontrol_fullpath = $CI->config->item('siteutil');
 	$output = array();
+	$array_cartridge = array();
 	$command = '';
 	$ret_val = 0;
 	
 	// start alter temporary solution
-	switch ($abb_filament) {
-		case 'l':
-			$command = $arcontrol_fullpath . PRINTERSTATE_UNIN_FILAMENT_L;
-			break;
+// 	switch ($abb_filament) {
+// 		case 'l':
+// 			$command = $arcontrol_fullpath . PRINTERSTATE_UNIN_FILAMENT_L;
+// 			break;
 				
-		case 'r':
-			$command = $arcontrol_fullpath . PRINTERSTATE_UNIN_FILAMENT_R;
-			break;
+// 		case 'r':
+// 			$command = $arcontrol_fullpath . PRINTERSTATE_UNIN_FILAMENT_R;
+// 			break;
 				
-		default:
-			PrinterLog_logError('input filament type error', __FILE__, __LINE__);
-			return ERROR_WRONG_PRM;
-			break; // never reach here
+// 		default:
+// 			PrinterLog_logError('input filament type error', __FILE__, __LINE__);
+// 			return ERROR_WRONG_PRM;
+// 			break; // never reach here
+// 	}
+	$ret_val = PrinterState_getCartridgeAsArray($array_cartridge, $abb_filament);
+	if ($ret_val != ERROR_OK) {
+		PrinterLog_logError('read cartridge error when unloading', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
 	}
+	
+	$command = $arcontrol_fullpath . PRINTERSTATE_UNLOAD_FILAMENT . $abb_filament . ' ' . $array_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1];
 	
 	$CI->load->helper('detectos');
 	if ($CI->config->item('simulator') == FALSE && !DectectOS_checkWindows()) {
-		$command .= ' > ' . PRINTERSTATE_FILE_RESPONSE . ' &';
+// 		$command .= ' > ' . PRINTERSTATE_FILE_RESPONSE . ' &';
+		$command .= ' &';
 	}
 	
 	// check if we are in printing
