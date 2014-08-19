@@ -28,7 +28,7 @@ class Menu_home extends MY_Controller {
 		// parse the main body
 		if (ZimAPI_getPrinterSSOName($value) != ERROR_OK);
 			;
-		if ($value == '')
+		if (true)//$value == '')
 			$activation_btn = $this->parser->parse('template/activation/activation_btn', array('activate_printer' => t('activate_printer')), true);
 		else
 			$activation_btn = NULL;

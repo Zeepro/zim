@@ -72,8 +72,8 @@ class Activation extends MY_Controller
 					ZimAPI_setPrinterSSOName($printer_name);
 					$file = 'template/activation/activation_confirm';
 				}
-				else
-					echo '<script>console.log("FAIL");</script>';
+				else //TODO: gestion erreur echo '<script>console.log("FAIL");</script>'
+					;
 			}
 		}
 		$body_page = $this->parser->parse($file, array(), TRUE);
