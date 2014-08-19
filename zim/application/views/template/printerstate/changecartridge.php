@@ -99,6 +99,15 @@ function inputUserChoice(action) {
 			});
 			break;
 
+		case 'cancel_unload':
+			var_action = $.ajax({
+				url: "/printerstate/changecartridge_action/cancel_unload",
+				type: "GET",
+				data: {v: "{abb_cartridge}"},
+				cache: false,
+			});
+			break;
+
 		case 'change':
 			var_next_phase = '{insert_status}';
 			checkChangeStatus();
@@ -139,6 +148,9 @@ function inputUserChoice(action) {
 		var_action.done(function() {
 			if ($('#showPaletteOnly').length > 0) {
 				$('#showPaletteOnly').spectrum('destroy');
+			}
+			if (action == 'cancel_unload') {
+				window.location.replace("/");
 			}
 // 			alert("done choice");
 			checkChangeStatus();

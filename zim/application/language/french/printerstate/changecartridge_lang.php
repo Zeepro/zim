@@ -57,5 +57,6 @@ $lang['length_label']
 $lang['write_button']
 	= 'Ecrire sur la RFID';
 $lang['Home']
-= 'Accueil';
-?>
+	= 'Accueil';
+$lang['cancel_button']
+	= 'Annuler';

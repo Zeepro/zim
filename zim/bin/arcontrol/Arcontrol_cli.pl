@@ -91,6 +91,7 @@ use constant CMD_GET_VERSION         => 'M1400';
 use constant CMD_SET_RFID_ON         => 'M1616';
 use constant CMD_SET_RFID_OFF        => 'M1617';
 use constant CMD_GET_ALL_TEMPER      => 'M1402';
+use constant CMD_RAISE_PLATFORM      => 'M1905';
 
 use constant CMD_STOP_PRINT    => 'M1000';
 use constant CMD_RESET_PRINTER => 'M1100';
@@ -1152,7 +1153,8 @@ else {
 			|| $command eq CMD_SET_RFID_OFF
 			|| $command eq CMD_SET_RFID_ON
 			|| $command eq CMD_SET_RIGHT_LAB
-			|| $command eq CMD_SET_LEFT_LAB ) {
+			|| $command eq CMD_SET_LEFT_LAB
+			|| $command eq CMD_RAISE_PLATFORM ) {
 
 		#cmd: move / extrude / special g99 / etc.
 		exit(RC_OK);

@@ -56,5 +56,7 @@ $lang['length_label']
 	= '长度';
 $lang['write_button']
 	= '写入RFID';
-
-?>
+$lang['Home']
+	= '首页';
+$lang['cancel_button']
+	= '取消';

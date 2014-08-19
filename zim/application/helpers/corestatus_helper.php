@@ -278,11 +278,12 @@ function CoreStatus_checkCallUnloading(&$url_redirect = '') {
 	}
 	
 	return CoreStatus__checkCallURI(array(
-			'/printerstate/changecartridge'			=> array(
+			'/printerstate/changecartridge'							=> array(
 					'v'	=> $abb_filament,
 			),
-			'/printerstate/changecartridge_ajax'	=> NULL,
-			'/printerstate/changecartridge_action'	=> NULL,
+			'/printerstate/changecartridge_ajax'					=> NULL,
+			'/printerstate/changecartridge_action'					=> NULL,
+			'/printerstate/changecartridge_action/cancel_unload'	=> NULL,
 	));
 }
 

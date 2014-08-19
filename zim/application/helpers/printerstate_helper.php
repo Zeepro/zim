@@ -69,6 +69,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_GET_RFID_POWER',	' M1618');
 	define('PRINTERSTATE_SET_CARTRIDGER',	' M1610\ ');
 	define('PRINTERSTATE_SET_CARTRIDGEL',	' M1611\ ');
+	define('PRINTERSTATE_RAISE_PLATFORM',	' M1905');
 	
 // 	define('PRINTERSTATE_TEMP_PRINT_FILENAME',	'/tmp/printer_percentage'); // fix the name on SD card
 	define('PRINTERSTATE_FILE_PRINTLOG',	'/tmp/printlog.log');
@@ -76,7 +77,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_FILE_STOPFILE',	'/tmp/printer_stop');
 	define('PRINTERSTATE_FILE_PAUSEFILE',	'/tmp/printer_pause');
 	define('PRINTERSTATE_FILE_RESUMEFILE',	'/tmp/printer_resume');
-	define('PRINTERSTATE_FILE_UNLOAD_HEAT',	'/tmp/printer_unload_heat');
+	define('PRINTERSTATE_FILE_UNLOAD_HEAT',	'./tmp/printer_unload_heat');
 	
 	define('PRINTERSTATE_RIGHT_EXTRUD',	0);
 	define('PRINTERSTATE_LEFT_EXTRUD',	1);
@@ -2765,6 +2766,29 @@ function PrinterState_setRFIDPower($on = TRUE) {
 	PrinterLog_logArduino($command, $output);
 	if ($ret_val != ERROR_NORMAL_RC_OK) {
 		PrinterLog_logError('set rfid power error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	
+	return ERROR_OK;
+}
+
+function PrinterState_raisePlatform() {
+	// as preview, the RFID will automatically active when we read and write
+	// so normally, we need only turn off the power
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$output = array();
+	$command = $arcontrol_fullpath . PRINTERSTATE_RAISE_PLATFORM;
+	$ret_val = 0;
+	
+	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output)) {
+		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	PrinterLog_logArduino($command, $output);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		PrinterLog_logError('raise platform error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
 	

@@ -318,7 +318,7 @@ function ZimAPI_setsWifi($nameWifi, $passWifi = '') {
 			}
 			$nameWifi = ZimAPI__filterCharacter($nameWifi); //str_replace('"', '\"', $nameWifi);
 			
-			if (strlen($passWifi == 0)) {
+			if (strlen($passWifi) == 0) {
 				$command = ZIMAPI_CMD_SWIFI . ' ' . $nameWifi;
 			}
 			else {

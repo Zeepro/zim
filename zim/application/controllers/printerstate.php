@@ -39,9 +39,17 @@ class Printerstate extends MY_Controller {
 	}
 	
 	private function _display_changecartridge_in_unload_filament($abb_cartridge) {
-		$ret_val = PrinterState_getTemperature($value_temper, 'e', $abb_cartridge);
-		if ($ret_val != ERROR_OK) {
-			$value_temper = 0; //TODO find a proper way to deal with error
+		$in_heating = TRUE;
+		$value_temper = 0; //TODO find a proper way to deal with error
+		// check if we in heating process or not
+		if (!file_exists(PRINTERSTATE_FILE_UNLOAD_HEAT)) {
+			$in_heating = FALSE;
+		}
+		else {
+			$ret_val = PrinterState_getTemperature($value_temper, 'e', $abb_cartridge);
+			if ($ret_val != ERROR_OK) {
+				$value_temper = 0;
+			}
 		}
 		
 		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
@@ -49,6 +57,8 @@ class Printerstate extends MY_Controller {
 				'next_phase'	=> PRINTERSTATE_CHANGECART_REMOVE_C,
 				'unload_info'	=> t('Wait for unloading...'),
 				'value_temper'	=> $value_temper,
+				'in_heating'	=> $in_heating ? 'true' : 'false',
+				'cancel_button'	=> t('cancel_button'),
 		);
 		$template_name = 'template/printerstate/changecartridge_ajax/in_unload_filament';
 		$this->_display_changecartridge_base($template_name, $template_data);
@@ -510,6 +520,11 @@ class Printerstate extends MY_Controller {
 			return;
 		}
 		
+		if (ERROR_OK != PrinterState_raisePlatform()) {
+			$this->output->set_header('Location: /');
+			return;
+		}
+		
 		$this->load->library('parser');
 		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
 		
@@ -882,7 +897,7 @@ class Printerstate extends MY_Controller {
 		else if ($mode == 'load_r') {
 			$mode = 'load';
 		}
-		else {
+		else if ($mode != 'cancel_unload') {
 			//block request when not in idle
 			$this->load->helper('corestatus');
 			if (CoreStatus_checkInIdle() == FALSE) {
