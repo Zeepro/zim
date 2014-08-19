@@ -65,7 +65,7 @@ class Activation extends MY_Controller
 						'method'  => 'POST',
 						'content' => http_build_query($data)));
 				$context  = stream_context_create($options);
-				file_get_contents($url, false, $context);
+				@file_get_contents($url, false, $context);
 				$result = substr($http_response_header[0], 9, 3);
 				if ($result == 200)
 				{

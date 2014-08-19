@@ -10,7 +10,10 @@
 			<form method="post" accept-charset="utf-8">
 				<input type="text" name="hostname" id="hostname" value="{hostname}" data-clear-btn="true"/>
 				<input type="hidden" name="restart" id="restart" value="{restart}" />
-				<p>{info_text}</p>
+				<br />
+				{info_text}
+				<br />
+				<br />
 				<div>
 					<input type="submit" value="{set_button}" />
 				</div>
@@ -18,17 +21,22 @@
 			</form>
 		</div>
 	</div>
+	<script>
+		var pattern;
+		var string = $("#fqdn").text();
+
+		$("#fqdn").text(string.replace(new RegExp('xxx', 'g'), $("#hostname").val()));
+		$("#fqdn2").text(string.replace(new RegExp('xxx', 'g'), $("#hostname").val()));
+		pattern = $("#hostname").val();
+		$("#hostname").on('keyup', function()
+		{
+			$("#fqdn").text(string.replace(new RegExp(pattern+'|'+'xxx', 'g'), $("#hostname").val()));
+			$("#fqdn2").text(string.replace(new RegExp(pattern+'|'+'xxx', 'g'), $("#hostname").val()));
+			if ($("#hostname").val() != "")
+			{
+				pattern = $("#hostname").val();
+			}
+		});
+	</script>
 </div>
 
-<script>
-	var pattern;
-	var string = $("p").text();
-
-	$("p").text(string.replace(new RegExp('xxx', 'g'), $("#hostname").val()));
-	pattern = $("#hostname").val();
-	$("#hostname").on('keyup', function()
-	{
-		$("p").text(string.replace(new RegExp(pattern+'|'+'xxx', 'g'), $("#hostname").val()));
-		pattern = $("#hostname").val();
-	});
-</script>

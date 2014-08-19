@@ -1,7 +1,9 @@
 <?php
 // general page
 $lang['back']
-	= 'back';
+	= 'Back';
+$lang['home_button']
+	= 'Home';
 
 $lang['page_title']
 	= 'Zim - Set hostname';
@@ -18,11 +20,12 @@ $lang['finish_hint']
 		</br>
 		Reconnect to your usual network to access your printer using the link:</br>
 		</br>
-		<a href="http://%s.local/">http://%s.local/</a></br>
+		<a href="http://%s.local/">http://%s.local/</a> or <a href="http://%s">http://%s</a>';
+$lang['finish_hint_norestart']
+	= 'Your printer will restart to apply its new parameters.</br>
 		</br>
+		Reconnect to your usual network to access your printer using the link:</br>
 		</br>
-		If several Zim printers are connected to your network, your new Zim will be reachable at the first free address http://zimXXX - e.g. <i>http://zim1 http://zim2 ...</i>';
-$lang['home_button']
-	= 'Home';
+		http://%s.local/ or http://%s';
 $lang['info_text']
-	= 'From your local network, you can reach your printer from "http://xxx.local" if you use an Apple, Android or Linux device, and from "http://xxx" if you\'re using Windows.';
+	= 'From your local network, you can reach your printer from "http://<span id="fqdn">xxx</span>.local" if you use an Apple, Android or Linux device, and from "http://<span id="fqdn2">xxx</span>" if you\'re using Windows.';

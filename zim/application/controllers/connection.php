@@ -397,7 +397,7 @@ class Connection extends MY_Controller {
 		// parse the main body
 		$template_data = array(
 				'thank_you'	=> t('thank you'),
-				'confirm'	=> t("confirmation text", array($hostname, $hostname)),
+				'confirm'	=> t("confirmation text", array($hostname, $hostname, $hostname, $hostname)),
 		);
 		
 		$body_page = $this->parser->parse('template/connection/confirmation', $template_data, TRUE);
