@@ -68,7 +68,7 @@ function checkChangeStatus() {
 	}
 }
 
-function inputUserChoice(action) {
+function inputUserChoice(action, flag) {
 	var var_action = null;
 
 	switch (action) {
@@ -134,7 +134,8 @@ function inputUserChoice(action) {
 			break;
 
 		case 'write':
-			var_action = $.ajax({
+			if (flag == true) {
+				var_action = $.ajax({
 				url: "/printerstate/changecartridge_action/write",
 				type: "GET",
 				data: {
@@ -156,6 +157,10 @@ function inputUserChoice(action) {
 					$(".ui-loader").css("display", "none");
 		        },
 			});
+			}
+			else {
+				checkChangeStatus();
+			}
 			break;
 
 		default:

@@ -34,11 +34,12 @@
 	</div></div>
 </div>
 
-<button onclick="javascript: inputUserChoice('write');">{write_button}</button>
+<button onclick="javascript: inputUserChoice('write', flag);">{write_button}</button>
 
 
 <script type="text/javascript">
 var_next_phase = '{next_phase}';
+var flag = false;
 
 $("#showPaletteOnly").spectrum(
 {
@@ -53,4 +54,10 @@ $("#showPaletteOnly").spectrum(
 });
 
 $("#home").trigger('create');
+
+$("input#showPaletteOnly").on('change', function(){flag = true;});
+$("input#temper_input").on('change', function(){flag = true;});
+$("input#length_input").on('change', function(){flag = true;});
+$("select#material_input").on('change', function(){flag = true;});
+
 </script>
