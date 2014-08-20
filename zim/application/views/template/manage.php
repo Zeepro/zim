@@ -80,7 +80,7 @@
 						<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" onclick="move('Z', -50);">50</a>
 					</div>
 					<div class="grid_4 prefix_6 suffix_6">
-						<input type="number" style="text-align:right;" data-clear-btn="false" name="z_speed" id="z_speed" value="10" min="1" max="10"/><center style="padding-left:22px">mm/s</center>
+						<input type="number" style="text-align:right;" data-clear-btn="false" name="z_speed" id="z_speed" value="5" min="1" max="10"/><center style="padding-left:22px">mm/s</center>
 					</div>
 					<div class="grid_4 prefix_6 suffix_6">
 						<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" onclick="move('Z', 1);">1</a>
