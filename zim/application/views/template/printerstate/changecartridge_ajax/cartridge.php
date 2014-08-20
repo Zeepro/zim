@@ -8,7 +8,7 @@
 		<label for="showPaletteOnly">{color_label}</label>
 	</div></div>
 	<div class="grid_11"><div class="ui-bar ui-bar-c" style="height: 2em;">
-		<input name="c" id="showPaletteOnly" value="black" data-role="none" />
+		<input name="c" id="showPaletteOnly" value="{rfid_color}" data-role="none" />
 	</div></div>
 	<div class="grid_5"><div class="ui-bar ui-bar-d" style="height: 3em;">
 		<label for="material_input">{material_label}</label>
@@ -55,7 +55,10 @@ $("#showPaletteOnly").spectrum(
 
 $("#home").trigger('create');
 
-$("input#showPaletteOnly").on('change', function(){flag = true;});
+$("input#showPaletteOnly").on('change', function()
+{
+	flag = true;
+});
 $("input#temper_input").on('change', function(){flag = true;});
 $("input#length_input").on('change', function(){flag = true;});
 $("select#material_input").on('change', function(){flag = true;});

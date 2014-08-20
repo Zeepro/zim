@@ -130,6 +130,7 @@ class Printerstate extends MY_Controller {
 				'length_min'		=> ceil($need_filament / 1000) + 2,
 				'length_value'		=> $length_value,
 				'temper_value'		=> $temper_value,
+				'rfid_color'		=> $cartridge_data[PRINTERSTATE_TITLE_COLOR],
 		);
 		$this->_display_changecartridge_base('template/printerstate/changecartridge_ajax/cartridge', $template_data);
 		

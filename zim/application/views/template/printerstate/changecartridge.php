@@ -1,8 +1,8 @@
 <div data-role="page" id="home" data-url="/printerstate/changecartridge">
 	<div id="overlay"></div>
 	<header data-role="header" class="page-header">
-		<a href="javascript:history.back();" data-icon="back" data-ajax="false">{back}</a>
-		<a href="/" data-icon="home" data-ajax="false">{home}</a>
+		<a id="back_button" href="javascript:history.back();" data-icon="back" data-ajax="false" style="display:none">{back}</a>
+		<a id="home_button" href="/" data-icon="home" data-ajax="false" style="display:none">{home}</a>
 	</header>
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
