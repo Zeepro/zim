@@ -40,7 +40,7 @@ function load_jwplayer_video() {
 	});
 }
 
-setTimeout(load_jwplayer_video, 5000);
+setTimeout(load_jwplayer_video, 7000);
 </script>
 
 <script type="text/javascript">
