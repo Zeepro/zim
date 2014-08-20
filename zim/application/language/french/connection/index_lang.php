@@ -12,5 +12,5 @@ $lang['Option 2'] =
 $lang['Option 3'] =
         "Point d'accès WiFi (point à point)";
 $lang['set_hostname'] =
-		'Changer le FQDN';
+		"Changer le nom d'hôte";
 ?>

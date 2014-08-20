@@ -14,7 +14,7 @@ $lang['change_right']
 $lang['printer_info']
 	= 'Information';
 $lang['set_hostname']
-	= 'Change FQDN';
+	= 'Change hostname';
 $lang['strip_led']
 	= 'Platform lighting';
 $lang['head_led']

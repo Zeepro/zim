@@ -12,5 +12,5 @@ $lang['Option 2'] =
 $lang['Option 3'] =
         "WiFi Peer to Peer";
 $lang['set_hostname'] =
-		'Set FQDN';
+		'Set hostname';
 ?>
