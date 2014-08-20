@@ -65,6 +65,7 @@ unload_filament() {
 #	chgrp www-data $STATUS_FILE_UNLOAD_HEAT
 	
 	arcontrol_cli "M104 S$2 $gcode_extruder"
+	arcontrol_cli M1905;
 	temper_current=`arcontrol_cli -q $gcode_temper`;
 	temper_current=`awk 'BEGIN {printf "%d\n", '$temper_current' }'`;
 	while [ $temper_current -le $2 ]

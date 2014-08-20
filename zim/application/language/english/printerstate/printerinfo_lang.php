@@ -27,3 +27,5 @@ $lang['ip_address']
 	= 'Local IP';
 $lang['sso_name']
 	= 'Printer name';
+$lang['printer_no_sso']
+	= '(Printer not activated)';

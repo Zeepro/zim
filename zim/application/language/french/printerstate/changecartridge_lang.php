@@ -60,3 +60,5 @@ $lang['Home']
 	= 'Accueil';
 $lang['cancel_button']
 	= 'Annuler';
+$lang['hint_unload_temper']
+	= 'Chauffage...';

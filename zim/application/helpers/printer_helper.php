@@ -287,7 +287,13 @@ function Printer_printFromFile($gcode_path, $need_prime = TRUE, $array_filament 
 //	if (!PrinterState_beforeFileCommand()) {
 //		return ERROR_INTERNAL;
 //	}
-	$command = PrinterState_getPrintCommand() . $gcode_path;
+	// use different command for priming
+	if ($need_prime == FALSE) {
+		$command = PrinterState_getPrintCommand(TRUE, TRUE) . $gcode_path;
+	}
+	else {
+		$command = PrinterState_getPrintCommand() . $gcode_path;
+	}
 	// 		exec($command, $output, $ret_val);
 	// 		if ($ret_val != ERROR_NORMAL_RC_OK) {
 	// 			return ERROR_INTERNAL;

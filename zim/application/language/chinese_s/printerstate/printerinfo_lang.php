@@ -25,3 +25,5 @@ $lang['ip_address']
 	= 'IP 地址';
 $lang['sso_name']
 	= '打印机名称';
+$lang['printer_no_sso']
+	= '（打印机未激活）';

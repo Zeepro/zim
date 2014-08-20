@@ -54,6 +54,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_POSITION_RELAT',	' G91');
 	define('PRINTERSTATE_POSITION_ABSOL',	' G90');
 	define('PRINTERSTATE_VERBATIM',			' -d ');
+	define('PRINTERSTATE_PRIME_END',		' -l ');
 	define('PRINTERSTATE_EXTRUDE_RELAT',	' M83');
 	define('PRINTERSTATE_GET_STRIP_LED',	' M1614');
 	define('PRINTERSTATE_GET_TOP_LED',		' M1615');
@@ -77,7 +78,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_FILE_STOPFILE',	'/tmp/printer_stop');
 	define('PRINTERSTATE_FILE_PAUSEFILE',	'/tmp/printer_pause');
 	define('PRINTERSTATE_FILE_RESUMEFILE',	'/tmp/printer_resume');
-	define('PRINTERSTATE_FILE_UNLOAD_HEAT',	'./tmp/printer_unload_heat');
+	define('PRINTERSTATE_FILE_UNLOAD_HEAT',	'/tmp/printer_unload_heat');
 	
 	define('PRINTERSTATE_RIGHT_EXTRUD',	0);
 	define('PRINTERSTATE_LEFT_EXTRUD',	1);
@@ -139,9 +140,9 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_VALUE_OFFSET_TO_CAL_TIME',	10);
 	
 	define('PRINTERSTATE_VALUE_DEFAULT_EXTRUD',				5);
-	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD',		89);
+	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD',		180);
 	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD',		10);
-	define('PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_LOAD',		180);
+	define('PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_LOAD',		240);
 	define('PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_UNLOAD',	180);
 	define('PRINTERSTATE_VALUE_TIMEOUT_UNLOAD_HEAT',		600);
 	define('PRINTERSTATE_VALUE_ENDSTOP_OPEN',				'open');
@@ -991,14 +992,17 @@ function PrinterState_checkFilament($abb_cartridge, $need_filament = 0, &$data_j
 	return ERROR_OK;
 }
 
-function PrinterState_getPrintCommand($rewrite = TRUE) {
+function PrinterState_getPrintCommand($rewrite = TRUE, $is_prime = FALSE) {
 	global $CFG;
+	$command = $CFG->config['arcontrol_p'];
+	
 	if ($rewrite == FALSE) {
-		$command = $CFG->config['arcontrol_p'] . PRINTERSTATE_VERBATIM . PRINTERSTATE_PRINT_FILE;
+		$command .= PRINTERSTATE_VERBATIM;
 	}
-	else {
-		$command = $CFG->config['arcontrol_p'] . PRINTERSTATE_PRINT_FILE;
+	if ($is_prime == TRUE) {
+		$command .= PRINTERSTATE_PRIME_END;
 	}
+	$command .= PRINTERSTATE_PRINT_FILE;
 	
 	return $command;
 }

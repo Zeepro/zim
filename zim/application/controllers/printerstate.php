@@ -56,6 +56,7 @@ class Printerstate extends MY_Controller {
 		$template_data = array (
 				'next_phase'	=> PRINTERSTATE_CHANGECART_REMOVE_C,
 				'unload_info'	=> t('Wait for unloading...'),
+				'hint_temper'	=> t('hint_unload_temper'),
 				'value_temper'	=> $value_temper,
 				'in_heating'	=> $in_heating ? 'true' : 'false',
 				'cancel_button'	=> t('cancel_button'),
@@ -476,7 +477,7 @@ class Printerstate extends MY_Controller {
 				),
 				array(
 						'title' => t('sso_name'),
-						'value'	=> $sso_name ? $sso_name : 'N/A',
+						'value'	=> $sso_name ? $sso_name : t('printer_no_sso'),
 				),
 		);
 		
@@ -520,11 +521,6 @@ class Printerstate extends MY_Controller {
 			return;
 		}
 		
-		if (ERROR_OK != PrinterState_raisePlatform()) {
-			$this->output->set_header('Location: /');
-			return;
-		}
-		
 		$this->load->library('parser');
 		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
 		
@@ -532,7 +528,7 @@ class Printerstate extends MY_Controller {
 		$template_data = array(
 				'title'			=> ($abb_cartridge == 'l') ? t('Left cartridge change') : t('Right cartridge change'),
 				'wait_info'		=> t('Waiting for getting information...'),
-				'home'		=> t('Home'),
+				'home'			=> t('Home'),
 				'first_status'	=> PRINTERSTATE_CHANGECART_UNLOAD_F,
 				'insert_status'	=> PRINTERSTATE_CHANGECART_INSERT_C,
 				'back'			=> t('back'),
@@ -675,6 +671,12 @@ class Printerstate extends MY_Controller {
 						}
 						else if ($ret_val == $code_miss_cartridge) {
 							// no cartridge
+							// raise the platform for first loading ajax page
+							if (ERROR_OK != PrinterState_raisePlatform()) {
+								$this->output->set_header('Location: /');
+								return;
+							}
+							
 							$this->_display_changecartridge_insert_cartridge();
 						}
 						else {

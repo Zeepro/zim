@@ -25,6 +25,7 @@
 </div>
 
 <script>
+function load_jwplayer_video() {
 	var player = jwplayer("myVideo").setup({
 							file: "{video_url}",
 							width: "100%",
@@ -32,11 +33,14 @@
 							fallback: false,
 							androidhls: true
 						});
-						player.onSetupError(function()
-						{
-							$("#myVideo").empty().append('<img src=/images/error.png" height="280" width="280" />' +
-														"<p>{video_error}</p>");
-						});
+	player.onSetupError(function()
+	{
+		$("#myVideo").empty().append('<img src=/images/error.png" height="280" width="280" />' +
+									"<p>{video_error}</p>");
+	});
+}
+
+setTimeout(load_jwplayer_video, 5000);
 </script>
 
 <script type="text/javascript">
@@ -48,6 +52,7 @@ var var_ajax;
 var var_prime = {var_prime};
 // var var_finish = false;
 var var_ajax_lock = false;
+var var_finish = false;
 
 $(document).ready(checkPrintStatus());
 
@@ -94,9 +99,9 @@ function checkPrintStatus() {
 		});
 	}
 
-	jwplayer("myVideo").onPlay(function() {
-		var_onPlay = true;
-	})
+// 	jwplayer("myVideo").onPlay(function() {
+// 		var_onPlay = true;
+// 	})
 
 	return;
 }
@@ -134,6 +139,10 @@ function finishLoop() {
 }
 
 function stopPrint() {
+	if (var_finish == true) {
+		return;
+	}
+	
 	finishLoop();
 	setTimeout(redirect_cancel, 1000);
 
@@ -152,9 +161,11 @@ function finishAction() {
 	// display info
 	$("#print_detail_info").html('<p>{finish_info}</p>');
 	// change return button
+	$('button#print_action').attr('onclick','').unbind('click');
 	$('button#print_action').click(function(){window.location.href='{return_url}'; return false;});
 	$('button#print_action').parent().find('span.ui-btn-text').text('{return_button}');
 	$('button#print_action').html('{return_button}');
+	var_finish = true;
 
 	// add restart button for print again
 	$('<div>').appendTo('#container')

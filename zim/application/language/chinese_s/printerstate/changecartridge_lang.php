@@ -60,3 +60,5 @@ $lang['Home']
 	= '首页';
 $lang['cancel_button']
 	= '取消';
+$lang['hint_unload_temper']
+	= '加热中…';

@@ -1136,14 +1136,14 @@ class Rest extends MY_Controller {
 			switch ($abb_cartridge) {
 				case 'l':
 				case 'r':
-					$temper = 0;
-					$cr = PrinterState_getTemperature($temper, 'e', $abb_cartridge);
-					if ($cr == ERROR_OK && $temper > PRINTERSTATE_VALUE_MAXTEMPER_BEFORE_UNLOAD) {
+// 					$temper = 0;
+// 					$cr = PrinterState_getTemperature($temper, 'e', $abb_cartridge);
+// 					if ($cr == ERROR_OK && $temper > PRINTERSTATE_VALUE_MAXTEMPER_BEFORE_UNLOAD) {
 						$cr = PrinterState_unloadFilament($abb_cartridge);
-					}
-					else if ($cr == ERROR_OK) {
-						$cr = ERROR_BUSY_PRINTER;
-					}
+// 					}
+// 					else if ($cr == ERROR_OK) {
+// 						$cr = ERROR_BUSY_PRINTER;
+// 					}
 					break;
 					
 				default:
@@ -1160,7 +1160,13 @@ class Rest extends MY_Controller {
 		return;
 	}
 	
-	
+	public function raiseplatform() {
+		$cr = PrinterState_raisePlatform();
+		
+		$this->_return_cr($cr);
+		
+		return;
+	}
 	
 	public function slicerlistpreset() {
 		$display = '';

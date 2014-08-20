@@ -27,3 +27,5 @@ $lang['ip_address']
 	= 'IP locale';
 $lang['sso_name']
 	= 'Nom de l\'imprimante';
+$lang['printer_no_sso']
+	= '(Imprimante non activée)';
