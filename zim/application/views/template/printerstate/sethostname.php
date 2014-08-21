@@ -15,7 +15,7 @@
 				<br />
 				<br />
 				<div>
-					<input type="submit" value="{set_button}" />
+					<input data-ajax=false type="submit" value="{set_button}" />
 				</div>
 				{error}
 			</form>

@@ -22,7 +22,7 @@
    					{/array_info}
   				</tbody>
 			</table>
-			<a href="/activation" data-role="button">{button_sso}</a>
+			<!--<a href="/activation" data-role="button">{button_sso}</a>-->
 		</div>
 	</div>
 </div>

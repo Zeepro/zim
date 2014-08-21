@@ -9,7 +9,7 @@
 		<div id="container">
 			<h1>Activation</h1>
 			<div id="error"><?php $this->load->helper('form'); echo validation_errors(); ?></div>
-			<form action="/activation/activation_form" data-ajax="false" method="POST">
+			<form action="/activation/activation_form/{returnUrl}" data-ajax="false" method="POST">
 				<input type="hidden" name="email" value='{email}' />
 				<input type="hidden" name="password" value='{password}' />
 				<label for="printer_name">{give_name}</label>

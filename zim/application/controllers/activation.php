@@ -27,7 +27,8 @@ class Activation extends MY_Controller
 					'sign_in'		=> t('sign_in'),
 					'sign_up'		=> t('sign_up'),
 					'back'			=> t('back'),
-					'create_account'=> t('create_account')
+					'create_account'=> t('create_account'),
+					'returnUrl'		=> isset($_GET['returnUrl']) ? ("?returnUrl=".$_GET['returnUrl']) : ""
 			);
 		}
 		else
@@ -84,7 +85,8 @@ class Activation extends MY_Controller
 				'contents'		=> $body_page,
 				'back'			=> t('back'),
 				'congrats'		=> t('congrats'),
-				'confirmation_message'	=> t('confirmation_message')
+				'confirmation_message'	=> t('confirmation_message'),
+				'returnUrl'		=> isset($_GET['returnUrl']) ? $_GET['returnUrl'] : "/"
 		);
 		$this->parser->parse('template/basetemplate', $template_data);
 	}

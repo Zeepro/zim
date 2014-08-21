@@ -447,6 +447,8 @@ class Printerstate extends MY_Controller {
 		ZimAPI_getPrinterSSOName($sso_name);
 		
 		$temp_info = PrinterState_getInfoAsArray();
+		$hostname = "no hostname";
+		ZimAPI_getHostname($hostname);
 		$array_info = array(
 				array(
 						'title'	=> t('version_title'),
@@ -478,7 +480,11 @@ class Printerstate extends MY_Controller {
 				),
 				array(
 						'title' => t('sso_name'),
-						'value'	=> $sso_name ? $sso_name : t('printer_no_sso'),
+						'value'	=> "<div style='text-align:center'>" . ($sso_name ? $sso_name : "") . "<a data-role='button' href='/activation/?returnUrl=printerstate/printerinfo'>{button_sso}</a></div>",
+				),
+				array(
+						'title'	=> t('hostname'),
+						'value'	=> "<div style='text-align:center'>" . $hostname . "<a data-ajax=false data-role='button' href='/printerstate/sethostname'>{button_sso}</a></div>"
 				),
 		);
 		
@@ -488,6 +494,7 @@ class Printerstate extends MY_Controller {
 				'back'			=> t('back'),
 				'home'			=> t('Home'),
 				'button_sso'	=> ($sso_name == NULL) ? t('button_active_sso') : t('button_rename_sso'),
+				'button_fqdn'	=> t('button_rename_sso')
 		);
 		
 		$body_page = $this->parser->parse('template/printerstate/printerinfo', $template_data, TRUE);
@@ -1093,6 +1100,7 @@ class Printerstate extends MY_Controller {
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$hostname = $this->input->post('hostname');
 			$restart = $this->input->post('restart');
+			$returnUrl = $this->input->post('returnUrl');
 			
 			if ((int) $restart == 0) {
 				$restart = FALSE;
@@ -1104,16 +1112,17 @@ class Printerstate extends MY_Controller {
 			if ($hostname) {
 				$this->load->helper('zimapi');
 				
-				if (ZimAPI_setHostname($hostname, $restart) == ERROR_OK) {
+				if (ZimAPI_setHostname($hostname, $restart) == ERROR_OK)
+				{
 					$hint_message = NULL;
-					
-					if ($restart == TRUE) {
+					if ($restart == TRUE)
+					{
 						$hint_message = t('finish_hint', array($hostname, $hostname, $hostname, $hostname));
 					}
-					else {
+					else
+					{
 						$hint_message = t('finish_hint_norestart', array($hostname, $hostname));
 					}
-					
 					// parse the main body
 					$template_data = array(
 							'hint'			=> $hint_message,

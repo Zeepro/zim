@@ -10,7 +10,7 @@
 			<h2>{title}</h2>
 			<div id="error"><?php $this->load->helper('form'); echo validation_errors(); ?></div>
 			<?php
-				echo form_open('/account/signin', array('data-ajax' => "false"));
+				echo form_open('/account/signin/{returnUrl}', array('data-ajax' => "false"));
 				echo form_label('Email', 'email') . '<br />';
 				echo form_input('email') . '<br />' . '<br />';
 				echo form_label('{password}', 'password') . '<br />';
@@ -20,6 +20,6 @@
 			?>
 		</div>
 		<h2>{create_account}</h2>
-		<a href="/account/signup" data-role="button" data-ajax="false">{sign_up}</a>
+		<a href="/account/signup/{returnUrl}" data-role="button" data-ajax="false">{sign_up}</a>
 	</div>
 </div>

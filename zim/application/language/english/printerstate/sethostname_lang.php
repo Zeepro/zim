@@ -21,6 +21,10 @@ $lang['finish_hint']
 		Reconnect to your usual network to access your printer using the link:</br>
 		</br>
 		<a href="http://%s.local/">http://%s.local/</a> or <a href="http://%s">http://%s</a>';
+$lang['finish_hint_returnUrl']
+	= 'Return your printer\'s information page using this link:</br>
+		</br>
+		<a href="http://%s.local/%s">http://%s.local/%s</a> or <a href="http://%s/%s">http://%s/%s</a>';
 $lang['finish_hint_norestart']
 	= 'Your printer will restart to apply its new parameters.</br>
 		</br>

@@ -127,7 +127,7 @@
 								<input type="number" style="text-align:right;" data-clear-btn="false" name="extrude_l" id="extrude_l" value="20"> mm
 							</div>
 							<div style="width:60px;float:left;margin-right:10px;">
-								<input type="number" style="text-align:right;" data-clear-btn="false" name="speed_l" id="speed_l" value="100"> mm/s
+								<input type="number" style="text-align:right;" data-clear-btn="false" name="speed_l" id="speed_l" value="100"> mm/min
 							</div>
 							<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" data-inline="true" onclick="extrude('l', '-');">Reverse</a>
 							<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" data-inline="true" onclick="extrude('l', '+');">Extrude</a>
@@ -145,7 +145,7 @@
 								<input type="number" style="text-align:right;" data-clear-btn="false" name="extrude_r" id="extrude_r" value="20"> mm
 							</div>
 							<div style="width:60px;float:left;margin-right:10px;">
-								<input type="number" style="text-align:right;" data-clear-btn="false" name="speed_r" id="speed_r" value="100"> mm/s
+								<input type="number" style="text-align:right;" data-clear-btn="false" name="speed_r" id="speed_r" value="100"> mm/min
 							</div>
 							<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" data-inline="true" onclick="extrude('r', '-');">Reverse</a>
 							<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" data-inline="true" onclick="extrude('r', '+');">Extrude</a>

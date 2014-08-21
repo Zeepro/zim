@@ -34,6 +34,7 @@ class Account extends MY_Controller
 				}
 				catch (Exception $e)
 				{
+					//TODO:error handling
 					die();
 				}
 				
@@ -41,7 +42,7 @@ class Account extends MY_Controller
 				if ($result == 202)
 				{
 					$file = 'template/activation/activation_form';
-					$data = array('email' =>$email, 'password' => $password);
+					$data = array('email' =>$email, 'password' => $password, 'returnUrl' => isset($_GET['returnUrl']) ? ('?returnUrl='.$_GET['returnUrl']) : '');
 				}
 			}
 		}

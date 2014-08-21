@@ -10,8 +10,7 @@
 				{confirmation_message}
 			</p>
 			
-			<a href="/" data-role="button">Ok</a>
-			
+			<a href="{returnUrl}" data-role="button">Ok</a>
 		</div>
 	</div>
 </div>

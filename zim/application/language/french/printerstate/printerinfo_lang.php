@@ -29,3 +29,5 @@ $lang['sso_name']
 	= 'Nom de l\'imprimante';
 $lang['printer_no_sso']
 	= '(Imprimante non activée)';
+$lang['hostname']
+	= "Nom d'hôte";

@@ -63,13 +63,10 @@ $("#strip_led").change(function() {
 			v: var_state,
 			},
 		type: "GET",
-	});
-// 	var_ajax.done(function(html) {
-// 		alert("done");
-// 	})
-// 	.fail(function() {
-// 		alert("failed");
-// 	});
+	})
+	.fail(function() {
+ 		alert("failed");
+ 	});
 });
 $("#head_led").change(function() {
 	var var_state = $("#head_led").val().toString();

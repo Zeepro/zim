@@ -19,6 +19,10 @@ $lang['finish_hint']
 		Reconnectez-vous à votre réseau habituel pour accéder à votre imprimante en cliquant sur le lien suivant :</br>
 		</br>
 		<a href="http://%s.local/">http://%s.local/</a> or <a href="http://%s">http://%s</a>';
+$lang['finish_hint_returnUrl']
+	= 'Retournez à la page d\'informations de votre imprimante en utilisant ce lien:</br>
+		</br>
+		<a href="http://%s.local/%s">http://%s.local/%s</a> or <a href="http://%s/%s">http://%s/%s</a>';
 $lang['finish_hint_norestart']
 	= 'Votre imprimante va redémarrer pour appliquer ses nouveaux paramètres.</br>
 		</br>
