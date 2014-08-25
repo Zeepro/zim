@@ -25,3 +25,5 @@ $lang['led_off']
 	= 'Off';
 $lang['set_preset']
 	= 'Slicer presets';
+$lang['nozzles_adjustments']
+	= 'Nozzles offset adjustments';

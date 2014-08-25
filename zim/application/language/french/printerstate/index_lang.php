@@ -25,3 +25,5 @@ $lang['led_off']
 	= 'Éteint';
 $lang['set_preset']
 	= 'Présélections du slicer';
+$lang['nozzles_adjustments']
+	= 'Ajustement du décalage des buses';
