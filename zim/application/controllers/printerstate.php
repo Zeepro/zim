@@ -1112,7 +1112,8 @@ class Printerstate extends MY_Controller {
 			if ($hostname) {
 				$this->load->helper('zimapi');
 				
-				if (ZimAPI_setHostname($hostname, $restart) == ERROR_OK)
+				$code = ZimAPI_setHostname($hostname, $restart); 
+				if ($code == ERROR_OK)
 				{
 					$hint_message = NULL;
 					if ($restart == TRUE)
@@ -1139,10 +1140,14 @@ class Printerstate extends MY_Controller {
 					);
 					
 					$this->parser->parse('template/basetemplate', $template_data);
-					
 					return;
 				}
-				else {
+				else if ($code == ERROR_WRONG_PRM)
+				{
+					$error = t('bad_char');
+				}
+				else
+				{
 					$error = t('set_error');
 				}
 			}
@@ -1188,6 +1193,44 @@ class Printerstate extends MY_Controller {
 	
 		$this->parser->parse('template/basetemplate', $template_data);
 	
+		return;
+	}
+	
+	public function nozzles_adjustment()
+	{
+		$this->load->library('parser');
+		$body_page = NULL;
+		$template_data = array( 'back'	=> t('back'));
+		$body_page = $this->parser->parse('template/printerstate/nozzles_adjustment', $template_data, TRUE);
+		$template_data = array(
+				'lang'			=> $this->config->item('language_abbr'),
+				'headers'		=> '<title>' . t('manage_index_pagetitle') . '</title>' . "\n"
+				. '<link rel="stylesheet" href="/assets/jquery-mobile-fluid960.min.css">',
+				'contents'		=> $body_page,
+		);
+	
+		$this->parser->parse('template/basetemplate', $template_data);
+		return;
+	}
+	
+	public function offset_setting()
+	{
+		$this->load->library('parser');
+		$body_page = NULL;
+		$template_data = array( 'back'	=> t('back'));
+		$body_page = $this->parser->parse('template/printerstate/offset_setting', $template_data, TRUE);
+		if ($_SERVER['REQUEST_METHOD'] == "POST")
+		{
+			$body_page = $this->parser->parse('template/printerstate/offset_setting', $template_data, TRUE);
+		}
+		$template_data = array(
+				'lang'			=> $this->config->item('language_abbr'),
+				'headers'		=> '<title>' . t('manage_index_pagetitle') . '</title>' . "\n"
+				. '<link rel="stylesheet" href="/assets/jquery-mobile-fluid960.min.css">',
+				'contents'		=> $body_page,
+		);
+	
+		$this->parser->parse('template/basetemplate', $template_data);
 		return;
 	}
 }
