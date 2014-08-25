@@ -1,4 +1,5 @@
 <div data-role="page" data-url="/pronterface">
+	<div id="overlay"></div>
 	<header data-role="header" class="page-header">
 	</header>
 	<div class="logo"><div id="link_logo"></div></div>
@@ -30,11 +31,11 @@
 					<td><a href="#" data-role="button" data-icon="arrow-l" data-iconpos="left" data-inline="true" onclick="move('X', -50);">50</a></td>
 					<td><a href="#" data-role="button" data-icon="arrow-l" data-iconpos="left" data-inline="true" onclick="move('X', -10);">10</a></td>
 					<td><a href="#" data-role="button" data-icon="arrow-l" data-iconpos="left" data-inline="true" onclick="move('X', -1);">1</a></td>
-					<td><input type="number" style="text-align:right;" data-clear-btn="false" name="xy_speed" id="xy_speed" value="6000"></td>
+					<td><input type="number" style="text-align:right;" data-clear-btn="false" name="xy_speed" id="xy_speed" value="2000"></td>
 					<td><a href="#" data-role="button" data-icon="arrow-r" data-iconpos="left" data-inline="true" onclick="move('X', 1);">1</a></td>
 					<td><a href="#" data-role="button" data-icon="arrow-r" data-iconpos="left" data-inline="true" onclick="move('X', 10);">10</a></td>
 					<td><a href="#" data-role="button" data-icon="arrow-r" data-iconpos="left" data-inline="true" onclick="move('X', 50);">50</a></td>
-					<td><input type="number" style="text-align:right;" data-clear-btn="false" name="z_speed" id="z_speed" value="400"></td>
+					<td><input type="number" style="text-align:right;" data-clear-btn="false" name="z_speed" id="z_speed" value="500"></td>
 				</tr>
 				<tr>
 					<td><a href="#" data-role="button" data-icon="home" data-iconpos="left" data-inline="true" onclick="home('X');">X</a></td>
@@ -112,7 +113,7 @@
 					</div>
 				</div>
 			</div>
-			<div data-role="collapsible" data-collapsed="false" style="align: center;">
+			<div data-role="collapsible" data-collapsed="true" style="align: center;">
 				<h4>Filament</h4>
 				<div class="ui-grid-a">
 					<div class="ui-block-a">
@@ -153,7 +154,7 @@
 					</div>
 				</div>
 			</div>
-			<div data-role="collapsible" data-collapsed="false" style="align: center;">
+			<div data-role="collapsible" data-collapsed="true" style="align: center;">
 				<h4>G-code</h4>
 				<label for="oneline_v">Verbatim one line G-code</label>
 				<input type="text" name="oneline_v" id="oneline_v" value="">
@@ -168,20 +169,20 @@
 					<label for="severalline_v">Verbatim file upload</label>
 					<input type="file" data-clear-btn="true" name="f" id="file_v">
 					<input type="hidden" name="mode" value="verbatim">
-					<input type="submit" value="Send" data-icon="arrow-r" data-iconpos="right">
+					<input type="submit" value="Send" data-icon="arrow-r" data-iconpos="right" onclick="spinner_start();">
 				</form>
 <!-- 				<a href="#" data-role="button" data-icon="arrow-r" data-iconpos="right">Send</a> -->
 				<form action="/rest/gcodefile" method="post" enctype="multipart/form-data" data-ajax="false">
 					<label for="severalline_v">File upload</label>
 					<input type="file" data-clear-btn="true" name="f" id="file_n">
-					<input type="submit" value="Send" data-icon="arrow-r" data-iconpos="right">
+					<input type="submit" value="Send" data-icon="arrow-r" data-iconpos="right" onclick="spinner_start();">
 				</form>
 <!-- 				<a href="#" data-role="button" data-icon="arrow-r" data-iconpos="right">Send</a> -->
-				<form action="/pronterface/emulator" method="post" enctype="multipart/form-data" data-ajax="false">
+<!-- 				<form action="/pronterface/emulator" method="post" enctype="multipart/form-data" data-ajax="false">
 					<label for="severalline_v">File upload emulator</label>
 					<input type="file" data-clear-btn="true" name="f" id="file_n_e">
 					<input type="submit" value="Send" data-icon="arrow-r" data-iconpos="right">
-				</form>
+				</form> -->
 				<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete" onclick="javascript: window.location.href='/pronterface/stop';">Stop</button>
 			</div>
 			<label for="gcode_detail_info">Output</label>
@@ -189,31 +190,66 @@
 <!-- 			<div id="gcode_detail_info"></div> -->
 		</div>
 	</div>
-</div>
 
 <script type="text/javascript">
 var var_ajax;
 var var_refreshCheckTemper = 0;
+var var_ajax_lock = false;
 
 $(document).ready(checkTemper());
 
+/* 
 function checkTemper() {
 //	refreshCheckTemper();
-//	var_refreshCheckTemper = setInterval(refreshCheckTemper, 10000);
 	$("#temper_collaspible").bind('expand', function () {
-		if (var_refreshCheckTemper == 0)
-			checkTemper();
+		if (var_refreshCheckTemper == 0) {
+//			checkTemper();
+			var_refreshCheckTemper = setInterval(refreshCheckTemper, 10000);
+		}
 	}).bind('collapse', function() {
-//		clearInterval(var_refreshCheckTemper);
+		clearInterval(var_refreshCheckTemper);
 		var_refreshCheckTemper = 0;
 	});
 }
+ */
+function checkTemper() {
+//		refreshCheckTemper();
+		$("#temper_collaspible").collapsible({
+			expand: function(event, ui) {
+				if (var_refreshCheckTemper == 0) {
+					refreshCheckTemper();
+					var_refreshCheckTemper = setInterval(refreshCheckTemper, 10000);
+				}
+			},
+			collapse: function(event, ui) {
+				if (var_refreshCheckTemper != 0) {
+					clearInterval(var_refreshCheckTemper);
+					var_refreshCheckTemper = 0;
+				}
+			},
+		});
+	}
 
 function refreshCheckTemper() {
+	if (var_ajax_lock == true) {
+		return;
+	}
+	else {
+		var_ajax_lock = true;
+	}
+	
 	var_ajax = $.ajax({
 		url: "/pronterface/temper_ajax",
 		type: "GET",
 		cache: false,
+		beforeSend: function() {
+			$("#overlay").addClass("gray-overlay");
+			$(".ui-loader").css("display", "block");
+		},
+		complete: function() {
+			$("#overlay").removeClass("gray-overlay");
+			$(".ui-loader").css("display", "none");
+		},
 	})
 	.done(function(html) {
 		var response = JSON.parse(html);
@@ -222,11 +258,20 @@ function refreshCheckTemper() {
 	})
 	.fail(function() {
 		$("#gcode_detail_info").html('ERROR');
+	})
+	.always(function() {
+		var_ajax_lock = false;
 	});
 }
 
 function home(var_axis) {
 	var var_url;
+	if (var_ajax_lock == true) {
+		return;
+	}
+	else {
+		var_ajax_lock = true;
+	}
 
 	var_axis = typeof var_axis !== 'undefined' ? var_axis : 'all';
 	if (var_axis == 'all') {
@@ -239,12 +284,23 @@ function home(var_axis) {
 		url: var_url,
 		type: "GET",
 		cache: false,
+		beforeSend: function() {
+			$("#overlay").addClass("gray-overlay");
+			$(".ui-loader").css("display", "block");
+		},
+		complete: function() {
+			$("#overlay").removeClass("gray-overlay");
+			$(".ui-loader").css("display", "none");
+		},
 	})
 	.done(function(html) {
 		$("#gcode_detail_info").html('OK');
 	})
 	.fail(function() {
 		$("#gcode_detail_info").html('ERROR');
+	})
+	.always(function() {
+		var_ajax_lock = false;
 	});
 
 	return false;
@@ -253,6 +309,12 @@ function home(var_axis) {
 function move(var_axis, var_value) {
 	var var_url;
 	var var_speed;
+	if (var_ajax_lock == true) {
+		return;
+	}
+	else {
+		var_ajax_lock = true;
+	}
 
 	var_axis = typeof var_axis !== 'undefined' ? var_axis : 'error';
 	if (var_axis == 'error') {
@@ -272,12 +334,23 @@ function move(var_axis, var_value) {
 		url: var_url,
 		type: "GET",
 		cache: false,
+		beforeSend: function() {
+			$("#overlay").addClass("gray-overlay");
+			$(".ui-loader").css("display", "block");
+		},
+		complete: function() {
+			$("#overlay").removeClass("gray-overlay");
+			$(".ui-loader").css("display", "none");
+		},
 	})
 	.done(function(html) {
 		$("#gcode_detail_info").html('OK');
 	})
 	.fail(function() {
 		$("#gcode_detail_info").html('ERROR');
+	})
+	.always(function() {
+		var_ajax_lock = false;
 	});
 
 	return false;
@@ -285,6 +358,12 @@ function move(var_axis, var_value) {
 
 function level(var_point) {
 	var var_url;
+	if (var_ajax_lock == true) {
+		return;
+	}
+	else {
+		var_ajax_lock = true;
+	}
 
 	var_point = typeof var_point !== 'undefined' ? var_point : 'error';
 	if (var_point == 'error') {
@@ -298,12 +377,23 @@ function level(var_point) {
 		url: var_url,
 		type: "GET",
 		cache: false,
+		beforeSend: function() {
+			$("#overlay").addClass("gray-overlay");
+			$(".ui-loader").css("display", "block");
+		},
+		complete: function() {
+			$("#overlay").removeClass("gray-overlay");
+			$(".ui-loader").css("display", "none");
+		},
 	})
 	.done(function(html) {
 		$("#gcode_detail_info").html('OK');
 	})
 	.fail(function() {
 		$("#gcode_detail_info").html('ERROR');
+	})
+	.always(function() {
+		var_ajax_lock = false;
 	});
 
 	return false;
@@ -311,6 +401,12 @@ function level(var_point) {
 
 function heat(var_extruder, var_value) {
 	var var_url;
+	if (var_ajax_lock == true) {
+		return;
+	}
+	else {
+		var_ajax_lock = true;
+	}
 
 	var_extruder = typeof var_extruder !== 'undefined' ? var_extruder : 'error';
 	var_value = typeof var_value !== 'undefined' ? var_value : 'get';
@@ -333,12 +429,23 @@ function heat(var_extruder, var_value) {
 		url: var_url,
 		type: "GET",
 		cache: false,
+		beforeSend: function() {
+			$("#overlay").addClass("gray-overlay");
+			$(".ui-loader").css("display", "block");
+		},
+		complete: function() {
+			$("#overlay").removeClass("gray-overlay");
+			$(".ui-loader").css("display", "none");
+		},
 	})
 	.done(function(html) {
 		$("#gcode_detail_info").html('OK');
 	})
 	.fail(function() {
 		$("#gcode_detail_info").html('ERROR');
+	})
+	.always(function() {
+		var_ajax_lock = false;
 	});
 
 	return false;
@@ -347,6 +454,12 @@ function heat(var_extruder, var_value) {
 function extrude(var_extruder, var_direction) {
 	var var_url, var_value, var_speed;
 	var id_extrude, id_speed;
+	if (var_ajax_lock == true) {
+		return;
+	}
+	else {
+		var_ajax_lock = true;
+	}
 
 	var_extruder = typeof var_extruder !== 'undefined' ? var_extruder : 'error';
 	var_direction = typeof var_direction !== 'undefined' ? var_direction : 'error';
@@ -380,22 +493,48 @@ function extrude(var_extruder, var_direction) {
 		url: var_url,
 		type: "GET",
 		cache: false,
+		beforeSend: function() {
+			$("#overlay").addClass("gray-overlay");
+			$(".ui-loader").css("display", "block");
+		},
+		complete: function() {
+			$("#overlay").removeClass("gray-overlay");
+			$(".ui-loader").css("display", "none");
+		},
 	})
 	.done(function(html) {
 		$("#gcode_detail_info").html('OK');
 	})
 	.fail(function() {
 		$("#gcode_detail_info").html('ERROR');
+	})
+	.always(function() {
+		var_ajax_lock = false;
 	});
 
 	return false;
 }
 
 function refreshRfid() {
+	if (var_ajax_lock == true) {
+		return;
+	}
+	else {
+		var_ajax_lock = true;
+	}
+	
 	var_ajax = $.ajax({
 		url: "/pronterface/rfid_ajax",
 		type: "GET",
 		cache: false,
+		beforeSend: function() {
+			$("#overlay").addClass("gray-overlay");
+			$(".ui-loader").css("display", "block");
+		},
+		complete: function() {
+			$("#overlay").removeClass("gray-overlay");
+			$(".ui-loader").css("display", "none");
+		},
 	})
 	.done(function(html) {
 		var response = JSON.parse(html);
@@ -404,6 +543,9 @@ function refreshRfid() {
 	})
 	.fail(function() {
 		$("#gcode_detail_info").html('ERROR');
+	})
+	.always(function() {
+		var_ajax_lock = false;
 	});
 
 	return false;
@@ -411,6 +553,12 @@ function refreshRfid() {
 
 function runGcodeGet() {
 	var var_gcode = $('#oneline_v').val();
+	if (var_ajax_lock == true) {
+		return;
+	}
+	else {
+		var_ajax_lock = true;
+	}
 
 	if (var_gcode.indexOf('M109') != -1
 			|| var_gcode.indexOf('M1606') != -1
@@ -425,12 +573,23 @@ function runGcodeGet() {
 			v: var_gcode,
 		},
 		cache: false,
+		beforeSend: function() {
+			$("#overlay").addClass("gray-overlay");
+			$(".ui-loader").css("display", "block");
+		},
+		complete: function() {
+			$("#overlay").removeClass("gray-overlay");
+			$(".ui-loader").css("display", "none");
+		},
 	})
 	.done(function(html) {
 		$("#gcode_detail_info").html(html);
 	})
 	.fail(function() {
 		$("#gcode_detail_info").html('ERROR');
+	})
+	.always(function() {
+		var_ajax_lock = false;
 	});
 
 	return false;
@@ -438,6 +597,12 @@ function runGcodeGet() {
 
 function runGcodePOST(id_code, var_mode) {
 	var var_gcode;
+	if (var_ajax_lock == true) {
+		return;
+	}
+	else {
+		var_ajax_lock = true;
+	}
 
 	id_code = typeof id_code !== 'undefined' ? id_code : 'error';
 	var_mode = typeof var_mode !== 'undefined' ? var_mode : 'normal';
@@ -455,13 +620,31 @@ function runGcodePOST(id_code, var_mode) {
 			mode:	var_mode,
 		},
 		cache: false,
+		beforeSend: function() {
+			$("#overlay").addClass("gray-overlay");
+			$(".ui-loader").css("display", "block");
+		},
+		complete: function() {
+			$("#overlay").removeClass("gray-overlay");
+			$(".ui-loader").css("display", "none");
+		},
 	})
 	.done(function(html) {
 		$("#gcode_detail_info").html('OK');
 	})
 	.fail(function() {
 		$("#gcode_detail_info").html('ERROR');
+	})
+	.always(function() {
+		var_ajax_lock = false;
 	});
 }
 
+function spinner_start() {
+	$("#overlay").addClass("gray-overlay");
+	$(".ui-loader").css("display", "block");
+}
+
 </script>
+
+</div>

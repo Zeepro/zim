@@ -126,6 +126,14 @@ function home(var_axis) {
 		url: var_url,
 		type: "GET",
 		cache: false,
+		beforeSend: function() {
+			$("#overlay").addClass("gray-overlay");
+			$(".ui-loader").css("display", "block");
+		},
+		complete: function() {
+			$("#overlay").removeClass("gray-overlay");
+			$(".ui-loader").css("display", "none");
+		},
 	})
 	.done(function(html) {
 		$("#gcode_detail_info").html('OK');
@@ -159,16 +167,14 @@ function move(var_axis, var_value) {
 		url: var_url,
 		type: "GET",
 		cache: false,
-		beforeSend: function()
-		{
+		beforeSend: function() {
 			$("#overlay").addClass("gray-overlay");
 			$(".ui-loader").css("display", "block");
-        },
-        complete: function()
-        {	
+		},
+		complete: function() {
 			$("#overlay").removeClass("gray-overlay");
 			$(".ui-loader").css("display", "none");
-        },
+		},
 	})
 	.done(function(html) {
 		$("#gcode_detail_info").html('OK');
