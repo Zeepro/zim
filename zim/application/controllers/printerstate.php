@@ -1205,8 +1205,12 @@ class Printerstate extends MY_Controller {
 	public function nozzles_adjustment()
 	{
 		$this->load->library('parser');
+		$this->lang->load('printerstate/nozzles', $this->config->item('language'));
 		$body_page = NULL;
-		$template_data = array( 'back'	=> t('back'));
+		$template_data = array( 'print_calibration'	=> t('print_calibration'),
+								'trim_offset'		=> t('trim_offset'),
+								'back'				=> t('back'),
+								'home'				=> t('home'));
 		$body_page = $this->parser->parse('template/printerstate/nozzles_adjustment', $template_data, TRUE);
 		$template_data = array(
 				'lang'			=> $this->config->item('language_abbr'),
@@ -1222,8 +1226,15 @@ class Printerstate extends MY_Controller {
 	public function offset_setting()
 	{
 		$this->load->library('parser');
+		$this->lang->load('printerstate/nozzles', $this->config->item('language'));
 		$body_page = NULL;
-		$template_data = array( 'back'	=> t('back'));
+		
+		$template_data = array( 'nozzles_title' => t('nozzles_title'),
+								'nozzles_intro' => t('nozzles_intro'),
+								'collapsible_1' => t('collapsible_1'),
+								'collapsible_2' => t('collapsible_2'),
+								'back'	=> t('back'),
+								'home'	=> t('home'));
 		$body_page = $this->parser->parse('template/printerstate/offset_setting', $template_data, TRUE);
 		if ($_SERVER['REQUEST_METHOD'] == "POST")
 		{
