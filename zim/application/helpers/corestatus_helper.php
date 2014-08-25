@@ -287,6 +287,29 @@ function CoreStatus_checkCallUnloading(&$url_redirect = '') {
 	));
 }
 
+function CoreStatus_checkCallloading(&$url_redirect = '') {
+	$status_current = '';
+	$abb_filament = '';
+	CoreStatus_checkInIdle($status_current);
+	if ($status_current == CORESTATUS_VALUE_LOAD_FILA_L) {
+		$url_redirect = '/printerstate/changecartridge?v=l&f=0';
+		$abb_filament = 'l';
+	}
+	else { // CORESTATUS_VALUE_LOAD_FILA_R
+		$url_redirect = '/printerstate/changecartridge?v=r&f=0';
+		$abb_filament = 'r';
+	}
+	
+	return CoreStatus__checkCallURI(array(
+			'/printerstate/changecartridge'							=> array(
+					'v'	=> $abb_filament,
+			),
+			'/printerstate/changecartridge_ajax'					=> NULL,
+			'/printerstate/changecartridge_action'					=> NULL,
+			'/printerstate/changecartridge_action/cancel_unload'	=> NULL,
+	));
+}
+
 function CoreStatus_checkCallRecovery(&$url_redirect = '') {
 	//TODO finish and test me
 	$url_redirect = '/printdetail/recovery';

@@ -130,7 +130,10 @@ class MY_Controller extends CI_Controller
 						
 					case CORESTATUS_VALUE_LOAD_FILA_L:
 					case CORESTATUS_VALUE_LOAD_FILA_R:
-						return; // we do not block users when charging filament
+						if (CoreStatus_checkCallloading($url_redirect)) {
+							return; // we are calling the right page
+						}
+// 						return; // we do not block users when charging filament
 						break;
 						
 					case CORESTATUS_VALUE_UNLOAD_FILA_L:

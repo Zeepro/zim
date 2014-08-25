@@ -601,11 +601,17 @@ class Printerstate extends MY_Controller {
 				
 				// block any sending command to arduino when in unloading wait time
 				//TODO test me
-				if (CoreStatus_checkInIdle($status_current) == FALSE
-						&& ($status_current == CORESTATUS_VALUE_UNLOAD_FILA_L
-								|| $status_current == CORESTATUS_VALUE_UNLOAD_FILA_R)) {
-					if (!$this->_deal_with_unloading_wait_time($abb_cartridge)) {
-						$this->_display_changecartridge_in_unload_filament($abb_cartridge);
+				if (CoreStatus_checkInIdle($status_current) == FALSE) {
+					if ($status_current == CORESTATUS_VALUE_UNLOAD_FILA_L
+								|| $status_current == CORESTATUS_VALUE_UNLOAD_FILA_R) {
+						if (!$this->_deal_with_unloading_wait_time($abb_cartridge)) {
+							$this->_display_changecartridge_in_unload_filament($abb_cartridge);
+							break;
+						}
+					}
+					else if ($status_current == CORESTATUS_VALUE_LOAD_FILA_L
+								|| $status_current == CORESTATUS_VALUE_LOAD_FILA_R) {
+						$this->_display_changecartridge_in_load_filament();
 						break;
 					}
 				}
