@@ -125,6 +125,13 @@ function Printer_printFromPrime($abb_extruder, $first_run = TRUE) {
 	return $ret_val;
 }
 
+function Printer_printFromCalibration() {
+	$CI = &get_instance();
+	$CI->load->helper('printlist');
+	
+	return Printer_printFromModel(ModelList_codeModelHash(PRINTLIST_MODEL_CALIBRATION));
+}
+
 // function Printer_printFromModel($id_model, $stop_printing = FALSE) {
 function Printer_printFromModel($id_model, $array_temper = array()) {
 	$gcode_path = NULL;

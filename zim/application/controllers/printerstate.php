@@ -407,17 +407,18 @@ class Printerstate extends MY_Controller {
 
 		// parse the main body
 		$template_data = array(
-				'reset_network'	=> t('reset_network'),
-				'printer_info'	=> t('printer_info'),
-				'back'			=> t('back'),
-				'set_hostname'	=> t('set_hostname'),
-				'set_preset'	=> t('set_preset'),
-				'strip_led_on'	=> ($status_strip == TRUE) ? $option_selected : NULL,
-				'head_led_on'	=> ($status_head == TRUE) ? $option_selected : NULL,
-				'strip_led'		=> t('strip_led'),
-				'head_led'		=> t('head_led'),
-				'led_on'		=> t('led_on'),
-				'led_off'		=> t('led_off'),
+				'reset_network'			=> t('reset_network'),
+				'printer_info'			=> t('printer_info'),
+				'back'					=> t('back'),
+				'set_hostname'			=> t('set_hostname'),
+				'set_preset'			=> t('set_preset'),
+				'strip_led_on'			=> ($status_strip == TRUE) ? $option_selected : NULL,
+				'head_led_on'			=> ($status_head == TRUE) ? $option_selected : NULL,
+				'strip_led'				=> t('strip_led'),
+				'head_led'				=> t('head_led'),
+				'led_on'				=> t('led_on'),
+				'led_off'				=> t('led_off'),
+				'nozzles_adjustments'	=> t('nozzles_adjustments'),
 		);
 		
 		$body_page = $this->parser->parse('template/printerstate/index', $template_data, TRUE);
@@ -1204,6 +1205,7 @@ class Printerstate extends MY_Controller {
 	
 	public function nozzles_adjustment()
 	{
+		//TODO add /printdetail/printcalibration as printing
 		$this->load->library('parser');
 		$this->lang->load('printerstate/nozzles', $this->config->item('language'));
 		$body_page = NULL;
@@ -1225,16 +1227,17 @@ class Printerstate extends MY_Controller {
 	
 	public function offset_setting()
 	{
+		//TODO use PrinterState_getOffset('X' / 'Y', $value) & PrinterState_setOffset(array('X'=>$value)) ERROR_OK
 		$this->load->library('parser');
 		$this->lang->load('printerstate/nozzles', $this->config->item('language'));
 		$body_page = NULL;
 		
-		$template_data = array( 'nozzles_title' => t('nozzles_title'),
-								'nozzles_intro' => t('nozzles_intro'),
-								'collapsible_1' => t('collapsible_1'),
-								'collapsible_2' => t('collapsible_2'),
-								'back'	=> t('back'),
-								'home'	=> t('home'));
+		$template_data = array( 'nozzles_title'	=> t('nozzles_title'),
+								'nozzles_intro'	=> t('nozzles_intro'),
+								'collapsible_1'	=> t('collapsible_1'),
+								'collapsible_2'	=> t('collapsible_2'),
+								'back'			=> t('back'),
+								'home'			=> t('home'));
 		$body_page = $this->parser->parse('template/printerstate/offset_setting', $template_data, TRUE);
 		if ($_SERVER['REQUEST_METHOD'] == "POST")
 		{

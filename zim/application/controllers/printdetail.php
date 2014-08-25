@@ -16,6 +16,24 @@ class Printdetail extends MY_Controller {
 		return;
 	}
 	
+	public function printcalibration() {
+		$mid = NULL;
+		$cr = 0;
+		
+		// check model id, and then send it to print command
+		$this->load->helper('printer');
+		
+		$cr = Printer_printFromCalibration();
+		if ($cr != ERROR_OK) {
+			$this->output->set_header('Location: /printmodel/listmodel');
+			return;
+		}
+		
+		$this->output->set_header('Location: /printdetail/status?id=calibration');
+		
+		return;
+	}
+	
 	public function printprime() {
 		$abb_cartridge = NULL;
 		$first_run = FALSE;
@@ -160,6 +178,7 @@ class Printdetail extends MY_Controller {
 		$data_status = array();
 		$temper_status = array();
 		$print_slice = FALSE;
+		$print_calibration = FALSE;
 		
 		$this->load->library('parser');
 		$this->lang->load('printdetail', $this->config->item('language'));
@@ -177,6 +196,10 @@ class Printdetail extends MY_Controller {
 		
 		if ($id == 'slice') {
 			$print_slice = TRUE;
+		}
+		else if ($id == 'calibration') {
+			$print_calibration = TRUE;
+			$callback = 'calibration';
 		}
 		
 		// parse the main body
@@ -206,6 +229,9 @@ class Printdetail extends MY_Controller {
 		
 		if ($print_slice == TRUE) {
 			$template_data['restart_url'] = '/printdetail/printslice';
+		}
+		else if ($print_calibration == TRUE) {
+			$template_data['restart_url'] = '/printdetail/printcalibration';
 		} else if ($abb_cartridge) {
 			$template_data['finish_info']	= t('Restart?');
 // 			$template_data['return_url']	= '/printmodel/detail?id=' . $callback;
@@ -217,6 +243,10 @@ class Printdetail extends MY_Controller {
 		if ($callback) {
 			if ($callback == 'slice') {
 				$template_data['return_url']	= '/sliceupload/slice?callback';
+			}
+			else if ($callback == 'calibration') {
+				$template_data['return_url']	= '/printerstate/offset_setting';
+				$template_data['return_button']	= t('button_set_offset');
 			}
 			else {
 				$template_data['return_url']	= '/printmodel/detail?id=' . $callback;

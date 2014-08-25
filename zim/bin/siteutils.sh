@@ -32,6 +32,16 @@ restart_arcontrol() {
 	/etc/init.d/arcontrol stop
 	/etc/init.d/arcontrol start
 	arcontrol_cli M1400
+	
+	return $?
+}
+
+change_profile() {
+	mount /fab -o remount,rw,noatime
+	echo $1 > /fab/profile.txt
+	mount /fab -o remount,ro,noatime
+	
+	return $?
 }
 
 unload_filament() {
@@ -121,6 +131,10 @@ case "$1" in
 		
 	restart_arcontrol)
 		restart_arcontrol
+		;;
+		
+	profile)
+		change_profile $2
 		;;
 		
 	unload)

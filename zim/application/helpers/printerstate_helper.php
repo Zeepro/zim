@@ -71,6 +71,11 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_SET_CARTRIDGER',	' M1610\ ');
 	define('PRINTERSTATE_SET_CARTRIDGEL',	' M1611\ ');
 	define('PRINTERSTATE_RAISE_PLATFORM',	' M1905');
+	define('PRINTERSTATE_GET_OFFSET_X',		' M1661');
+	define('PRINTERSTATE_GET_OFFSET_Y',		' M1662');
+	define('PRINTERSTATE_SET_OFFSET',		' M1660');
+	define('PRINTERSTATE_OFFSET_X_LABEL',	'\ X');
+	define('PRINTERSTATE_OFFSET_Y_LABEL',	'\ Y');
 	
 // 	define('PRINTERSTATE_TEMP_PRINT_FILENAME',	'/tmp/printer_percentage'); // fix the name on SD card
 	define('PRINTERSTATE_FILE_PRINTLOG',	'/tmp/printlog.log');
@@ -1377,6 +1382,11 @@ function PrinterState_checkStatusAsArray() {
 	
 	if (CoreStatus_checkInUSB()) {
 		$data_json[PRINTERSTATE_TITLE_STATUS] = CORESTATUS_VALUE_USB;
+		
+		return $data_json;
+	}
+	else if (CoreStatus_checkInConnection()) {
+		$data_json[PRINTERSTATE_TITLE_STATUS] = CORESTATUS_VALUE_WAIT_CONNECT;
 		
 		return $data_json;
 	}
@@ -2737,8 +2747,6 @@ function PrinterState_getRFIDPower(&$value) {
 		}
 	}
 	
-	PrinterLog_logDebug('Turn off rfid', __FILE__, __LINE__);
-	
 	return ERROR_OK;
 }
 
@@ -2794,6 +2802,96 @@ function PrinterState_raisePlatform() {
 	if ($ret_val != ERROR_NORMAL_RC_OK) {
 		PrinterLog_logError('raise platform error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
+	}
+	
+	return ERROR_OK;
+}
+
+function PrinterState_getOffset($axis, &$value) {
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$command = $arcontrol_fullpath;
+	$ret_val = 0;
+	$output = array();
+	$last_output = '';
+	
+	switch ($axis) {
+		case 'X':
+			$command .= PRINTERSTATE_GET_OFFSET_X;
+			break;
+			
+		case 'Y':
+			$command .= PRINTERSTATE_GET_OFFSET_Y;
+			break;
+			
+		default:
+			return ERROR_WRONG_PRM;
+			break;
+	}
+	
+	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output)) {
+		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	PrinterLog_logArduino($command, $output);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		PrinterLog_logError('get offset command error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	else {
+		$value = $output[0];
+		if ($value > 100 || $value < -100) {
+			PrinterLog_logError('get offset value out of region', __FILE__, __LINE__);
+			return ERROR_INTERNAL;
+		}
+	}
+	
+	return ERROR_OK;
+}
+
+function PrinterState_setOffset($array_data = array()) {
+	//TODO finish me
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$command = $arcontrol_fullpath . PRINTERSTATE_SET_OFFSET;
+	$ret_val = 0;
+	$output = array();
+	$last_output = '';
+	
+	foreach ($array_data as $axis => $value) {
+		if ($value < -100 || $value > 100) {
+			return ERROR_WRONG_PRM;
+		}
+		
+		switch ($axis) {
+			case 'X':
+				$command .= PRINTERSTATE_OFFSET_X_LABEL . $value;
+				break;
+				
+			case 'Y':
+				$command .= PRINTERSTATE_OFFSET_Y_LABEL . $value;
+				break;
+				
+			default:
+				return ERROR_WRONG_PRM;
+				break; // never reach here
+		}
+	}
+	
+	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output)) {
+		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	PrinterLog_logArduino($command, $output);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		PrinterLog_logError('set offset command error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	else if (count($output) && FALSE !== strstr($output[0], 'Error')) {
+		PrinterLog_logError('set offset command message error', __FILE__, __LINE__);
+		return ERROR_WRONG_PRM;
 	}
 	
 	return ERROR_OK;
