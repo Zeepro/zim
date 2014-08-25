@@ -12,7 +12,7 @@ $lang['head_title']
 $lang['platform_title']
 	= 'Platform';
 $lang['filament_title']
-	= 'Filament';
+	= 'Cartridges & filament';
 $lang['manage_left']
 	= 'Left	cartridge';
 $lang['manage_right']

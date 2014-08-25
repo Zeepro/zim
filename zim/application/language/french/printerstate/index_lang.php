@@ -14,7 +14,7 @@ $lang['change_right']
 $lang['printer_info']
 	= 'Informations';
 $lang['set_hostname']
-	= "Changer le nom d'hôte";
+	= "Changer le lien d'accès(nom d'hôte)";
 $lang['strip_led']
 	= 'Eclairage du plateau';
 $lang['head_led']

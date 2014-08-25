@@ -10,7 +10,7 @@
 			<form action="/connection/wifinotvisiblessid" method="post"
 				accept-charset="utf-8">
 				<input type="text" name="ssid" id="ssid" value=""  data-clear-btn="true"/>
-				{error}
+				<div class="zim-error">{error}</div>
 				<div>
 					<input type="submit" value="{submit}" />
 				</div>

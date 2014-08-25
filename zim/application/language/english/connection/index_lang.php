@@ -1,16 +1,16 @@
 <?php
 $lang['ZeePro Personal Printer 21 - Connection configuration'] =
-        "Zim - Connection configuration";
+        "zim - Connection configuration";
 $lang['Connection configuration'] =
-        "Welcome to your Zim configuration!";
+        "Welcome to your zim configuration!";
 $lang['Welcome...'] =
-        "Choose your printer connection:";
+        "Choose how to connect to zim:";
 $lang['Option 1'] =
-        "WiFi network connected to the Internet";
+		"With your WiFi network";
 $lang['Option 2'] =
-        "Wired network connection";
+        "With a wired network connection";
 $lang['Option 3'] =
-        "WiFi Peer to Peer";
+        "Directly with zim as a WiFi access point (peer-to-peer)";
 $lang['set_hostname'] =
 		'Set hostname';
 ?>

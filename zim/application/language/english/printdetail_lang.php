@@ -12,6 +12,8 @@ $lang['Control your printing']
 	= 'Control your printing';
 $lang['Printing details']
 	= 'Printing details';
+$lang['cancel_confirm']
+	= "Do you really want to stop the printing ?";
 $lang['video_error']
 	= 'We\'re sorry, but your device is not compatible with HLS video streaming.';
 

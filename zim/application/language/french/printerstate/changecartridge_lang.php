@@ -7,9 +7,9 @@ $lang['back']
 $lang['ZeePro Personal Printer 21 - Change cartridge']
 	= 'Zim - Changement de cartouches';
 $lang['Left cartridge change']
-	= 'Changement de la cartouche gauche';
+	= 'Cartouche gauche';
 $lang['Right cartridge change']
-	= 'Changement de la cartouche droite';
+	= 'Cartouche droite';
 $lang['Unload the filament']
 	= 'Rembobiner le filament';
 $lang['Waiting for getting information...']
@@ -41,9 +41,9 @@ $lang['No model']
 $lang['Error']
 	= 'Erreur';
 $lang['Remove the cartridge above']
-	= 'Retirer la cartouche dessus';
+	= 'Retirez la cartouche';
 $lang['Insert the cartridge above']
-	= 'Charger la cartouche';
+	= 'Insérez la cartouche';
 $lang['prime_button']
 	= 'Amorcer le filament';
 $lang['color_label']

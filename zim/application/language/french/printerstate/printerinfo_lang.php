@@ -6,13 +6,13 @@ $lang['back']
 $lang['printerstate_printerinfo_pagetitle']
 	= 'Zim - Information';
 $lang['version_title']
-	= 'Version d\'image';
+	= 'Version du logiciel';
 $lang['next_version_title']
-	= 'Version d\'image (Après redémarrage)';
+	= 'Version du logiciel (après redémarrage)';
 $lang['type_title']
 	= 'Type';
 $lang['serial_title']
-	= 'Numéro de série';
+	= 'Numéro de série (adresse MAC)';
 $lang['extruder_title']
 	= 'Nombre des extrudeurs';
 $lang['marlin_title']

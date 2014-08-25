@@ -1,17 +1,17 @@
 <?php
 
 $lang['back']
-	= 'retour';
+	= 'Retour';
 
 // wifip2p()
 $lang['ZeePro Personal Printer 21 - Connection setting']
 	= 'Zim - Configuration de connexion';
 $lang['Personalize the printer\'s network']
-	= 'Personnalisez le réseau de l\'imprimante';
+	= 'Configurez le réseau de votre zim';
 $lang['Write your network\'s name']
-	= 'Saisissez le nom de votre réseau';
+	= 'Donnez un nom à votre réseau';
 $lang['Write your password']
-	= 'Saisissez votre mot de passe';
+	= 'Choisissez un mot de passe';
 $lang['OK']
 	= 'Valider';
 

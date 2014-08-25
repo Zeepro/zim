@@ -48,6 +48,11 @@
 		top: -17px;
 		z-index: 5;
 	}
+	.zim-error
+	{
+		color:red;
+		font-weight: bold;
+	}
 </style>
 <script type="text/javascript">
 	$(document).on("pageinit", function() {

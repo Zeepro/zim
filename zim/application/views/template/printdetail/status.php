@@ -5,6 +5,28 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container" style="text-align: center;">
+			<div class="ui-grid-a">
+				<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;">
+					<label for="slider"><h2>{strip_led}</h2></label>
+				</div></div>
+				<div class="ui-block-b"><div class="ui-bar ui-bar-f" style="height:3em;">
+					<select name="strip_led" id="strip_led" data-role="slider" data-track-theme="a" data-theme="a">
+						<option value="off">{led_off}</option>
+						<option value="on" {strip_led_on}>{led_on}</option>
+					</select>
+				</div></div>
+				<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;">
+					<label for="slider"><h2>{head_led}</h2></label>
+				</div></div>
+				<div class="ui-block-b">
+					<div class="ui-bar ui-bar-f" style="height:3em;">
+						<select name="head_led" id="head_led" data-role="slider" data-track-theme="a" data-theme="a">
+							<option value="off">{led_off}</option>
+							<option value="on" {head_led_on}>{led_on}</option>
+						</select>
+					</div>
+				</div>
+			</div>
 			<div data-role="collapsible" data-collapsed="false" style="align: center;">
 				<h4>{title}</h4>
 				<script type="text/javascript" src="/assets/jwplayer/jwplayer.js"></script>
@@ -55,7 +77,50 @@ var var_ajax_lock = false;
 var var_finish = false;
 
 $(document).ready(checkPrintStatus());
+/*
+$("#strip_led").change(function()
+{
+	var flag = true;
 
+	setTimeout(function()
+	{
+		if (var_ajax_lock == false)
+		{
+			var var_state = $("#strip_led").val().toString();
+			var_ajax = $.ajax(
+			{
+				url: "/rest/set",
+				cache: false,
+				data:
+				{
+					p: "stripled",
+					v: var_state,
+				},
+				type: "GET",
+			})
+			.fail(function()
+			{
+		 		alert("failed");
+	 		});
+		}
+	}, 1000);
+});
+
+$("#head_led").change(function()
+{
+
+	var var_state = $("#head_led").val().toString();
+	var_ajax = $.ajax({
+		url: "/rest/set",
+		cache: false,
+		data: {
+			p: "headlight",
+			v: var_state,
+			},
+		type: "GET",
+	});
+});
+*/
 function again()
 {
 	$("#overlay").addClass("gray-overlay");
@@ -138,21 +203,24 @@ function finishLoop() {
 	return;
 }
 
-function stopPrint() {
-	if (var_finish == true) {
-		return;
+function stopPrint()
+{
+	var cancel = confirm("{cancel_confirm}");
+
+	if (cancel == true)
+	{
+		if (var_finish == true)
+			return;
+		finishLoop();
+		setTimeout(redirect_cancel, 1000);
+
+		function redirect_cancel()
+		{
+ 			//window.location.href="/printdetail/cancel?_=" + Math.round(+new Date / 1e3);
+			window.location.href="/printdetail/cancel";
+			return;
+		}
 	}
-	
-	finishLoop();
-	setTimeout(redirect_cancel, 1000);
-
-	function redirect_cancel() {
-// 		window.location.href="/printdetail/cancel?_=" + Math.round(+new Date / 1e3);
-		window.location.href="/printdetail/cancel";
-
-		return;
-	}
-
 	return;
 }
 

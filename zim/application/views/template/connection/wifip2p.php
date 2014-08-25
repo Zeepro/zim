@@ -12,7 +12,7 @@
 				<input type="text" name="ssid" id="ssid" value=""  data-clear-btn="true"/>
 				<p>{pwd_title}</p>
 				<input type="password" name="pwd" id="pwd" value=""  data-clear-btn="true" autocomplete="off"/>
-				{error}
+				<div class="zim-error">{error}</div>
 				<div>
 					<input type="submit" value="{ok}" />
 				</div>

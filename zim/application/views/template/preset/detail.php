@@ -621,7 +621,7 @@
 			</div>
 			<div id="submit_container" style="{hide_submit}"><input type="submit" value="{submit_button}" data-ajax="false"></div>
 			</form>
-			<div>{error}</div>
+			<div class="zim-error">{error}</div>
 		</div>
 	</div>
 </div>

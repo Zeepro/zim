@@ -2,14 +2,14 @@
 $lang['Home']
 	= 'Home';
 $lang['Quick print']
-	= 'Quick print';
+	= 'Demo models';
 $lang['Configuration']
 	= 'Configuration';
 $lang['ZeePro Personal Printer 21 - Home']
 	= 'Zim - Home';
 $lang['manage']
-	= 'Printer Management';
+	= 'zim management';
 $lang['upload']
-	= 'File print';
+	= 'Print your models';
 $lang['activate_printer']
-	= 'Activate the printer';
+	= 'Activate your zim';

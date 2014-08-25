@@ -163,6 +163,7 @@ class Printdetail extends MY_Controller {
 		
 		$this->load->library('parser');
 		$this->lang->load('printdetail', $this->config->item('language'));
+		$this->lang->load('printerstate/index', $this->config->item('language'));
 		
 		$this->load->helper('zimapi');
 		if (!ZimAPI_cameraOn(ZIMAPI_PRM_CAMERA_PRINTSTART)) {
@@ -183,6 +184,7 @@ class Printdetail extends MY_Controller {
 				'title'			=> t('Control your printing'),
 				'print_detail'	=> t('Printing details'),
 				'print_stop'	=> t('Cancel'),
+				'cancel_confirm'=> t('cancel_confirm'),
  				'wait_info'		=> t('Waiting for starting...'),
 				'finish_info'	=> t('Congratulation, your printing is complete!'),
 				'return_button'	=> t('Home'),
@@ -192,6 +194,13 @@ class Printdetail extends MY_Controller {
 				'var_prime'		=> 'false',
 				'again_button'	=> t('Print again'),
 				'video_url'		=> $this->config->item('video_url'),
+				'strip_led'		=> t('strip_led'),
+				'strip_led_on'	=> t('strip_led_on'),
+				'head_led'		=> t('head_led'),
+				'head_led_on'	=> t('head_lead_on'),
+				'led_on'		=> t('led_on'),
+				'led_off'		=> t('led_off')
+				
 				//'video_error'	=> t('video_error')
 		);
 		

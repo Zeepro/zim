@@ -188,8 +188,10 @@ class Connection extends MY_Controller {
 // 				$error = t('invalid data');
 				$this->output->set_header("Location:/connection/wifissid");
 			}
-			else {
-				$this->confirmation();
+			else
+			{
+				//$this->confirmation();
+				$this->output->set_header("Location:/printerstate/sethostname");
 			}
 		}
 		
@@ -240,8 +242,10 @@ class Connection extends MY_Controller {
 		if ($cr != ERROR_OK) {
 			$this->output->set_header("Location:/connection");
 		}
-		else {
+		else
+		{
 			$this->confirmation();
+			$this->output->set_header("Location:/printerstate/sethostname");
 		}
 		
 		return;
@@ -310,8 +314,10 @@ class Connection extends MY_Controller {
 			if ($cr != ERROR_OK) {
 				$this->output->set_header("Location:/connection");
 			}
-			else {
-				$this->confirmation();
+			else
+			{
+				//$this->confirmation();
+				$this->output->set_header("Location:/printerstate/sethostname");
 			}
 		}
 		
@@ -352,6 +358,7 @@ class Connection extends MY_Controller {
 					else {
 // 						$this->output->set_header("Location:/connection/confirmation");
 						$this->confirmation();
+						$this->output->set_header("Location:/printerstate/sethostname");
 						return; // end generating if successed
 					}
 				}

@@ -7,13 +7,13 @@ $lang['back']
 $lang['ZeePro Personal Printer 21 - Change cartridge']
 	= 'Zim - Change cartridge';
 $lang['Left cartridge change']
-	= 'Left cartridge change';
+	= 'Left cartridge';
 $lang['Right cartridge change']
-	= 'Right cartridge change';
+	= 'Right cartridge';
 $lang['Unload the filament']
 	= 'Unload the filament';
 $lang['Waiting for getting information...']
-	= 'Waiting for getting information...';
+	= 'Waiting for information...';
 $lang['Wait for unloading...']
 	= 'Wait for unloading...';
 $lang['Not enough filament']
@@ -21,7 +21,7 @@ $lang['Not enough filament']
 $lang['Load the filament']
 	= 'Load the filament';
 $lang['Your cartridge is loaded']
-	= 'Your cartridge is loaded';
+	= 'Your cartridge is inserted';
 $lang['Change the cartridge']
 	= 'Change the cartridge';
 $lang['Waiting for loading...']
@@ -41,9 +41,9 @@ $lang['No model']
 $lang['Error']
 	= 'Error';
 $lang['Remove the cartridge above']
-	= 'Remove the cartridge above';
+	= 'Remove the cartridge';
 $lang['Insert the cartridge above']
-	= 'Load the cartridge';
+	= 'Insert the cartridge';
 $lang['prime_button']
 	= 'Prime the filament';
 $lang['color_label']
@@ -51,11 +51,11 @@ $lang['color_label']
 $lang['material_label']
 	= 'Material';
 $lang['temper_label']
-	= 'Temperature';
+	= 'Temperature (°C)';
 $lang['length_label']
-	= 'Length';
+	= 'Length (meters)';
 $lang['write_button']
-	= 'Ok';
+	= 'OK';
 $lang['Home']
 	= 'Home';
 $lang['cancel_button']

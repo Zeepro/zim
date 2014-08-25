@@ -2,9 +2,11 @@
 $lang['thank you'] =
 		"Thank You!";
 $lang['confirmation text'] =
-		"Your printer will restart to apply its new parameters.</br>
+		"You zim network configuration has been updated</br>
 		</br>
-		Reconnect to your usual network to access your printer using the link:</br>
+		You can now access zim using the link:</br>
 		</br>
-		<a href=\"http://%s.local/\">http://%s.local/</a> or <a href=\"http://%s\">http://%s</a>";
+		<a href=\"http://%s.local/\">http://%s.local/</a> or <a href=\"http://%s\">http://%s</a><br />
+		<br />
+		If you selected \"Directly with zim as an access point\", connect to the access point you just set up before clicking on the link.";
 ?>
