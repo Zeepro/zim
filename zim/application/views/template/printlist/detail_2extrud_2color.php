@@ -44,10 +44,10 @@
 							</div>
 						</div>
 						<div class="ui-block-a">
-							<p>{state_f_l}</p>
+							<p id="state_left">{state_f_l}</p>
 						</div>
 						<div class="ui-block-b">
-							<p>{state_f_r}</p>
+							<p id="state_right">{state_f_r}</p>
 						</div>
 						<div class="ui-block-a" style="padding-left:0px">
 							<a href="/printerstate/changecartridge?v=l&f={need_filament_l}&id={model_id}" data-role="button" data-ajax="false" data-iconpos="none" class="ui-shadow ui-corner-all">{change_filament_l}</a>
@@ -95,5 +95,10 @@ $("input[type=submit]").on('click', function()
 if ("{state_f_l}" == "{error}" || "{state_f_r}" == "{error}")
 {
 	$("#slider-" + ("{state_f_l}" == "{error}" ? "1" : "2")).attr("disabled", "disabled");
+}
+
+if ("{state_f_l}" != "ok" || "{state_f_r}" != "ok")
+{
+	$("input[type=submit]").attr("disabled", "disabled");
 }
 </script>

@@ -77,4 +77,9 @@
 	{
 		$("#slider-2").attr("disabled", "disabled");
 	}
+
+	if ("{state_f_r}" != "ok")
+	{
+		$("input[type=submit]").attr("disabled", "disabled");
+	}
 </script>
