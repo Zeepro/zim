@@ -77,15 +77,48 @@ var var_ajax_lock = false;
 var var_finish = false;
 
 $(document).ready(checkPrintStatus());
-/*
-$("#strip_led").change(function()
-{
-	var flag = true;
 
+function again()
+{
+	$("#overlay").addClass("gray-overlay");
+	$(".ui-loader").css("display", "block");
+	window.location.href="{restart_url}";
+};
+
+$("#head_led").change(function()
+{
 	setTimeout(function()
 	{
 		if (var_ajax_lock == false)
 		{
+			var_ajax_lock = true;
+			var var_state = $("#head_led").val().toString();
+			var_ajax = $.ajax(
+			{
+				url: "/rest/set",
+				cache: false,
+				data:
+				{
+					p: "headlight",
+					v: var_state,
+				},
+				type: "GET",
+			})
+			.always(function()
+			{
+				var_ajax_lock = false;
+			});
+		}
+	}, 1000);
+});
+
+$("#strip_led").change(function()
+{
+	setTimeout(function()
+	{
+		if (var_ajax_lock == false)
+		{
+			var_ajax_lock = true;
 			var var_state = $("#strip_led").val().toString();
 			var_ajax = $.ajax(
 			{
@@ -98,35 +131,13 @@ $("#strip_led").change(function()
 				},
 				type: "GET",
 			})
-			.fail(function()
+			.always(function()
 			{
-		 		alert("failed");
-	 		});
+				var_ajax_lock = false;
+			});
 		}
 	}, 1000);
 });
-
-$("#head_led").change(function()
-{
-
-	var var_state = $("#head_led").val().toString();
-	var_ajax = $.ajax({
-		url: "/rest/set",
-		cache: false,
-		data: {
-			p: "headlight",
-			v: var_state,
-			},
-		type: "GET",
-	});
-});
-*/
-function again()
-{
-	$("#overlay").addClass("gray-overlay");
-	$(".ui-loader").css("display", "block");
-	window.location.href="{restart_url}";
-};
 
 function checkPrintStatus() {
 	refreshPrintStatus();
