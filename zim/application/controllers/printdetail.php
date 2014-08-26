@@ -231,11 +231,10 @@ class Printdetail extends MY_Controller {
 				'again_button'	=> t('Print again'),
 				'video_url'		=> $this->config->item('video_url'),
 				'strip_led'		=> t('strip_led'),
-				'strip_led_on'	=> t('strip_led_on'),
 				'head_led'		=> t('head_led'),
-				'head_led_on'	=> t('head_lead_on'),
 				'led_on'		=> t('led_on'),
 				'led_off'		=> t('led_off'),
+				'lighting'		=> t('lighting'),
 				'initial_strip'	=> ($status_strip == TRUE) ? $option_selected : NULL,
 				'initial_head'	=> ($status_head == TRUE) ? $option_selected : NULL,
 				//'video_error'	=> t('video_error')

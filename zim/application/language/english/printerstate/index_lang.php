@@ -17,6 +17,8 @@ $lang['set_hostname']
 	= 'Change access link (hostname)';
 $lang['strip_led']
 	= 'Platform lighting';
+$lang['lighting']
+	= 'Lighting';
 $lang['head_led']
 	= 'LED';
 $lang['led_on']

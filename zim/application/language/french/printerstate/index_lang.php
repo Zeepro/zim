@@ -16,13 +16,15 @@ $lang['printer_info']
 $lang['set_hostname']
 	= "Changer le lien d'accès(nom d'hôte)";
 $lang['strip_led']
-	= 'Eclairage du plateau';
+	= 'Éclairage du plateau';
 $lang['head_led']
 	= 'LED';
 $lang['led_on']
 	= 'Allumé';
 $lang['led_off']
 	= 'Éteint';
+$lang['lighting']
+	= 'Éclairage du plateau';
 $lang['set_preset']
 	= 'Présélections du slicer';
 $lang['nozzles_adjustments']

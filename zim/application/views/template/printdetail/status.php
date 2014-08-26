@@ -5,34 +5,38 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container" style="text-align: center;">
-			<div class="ui-grid-a">
-				<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;">
-					<label for="slider"><h2>{strip_led}</h2></label>
-				</div></div>
-				<div class="ui-block-b"><div class="ui-bar ui-bar-f" style="height:3em;">
-					<select name="strip_led" id="strip_led" data-role="slider" data-track-theme="a" data-theme="a">
-						<option value="off">{led_off}</option>
-						<option value="on" {strip_led_on}>{led_on}</option>
-					</select>
-				</div></div>
-				<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;">
-					<label for="slider"><h2>{head_led}</h2></label>
-				</div></div>
-				<div class="ui-block-b">
-					<div class="ui-bar ui-bar-f" style="height:3em;">
-						<select name="head_led" id="head_led" data-role="slider" data-track-theme="a" data-theme="a">
-							<option value="off">{led_off}</option>
-							<option value="on" {head_led_on}>{led_on}</option>
-						</select>
-					</div>
-				</div>
-			</div>
+			
 			<div data-role="collapsible" data-collapsed="false" style="align: center;">
 				<h4>{title}</h4>
 				<script type="text/javascript" src="/assets/jwplayer/jwplayer.js"></script>
 	 			<script type="text/javascript">jwplayer.key="Jh6aqwb1m2vKLCoBtS7BJxRWHnF/Qs3LMjnt13P9D6A=";</script>
 	 			<style type="text/css">div#myVideo_wrapper {margin: 0 auto;}</style>
 				<div id="myVideo">Loading the player...</div>
+			</div>
+			<div data-role="collapsible">
+				<h4>{lighting}</h4>
+				<div class="ui-grid-a">
+					<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;">
+						<label for="slider"><h2>{strip_led}</h2></label>
+					</div></div>
+					<div class="ui-block-b"><div class="ui-bar ui-bar-f" style="height:3em;">
+						<select name="strip_led" id="strip_led" data-role="slider" data-track-theme="a" data-theme="a">
+							<option value="off">{led_off}</option>
+							<option value="on" {initial_strip}>{led_on}</option>
+						</select>
+					</div></div>
+					<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;">
+						<label for="slider"><h2>{head_led}</h2></label>
+					</div></div>
+					<div class="ui-block-b">
+						<div class="ui-bar ui-bar-f" style="height:3em;">
+							<select name="head_led" id="head_led" data-role="slider" data-track-theme="a" data-theme="a">
+								<option value="off">{led_off}</option>
+								<option value="on" {initial_head}>{led_on}</option>
+							</select>
+						</div>
+					</div>
+				</div>
 			</div>
 			<div data-role="collapsible" data-collapsed="false" style="align: center;">
 				<h4>{print_detail}</h4>
