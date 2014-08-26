@@ -9,7 +9,7 @@
 			<h2>{nozzles_title}</h2>
 			<p>{nozzles_intro}</p>
 			<br />
-			<form action="" method="POST">
+			<form action="/printerstate/offset_setting" method="POST"  data-ajax="false">
 				<div id="col1" class="hideIcon">
 					<h3>{collapsible_1}</h3>
 					<div class="ui-grid-c" >
@@ -68,7 +68,7 @@
 						</div>
 					</div>
 				</div>
-				<input type="submit" value="Ok" data-ajax="false" />
+				<input type="submit" value="Ok" />
 			</form>
 		</div>
 		<script>
