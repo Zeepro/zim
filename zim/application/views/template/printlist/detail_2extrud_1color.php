@@ -75,6 +75,6 @@
 
 	if ("{state_f_r}" == "{error}")
 	{
-		$("#slider-2")).attr("disabled", "disabled");
+		$("#slider-2").attr("disabled", "disabled");
 	}
 </script>
