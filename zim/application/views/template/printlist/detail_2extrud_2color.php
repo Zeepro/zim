@@ -29,42 +29,45 @@
 				</div><br>
 				<p>{time}</p>
 			</div>
-<!-- 			<div data-role="collapsible" data-collapsed="false"> -->
-<!-- 				<h4>Gestion des températures</h4> -->
-<!-- 						<label>Température tête gauche</label> -->
-<!-- 						<label>Température tête droite</label> -->
-<!-- 			</div> -->
 			<div data-role="collapsible" data-collapsed="false" style="text-align: center;">
 				<h4>{title_current}</h4>
-				<div style="height:240px">
-					<div style="width: 50%; float: left; text-align: center;">
-						<div style="width: 75px; height: 75px; background-color: {state_c_l}; margin: 0 auto;">
-							<img src="/images/cartridge.png" style="width: 100%">
+				<div style="height:265px">
+					<div class="ui-grid-a">
+						<div class="ui-block-a">
+							<div style="width: 75px; height: 75px; background-color: {state_c_l}; margin: 0 auto;">
+								<img src="/images/cartridge.png" style="width: 100%">
+							</div>
 						</div>
-						<p>{state_f_l}</p>
-<!-- 					<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh" onclick="window.location.href='/printerstate/changecartridge?v=l&f={need_filament_l}&id={model_id}'">{change_filament_l}</button> -->
-						<a href="/printerstate/changecartridge?v=l&f={need_filament_l}&id={model_id}" data-role="button" data-ajax="false" data-icon="refresh" class="ui-shadow ui-corner-all">{change_filament_l}</a>
-					</div>
-					<div style="width: 50%; float: left; text-align: center;">
-						<div style="width: 75px; height: 75px; background-color: {state_c_r}; margin: 0 auto;">
-							<img src="/images/cartridge.png" style="width: 100%">
+						<div class="ui-block-b">
+							<div style="width: 75px; height: 75px; background-color: {state_c_r}; margin: 0 auto;">
+								<img src="/images/cartridge.png" style="width: 100%">
+							</div>
 						</div>
-						<p>{state_f_r}</p>
-<!-- 					<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh" onclick="window.location.href='/printerstate/changecartridge?v=l&f={need_filament_l}&id={model_id}'">{change_filament_l}</button> -->
-						<a href="/printerstate/changecartridge?v=r&f={need_filament_r}&id={model_id}" data-role="button" data-ajax="false" data-icon="refresh" class="ui-shadow ui-corner-all">{change_filament_r}</a>
+						<div class="ui-block-a">
+							<p>{state_f_l}</p>
+						</div>
+						<div class="ui-block-b">
+							<p>{state_f_r}</p>
+						</div>
+						<div class="ui-block-a" style="padding-left:0px">
+							<a href="/printerstate/changecartridge?v=l&f={need_filament_l}&id={model_id}" data-role="button" data-ajax="false" data-iconpos="none" class="ui-shadow ui-corner-all">{change_filament_l}</a>
+						</div>
+						<div class="ui-block-b">
+							<a href="/printerstate/changecartridge?v=r&f={need_filament_r}&id={model_id}" data-role="button" data-ajax="false" data-iconpos="none" class="ui-shadow ui-corner-all">{change_filament_r}</a>
+						</div>
 					</div>
 					<div>{temp_adjustments}</div>
-					<div style="width: 50%; float: left; text-align: center;">
-						<input type="range" name="l" id="slider-1" value="{temper_filament_l}" min="160" max="260">
-					</div>
-					<div style="width: 50%; float: left; text-align: center;">
-						<input type="range" name="r" id="slider-2" value="{temper_filament_r}" min="160" max="260">
+					<div class="ui-grid-a">
+						<div class="ui-block-a">
+							<input type="range" name="l" id="slider-1" value="{temper_filament_l}" min="160" max="260">
+						</div>
+						<div class="ui-block-b">
+							<input type="range" name="r" id="slider-2" value="{temper_filament_r}" min="160" max="260">
+						</div>
 					</div>
 				</div>
-	<!-- 				<a href="/print?id={model_id}" class="ui-btn ui-btn-inline ui-icon-action ui-btn-icon-left">{print_model}</a> -->
 			</div>
 			<div style="clear: both;">
-<!-- 				<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh" onclick="window.location.href='/printdetail/printmodel?id={model_id}'">{print_model}</button> -->
 				<input type="submit" value="{print_model}" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh" />
 			</div>
 			</form>

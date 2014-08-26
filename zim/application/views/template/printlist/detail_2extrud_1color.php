@@ -30,7 +30,7 @@
 <!-- 			</div> -->
 			<div data-role="collapsible" data-collapsed="false" style="text-align: center;">
 				<h4>{title_current}</h4>
-				<div style="height:240px">
+				<div style="height:250px">
 				<div style="width: 50%; float: left; text-align: center;">
 					<div style="width: 75px; height: 75px; background-color: {state_c_l}; margin: 0 auto;">
 						<img src="/images/cartridge.png" style="width: 100%">
