@@ -23,7 +23,7 @@ $lang['unknown']
 $lang['ok']
 	= 'ok';
 $lang['not enough']
-	= 'not enough';
+	= 'not enough filament';
 $lang['unloaded']
 	= 'unloaded';
 $lang['Filament']
