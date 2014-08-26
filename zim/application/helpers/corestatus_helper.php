@@ -382,7 +382,17 @@ function CoreStatus_checkCallNoBlockRESTInPrint() {
 			'/rest/suspend'		=> NULL,
 			'/rest/resume'		=> NULL,
 			'/rest/get'			=> array(
-					'p'	=> PRINTERSTATE_PRM_TEMPER,
+					'p'	=> array(
+							PRINTERSTATE_PRM_TEMPER,
+							PRINTERSTATE_PRM_STRIPLED,
+							PRINTERSTATE_PRM_HEADLED,
+					),
+			),
+			'/rest/set'			=> array(
+					'p'	=> array(
+							PRINTERSTATE_PRM_STRIPLED,
+							PRINTERSTATE_PRM_HEADLED,
+					),
 			),
 	));
 }
