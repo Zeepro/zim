@@ -70,6 +70,7 @@
 				</div>
 				<input type="submit" value="Ok" />
 			</form>
+			<div class="zim-error">{error}</div>
 		</div>
 		<script>
 		$("#col1").collapsible({collapsed: false, disabled: true, iconpos: "none"});

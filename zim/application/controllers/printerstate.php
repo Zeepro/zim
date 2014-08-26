@@ -869,11 +869,11 @@ class Printerstate extends MY_Controller {
 					$this->_display_changecartridge_in_load_filament();
 					break;
 				}
-				else if (!CoreStatus_checkInWaitTime(PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_LOAD)) {
-					// already passed the timeout of changement
-					$this->_display_changecartridge_error_loading();
-					break;
-				}
+// 				else if (!CoreStatus_checkInWaitTime(PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_LOAD)) {
+// 					// already passed the timeout of changement
+// 					$this->_display_changecartridge_error_loading();
+// 					break;
+// 				}
 				
 				if (PrinterState_getFilamentStatus($abb_cartridge)) {
 					// have filament
@@ -887,6 +887,12 @@ class Printerstate extends MY_Controller {
 				}
 				else {
 					// no filament
+					if (!CoreStatus_checkInWaitTime(PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_LOAD)) {
+						// already passed the timeout of changement
+						CoreStatus_setInIdle(); //TODO need test and error control here
+						$this->_display_changecartridge_error_loading();
+						break;
+					}
 					$this->_display_changecartridge_in_load_filament();
 				}
 				break;
@@ -1205,14 +1211,15 @@ class Printerstate extends MY_Controller {
 	
 	public function nozzles_adjustment()
 	{
-		//TODO add /printdetail/printcalibration as printing
 		$this->load->library('parser');
 		$this->lang->load('printerstate/nozzles', $this->config->item('language'));
 		$body_page = NULL;
-		$template_data = array( 'print_calibration'	=> t('print_calibration'),
-								'trim_offset'		=> t('trim_offset'),
-								'back'				=> t('back'),
-								'home'				=> t('home'));
+		$template_data = array(
+				'print_calibration'	=> t('print_calibration'),
+				'trim_offset'		=> t('trim_offset'),
+				'back'				=> t('back'),
+				'home'				=> t('home'),
+		);
 		$body_page = $this->parser->parse('template/printerstate/nozzles_adjustment', $template_data, TRUE);
 		$template_data = array(
 				'lang'			=> $this->config->item('language_abbr'),
@@ -1225,24 +1232,91 @@ class Printerstate extends MY_Controller {
 		return;
 	}
 	
-	public function offset_setting()
-	{
+	public function offset_setting() {
+		$template_data = array();
+		$body_page = NULL;
+		$error = '';
+		
 		//TODO use PrinterState_getOffset('X' / 'Y', $value) & PrinterState_setOffset(array('X'=>$value)) ERROR_OK
 		$this->load->library('parser');
 		$this->lang->load('printerstate/nozzles', $this->config->item('language'));
-		$body_page = NULL;
 		
-		$template_data = array( 'nozzles_title'	=> t('nozzles_title'),
-								'nozzles_intro'	=> t('nozzles_intro'),
-								'collapsible_1'	=> t('collapsible_1'),
-								'collapsible_2'	=> t('collapsible_2'),
-								'back'			=> t('back'),
-								'home'			=> t('home'));
-		$body_page = $this->parser->parse('template/printerstate/offset_setting', $template_data, TRUE);
-		if ($_SERVER['REQUEST_METHOD'] == "POST")
-		{
-			$body_page = $this->parser->parse('template/printerstate/offset_setting', $template_data, TRUE);
+		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+			$this->load->helper('printerstate');
+			$top_offset = $this->input->post('top_offset') * PRINTERSTATE_VALUE_FACTOR_NOZZLE_OFFSET;
+			$bot_offset = $this->input->post('bot_offset') * PRINTERSTATE_VALUE_FACTOR_NOZZLE_OFFSET;
+			$right_offset = $this->input->post('right_offset') * PRINTERSTATE_VALUE_FACTOR_NOZZLE_OFFSET;
+			$left_offset = $this->input->post('left_offset') * PRINTERSTATE_VALUE_FACTOR_NOZZLE_OFFSET;
+			
+			if ($top_offset * $bot_offset != 0 || $right_offset * $left_offset != 0) {
+				$error .= t('invalid_input') . '<br/>';
+			}
+			else {
+				$array_data = array();
+				
+				if ($top_offset != 0) {
+					$array_data['Y'] = $top_offset;
+				}
+				else if ($bot_offset != 0) {
+					$array_data['Y'] = -$bot_offset;
+				}
+				if ($right_offset != 0) {
+					$array_data['X'] = $right_offset;
+				}
+				else if ($left_offset != 0) {
+					$array_data['X'] = -$left_offset;
+				}
+				
+				if (count($array_data)) {
+					$cr = 0;
+					
+					foreach (array('X', 'Y') as $axis) {
+						if (array_key_exists($axis, $array_data)) {
+							$value = 0;
+							$cr = PrinterState_getOffset($axis, $value);
+							if ($cr != ERROR_OK) {
+								$error .= t('marlin_error') . '<br/>';
+								$this->load->helper('printerlog');
+								PrinterLog_logError('get ancient offset error, axis: ' . $axis
+										. ', cr: ' . $cr, __FILE__, __LINE__);
+								break;
+							}
+							$array_data[$axis] += $value; // add new offset on the ancient offset
+						}
+					}
+					if (count($error)) {
+						// we have no error for getting ancient offset, goto setting offset
+						$cr = PrinterState_setOffset($array_data);
+						if ($cr == ERROR_WRONG_PRM) {
+							$error .= t('value_zone_error') . '<br/>';
+							$this->load->helper('printerlog');
+							PrinterLog_logError('pass value zone for offset', __FILE__, __LINE__);
+						}
+						else if ($cr != ERROR_OK) {
+							$error .= t('marlin_error') . '<br/>';
+							$this->load->helper('printerlog');
+							PrinterLog_logError('set offset error, axis: ' . $axis
+									. ', cr: ' . $cr, __FILE__, __LINE__);
+						}
+						else {
+							$error = t('set_offset_ok');
+						}
+					}
+				}
+			}
 		}
+		
+		$template_data = array(
+				'nozzles_title'	=> t('nozzles_title'),
+				'nozzles_intro'	=> t('nozzles_intro'),
+				'collapsible_1'	=> t('collapsible_1'),
+				'collapsible_2'	=> t('collapsible_2'),
+				'back'			=> t('back'),
+				'home'			=> t('home'),
+				'error'			=> $error,
+		);
+		$body_page = $this->parser->parse('template/printerstate/offset_setting', $template_data, TRUE);
+		
 		$template_data = array(
 				'lang'			=> $this->config->item('language_abbr'),
 				'headers'		=> '<title>' . t('manage_index_pagetitle') . '</title>' . "\n"

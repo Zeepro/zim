@@ -179,15 +179,28 @@ class Printdetail extends MY_Controller {
 		$temper_status = array();
 		$print_slice = FALSE;
 		$print_calibration = FALSE;
+		$status_strip = FALSE;
+		$status_head = FALSE;
+		$ret_val = 0;
+		$option_selected = 'selected="selected"';
 		
 		$this->load->library('parser');
 		$this->lang->load('printdetail', $this->config->item('language'));
 		$this->lang->load('printerstate/index', $this->config->item('language'));
 		
-		$this->load->helper('zimapi');
+		$this->load->helper(array('zimapi', 'printerstate'));
 		if (!ZimAPI_cameraOn(ZIMAPI_PRM_CAMERA_PRINTSTART)) {
 			$this->load->helper('printerlog');
 			PrinterLog_logError('can not set camera', __FILE__, __LINE__);
+		}
+		
+		$ret_val = PrinterState_getStripLedStatus($status_strip);
+		if ($ret_val != ERROR_OK) {
+			$status_strip = FALSE;
+		}
+		$ret_val = PrinterState_getTopLedStatus($status_head);
+		if ($ret_val != ERROR_OK) {
+			$status_head = FALSE;
 		}
 		
 		$callback = $this->input->get('cb');
@@ -222,8 +235,9 @@ class Printdetail extends MY_Controller {
 				'head_led'		=> t('head_led'),
 				'head_led_on'	=> t('head_lead_on'),
 				'led_on'		=> t('led_on'),
-				'led_off'		=> t('led_off')
-				
+				'led_off'		=> t('led_off'),
+				'initial_strip'	=> ($status_strip == TRUE) ? $option_selected : NULL,
+				'initial_head'	=> ($status_head == TRUE) ? $option_selected : NULL,
 				//'video_error'	=> t('video_error')
 		);
 		

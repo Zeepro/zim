@@ -145,13 +145,14 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_VALUE_OFFSET_TO_CAL_TIME',	10);
 	
 	define('PRINTERSTATE_VALUE_DEFAULT_EXTRUD',				5);
-	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD',		180);
+	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD',		90);
 	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD',		10);
-	define('PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_LOAD',		240);
+	define('PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_LOAD',		180);
 	define('PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_UNLOAD',	180);
 	define('PRINTERSTATE_VALUE_TIMEOUT_UNLOAD_HEAT',		600);
 	define('PRINTERSTATE_VALUE_ENDSTOP_OPEN',				'open');
 	define('PRINTERSTATE_VALUE_MAXTEMPER_BEFORE_UNLOAD',	50);
+	define('PRINTERSTATE_VALUE_FACTOR_NOZZLE_OFFSET',		10);
 	
 	define('PRINTERSTATE_PRM_EXTRUDER',			'extruder');
 	define('PRINTERSTATE_PRM_TEMPER',			'temp');
@@ -508,7 +509,7 @@ function PrinterState_setCartridgeCode($code_cartridge, $abb_cartridge, $power_o
 	}
 	$command .= $code_cartridge;
 	
-	if ($CFG->config['simulator'] && DectectOS_checkWindows()) {
+	if ($CFG->config['simulator']) {
 		// remove the symbol "\" for simulator
 		$command = str_replace('\ ', ' ', $command);
 	}
@@ -2852,8 +2853,8 @@ function PrinterState_getOffset($axis, &$value) {
 
 function PrinterState_setOffset($array_data = array()) {
 	//TODO finish me
-	global $CFG;
-	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$CI = &get_instance();
+	$arcontrol_fullpath = $CI->config->item('arcontrol_c');
 	$command = $arcontrol_fullpath . PRINTERSTATE_SET_OFFSET;
 	$ret_val = 0;
 	$output = array();
@@ -2879,6 +2880,9 @@ function PrinterState_setOffset($array_data = array()) {
 		}
 	}
 	
+	if ($CI->config->item('simulator')) {
+		$command = str_replace('\ ', ' ', $command);
+	}
 	exec($command, $output, $ret_val);
 	if (!PrinterState_filterOutput($output)) {
 		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
