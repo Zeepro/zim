@@ -13,3 +13,5 @@ $lang['upload']
 	= 'Imprimez vos modèles';
 $lang['activate_printer']
 	= "Activez votre zim";
+$lang['about']
+= 'Informations';

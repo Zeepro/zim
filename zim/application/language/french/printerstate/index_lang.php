@@ -11,8 +11,6 @@ $lang['change_left']
 	= 'Changer la cartouche gauche';
 $lang['change_right']
 	= 'Changer la cartouche droite';
-$lang['printer_info']
-	= 'Informations';
 $lang['set_hostname']
 	= "Changer le lien d'accès(nom d'hôte)";
 $lang['strip_led']

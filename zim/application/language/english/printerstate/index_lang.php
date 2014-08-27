@@ -11,8 +11,6 @@ $lang['change_left']
 	= 'Change left cartridge';
 $lang['change_right']
 	= 'Change right cartridge';
-$lang['printer_info']
-	= 'Info.';
 $lang['set_hostname']
 	= 'Change access link (hostname)';
 $lang['strip_led']

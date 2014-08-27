@@ -21,6 +21,9 @@
 				<li style="margin-top: 30px;"><a href="/printerstate">
 					<h2>{menu_printerstate}</h2></a>
 				</li>
+				<li><a href="/printerstate/printerinfo">
+					<h2>{about}</h2></a>
+				</li>
 			</ul>
 			<img src="/assets/images/shadow2.png" class="shadow" alt="shadow">
 		</div>
