@@ -21,7 +21,7 @@ if (!defined('PRINTER_FN_CHARGE')) {
 	define('PRINTER_PRM_TEMPER_R_F',	' -r ');	// right temperature for first layer (or all layer)
 	define('PRINTER_PRM_FILE',			' -f ');	// file path
 	
-	define('PRINTER_VALUE_DEFAULT_TEMPER',	240);
+	define('PRINTER_VALUE_DEFAULT_TEMPER',	230);
 }
 
 function Printer_preparePrint($need_prime = TRUE) {

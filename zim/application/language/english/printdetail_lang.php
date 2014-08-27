@@ -40,6 +40,8 @@ $lang['Yes']
 	= 'Yes';
 $lang['No']
 	= 'No';
+$lang['button_set_offset']
+	= 'Trim offset';
 
 //printdetail cancel()
 $lang['printdetail_cancel_pagetitle']

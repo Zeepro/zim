@@ -168,6 +168,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_PRM_ENDSTOP',			'endstop');
 	define('PRINTERSTATE_PRM_FILAMENT',			'filament');
 	define('PRINTERSTATE_PRM_SSO_NAME',			'name');
+	define('PRINTERSTATE_PRM_OFFSET',			'offsetadjustment');
 	
 	define('PRINTERSTATE_CHANGECART_UNLOAD_F',	'unload_filament');
 	define('PRINTERSTATE_CHANGECART_REMOVE_C',	'remove_cartridge');
@@ -2816,6 +2817,7 @@ function PrinterState_getOffset($axis, &$value) {
 	$output = array();
 	$last_output = '';
 	
+	$axis = strtoupper($axis);
 	switch ($axis) {
 		case 'X':
 			$command .= PRINTERSTATE_GET_OFFSET_X;
@@ -2865,6 +2867,7 @@ function PrinterState_setOffset($array_data = array()) {
 			return ERROR_WRONG_PRM;
 		}
 		
+		$axis = strtoupper($axis);
 		switch ($axis) {
 			case 'X':
 				$command .= PRINTERSTATE_OFFSET_X_LABEL . $value;

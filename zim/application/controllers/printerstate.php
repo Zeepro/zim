@@ -1223,7 +1223,7 @@ class Printerstate extends MY_Controller {
 		$body_page = $this->parser->parse('template/printerstate/nozzles_adjustment', $template_data, TRUE);
 		$template_data = array(
 				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('manage_index_pagetitle') . '</title>' . "\n"
+				'headers'		=> '<title>' . t('nozzle_offset_pagetitle') . '</title>' . "\n"
 				. '<link rel="stylesheet" href="/assets/jquery-mobile-fluid960.min.css">',
 				'contents'		=> $body_page,
 		);
@@ -1255,16 +1255,16 @@ class Printerstate extends MY_Controller {
 				$array_data = array();
 				
 				if ($top_offset != 0) {
-					$array_data['Y'] = $top_offset;
+					$array_data['Y'] = -$top_offset;
 				}
 				else if ($bot_offset != 0) {
-					$array_data['Y'] = -$bot_offset;
+					$array_data['Y'] = $bot_offset;
 				}
 				if ($right_offset != 0) {
-					$array_data['X'] = $right_offset;
+					$array_data['X'] = -$right_offset;
 				}
 				else if ($left_offset != 0) {
-					$array_data['X'] = -$left_offset;
+					$array_data['X'] = $left_offset;
 				}
 				
 				if (count($array_data)) {
@@ -1299,7 +1299,9 @@ class Printerstate extends MY_Controller {
 									. ', cr: ' . $cr, __FILE__, __LINE__);
 						}
 						else {
-							$error = t('set_offset_ok');
+							$this->output->set_header('Location: /printerstate/nozzles_adjustment');
+							
+							return;
 						}
 					}
 				}
@@ -1319,7 +1321,7 @@ class Printerstate extends MY_Controller {
 		
 		$template_data = array(
 				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('manage_index_pagetitle') . '</title>' . "\n"
+				'headers'		=> '<title>' . t('nozzle_offset_pagetitle') . '</title>' . "\n"
 				. '<link rel="stylesheet" href="/assets/jquery-mobile-fluid960.min.css">',
 				'contents'		=> $body_page,
 		);

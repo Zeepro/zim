@@ -713,6 +713,21 @@ class Rest extends MY_Controller {
 					}
 					break;
 					
+				case PRINTERSTATE_PRM_OFFSET:
+					$value = NULL;
+					$axis = $this->input->get('axis');
+					
+					if ($axis) {
+						$cr = PrinterState_getOffset($axis, $value);
+						if ($cr == ERROR_OK) {
+							$display = $value;
+						}
+					}
+					else {
+						$cr = ERROR_MISS_PRM;
+					}
+					break;
+					
 				case ZIMAPI_PRM_CAPTURE:
 					$path_capture = '';
 					$password = $this->input->get('password');
@@ -771,7 +786,6 @@ class Rest extends MY_Controller {
 	public function set() {
 		$parameter = NULL;
 		$cr = 0;
-		$api_prm = NULL;
 		
 		$this->load->helper(array('printerstate', 'zimapi', 'slicer'));
 		
@@ -781,6 +795,7 @@ class Rest extends MY_Controller {
 			switch($parameter) {
 				case PRINTERSTATE_PRM_EXTRUDER:
 					$api_prm = $this->input->get('v');
+					
 					if ($api_prm) {
 						// refuse getting data not existed for mono extruder
 						if ($api_prm == 'l' && PrinterState_getNbExtruder() == 1) {
@@ -797,6 +812,7 @@ class Rest extends MY_Controller {
 				case PRINTERSTATE_PRM_TEMPER:
 					// check which temperature we want
 					$val_temper = 0;
+					$api_prm = NULL;
 					
 					$val_temper = $this->input->get('v');
 					$has_e = $this->input->get('e');
@@ -866,6 +882,17 @@ class Rest extends MY_Controller {
 					$status_set = $this->input->get('v');
 					if ($status_set) {
 						$cr = PrinterState_setHeadLed($status_set);
+					}
+					else {
+						$cr = ERROR_MISS_PRM;
+					}
+					break;
+					
+				case PRINTERSTATE_PRM_OFFSET:
+					$axis = $this->input->get('axis');
+					$val_offset = $this->input->get('adjustment');
+					if ($axis && $val_offset !== FALSE) {
+						$cr = PrinterState_setOffset(array($axis => $val_offset));
 					}
 					else {
 						$cr = ERROR_MISS_PRM;

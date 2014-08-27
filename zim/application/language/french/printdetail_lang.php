@@ -40,6 +40,8 @@ $lang['Yes']
 	= 'Oui';
 $lang['No']
 	= 'Non';
+$lang['button_set_offset']
+	= 'Corriger le décalage';
 
 //printdetail cancel()
 $lang['printdetail_cancel_pagetitle']
