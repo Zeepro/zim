@@ -376,6 +376,9 @@ function CoreStatus_checkCallNoBlockRESTInConnection() {
 }
 
 function CoreStatus_checkCallNoBlockRESTInPrint() {
+	$CI = &get_instance();
+	$CI->load->helper(array('printerstate', 'zimapi'));
+	
 	return CoreStatus__checkCallURI(array(
 			'/rest/status'		=> NULL,
 			'/rest/cancel'		=> NULL,
@@ -386,12 +389,14 @@ function CoreStatus_checkCallNoBlockRESTInPrint() {
 							PRINTERSTATE_PRM_TEMPER,
 							PRINTERSTATE_PRM_STRIPLED,
 							PRINTERSTATE_PRM_HEADLED,
+							ZIMAPI_PRM_VIDEO_MODE,
 					),
 			),
 			'/rest/set'			=> array(
 					'p'	=> array(
 							PRINTERSTATE_PRM_STRIPLED,
 							PRINTERSTATE_PRM_HEADLED,
+							ZIMAPI_PRM_VIDEO_MODE,
 					),
 			),
 	));

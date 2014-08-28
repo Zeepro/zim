@@ -12,6 +12,56 @@ class Printdetail extends MY_Controller {
 		) );
 	}
 	
+	private function set_led() {
+		$ret_val = 0;
+		$status_strip = 0;
+		$status_head = 0;
+		
+		$this->load->library('session');
+		$this->load->helper('printerstate');
+
+		$ret_val = PrinterState_getStripLedStatus($status_strip);
+		if ($ret_val != ERROR_OK || $status_strip == FALSE) {
+			$status_strip = 0;
+		}
+		else {
+			$status_strip = 1;
+		}
+		$ret_val = PrinterState_getTopLedStatus($status_head);
+		if ($ret_val != ERROR_OK || $status_head == FALSE) {
+			$status_head = 0;
+		}
+		else {
+			$status_head = 1;
+		}
+		
+		$this->session->set_flashdata('led_strip', $status_strip);
+		$this->session->set_flashdata('led_head', $status_head);
+		
+		return;
+	}
+	
+	private function get_led(&$status_strip, &$status_head) {
+		$this->load->library(array('parser', 'session'));
+		
+		$status_strip = $this->session->flashdata('led_strip');
+		if ($status_strip === FALSE) {
+			$ret_val = PrinterState_getStripLedStatus($status_strip);
+			if ($ret_val != ERROR_OK) {
+				$status_strip = FALSE;
+			}
+		}
+		$status_head = $this->session->flashdata('led_head');
+		if ($status_head === FALSE) {
+			$ret_val = PrinterState_getTopLedStatus($status_head);
+			if ($ret_val != ERROR_OK) {
+				$status_head = FALSE;
+			}
+		}
+		
+		return;
+	}
+	
 	public function index() {
 		return;
 	}
@@ -23,6 +73,7 @@ class Printdetail extends MY_Controller {
 		// check model id, and then send it to print command
 		$this->load->helper('printer');
 		
+		$this->set_led();
 		$cr = Printer_printFromCalibration();
 		if ($cr != ERROR_OK) {
 			$this->output->set_header('Location: /printmodel/listmodel');
@@ -47,6 +98,7 @@ class Printdetail extends MY_Controller {
 		
 		if ($abb_cartridge) {
 			$first_run = ($first_run === FALSE) ? TRUE : FALSE;
+			$this->set_led();
 			$cr = Printer_printFromPrime($abb_cartridge, $first_run);
 // 			$cr = Printer_startPrintingStatusFromModel($mid);
 			if ($cr != ERROR_OK) {
@@ -79,6 +131,7 @@ class Printdetail extends MY_Controller {
 // 		$callback = $this->input->get('cb');
 		
 		if ($mid) {
+			$this->set_led();
 			$cr = Printer_printFromModel($mid);
 // 			$cr = Printer_startPrintingStatusFromModel($mid);
 			if ($cr != ERROR_OK) {
@@ -116,6 +169,7 @@ class Printdetail extends MY_Controller {
 		$mid = $this->input->get('id');
 		
 		if ($mid) {
+			$this->set_led();
 			$cr = Printer_printFromModel($mid, $array_temper);
 			if ($cr != ERROR_OK) {
 				$this->output->set_header('Location: /printmodel/listmodel');
@@ -137,6 +191,7 @@ class Printdetail extends MY_Controller {
 		
 		$this->load->helper('printer');
 		
+		$this->set_led();
 		$cr = Printer_printFromSlice();
 		if ($cr != ERROR_OK) {
 			$this->output->set_header('Location: /sliceupload/slice?callback');
@@ -159,6 +214,7 @@ class Printdetail extends MY_Controller {
 		
 		$this->load->helper('printer');
 		
+		$this->set_led();
 		$cr = Printer_printFromSlice($array_temper);
 		if ($cr != ERROR_OK) {
 			$this->output->set_header('Location: /sliceupload/slice?callback');
@@ -194,14 +250,8 @@ class Printdetail extends MY_Controller {
 			PrinterLog_logError('can not set camera', __FILE__, __LINE__);
 		}
 		
-		$ret_val = PrinterState_getStripLedStatus($status_strip);
-		if ($ret_val != ERROR_OK) {
-			$status_strip = FALSE;
-		}
-		$ret_val = PrinterState_getTopLedStatus($status_head);
-		if ($ret_val != ERROR_OK) {
-			$status_head = FALSE;
-		}
+		//TODO improve passing the real value of LED later
+		$this->get_led($status_strip, $status_head);
 		
 		$callback = $this->input->get('cb');
 		$abb_cartridge = $this->input->get('v');
@@ -348,7 +398,6 @@ class Printdetail extends MY_Controller {
 	
 	public function cancel() {
 		$ret_val = NULL;
-		//TODO finish me for canceling
 		$this->load->helper('printer');
 		
 		$ret_val = Printer_stopPrint();
@@ -400,7 +449,7 @@ class Printdetail extends MY_Controller {
 	
 	public function recovery() {
 		$ret_val = NULL;
-		//TODO finish me for canceling
+		//TODO finish me for recovery
 		$this->load->helper('printer');
 		$this->load->library('parser');
 		$this->lang->load('printdetail', $this->config->item('language'));
@@ -429,7 +478,6 @@ class Printdetail extends MY_Controller {
 	}
 	
 	public function cancel_ajax() {
-		//TODO finish me for canceling
 		$template_data = array();
 		$ret_val = 0;
 // 		$data_status = array();
