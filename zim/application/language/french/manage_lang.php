@@ -5,8 +5,10 @@ $lang['back']
 
 $lang['manage_index_pagetitle']
 	= 'Zim - Gestion';
+$lang['platform_view_title']
+	= 'Platform view';
 $lang['reset_title']
-  = 'Remise à l\'origine';
+	= 'Remise à l\'origine';
 $lang['head_title']
 	= 'Tête';
 $lang['platform_title']
@@ -17,5 +19,9 @@ $lang['manage_left']
 	= 'Cartouche de gauche';
 $lang['manage_right']
 	= 'Cartouche de droite';
+$lang['bed_title']
+	= 'Remise à niveau du plateau';
 $lang['activate_printer']
 	= "Activez l'imprimante";
+$lang['video_error']
+	= 'Nous sommes désolés, mais votre terminal ne supporte pas le streaming vidéo HLS.';

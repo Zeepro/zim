@@ -1,4 +1,12 @@
 <div data-role="page" data-url="/manage">
+	<style>
+		.round-button
+		{
+			width: 40px !important;
+			height: 40px !important;
+			border-radius: 50% !important;
+		}
+	</style>
 	<div id="overlay"></div>
 	<header data-role="header" class="page-header">
 		<a href="javascript:history.back();" data-icon="back" data-ajax="false">{back}</a>
@@ -6,6 +14,37 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
+			<div data-role="collapsible">
+				<h4>{platform_view_title}</h4>
+				<div class="container_16">
+					<script type="text/javascript" src="/assets/jwplayer/jwplayer.js"></script>
+	 				<script type="text/javascript">jwplayer.key="Jh6aqwb1m2vKLCoBtS7BJxRWHnF/Qs3LMjnt13P9D6A=";</script>
+	 				<style type="text/css">div#myVideo_wrapper {margin: 0 auto;}</style>
+					<div id="myVideo">Loading the player...</div>
+					<div class="ui-grid-a">
+					<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;">
+						<label for="slider"><h2>{strip_led}</h2></label>
+					</div></div>
+					<div class="ui-block-b"><div class="ui-bar ui-bar-f" style="height:3em;">
+						<select name="strip_led" id="strip_led" data-role="slider" data-track-theme="a" data-theme="a">
+							<option value="off" id="strip_off">{led_off}</option>
+							<option value="on" id="strip_on" {strip_led_on}>{led_on}</option>
+						</select>
+					</div></div>
+					<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;">
+						<label for="slider"><h2>{head_led}</h2></label>
+					</div></div>
+					<div class="ui-block-b">
+						<div class="ui-bar ui-bar-f" style="height:3em;">
+							<select name="head_led" id="head_led" data-role="slider" data-track-theme="a" data-theme="a">
+								<option value="off" id="head_off">{led_off}</option>
+								<option value="on" id="head_on"{head_led_on}>{led_on}</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				</div>
+			</div>
 			<div data-role="collapsible" style="align: center;">
 				<h4>{reset}</h4>
 				<div class="container_16">
@@ -105,12 +144,92 @@
 					</li>
 				</ul>
 			</div>
+			<div data-role="collapsible" data-collapsed="false">
+				<h4>{bed_title}</h4>
+				<div class="container_16" style="height:450px">
+					<div style="width:400px;height:400px;background-color:silver;margin:0 auto;">
+						<a onclick="level('step2')" data-role="button" data-inline="true" class="round-button" style="left: 40px;top: 20px;">2</a>
+						<a onclick="level('step3')" data-role="button" data-inline="true" class="round-button" style="left: 200px;top: 20px;">3</a>
+						<a onclick="level('step1')" data-role="button" data-inline="true" class="round-button" style="left: -10px;top: 250px;">1</a>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
-</div>
 
 <script type="text/javascript">
+function load_jwplayer_video() {
+	var player = jwplayer("myVideo").setup({
+							file: "{video_url}",
+							width: "100%",
+							autostart: true,
+							fallback: false,
+							androidhls: true
+						});
+	player.onSetupError(function()
+	{
+		$("#myVideo").empty().append('<img src=/images/error.png" height="280" width="280" />' +
+									"<p>{video_error}</p>");
+	});
+}
+
+setTimeout(load_jwplayer_video, 7000);
 var var_ajax;
+var var_ajax_lock = false;
+
+$("#head_led").change(function()
+{
+	setTimeout(function()
+	{
+		if (var_ajax_lock == false)
+		{
+			var_ajax_lock = true;
+			var var_state = $("#head_led").val().toString();
+			var_ajax = $.ajax(
+			{
+				url: "/rest/set",
+				cache: false,
+				data:
+				{
+					p: "headlight",
+					v: var_state,
+				},
+				type: "GET",
+			})
+			.always(function()
+			{
+				var_ajax_lock = false;
+			});
+		}
+	}, 1000);
+});
+
+$("#strip_led").change(function()
+{
+	setTimeout(function()
+	{
+		if (var_ajax_lock == false)
+		{
+			var_ajax_lock = true;
+			var var_state = $("#strip_led").val().toString();
+			var_ajax = $.ajax(
+			{
+				url: "/rest/set",
+				cache: false,
+				data:
+				{
+					p: "stripled",
+					v: var_state,
+				},
+				type: "GET",
+			})
+			.always(function()
+			{
+				var_ajax_lock = false;
+			});
+		}
+	}, 1000);
+});
 
 function home(var_axis) {
 	var var_url;
@@ -186,4 +305,50 @@ function move(var_axis, var_value) {
 	return false;
 }
 
+function level(var_point) {
+	var var_url;
+	if (var_ajax_lock == true)
+	{
+		return;
+	}
+	else
+	{
+		var_ajax_lock = true;
+	}
+
+	var_point = typeof var_point !== 'undefined' ? var_point : 'error';
+	if (var_point == 'error')
+	{	
+		return false;
+	}
+	else
+	{
+		var_url = "/manage/level/" + var_point;
+	}
+	var_ajax = $.ajax({
+		url: var_url,
+		type: "GET",
+		cache: false,
+		beforeSend: function() {
+			$("#overlay").addClass("gray-overlay");
+			$(".ui-loader").css("display", "block");
+		},
+		complete: function() {
+			$("#overlay").removeClass("gray-overlay");
+			$(".ui-loader").css("display", "none");
+		},
+	})
+	.done(function(html) {
+	
+	})
+	.fail(function() {
+		
+	})
+	.always(function() {
+		var_ajax_lock = false;
+	});
+
+	return false;
+}
 </script>
+</div>
