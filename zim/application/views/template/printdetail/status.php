@@ -21,8 +21,8 @@
 					</div></div>
 					<div class="ui-block-b"><div class="ui-bar ui-bar-f" style="height:3em;">
 						<select name="strip_led" id="strip_led" data-role="slider" data-track-theme="a" data-theme="a">
-							<option value="off">{led_off}</option>
-							<option value="on" {initial_strip}>{led_on}</option>
+							<option value="off" id="strip_off">{led_off}</option>
+							<option value="on" id="strip_on" {initial_strip}>{led_on}</option>
 						</select>
 					</div></div>
 					<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;">
@@ -31,8 +31,8 @@
 					<div class="ui-block-b">
 						<div class="ui-bar ui-bar-f" style="height:3em;">
 							<select name="head_led" id="head_led" data-role="slider" data-track-theme="a" data-theme="a">
-								<option value="off">{led_off}</option>
-								<option value="on" {initial_head}>{led_on}</option>
+								<option value="off" id="head_off">{led_off}</option>
+								<option value="on" id="head_on" {initial_head}>{led_on}</option>
 							</select>
 						</div>
 					</div>
@@ -67,6 +67,7 @@ function load_jwplayer_video() {
 }
 
 setTimeout(load_jwplayer_video, 7000);
+
 </script>
 
 <script type="text/javascript">
@@ -79,6 +80,77 @@ var var_prime = {var_prime};
 // var var_finish = false;
 var var_ajax_lock = false;
 var var_finish = false;
+// var timeout_head;
+// var timeout_strip;
+
+// timeout_strip = setInterval(function()
+// {
+// 	if (var_ajax_lock == false)
+// 	{
+// 		var_ajax_lock = true;
+// 		var var_state = $("#head_led").val().toString();
+// 		var_ajax = $.ajax(
+// 		{
+// 			url: "/rest/get",
+// 			cache: false,
+// 			data:
+// 			{
+// 				p: "headlight",
+// 			},
+// 			type: "GET",
+// 		})
+// 		.done(function(led_status)
+// 		{
+// 			if (led_status == "on")
+// 			{
+// 				$("#strip_led option:nth-child(2)").attr("selected", "selected");
+// 				$("#strip_led").refresh();
+// 			}
+// 			clearInterval(timeout_strip);
+// 		})
+// 		.always(function()
+// 		{
+// 			console.log("realease");
+// 			var_ajax_lock = false;
+// 		});
+// 	}
+// }, 1000);
+
+// function get_head_led()
+// {
+// 	if (var_ajax_lock == false)
+// 	{
+// 		var_ajax_lock = true;
+// 		var var_state = $("#head_led").val().toString();
+// 		var_ajax = $.ajax(
+// 		{
+// 			url: "/rest/get",
+// 			cache: false,
+// 			data:
+// 			{
+// 				p: "headlight",
+// 			},
+// 			type: "GET",
+// 		})
+// 		.done(function(msg)
+// 		{
+// 			$("#head_led option:nth-child(2)").attr("selected", "selected");
+// 			$("#head_led").refresh();
+// 			console.log('head_done : ' + timeout_head);
+// 			clearInterval(timeout_head);
+// 		})
+// 		.always(function()
+// 		{
+// 			var_ajax_lock = false;
+// 		});
+// 	}
+// 	else
+// 	{
+// 		console.log("locked");
+// 	}
+// }
+
+// timeout_head = setInterval(get_head_led, 1000);
 
 $(document).ready(checkPrintStatus());
 
@@ -91,7 +163,9 @@ function again()
 
 $("#head_led").change(function()
 {
-	setTimeout(function()
+	var timeout;
+
+	timeout = setInterval(function()
 	{
 		if (var_ajax_lock == false)
 		{
@@ -108,6 +182,10 @@ $("#head_led").change(function()
 				},
 				type: "GET",
 			})
+			.done(function()
+			{
+				clearInterval(timeout);
+			})
 			.always(function()
 			{
 				var_ajax_lock = false;
@@ -118,7 +196,9 @@ $("#head_led").change(function()
 
 $("#strip_led").change(function()
 {
-	setTimeout(function()
+	var interval;
+
+	interval = setInterval(function()
 	{
 		if (var_ajax_lock == false)
 		{
@@ -135,6 +215,10 @@ $("#strip_led").change(function()
 				},
 				type: "GET",
 			})
+			.done(function()
+			{
+				clearInterval(interval);
+			})
 			.always(function()
 			{
 				var_ajax_lock = false;
@@ -142,7 +226,7 @@ $("#strip_led").change(function()
 		}
 	}, 1000);
 });
-
+	
 function checkPrintStatus() {
 	refreshPrintStatus();
 	var_refreshPrintStatus = setInterval(refreshPrintStatus, 5000);
