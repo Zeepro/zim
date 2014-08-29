@@ -142,7 +142,7 @@ class Manage extends MY_Controller {
 			case 'step3':
 				$array_cmd = array(
 				'X'	=> 124,
-				'Y'	=> 10,
+				'Y'	=> 150,
 				);
 				break;
 			default:
