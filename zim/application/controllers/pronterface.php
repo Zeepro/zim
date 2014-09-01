@@ -171,7 +171,7 @@ class Pronterface extends MY_Controller {
 		}
 		
 		foreach ($array_cmd as $axis => $value) {
-			$cr = PrinterState_move($axis, $value);
+			$cr = PrinterState_move($axis, $value, 2000);
 			if ($cr != ERROR_OK) {
 				$this->output->set_status_header(403);
 				return;

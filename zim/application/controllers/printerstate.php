@@ -440,16 +440,16 @@ class Printerstate extends MY_Controller {
 		$body_page = NULL;
 		$temp_info = array();
 		$array_info = array();
-		$sso_name = NULL;
+// 		$sso_name = NULL;
 		
 		$this->load->helper(array('printerstate', 'zimapi'));
 		$this->load->library('parser');
 		$this->lang->load('printerstate/printerinfo', $this->config->item('language'));
-		ZimAPI_getPrinterSSOName($sso_name);
+// 		ZimAPI_getPrinterSSOName($sso_name);
 		
 		$temp_info = PrinterState_getInfoAsArray();
-		$hostname = "no hostname";
-		ZimAPI_getHostname($hostname);
+// 		$hostname = "no hostname";
+// 		ZimAPI_getHostname($hostname);
 		$array_info = array(
 				array(
 						'title'	=> t('version_title'),
@@ -481,11 +481,14 @@ class Printerstate extends MY_Controller {
 				),
 				array(
 						'title' => t('sso_name'),
-						'value'	=> "<div style='text-align:center'>" . ($sso_name ? $sso_name : "") . "<a data-role='button' href='/activation/?returnUrl=printerstate/printerinfo'>{button_sso}</a></div>",
+						'value'	=> "<div style='text-align:center'>"
+								. (array_key_exists('PRINTERSTATE_TITLE_SSO_NAME', $temp_info) ? $temp_info[PRINTERSTATE_TITLE_SSO_NAME] : "")
+								. "<a data-role='button' href='/activation/?returnUrl=printerstate/printerinfo'>{button_sso}</a></div>",
 				),
 				array(
 						'title'	=> t('hostname'),
-						'value'	=> "<div style='text-align:center'>" . $hostname . "<a data-ajax=false data-role='button' href='/printerstate/sethostname'>{button_sso}</a></div>"
+						'value'	=> "<div style='text-align:center'>" . $temp_info[PRINTERSTATE_TITLE_HOSTNAME]
+								. "<a data-ajax=false data-role='button' href='/printerstate/sethostname'>{button_sso}</a></div>"
 				),
 		);
 		
@@ -494,7 +497,8 @@ class Printerstate extends MY_Controller {
 				'array_info'	=> $array_info,
 				'back'			=> t('back'),
 				'home'			=> t('Home'),
-				'button_sso'	=> ($sso_name == NULL) ? t('button_active_sso') : t('button_rename_sso'),
+				'button_sso'	=> (array_key_exists('PRINTERSTATE_TITLE_SSO_NAME', $temp_info)
+						? t('button_active_sso') : t('button_rename_sso')),
 				'button_fqdn'	=> t('button_rename_sso')
 		);
 		

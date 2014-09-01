@@ -112,6 +112,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_TITLE_NEED_L',		'need');
 	define('PRINTERSTATE_TITLE_VER_MARLIN',	'marlin');
 	define('PRINTERSTATE_TITLE_SSO_NAME',	'name');
+	define('PRINTERSTATE_TITLE_HOSTNAME',	'hostname');
 	define('PRINTERSTATE_TITLE_EXTEND_PRM',	'eXtended_parameters');
 	define('PRINTERSTATE_TITLE_EXT_TEMP_L',	'l_temperature');
 	define('PRINTERSTATE_TITLE_EXT_TEMP_R',	'r_temperature');
@@ -167,7 +168,6 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_PRM_MOTOR_OFF',		'motor');
 	define('PRINTERSTATE_PRM_ENDSTOP',			'endstop');
 	define('PRINTERSTATE_PRM_FILAMENT',			'filament');
-	define('PRINTERSTATE_PRM_SSO_NAME',			'name');
 	define('PRINTERSTATE_PRM_OFFSET',			'offsetadjustment');
 	
 	define('PRINTERSTATE_CHANGECART_UNLOAD_F',	'unload_filament');
@@ -2104,12 +2104,18 @@ function PrinterState_getInfoAsArray() {
 	$CI->load->helper('zimapi');
 	$version_marlin = NULL;
 	$name_sso = NULL;
+	$hostname = NULL;
 	$network_data = array();
 	$array_return= array();
-	$cr = PrinterState_getMarlinVersion($version_marlin);
+	$cr = 0;
 	
+	$cr = PrinterState_getMarlinVersion($version_marlin);
 	if ($cr != ERROR_OK) {
 		$version_marlin = 'N/A';
+	}
+	$cr = ZimAPI_getHostname($hostname);
+	if ($cr != ERROR_OK) {
+		$hostname = 'N/A';
 	}
 	
 	$cr = ZimAPI_getNetworkInfoAsArray($network_data);
@@ -2120,7 +2126,9 @@ function PrinterState_getInfoAsArray() {
 			PRINTERSTATE_TITLE_SERIAL		=> ZimAPI_getSerial(),
 			PRINTERSTATE_TITLE_NB_EXTRUD	=> PrinterState_getNbExtruder(),
 			PRINTERSTATE_TITLE_VER_MARLIN	=> $version_marlin,
-			ZIMAPI_TITLE_IP					=> ($cr == ERROR_OK) ? $network_data[ZIMAPI_TITLE_IP] : 'N/A'
+			PRINTERSTATE_TITLE_HOSTNAME		=> $hostname,
+			ZIMAPI_TITLE_IP					=> ($cr == ERROR_OK && !is_null($network_data[ZIMAPI_TITLE_IP]))
+					 ? $network_data[ZIMAPI_TITLE_IP] : 'N/A',
 	);
 
 	$cr = ZimAPI_getPrinterSSOName($name_sso);

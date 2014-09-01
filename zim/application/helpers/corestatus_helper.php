@@ -7,6 +7,7 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_FILENAME_WORK',		'Work.json');
 	define('CORESTATUS_FILENAME_INIT',		'Boot.json');
 	define('CORESTATUS_FILENAME_CONNECT',	'Connection.json');
+	define('CORESTATUS_FILENAME_REMOTEOFF',	'tromboning_off');
 	
 	define('CORESTATUS_TITLE_VERSION',		'Version');
 // 	define('CORESTATUS_TITLE_CMD',			'CommandLine');
@@ -45,6 +46,8 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_FILE_LEVEL_ERROR',	'_Level_Error.tmp');
 	define('CORESTATUS_FILE_LEVEL_NONE',	'_Level_None.tmp');
 	define('CORESTATUS_FILENAME_PAUSE',		'_Printer_inPause.tmp');
+	
+	define('CORESTATUS_GLOBAL_URL_RDV',		'zeepro.com');
 }
 
 function CoreStatus_initialFile() {
@@ -146,12 +149,32 @@ function CoreStatus_initialFile() {
 	return TRUE;
 }
 
-function CoreStatus_checkInIdle(&$status_current = '', &$array_status = array()) {
+function CoreStatus_checkTromboning() {
 	global $CFG;
-	$state_file = $CFG->config['conf'] . CORESTATUS_FILENAME_WORK;
+	$state_file = $CFG->config['conf'] . CORESTATUS_FILENAME_REMOTEOFF;
+	
+	if (!file_exists($state_file)) {
+		return FALSE;
+	}
+	
+	if ($_SERVER['REMOTE_ADDR'] == $_SERVER['SERVER_ADDR']
+	&& substr($_SERVER['HTTP_HOST'], -strlen(CORESTATUS_GLOBAL_URL_RDV)) === CORESTATUS_GLOBAL_URL_RDV) {
+		// SSL connection
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
+	
+	return FALSE;
+}
+
+function CoreStatus_checkInIdle(&$status_current = '', &$array_status = array()) {
+// 	global $CFG;
+	$CI = &get_instance();
+	$state_file = $CI->config->item('conf') . CORESTATUS_FILENAME_WORK;
 	$tmp_array = array();
 	
-	$CI = &get_instance();
 	$CI->load->helper('json');
 	
 	// read json file

@@ -45,8 +45,10 @@ class MY_Controller extends CI_Controller
 		parent::__construct();
 // 		$this->load->helper(array('corestatus', 'url'));
 		$this->load->helper('corestatus');
-
+		
+		// set proper error handler
 		set_error_handler(array($this, 'errorToSSO'));
+		
 		// initialisation status files
 		if (!CoreStatus_initialFile()) {
 			$this->load->helper('printerlog');
@@ -57,6 +59,19 @@ class MY_Controller extends CI_Controller
 			header($protocol . ' 500');
 			header('Content-type: text/plain; charset=UTF-8');
 			echo 'file initialisation error';
+			exit;
+		}
+		
+		// check tromboning autorisation
+		if (CoreStatus_checkTromboning()) {
+			$this->load->helper('printerlog');
+			PrinterLog_logMessage('detected and refused tromboning connection', __FILE__, __LINE__);
+			
+			// let request failed
+			$protocol = (isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0');
+			header($protocol . ' 500');
+			header('Content-type: text/plain; charset=UTF-8');
+			echo 'connection refused';
 			exit;
 		}
 		

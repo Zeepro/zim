@@ -760,6 +760,28 @@ class Rest extends MY_Controller {
 					if (ZimAPI_getPreset($display)) {
 						$cr = ERROR_OK;
 					}
+					else {
+						$cr = ERROR_INTERNAL;
+					}
+					break;
+					
+				case ZIMAPI_PRM_UPGRADE:
+					if (ZimAPI_getUpgradeMode($display)) {
+						$cr = ERROR_OK;
+					}
+					else {
+						$cr = ERROR_INTERNAL;
+					}
+					break;
+					
+				case ZIMAPI_PRM_PROXY:
+					if (ZimAPI_getTromboning()) {
+						$display = 'on';
+					}
+					else {
+						$display = 'off';
+					}
+					$cr = ERROR_OK;
 					break;
 					
 				default:
@@ -1000,7 +1022,7 @@ class Rest extends MY_Controller {
 					}
 					break;
 					
-				case PRINTERSTATE_PRM_SSO_NAME:
+				case ZIMAPI_PRM_SSO_NAME:
 					$name = $this->input->get('name');
 					
 					if ($name) {
@@ -1009,6 +1031,22 @@ class Rest extends MY_Controller {
 					else {
 						$cr = ERROR_MISS_PRM;
 					}
+					break;
+					
+				case ZIMAPI_PRM_UPGRADE:
+					$status_set = $this->input->get('v');
+					$profile = $this->input->get('profile');
+					
+					if ($status_set) {
+						$cr = ZimAPI_setUpgradeMode($status_set, $profile);
+					}
+					else {
+						$cr = ERROR_MISS_PRM;
+					}
+					break;
+					
+				case ZIMAPI_PRM_PROXY:
+					//TODO finish me
 					break;
 					
 				default:
