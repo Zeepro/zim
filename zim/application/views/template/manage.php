@@ -183,7 +183,6 @@ $(document).ready(function()
 {
 	$("table").css("height", $("table").css("width"));
 	$("#bed_container").css("height", $("table").css("width")+1);
-	console.log($("#bed_container").css("height"));
 });
 
 function load_jwplayer_video() {
