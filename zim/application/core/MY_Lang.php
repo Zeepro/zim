@@ -50,8 +50,10 @@ class MY_Lang extends CI_Lang {
 
         /* get the language abbreviation from uri */
         $uri_abbr = $URI->segment(1);
+
         /* adjust the uri string leading slash */
         $URI->uri_string = preg_replace("|^\/?|", '/', $URI->uri_string);
+
         if ($lang_hide) {
 
             if (isset($lang_uri_abbr[$uri_abbr])) {
@@ -59,7 +61,7 @@ class MY_Lang extends CI_Lang {
                 /* set the language_abbreviation cookie */
                 $IN->set_cookie('user_lang', $uri_abbr, $config['sess_expiration']);
             } else {
-            	
+
                 /* get the language_abbreviation from cookie */
                 $lang_abbr = $IN->cookie($config['cookie_prefix'] . 'user_lang');
             }
