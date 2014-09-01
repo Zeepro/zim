@@ -48,6 +48,7 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_FILENAME_CAMERA',	'Camera.json');
 	define('ZIMAPI_FILENAME_SOFTWARE',	'Software.json');
 	define('ZIMAPI_FILEPATH_CAPTURE',	'/var/www/tmp/capture.jpg');
+	define('ZIMAPI_FILEPATH_UPGRADE',	'/config/conf/profile.json');
 	define('ZIMAPI_PRM_CAMERA_PRINTSTART',
 			' -v quiet -r 25 -s 320x240 -f video4linux2 -i /dev/video0 -minrate 256k -maxrate 256k -bufsize 256k -map 0 -force_key_frames "expr:gte(t,n_forced*2)" -c:v libx264 -crf 35 -profile:v baseline -b:v 256k -pix_fmt yuv420p -flags -global_header -f hls -hls_wrap 20 -hls_list_size 10 /var/www/tmp/zim.m3u8');
 	define('ZIMAPI_PRM_CAMERA_STOP',	' stop ');
@@ -69,6 +70,11 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_PRM_VIDEO_MODE',	'video');
 	define('ZIMAPI_PRM_PRESET',		'slicerpreset');
 	define('ZIMAPI_PRM_PASSWD',		'password');
+	define('ZIMAPI_PRM_SSO_NAME',	'name');
+	define('ZIMAPI_PRM_UPGRADE',	'upgrade');
+	define('ZIMAPI_PRM_PROXY',		'tromboning');
+	define('ZIMAPI_PRM_SSH',		'remotecontrol');
+	define('ZIMAPI_PRM_STATS',		'stats');
 	
 	define('ZIMAPI_FILE_PRESET_JSON',	'preset.json');
 	define('ZIMAPI_FILE_PRESET_INI',	'config.ini');
@@ -344,7 +350,7 @@ function ZimAPI_setsWifi($nameWifi, $passWifi = '') {
 // 				} while (($ret_val != ERROR_NORMAL_RC_OK)
 // 						&& ($retry_once == TRUE) && ($retry_once = FALSE));
 				// we can not get return value because of '&'
-				exec(ZIMAPI_CMD_RESTART_WEB);
+			//	exec(ZIMAPI_CMD_RESTART_WEB);
 			}
 		} catch (Exception $e) {
 			return ERROR_INTERNAL;
@@ -403,7 +409,7 @@ function ZimAPI_setcWifi($nameWifi, $passWifi = '') {
 // 				} while (($ret_val != ERROR_NORMAL_RC_OK)
 // 						&& ($retry_once == TRUE) && ($retry_once = FALSE));
 				// we can not get return value because of '&'
-				exec(ZIMAPI_CMD_RESTART_WEB);
+			//	exec(ZIMAPI_CMD_RESTART_WEB);
 			}
 		} catch (Exception $e) {
 			return ERROR_INTERNAL;
@@ -452,7 +458,7 @@ function ZimAPI_setcEth($ip = '', $mask = '', $gateWay = '') {
 			return ERROR_INTERNAL;
 		}
 		else {
-			exec(ZIMAPI_CMD_RESTART_WEB);
+		//	exec(ZIMAPI_CMD_RESTART_WEB);
 		}
 	}
 	
@@ -1163,6 +1169,143 @@ function ZimAPI_checkUSB() {
 	}
 	
 	return TRUE; // never reach here
+}
+
+function ZimAPI_getUpgradeMode(&$mode, &$profile = NULL) {
+	$tmp_array = array();
+	$json_file = NULL;
+	$CI = &get_instance();
+	
+	if (DectectOS_checkWindows()) {
+		$json_file = $CI->config->item('conf') . 'profile.json';
+	}
+	else {
+		$json_file = ZIMAPI_FILEPATH_UPGRADE;
+	}
+	
+	$CI->load->helper('json');
+	if (file_exists($json_file)) {
+		try {
+			$tmp_array = json_read($json_file, TRUE);
+			if ($tmp_array['error']) {
+				throw new Exception('read json error');
+			}
+		} catch (Exception $e) {
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('read upgrade json error', __FILE__, __LINE__);
+			return FALSE;
+		}
+		$mode = $tmp_array['json']['mode'];
+		if (array_key_exists('profile', $tmp_array['json'])) {
+			$profile = $tmp_array['json']['profile'];
+		}
+	}
+	else {
+		$mode = 'on';
+	}
+	
+	return TRUE;
+}
+
+function ZimAPI_setUpgradeMode($mode, $profile = NULL) {
+	$json_data = array();
+	$json_file = NULL;
+	
+	$mode = strtolower($mode);
+	
+	switch ($mode) {
+		case 'change':
+			$json_data['profile'] = $profile;
+			
+		case 'off':
+		case 'on':
+			$json_data['mode'] = $mode;
+			break;
+			
+		default:
+			$CI = &get_instance();
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('unknown mode in upgrade profile json', __FILE__, __LINE__);
+			return ERROR_WRONG_PRM;
+			break;
+	}
+	
+	if (DectectOS_checkWindows()) {
+		$json_file = $CI->config->item('conf') . 'profile.json';
+	}
+	else {
+		$json_file = ZIMAPI_FILEPATH_UPGRADE;
+	}
+	
+	//write model json info
+	try {
+		$fp = fopen($json_file, 'w');
+		if ($fp) {
+			fwrite($fp, json_encode_unicode($json_data));
+			fclose($fp);
+		}
+		else {
+			throw new Exception('write json error');
+		}
+	} catch (Exception $e) {
+		$CI = &get_instance();
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('write upgrade json file error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	
+	return ERROR_OK;
+}
+
+function ZimAPI_getTromboning() {
+	global $CFG;
+	$state_file = $CFG->config['conf'] . CORESTATUS_FILENAME_REMOTEOFF;
+	
+	if (file_exists($state_file)) {
+		return FALSE;
+	}
+	else {
+		return TRUE;
+	}
+	
+	return TRUE;
+}
+
+function ZimAPI_setTromboning($mode) {
+	global $CFG;
+	$state_file = $CFG->config['conf'] . CORESTATUS_FILENAME_REMOTEOFF;
+	
+	$mode = strtolower($mode);
+	
+	switch ($mode) {
+		case 'off':
+			try {
+				$fp = fopen($state_file, 'w');
+				if ($fp) {
+					fwrite($fp, 'off');
+					fclose($fp);
+				}
+				else {
+					throw new Exception('write file error');
+				}
+			} catch (Exception $e) {
+				$CI = &get_instance();
+				$CI->load->helper('printerlog');
+				PrinterLog_logError('write tromboning file error', __FILE__, __LINE__);
+				return ERROR_INTERNAL;
+			}
+			break;
+			
+		case 'on':
+			@unlink($state_file);
+			break;
+			
+		default:
+			return ERROR_WRONG_PRM;
+			break;
+	}
+	
+	return ERROR_OK;
 }
 
 function ZimAPI_getPresetInfoAsArray($preset_id, &$array_info, &$system_preset = NULL) {
