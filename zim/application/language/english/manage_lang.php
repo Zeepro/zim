@@ -27,3 +27,5 @@ $lang['activate_printer']
 	= 'Activate the printer';
 $lang['video_error']
 	= 'We\'re sorry, but your device is not compatible with HLS video streaming.';
+$lang['bed_hint']
+	= "Click on the buttons to move the printer's head above each screw to adjust the platform's height.";

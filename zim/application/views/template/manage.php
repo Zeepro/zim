@@ -151,7 +151,8 @@
 			</div>
 			<div data-role="collapsible">
 				<h4>{bed_title}</h4>
-				<div id="bed_container" class="container_16" style="height:400px">
+				<div id="bed_container" class="container_16" style="height:440px; text-align: center">
+					{bed_hint}<br /><br />
 					<table style="border: 2px solid;width:100%;background-color:silver;margin:0 auto;max-width:400px;max-height:400px">
 						<tr>
 							<td style="text-align: center">
@@ -182,7 +183,10 @@
 $(document).ready(function()
 {
 	$("table").css("height", $("table").css("width"));
+	console.log($("table").css("height"));
+	console.log($("table").css("height"));
 	$("#bed_container").css("height", $("table").css("width")+1);
+	console.log($("#bed_container").css("height"));
 });
 
 function load_jwplayer_video() {

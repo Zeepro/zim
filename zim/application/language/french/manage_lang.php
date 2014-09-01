@@ -27,3 +27,5 @@ $lang['activate_printer']
 	= "Activez l'imprimante";
 $lang['video_error']
 	= 'Nous sommes désolés, mais votre terminal ne supporte pas le streaming vidéo HLS.';
+$lang['bed_hint']
+	= "Cliquez sur les boutons pour déplacer la tête au-dessus des vis pour ajuster la plateforme.";

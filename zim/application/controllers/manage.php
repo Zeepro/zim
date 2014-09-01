@@ -47,6 +47,7 @@ class Manage extends MY_Controller {
 				'manage_left'	=> t('manage_left'),
 				'manage_right'	=> t('manage_right'),
 				'bed_title'		=> t('bed_title'),
+				'bed_hint'		=> t('bed_hint'),
 				'video_error'	=> t('video_error'),
 				'video_url'		=> $this->config->item('video_url'),
 				'lighting_title'=> t('lighting_title'),
