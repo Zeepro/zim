@@ -22,7 +22,7 @@ $lang['manage_left']
 $lang['manage_right']
 	= 'Cartouche de droite';
 $lang['bed_title']
-	= 'Remise à niveau du plateau';
+	= 'Mise à niveau du plateau';
 $lang['activate_printer']
 	= "Activez l'imprimante";
 $lang['video_error']
