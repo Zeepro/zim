@@ -149,7 +149,7 @@
 					</li>
 				</ul>
 			</div>
-			<div data-role="collapsible" data-collapsed="false">
+			<div data-role="collapsible">
 				<h4>{bed_title}</h4>
 				<div id="bed_container" class="container_16">
 					<table style="border: 2px solid;height: 100%;width: 100%;background-color:silver;margin:0 auto;max-width:400px;max-height:400px">
@@ -173,13 +173,6 @@
 						<tr></tr>
 					</table>
 				</div>
-				<!--<div class="container_16" style="height:430px">
-					<div id="bed_interface" style="height:100%;background-color:silver;margin:0 auto;max-width:400px;max-height:400px">
-						<a onclick="level('step2')" data-role="button" data-inline="true" class="round-button" style="margin-left: 15%;margin-top: 15%;">2</a>
-						<a onclick="level('step3')" data-role="button" data-inline="true" class="round-button" style="right: -35%;margin-top: 15%;">3</a>
-						<a onclick="level('step1')" data-role="button" data-inline="true" class="round-button" style="margin-left: 41%;margin-top: 30%;">1</a>
-					</div>
-				</div>-->
 			</div>
 		</div>
 	</div>
