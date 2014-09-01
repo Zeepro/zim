@@ -2,8 +2,8 @@
 	<style>
 		.round-button
 		{
-			width: 40px !important;
-			height: 40px !important;
+			width: 8% !important;
+			height: 8% !important;
 			border-radius: 50% !important;
 		}
 	</style>
@@ -146,11 +146,11 @@
 			</div>
 			<div data-role="collapsible" data-collapsed="false">
 				<h4>{bed_title}</h4>
-				<div class="container_16" style="height:450px">
-					<div style="width:400px;height:400px;background-color:silver;margin:0 auto;">
-						<a onclick="level('step2')" data-role="button" data-inline="true" class="round-button" style="left: 40px;top: 20px;">2</a>
-						<a onclick="level('step3')" data-role="button" data-inline="true" class="round-button" style="left: 200px;top: 20px;">3</a>
-						<a onclick="level('step1')" data-role="button" data-inline="true" class="round-button" style="left: -10px;top: 250px;">1</a>
+				<div class="container_16" style="height:430px">
+					<div id="bed_interface" style="height:100%;background-color:silver;margin:0 auto;max-width:400px;max-height:400px">
+						<a onclick="level('step2')" data-role="button" data-inline="true" class="round-button" style="margin-left: 15%;margin-top: 15%;">2</a>
+						<a onclick="level('step3')" data-role="button" data-inline="true" class="round-button" style="right: -35%;margin-top: 15%;">3</a>
+						<a onclick="level('step1')" data-role="button" data-inline="true" class="round-button" style="margin-left: 41%;margin-top: 30%;">1</a>
 					</div>
 				</div>
 			</div>
@@ -158,6 +158,12 @@
 	</div>
 
 <script type="text/javascript">
+
+$(document).ready(function()
+{
+	$("#bed_interface").css("height", $("#bed_interface").css("width"));
+});
+
 function load_jwplayer_video() {
 	var player = jwplayer("myVideo").setup({
 							file: "{video_url}",
