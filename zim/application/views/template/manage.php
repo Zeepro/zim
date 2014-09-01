@@ -2,8 +2,8 @@
 	<style>
 		.round-button
 		{
-			width: 8% !important;
-			height: 8% !important;
+			width: 15% !important;
+			height: 42% !important;
 			border-radius: 50% !important;
 		}
 	</style>
@@ -21,6 +21,11 @@
 	 				<script type="text/javascript">jwplayer.key="Jh6aqwb1m2vKLCoBtS7BJxRWHnF/Qs3LMjnt13P9D6A=";</script>
 	 				<style type="text/css">div#myVideo_wrapper {margin: 0 auto;}</style>
 					<div id="myVideo">Loading the player...</div>
+				</div>
+			</div>
+			<div data-role="collapsible">
+				<h4>{lighting_title}</h4>
+				<div class="container_16">
 					<div class="ui-grid-a">
 					<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;">
 						<label for="slider"><h2>{strip_led}</h2></label>
@@ -146,13 +151,35 @@
 			</div>
 			<div data-role="collapsible" data-collapsed="false">
 				<h4>{bed_title}</h4>
-				<div class="container_16" style="height:430px">
+				<div id="bed_container" class="container_16">
+					<table style="border: 2px solid;height: 100%;width: 100%;background-color:silver;margin:0 auto;max-width:400px;max-height:400px">
+						<tr>
+							<td style="text-align: center">
+								<a onclick="level('step2')" data-role="button" data-inline="true" class="round-button" style="margin-left:22%">2</a>
+							</td>
+							<td></td>
+							<td style="text-align: center">
+								<a onclick="level('step3')" data-role="button" data-inline="true" class="round-button">3</a>
+							</td>
+						</tr>
+						<tr>
+							<td></td>
+							<td style="text-align: center">
+								<a onclick="level('step1')" data-role="button" data-inline="true" class="round-button" style="margin-left: 15%">1</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr></tr>
+						<tr></tr>
+					</table>
+				</div>
+				<!--<div class="container_16" style="height:430px">
 					<div id="bed_interface" style="height:100%;background-color:silver;margin:0 auto;max-width:400px;max-height:400px">
 						<a onclick="level('step2')" data-role="button" data-inline="true" class="round-button" style="margin-left: 15%;margin-top: 15%;">2</a>
 						<a onclick="level('step3')" data-role="button" data-inline="true" class="round-button" style="right: -35%;margin-top: 15%;">3</a>
 						<a onclick="level('step1')" data-role="button" data-inline="true" class="round-button" style="margin-left: 41%;margin-top: 30%;">1</a>
 					</div>
-				</div>
+				</div>-->
 			</div>
 		</div>
 	</div>
@@ -161,7 +188,8 @@
 
 $(document).ready(function()
 {
-	$("#bed_interface").css("height", $("#bed_interface").css("width"));
+	$("table").css("height", $("table").css("width"));
+	$("#bed_container").css("height", $("table").css("height")+2);
 });
 
 function load_jwplayer_video() {

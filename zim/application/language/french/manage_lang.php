@@ -6,7 +6,9 @@ $lang['back']
 $lang['manage_index_pagetitle']
 	= 'Zim - Gestion';
 $lang['platform_view_title']
-	= 'Platform view';
+	= 'Vue de la plateforme';
+$lang['lighting_title']
+	= 'Éclairage';
 $lang['reset_title']
 	= 'Remise à l\'origine';
 $lang['head_title']

@@ -44,6 +44,7 @@ class Manage extends MY_Controller {
 				'bed_title'		=> t('bed_title'),
 				'video_error'	=> t('video_error'),
 				'video_url'		=> $this->config->item('video_url'),
+				'lighting_title'=> t('lighting_title'),
 				'strip_led'		=> t('strip_led'),
 				'head_led'		=> t('head_led'),
 				'led_on'		=> t('led_on'),
