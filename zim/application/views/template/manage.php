@@ -151,8 +151,8 @@
 			</div>
 			<div data-role="collapsible">
 				<h4>{bed_title}</h4>
-				<div id="bed_container" class="container_16">
-					<table style="border: 2px solid;height: 100%;width: 100%;background-color:silver;margin:0 auto;max-width:400px;max-height:400px">
+				<div id="bed_container" class="container_16" style="height:400px">
+					<table style="border: 2px solid;width:100%;background-color:silver;margin:0 auto;max-width:400px;max-height:400px">
 						<tr>
 							<td style="text-align: center">
 								<a onclick="level('step2')" data-role="button" data-inline="true" class="round-button" style="margin-left:22%">2</a>
@@ -182,7 +182,8 @@
 $(document).ready(function()
 {
 	$("table").css("height", $("table").css("width"));
-	$("#bed_container").css("height", $("table").css("height")+2);
+	$("#bed_container").css("height", $("table").css("width")+1);
+	console.log($("#bed_container").css("height"));
 });
 
 function load_jwplayer_video() {
