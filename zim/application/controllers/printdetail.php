@@ -496,7 +496,7 @@ class Printdetail extends MY_Controller {
 			if ($ret_val == FALSE) {
 				// log internal error
 				$this->load->helper('printerlog');
-				PrinterLog_logError('can not set idle after calceling', __FILE__, __LINE__);
+				PrinterLog_logError('can not set idle after canceling', __FILE__, __LINE__);
 			}
 			
 			if ($this->config->item('simulator')) {

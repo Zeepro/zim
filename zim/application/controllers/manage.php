@@ -20,7 +20,12 @@ class Manage extends MY_Controller {
 		$this->lang->load('manage', $this->config->item('language'));
 		$this->lang->load('printerstate/index', $this->config->item('language'));
 		
-		$this->load->helper('printerstate');
+		$this->load->helper(array('zimapi', 'printerstate'));
+		if (!ZimAPI_cameraOn(ZIMAPI_PRM_CAMERA_PRINTSTART))
+		{
+			$this->load->helper('printerlog');
+			PrinterLog_logError('can not set camera', __FILE__, __LINE__);
+		}
 		$ret_val = PrinterState_getStripLedStatus($status_strip);
 		if ($ret_val != ERROR_OK)
 		{
