@@ -164,16 +164,14 @@
 					</div>
 				</div>
 				<div class="container_16" style="text-align:center">
-					<div id="cartridge_ajax" style="text-align:center;border: 2px solid;display:inline-block;width:45%;margin-left:2%">
+					<div id="cartridge_ajax" style="text-align:center;border: 2px solid;display:inline-block;width:45%;margin-left:2%;cursor:pointer">
 						<div class="loader-left ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon-loading"></span></div>
 					</div>
-					<div id="cartridge_ajax2" style="text-align:center;border: 2px solid;display:inline-block;width:45%;margin-left:2%">
+					<div id="cartridge_ajax2" style="text-align:center;border: 2px solid;display:inline-block;width:45%;margin-left:2%;cursor:pointer">
 						<div class="loader-right ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon-loading"></span></div>
 					</div>
 				</div>
 				<br />
-				<!--<a href="#" onclick="javascript: window.location.href='/printerstate/changecartridge?v=l&f=0';">
-					<li><a href="#" onclick="javascript: window.location.href='/printerstate/changecartridge?v=r&f=0';">-->
 			</div>
 			<div data-role="collapsible">
 				<h4>{bed_title}</h4>
@@ -205,6 +203,16 @@
 	</div>
 
 <script type="text/javascript">
+
+$("#cartridge_ajax").on('click', function()
+{
+	window.location.href = '/printerstate/changecartridge?v=l&f=0';
+});
+
+$("#cartridge_ajax2").on('click', function()
+{
+	window.location.href = '/printerstate/changecartridge?v=r&f=0';
+});
 
 $.ajax(
 {
