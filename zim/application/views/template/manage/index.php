@@ -137,7 +137,7 @@
 					</div>
 				</div>
 			</div>
-			<div data-role="collapsible" data-collapsed="false">
+			<div data-role="collapsible">
 				<h4>{filament}</h4>
 				<div class="container_16" style="text-align:center">
 					<div style="text-align:center;display:inline-block;width:45%;margin-left:2%">
@@ -148,21 +148,20 @@
 					</div>
 				</div>
 				<div class="container_16" style="text-align:center">
-					<div id="cartridge_ajax" style="text-align:center;border: 2px solid;display:inline-block;width:45%;margin-left:2%"></div>
-					<div id="cartridge_ajax2" style="text-align:center;border: 2px solid;display:inline-block;width:45%;margin-left:2%"></div>
+					<div id="cartridge_ajax" style="text-align:center;border: 2px solid;display:inline-block;width:45%;margin-left:2%">
+						<div class="ui-loader ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon-loading"></span></div>
+					</div>
+					<div id="cartridge_ajax2" style="text-align:center;border: 2px solid;display:inline-block;width:45%;margin-left:2%">
+						<div class="ui-loader ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon-loading"></span></div>
+					</div>
 				</div>
 				<br />
-<!-- 				<div id="cartridge_ajax2" class="container_16"></div> -->
 				<!--<ul data-role="listview" id="listview" data-inset="true">
 					<li><a href="#" onclick="javascript: window.location.href='/printerstate/changecartridge?v=l&f=0';">
 						<h2>{manage_left}</h2></a>
 					</li>
 					<li><a href="#" onclick="javascript: window.location.href='/printerstate/changecartridge?v=r&f=0';">
 						<h2>{manage_right}</h2></a>
-					</li>
-					<li>
-						<h2 id="cartridge_ajax"></h2>
-					</li>
 				</ul>-->
 			</div>
 			<div data-role="collapsible">
@@ -203,7 +202,7 @@ $.ajax(
 	async: "true",
 	beforeSend: function()
 	{
-		$(".ui-loader").css('display', 'block');
+		$(".ui-loader").css("display", "block");
 	}
 })
 .done(function(html)
