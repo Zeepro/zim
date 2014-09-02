@@ -55,6 +55,8 @@ class Manage extends MY_Controller {
 				'head_led'		=> t('head_led'),
 				'led_on'		=> t('led_on'),
 				'led_off'		=> t('led_off'),
+				'left'		=> t('left'),
+				'right'		=> t('right'),
 				'strip_led_on'	=> ($status_strip == TRUE) ? "selected=selected" : NULL,
 				'head_led_on'	=> ($status_head == TRUE) ? "selected=selected" : NULL,
 		);
@@ -169,9 +171,25 @@ class Manage extends MY_Controller {
 		return;
 	}
 
-	public function filament_ajax()
+	public function filament_ajax($side)
 	{
-		echo "BLAH";
+		$this->load->library('parser');
+		$this->load->helper('printerstate');
+		$this->lang->load('manage/filament_ajax', $this->config->item('language'));
+
+		$json_cartridge = array();
+		PrinterState_getCartridgeAsArray($json_cartridge, $side);
+		
+		$initial = intval($json_cartridge['initial']);
+		$used = intval($json_cartridge['used']);
+		$template_data = array(
+							'color'		=> $json_cartridge['color'],
+							'material'	=> $json_cartridge['material'],
+							'length'	=> round(($initial - $used) / 1000),
+							'length_text'	=> t('length_text'),
+							'material_text'	=> t('material_text'));
+		
+		$this->parser->parse('template/manage/manage_filament_ajax', $template_data);
 		return;
 	}
 }

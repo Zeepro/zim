@@ -25,6 +25,10 @@ $lang['bed_title']
 	= 'Mise à niveau du plateau';
 $lang['activate_printer']
 	= "Activez l'imprimante";
+$lang['left']
+	= "Gauche";
+$lang['right']
+	= "Droite";
 $lang['video_error']
 	= 'Nous sommes désolés, mais votre terminal ne supporte pas le streaming vidéo HLS.';
 $lang['bed_hint']

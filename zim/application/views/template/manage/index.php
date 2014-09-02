@@ -137,10 +137,23 @@
 					</div>
 				</div>
 			</div>
-			<div data-role="collapsible" style="align: center;">
+			<div data-role="collapsible" data-collapsed="false">
 				<h4>{filament}</h4>
-				
-				<ul data-role="listview" id="listview" data-inset="true">
+				<div class="container_16" style="text-align:center">
+					<div style="text-align:center;display:inline-block;width:45%;margin-left:2%">
+						{left}
+					</div>
+					<div style="text-align:center;display:inline-block;width:45%;margin-left:2%">
+						{right}
+					</div>
+				</div>
+				<div class="container_16" style="text-align:center">
+					<div id="cartridge_ajax" style="text-align:center;border: 2px solid;display:inline-block;width:45%;margin-left:2%"></div>
+					<div id="cartridge_ajax2" style="text-align:center;border: 2px solid;display:inline-block;width:45%;margin-left:2%"></div>
+				</div>
+				<br />
+<!-- 				<div id="cartridge_ajax2" class="container_16"></div> -->
+				<!--<ul data-role="listview" id="listview" data-inset="true">
 					<li><a href="#" onclick="javascript: window.location.href='/printerstate/changecartridge?v=l&f=0';">
 						<h2>{manage_left}</h2></a>
 					</li>
@@ -150,7 +163,7 @@
 					<li>
 						<h2 id="cartridge_ajax"></h2>
 					</li>
-				</ul>
+				</ul>-->
 			</div>
 			<div data-role="collapsible">
 				<h4>{bed_title}</h4>
@@ -182,17 +195,29 @@
 	</div>
 
 <script type="text/javascript">
-/*$.ajax(
+$.ajax(
 {
-	url: "/manage/filament_ajax",
+	url: "/manage/filament_ajax/l",
 	cache: false,
 	type: "GET",
 	async: "true"
 })
 .done(function(html)
 {
-	$("#cartridge_ajax").html(html);
-});*/
+	$("#cartridge_ajax").append(html);
+});
+
+$.ajax(
+{
+	url: "/manage/filament_ajax/r",
+	cache: false,
+	type: "GET",
+	async: "true"
+})
+.done(function(html)
+{
+	$("#cartridge_ajax2").append(html);
+});
 
 $(document).ready(function()
 {
