@@ -194,6 +194,15 @@
 	</div>
 
 <script type="text/javascript">
+
+function filament_spinner()
+{
+	if (filament_spinner.count == 2)
+		$(".ui-loader").css('display', 'none');
+	filament_spinner.count += 1;
+}
+filament_spinner.count = 1;
+
 $.ajax(
 {
 	url: "/manage/filament_ajax/l",
@@ -208,7 +217,7 @@ $.ajax(
 .done(function(html)
 {
 	$("#cartridge_ajax").append(html);
-	$(".ui-loader").css('display', 'none');
+	filament_spinner();
 });
 
 $.ajax(
@@ -216,11 +225,16 @@ $.ajax(
 	url: "/manage/filament_ajax/r",
 	cache: false,
 	type: "GET",
-	async: "true"
+	async: "true",
+	beforeSend: function()
+	{
+		$(".ui-loader").css("display", "block");
+	}
 })
 .done(function(html)
 {
 	$("#cartridge_ajax2").append(html);
+	filament_spinner();
 });
 
 $(document).ready(function()
