@@ -200,11 +200,16 @@ $.ajax(
 	url: "/manage/filament_ajax/l",
 	cache: false,
 	type: "GET",
-	async: "true"
+	async: "true",
+	beforeSend: function()
+	{
+		$(".ui-loader").css('display', 'block');
+	}
 })
 .done(function(html)
 {
 	$("#cartridge_ajax").append(html);
+	$(".ui-loader").css('display', 'none');
 });
 
 $.ajax(
@@ -222,10 +227,7 @@ $.ajax(
 $(document).ready(function()
 {
 	$("table").css("height", $("table").css("width"));
-	console.log($("table").css("height"));
-	console.log($("table").css("height"));
 	$("#bed_container").css("height", $("table").css("width")+1);
-	console.log($("#bed_container").css("height"));
 });
 
 function load_jwplayer_video() {
