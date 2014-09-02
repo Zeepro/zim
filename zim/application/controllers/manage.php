@@ -58,7 +58,7 @@ class Manage extends MY_Controller {
 				'strip_led_on'	=> ($status_strip == TRUE) ? "selected=selected" : NULL,
 				'head_led_on'	=> ($status_head == TRUE) ? "selected=selected" : NULL,
 		);
-		$body_page = $this->parser->parse('template/manage', $template_data, TRUE);
+		$body_page = $this->parser->parse('template/manage/index', $template_data, TRUE);
 		
 		// parse all page
 		$template_data = array(
@@ -166,6 +166,12 @@ class Manage extends MY_Controller {
 			}
 		}	
 		$this->output->set_status_header(200);
+		return;
+	}
+
+	public function filament_ajax()
+	{
+		echo "BLAH";
 		return;
 	}
 }
