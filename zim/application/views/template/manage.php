@@ -147,6 +147,9 @@
 					<li><a href="#" onclick="javascript: window.location.href='/printerstate/changecartridge?v=r&f=0';">
 						<h2>{manage_right}</h2></a>
 					</li>
+					<li>
+						<h2 id="cartridge_ajax"></h2>
+					</li>
 				</ul>
 			</div>
 			<div data-role="collapsible">
@@ -179,6 +182,17 @@
 	</div>
 
 <script type="text/javascript">
+/*$.ajax(
+{
+	url: "/manage/filament_ajax",
+	cache: false,
+	type: "GET",
+	async: "true"
+})
+.done(function(html)
+{
+	$("#cartridge_ajax").html(html);
+});*/
 
 $(document).ready(function()
 {
