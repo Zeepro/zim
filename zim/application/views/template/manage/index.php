@@ -6,6 +6,22 @@
 			height: 42% !important;
 			border-radius: 50% !important;
 		}
+		.loader-left
+		{
+			background-image: url("styles/images/ajax-loader.gif");
+			position:absolute;
+			top: 77%;
+			left: 28%;
+			opacity: 0.5;
+		}
+		.loader-right
+		{
+			background-image: url("styles/images/ajax-loader.gif");
+			position:absolute;
+			top: 77%;
+			right: 25%;
+			opacity: 0.5;
+		}
 	</style>
 	<div id="overlay"></div>
 	<header data-role="header" class="page-header">
@@ -149,20 +165,15 @@
 				</div>
 				<div class="container_16" style="text-align:center">
 					<div id="cartridge_ajax" style="text-align:center;border: 2px solid;display:inline-block;width:45%;margin-left:2%">
-						<div class="ui-loader ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon-loading"></span></div>
+						<div class="loader-left ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon-loading"></span></div>
 					</div>
 					<div id="cartridge_ajax2" style="text-align:center;border: 2px solid;display:inline-block;width:45%;margin-left:2%">
-						<div class="ui-loader ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon-loading"></span></div>
+						<div class="loader-right ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon-loading"></span></div>
 					</div>
 				</div>
 				<br />
-				<!--<ul data-role="listview" id="listview" data-inset="true">
-					<li><a href="#" onclick="javascript: window.location.href='/printerstate/changecartridge?v=l&f=0';">
-						<h2>{manage_left}</h2></a>
-					</li>
-					<li><a href="#" onclick="javascript: window.location.href='/printerstate/changecartridge?v=r&f=0';">
-						<h2>{manage_right}</h2></a>
-				</ul>-->
+				<!--<a href="#" onclick="javascript: window.location.href='/printerstate/changecartridge?v=l&f=0';">
+					<li><a href="#" onclick="javascript: window.location.href='/printerstate/changecartridge?v=r&f=0';">-->
 			</div>
 			<div data-role="collapsible">
 				<h4>{bed_title}</h4>
@@ -195,14 +206,6 @@
 
 <script type="text/javascript">
 
-function filament_spinner()
-{
-	if (filament_spinner.count == 2)
-		$(".ui-loader").css('display', 'none');
-	filament_spinner.count += 1;
-}
-filament_spinner.count = 1;
-
 $.ajax(
 {
 	url: "/manage/filament_ajax/l",
@@ -211,13 +214,13 @@ $.ajax(
 	async: "true",
 	beforeSend: function()
 	{
-		$(".ui-loader").css("display", "block");
+		$(".loader-left").css("display", "block");
 	}
 })
 .done(function(html)
 {
 	$("#cartridge_ajax").append(html);
-	filament_spinner();
+	$(".loader-left").css("display", "none");
 });
 
 $.ajax(
@@ -228,13 +231,13 @@ $.ajax(
 	async: "true",
 	beforeSend: function()
 	{
-		$(".ui-loader").css("display", "block");
+		$(".loader-right").css("display", "block");
 	}
 })
 .done(function(html)
 {
 	$("#cartridge_ajax2").append(html);
-	filament_spinner();
+	$(".loader-right").css("display", "none");
 });
 
 $(document).ready(function()

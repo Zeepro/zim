@@ -185,7 +185,7 @@ class Manage extends MY_Controller {
 		$template_data = array(
 							'color'		=> $json_cartridge['color'],
 							'material'	=> $json_cartridge['material'],
-							'length'	=> round(($initial - $used) / 1000),
+							'length'	=> number_format(round(($initial - $used) / 1000, 2, PHP_ROUND_HALF_DOWN), 2),
 							'length_text'	=> t('length_text'),
 							'material_text'	=> t('material_text'));
 		
