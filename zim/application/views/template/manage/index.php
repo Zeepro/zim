@@ -9,9 +9,11 @@
 		.loader-left
 		{
 			background-image: url("styles/images/ajax-loader.gif");
-			position:absolute;
+			position:relative;
 			top: 77%;
 			left: 28%;
+			width:2.875em;
+			height:2.875em;
 			opacity: 0.5;
 		}
 		.loader-right
@@ -164,11 +166,11 @@
 					</div>
 				</div>
 				<div class="container_16" style="text-align:center">
-					<div id="cartridge_ajax" style="text-align:center;border: 2px solid;display:inline-block;width:45%;margin-left:2%;cursor:pointer">
-						<div class="loader-left ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon-loading"></span></div>
+					<div id="cartridge_ajax" style="text-align:center;border: 2px solid;display:inline-block;width:45%;margin-left:2%;">
+						<img src="styles/images/ajax-loader.gif" />
 					</div>
-					<div id="cartridge_ajax2" style="text-align:center;border: 2px solid;display:inline-block;width:45%;margin-left:2%;cursor:pointer">
-						<div class="loader-right ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon-loading"></span></div>
+					<div id="cartridge_ajax2" style="text-align:center;border: 2px solid;display:inline-block;width:45%;margin-left:2%;">
+						<img src="styles/images/ajax-loader.gif" />
 					</div>
 				</div>
 				<br />
@@ -204,31 +206,20 @@
 
 <script type="text/javascript">
 
-$("#cartridge_ajax").on('click', function()
-{
-	window.location.href = '/printerstate/changecartridge?v=l&f=0';
-});
-
-$("#cartridge_ajax2").on('click', function()
-{
-	window.location.href = '/printerstate/changecartridge?v=r&f=0';
-});
-
 $.ajax(
 {
 	url: "/manage/filament_ajax/l",
 	cache: false,
 	type: "GET",
 	async: "true",
-	beforeSend: function()
-	{
-		$(".loader-left").css("display", "block");
-	}
 })
 .done(function(html)
 {
-	$("#cartridge_ajax").append(html);
-	$(".loader-left").css("display", "none");
+	$("#cartridge_ajax").html(html);
+	$("#cartridge_ajax").on('click', function()
+	{
+		window.location.href = '/printerstate/changecartridge?v=l&f=0';
+	});
 });
 
 $.ajax(
@@ -236,16 +227,15 @@ $.ajax(
 	url: "/manage/filament_ajax/r",
 	cache: false,
 	type: "GET",
-	async: "true",
-	beforeSend: function()
-	{
-		$(".loader-right").css("display", "block");
-	}
+	async: "true"
 })
 .done(function(html)
 {
-	$("#cartridge_ajax2").append(html);
-	$(".loader-right").css("display", "none");
+	$("#cartridge_ajax2").html(html);
+	$("#cartridge_ajax2").on('click', function()
+	{
+		window.location.href = '/printerstate/changecartridge?v=r&f=0';
+	});
 });
 
 $(document).ready(function()
