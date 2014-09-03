@@ -6,24 +6,6 @@
 			height: 42% !important;
 			border-radius: 50% !important;
 		}
-		.loader-left
-		{
-			background-image: url("styles/images/ajax-loader.gif");
-			position:relative;
-			top: 77%;
-			left: 28%;
-			width:2.875em;
-			height:2.875em;
-			opacity: 0.5;
-		}
-		.loader-right
-		{
-			background-image: url("styles/images/ajax-loader.gif");
-			position:absolute;
-			top: 77%;
-			right: 25%;
-			opacity: 0.5;
-		}
 	</style>
 	<div id="overlay"></div>
 	<header data-role="header" class="page-header">
@@ -167,10 +149,10 @@
 				</div>
 				<div class="container_16" style="text-align:center">
 					<div id="cartridge_ajax" style="text-align:center;border: 2px solid;display:inline-block;width:45%;margin-left:2%;">
-						<img src="styles/images/ajax-loader.gif" />
+						<img src="styles/images/ajax-loader.gif" style="opacity: 0.18;" />
 					</div>
 					<div id="cartridge_ajax2" style="text-align:center;border: 2px solid;display:inline-block;width:45%;margin-left:2%;">
-						<img src="styles/images/ajax-loader.gif" />
+						<img src="styles/images/ajax-loader.gif" style="opacity: 0.18;" />
 					</div>
 				</div>
 				<br />
