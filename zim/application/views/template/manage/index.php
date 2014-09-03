@@ -216,6 +216,7 @@ $.ajax(
 .done(function(html)
 {
 	$("#cartridge_ajax").html(html);
+	$("#cartridge_ajax").css('cursor', pointer);
 	$("#cartridge_ajax").on('click', function()
 	{
 		window.location.href = '/printerstate/changecartridge?v=l&f=0';
@@ -232,6 +233,7 @@ $.ajax(
 .done(function(html)
 {
 	$("#cartridge_ajax2").html(html);
+	$("#cartridge_ajax2").css('cursor', pointer);
 	$("#cartridge_ajax2").on('click', function()
 	{
 		window.location.href = '/printerstate/changecartridge?v=r&f=0';
