@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="{lang}">
 <head>
-<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE9" />
+<meta http-equiv="X-UA-Compatible" content="IE=9" />
+<meta charset="utf-8" />
 	{headers}
 	<link rel="stylesheet" href="/styles/jquery.mobile-1.4.0.min.css" />
  	<link rel="stylesheet" href="/styles/Custom-zim.min.css" />
