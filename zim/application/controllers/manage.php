@@ -188,23 +188,23 @@ class Manage extends MY_Controller {
 			$initial = intval($json_cartridge['initial']);
 			$used = intval($json_cartridge['used']);
 			$template_data = array(
+								'visibility'=> "visible",
 								'color'		=> $json_cartridge['color'],
-								'material'	=> strtoupper($json_cartridge['material']),
+								'material'	=> "<br />" . strtoupper($json_cartridge['material'])."<br />",
 								'length'	=> number_format(round(($initial - $used) / 1000, 2, PHP_ROUND_HALF_DOWN), 2),
-								'length_text'	=> t('length_text'),
-								'action'		=> $action,
-								'material_text'	=> t('material_text'));
+								'length_text'	=> t('length_text') . "<br />",
+								'action'		=> $action);
 			$this->parser->parse('template/manage/manage_filament_ajax', $template_data);
 		}
 		else
 		{
 			$template_data = array(
+					'visibility'=> "hidden",
 					'color'		=> "#FFFFFF",
-					'material'	=> "N/A",
+					'material'	=> "",
 					'length'	=> "",
 					'length_text'	=> "",
-					'action'		=> t('insert_action'),
-					'material_text'	=> t('material_text'));
+					'action'		=> t('insert_action')  . "<br /><br /><br /><br />");
 			$this->parser->parse('template/manage/manage_filament_ajax', $template_data);
 		}
 		return;
