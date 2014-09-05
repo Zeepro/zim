@@ -162,7 +162,8 @@ class Manage extends MY_Controller {
 	
 		foreach ($array_cmd as $axis => $value) {
 			$cr = PrinterState_move($axis, $value, 2000);
-			if ($cr != ERROR_OK) {
+			if ($cr != ERROR_OK)
+			{
 				$this->output->set_status_header(403);
 				return;
 			}
@@ -178,18 +179,22 @@ class Manage extends MY_Controller {
 		$this->lang->load('manage/filament_ajax', $this->config->item('language'));
 
 		$json_cartridge = array();
-		PrinterState_getCartridgeAsArray($json_cartridge, $side);
+		$ret_val = PrinterState_getCartridgeAsArray($json_cartridge, $side);
 		
-		$initial = intval($json_cartridge['initial']);
-		$used = intval($json_cartridge['used']);
-		$template_data = array(
-							'color'		=> $json_cartridge['color'],
-							'material'	=> strtoupper($json_cartridge['material']),
-							'length'	=> number_format(round(($initial - $used) / 1000, 2, PHP_ROUND_HALF_DOWN), 2),
-							'length_text'	=> t('length_text'),
-							'material_text'	=> t('material_text'));
-		
-		$this->parser->parse('template/manage/manage_filament_ajax', $template_data);
+		if ($ret_val != ERROR_MISS_LEFT_CART && $ret_val != ERROR_MISS_RIGT_CART)
+		{
+			$initial = intval($json_cartridge['initial']);
+			$used = intval($json_cartridge['used']);
+			$template_data = array(
+								'color'		=> $json_cartridge['color'],
+								'material'	=> strtoupper($json_cartridge['material']),
+								'length'	=> number_format(round(($initial - $used) / 1000, 2, PHP_ROUND_HALF_DOWN), 2),
+								'length_text'	=> t('length_text'),
+								'material_text'	=> t('material_text'));
+			$this->parser->parse('template/manage/manage_filament_ajax', $template_data);
+		}
+		else
+			$this->parser->parse('template/plaintxt', array('display' => t('cartridge_missing')));
 		return;
 	}
 }
