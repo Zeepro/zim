@@ -1,8 +1,9 @@
-				<div id="cartridge_color_info">{wait_info}</div><br/><br/><br/><br/><br/><br/>
+				<div id="cartridge_color_info"></div>
 
 <script type="text/javascript">
 var_next_phase = '{next_phase}';
 
+/*
 $.ajax({
 	url: "/printerstate/changecartridge_action/detail",
 	type: "GET",
@@ -19,6 +20,7 @@ $.ajax({
 // 	window.location.replace("/");
 	alert('failed');
 });
+*/
 
 $('<div>').appendTo('#cartridge_detail_info')
 .attr({'id': 'load_button', 'onclick': 'javascript: inputUserChoice("load");'}).html('{load_button}')

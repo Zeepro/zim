@@ -1046,6 +1046,15 @@ class Rest extends MY_Controller {
 					break;
 					
 				case ZIMAPI_PRM_PROXY:
+					$status_set = $this->input->get('v');
+					
+					if ($status_set) {
+						$cr = ZimAPI_setTromboning($status_set);
+					}
+					else {
+						$cr = ERROR_MISS_PRM;
+					}
+					break;
 					//TODO finish me
 					break;
 					

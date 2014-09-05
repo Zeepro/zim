@@ -16,7 +16,7 @@
 	<div class="grid_11"><div class="ui-bar ui-bar-c" style="height: 3em;">
 		<select name="m" id="material_input">
 			{material_array}
-				<option value="{value}">{name}</option>
+				<option value="{value}" {on}>{name}</option>
 			{/material_array}
 		</select>
 	</div></div>

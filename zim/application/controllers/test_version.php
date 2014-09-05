@@ -11,6 +11,22 @@ class Test_version extends CI_Controller {
 				'json'
 		) );
 	}
+	
+	public function ssh() {
+		$output = array();
+		$ret_val = 0;
+		if (!file_exists('/tmp/remoteSSH')) {
+			exec('/etc/init.d/remote_ssh start');
+		}
+		exec('/etc/init.d/remote_ssh status', $output, $ret_val);
+		
+		var_dump(array(
+				'ret_code'	=> $ret_val,
+				'output'	=> $output,
+		));
+		
+		return;
+	}
 
 	public function index() {
 		$template_data = array();

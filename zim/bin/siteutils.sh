@@ -36,12 +36,10 @@ restart_arcontrol() {
 	return $?
 }
 
-change_profile() {
-	mount /fab -o remount,rw,noatime
-	echo $1 > /fab/profile.txt
-	mount /fab -o remount,ro,noatime
+start_slic3r() {
+	/etc/init.d/zeepro-slic3r start
 	
-	return $?
+	return 0
 }
 
 unload_filament() {
@@ -133,8 +131,8 @@ case "$1" in
 		restart_arcontrol
 		;;
 		
-	profile)
-		change_profile $2
+	start_slic3r)
+		start_slic3r
 		;;
 		
 	unload)

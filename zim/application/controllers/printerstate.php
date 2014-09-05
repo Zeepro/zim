@@ -97,6 +97,8 @@ class Printerstate extends MY_Controller {
 		$cartridge_data = array();
 		$length_value = 0;
 		$temper_value = 0;
+		$material_value = 0;
+		$option_selected = 'selected="selected"';
 		
 		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
 		$cr = PrinterState_getCartridgeAsArray($cartridge_data, $abb_cartridge);
@@ -123,15 +125,35 @@ class Printerstate extends MY_Controller {
 				'write_button'		=> t('write_button'),
 				'material_label'	=> t('material_label'),
 				'material_array'	=> array(
-						array('name' => 'PLA', 'value' => PRINTERSTATE_VALUE_MATERIAL_PLA),
-						array('name' => 'ABS', 'value' => PRINTERSTATE_VALUE_MATERIAL_ABS),
-						array('name' => 'PVA', 'value' => PRINTERSTATE_VALUE_MATERIAL_PVA),
+						array('name' => 'PLA', 'value' => PRINTERSTATE_VALUE_MATERIAL_PLA, 'on' => NULL),
+						array('name' => 'ABS', 'value' => PRINTERSTATE_VALUE_MATERIAL_ABS, 'on' => NULL),
+						array('name' => 'PVA', 'value' => PRINTERSTATE_VALUE_MATERIAL_PVA, 'on' => NULL),
 				),
 				'length_min'		=> ceil($need_filament / 1000) + 2,
 				'length_value'		=> $length_value,
 				'temper_value'		=> $temper_value,
 				'rfid_color'		=> $cartridge_data[PRINTERSTATE_TITLE_COLOR],
 		);
+		
+		switch ($cartridge_data[PRINTERSTATE_TITLE_MATERIAL]) {
+			case PRINTERSTATE_DESP_MATERIAL_PLA:
+				$material_value = PRINTERSTATE_VALUE_MATERIAL_PLA;
+				break;
+				
+			case PRINTERSTATE_DESP_MATERIAL_ABS:
+				$material_value = PRINTERSTATE_VALUE_MATERIAL_ABS;
+				break;
+				
+			case PRINTERSTATE_DESP_MATERIAL_PVA:
+				$material_value = PRINTERSTATE_VALUE_MATERIAL_PVA;
+				break;
+				
+			default:
+				$material_value = PRINTERSTATE_VALUE_MATERIAL_PLA;
+				break;
+		}
+		$template_data['material_array'][$material_value]['on'] = $option_selected;
+		
 		$this->_display_changecartridge_base('template/printerstate/changecartridge_ajax/cartridge', $template_data);
 		
 		$this->output->set_status_header(202); // disable checking
@@ -146,9 +168,9 @@ class Printerstate extends MY_Controller {
 					'next_phase'	=> PRINTERSTATE_CHANGECART_WAIT_F_C,
 					'load_button'	=> t('Load the filament'),
 					'change_button'	=> t('Change the cartridge'),
-					'wait_info'		=> t('Waiting for getting information...'),
-					'abb_cartridge'	=> $abb_cartridge,
-					'id_model'		=> $id_model,
+// 					'wait_info'		=> t('Waiting for getting information...'),
+//					'abb_cartridge'	=> $abb_cartridge,
+//					'id_model'		=> $id_model,
 			);
 			$template_name = 'template/printerstate/changecartridge_ajax/wait_load_change_filament';
 		}
@@ -386,20 +408,17 @@ class Printerstate extends MY_Controller {
 		$template_data = array();
 		$body_page = NULL;
 		$ret_val = 0;
-		$status_strip = FALSE;
-		$status_head = FALSE;
+		$status_upgrade = FALSE;
+		$status_tromboning = FALSE;
 		$option_selected = 'selected="selected"';
 		
 		// get led status
-		$this->load->helper('printerstate');
-		$ret_val = PrinterState_getStripLedStatus($status_strip);
-		if ($ret_val != ERROR_OK) {
-			$status_strip = FALSE;
+		$this->load->helper('zimapi');
+		$ret_val = ZimAPI_getUpgradeMode($status_upgrade);
+		if ($ret_val != TRUE) {
+			$status_upgrade = 'off';
 		}
-		$ret_val = PrinterState_getTopLedStatus($status_head);
-		if ($ret_val != ERROR_OK) {
-			$status_head = FALSE;
-		}
+		$status_tromboning = ZimAPI_getTromboning();
 		
 // 		$this->changecartridge();
 		$this->load->library('parser');
@@ -412,12 +431,14 @@ class Printerstate extends MY_Controller {
 				'back'					=> t('back'),
 				'set_hostname'			=> t('set_hostname'),
 				'set_preset'			=> t('set_preset'),
-				'strip_led_on'			=> ($status_strip == TRUE) ? $option_selected : NULL,
-				'head_led_on'			=> ($status_head == TRUE) ? $option_selected : NULL,
-				'strip_led'				=> t('strip_led'),
-				'head_led'				=> t('head_led'),
-				'led_on'				=> t('led_on'),
-				'led_off'				=> t('led_off'),
+				'upgrade_on'			=> ($status_upgrade != 'off') ? $option_selected : NULL,
+				'tromboning_on'			=> ($status_tromboning == TRUE) ? $option_selected : NULL,
+				'upgrade'				=> t('upgrade'),
+				'tromboning'			=> t('tromboning'),
+				'remote_control'		=> t('remote_control'),
+				'remote_control_on'		=> NULL,
+				'function_on'			=> t('function_on'),
+				'function_off'			=> t('function_off'),
 				'nozzles_adjustments'	=> t('nozzles_adjustments'),
 		);
 		
@@ -482,13 +503,13 @@ class Printerstate extends MY_Controller {
 				array(
 						'title' => t('sso_name'),
 						'value'	=> "<div style='text-align:center'>"
-								. (array_key_exists('PRINTERSTATE_TITLE_SSO_NAME', $temp_info) ? $temp_info[PRINTERSTATE_TITLE_SSO_NAME] : "")
+								. (array_key_exists(PRINTERSTATE_TITLE_SSO_NAME, $temp_info) ? $temp_info[PRINTERSTATE_TITLE_SSO_NAME] : "")
 								. "<a data-role='button' href='/activation/?returnUrl=printerstate/printerinfo'>{button_sso}</a></div>",
 				),
 				array(
 						'title'	=> t('hostname'),
 						'value'	=> "<div style='text-align:center'>" . $temp_info[PRINTERSTATE_TITLE_HOSTNAME]
-								. "<a data-ajax=false data-role='button' href='/printerstate/sethostname'>{button_sso}</a></div>"
+								. "<a data-ajax=false data-role='button' href='/printerstate/sethostname'>{button_fqdn}</a></div>"
 				),
 		);
 		
@@ -497,8 +518,8 @@ class Printerstate extends MY_Controller {
 				'array_info'	=> $array_info,
 				'back'			=> t('back'),
 				'home'			=> t('Home'),
-				'button_sso'	=> (array_key_exists('PRINTERSTATE_TITLE_SSO_NAME', $temp_info)
-						? t('button_active_sso') : t('button_rename_sso')),
+				'button_sso'	=> (array_key_exists(PRINTERSTATE_TITLE_SSO_NAME, $temp_info)
+						? t('button_rename_sso') : t('button_active_sso')),
 				'button_fqdn'	=> t('button_rename_sso')
 		);
 		

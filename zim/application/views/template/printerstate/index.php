@@ -7,25 +7,34 @@
 		<div id="container">
 			<div class="ui-grid-a">
 				<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;">
-					<label for="slider"><h2>{strip_led}</h2></label>
+					<label for="slider"><h2>{upgrade}</h2></label>
 				</div></div>
 				<div class="ui-block-b"><div class="ui-bar ui-bar-f" style="height:3em;">
-					<select name="strip_led" id="strip_led" data-role="slider" data-track-theme="a" data-theme="a">
-						<option value="off">{led_off}</option>
-						<option value="on" {strip_led_on}>{led_on}</option>
+					<select name="upgrade" id="upgrade" data-role="slider" data-track-theme="a" data-theme="a">
+						<option value="off">{function_off}</option>
+						<option value="on" {upgrade_on}>{function_on}</option>
 					</select>
 				</div></div>
 				<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;">
-					<label for="slider"><h2>{head_led}</h2></label>
+					<label for="slider"><h2>{tromboning}</h2></label>
 				</div></div>
 				<div class="ui-block-b">
 					<div class="ui-bar ui-bar-f" style="height:3em;">
-						<select name="head_led" id="head_led" data-role="slider" data-track-theme="a" data-theme="a">
-							<option value="off">{led_off}</option>
-							<option value="on" {head_led_on}>{led_on}</option>
+						<select name="tromboning" id="tromboning" data-role="slider" data-track-theme="a" data-theme="a">
+							<option value="off">{function_off}</option>
+							<option value="on" {tromboning_on}>{function_on}</option>
 						</select>
 					</div>
 				</div>
+<!-- 				<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;">
+					<label for="slider"><h2>{remote_control}</h2></label>
+				</div></div>
+				<div class="ui-block-b"><div class="ui-bar ui-bar-f" style="height:3em;">
+					<select name="remote_control" id="remote_control" data-role="slider" data-track-theme="a" data-theme="a">
+						<option value="off">{function_off}</option>
+						<option value="on" {remote_control_on}>{function_on}</option>
+					</select>
+				</div></div> -->
 			</div>
 			<ul data-role="listview" id="listview" class="shadowBox" data-inset="true">
 				<li><a href="/preset/listpreset">
@@ -48,14 +57,13 @@
 <!--
 var var_ajax;
 
-$("#strip_led").change(function() {
-	var var_state = $("#strip_led").val().toString();
-
+$("#upgrade").change(function() {
+	var var_state = $("#upgrade").val().toString();
 	var_ajax = $.ajax({
 		url: "/rest/set",
 		cache: false,
 		data: {
-			p: "stripled",
+			p: "upgrade",
 			v: var_state,
 			},
 		type: "GET",
@@ -64,17 +72,35 @@ $("#strip_led").change(function() {
  		alert("failed");
  	});
 });
-$("#head_led").change(function() {
-	var var_state = $("#head_led").val().toString();
+$("#tromboning").change(function() {
+	var var_state = $("#tromboning").val().toString();
 	var_ajax = $.ajax({
 		url: "/rest/set",
 		cache: false,
 		data: {
-			p: "headlight",
+			p: "tromboning",
 			v: var_state,
 			},
 		type: "GET",
-	});
+	})
+	.fail(function() {
+ 		alert("failed");
+ 	});
+});
+$("#remote_control").change(function() {
+	var var_state = $("#remote_control").val().toString();
+	var_ajax = $.ajax({
+		url: "/rest/set",
+		cache: false,
+		data: {
+			p: "remotecontrol",
+			v: var_state,
+			},
+		type: "GET",
+	})
+	.fail(function() {
+ 		alert("failed");
+ 	});
 });
 //-->
 </script>

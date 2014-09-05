@@ -227,6 +227,19 @@ class Printdetail extends MY_Controller {
 		return;
 	}
 	
+	public function end_print() {
+		//TODO need option for changing return page
+		$this->load->helper('printerstate');
+		
+		foreach(array('l', 'r') as $abb_filament) {
+			PrinterState_setTemperature($array_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1], 'e', $abb_filament);
+		}
+		
+		$this->output->set_header('Location: /');
+		
+		return;
+	}
+	
 	public function status() {
 		$time_remain = NULL;
 		$body_page = NULL;

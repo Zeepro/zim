@@ -78,6 +78,16 @@ function inputUserChoice(action, flag) {
 				type: "GET",
 				data: {v: "{abb_cartridge}"},
 				cache: false,
+				beforeSend: function()
+				{
+					$("#overlay").addClass("gray-overlay");
+					$(".ui-loader").css("display", "block");
+				},
+				complete: function()
+				{	
+					$("#overlay").removeClass("gray-overlay");
+					$(".ui-loader").css("display", "none");
+				},
 			});
 			break;
 
@@ -150,12 +160,12 @@ function inputUserChoice(action, flag) {
 				{
 					$("#overlay").addClass("gray-overlay");
 					$(".ui-loader").css("display", "block");
-		        },
-		        complete: function()
-		        {	
+				},
+				complete: function()
+				{	
 					$("#overlay").removeClass("gray-overlay");
 					$(".ui-loader").css("display", "none");
-		        },
+				},
 			});
 			}
 			else {

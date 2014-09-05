@@ -199,7 +199,7 @@ function PrinterState_getExtruder(&$abb_extruder) {
 		$command = $arcontrol_fullpath . PRINTERSTATE_GET_EXTRUD;
 // 		$last_output = system($command, $ret_val);
 		exec($command, $output, $ret_val);
-		if (!PrinterState_filterOutput($output)) {
+		if (!PrinterState_filterOutput($output, $command)) {
 			PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 			return ERROR_INTERNAL;
 		}
@@ -258,7 +258,7 @@ function PrinterState_setExtruder($abb_extruder = 'r') {
 	$ret_val = FALSE; //PrinterState_checkInPrint();
 	if ($ret_val == FALSE) {
 		exec($command, $output, $ret_val);
-		if (!PrinterState_filterOutput($output)) {
+		if (!PrinterState_filterOutput($output, $command)) {
 			PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 			return ERROR_INTERNAL;
 		}
@@ -322,7 +322,7 @@ function PrinterState_getTemperature(&$val_temperature, $type = 'e', $abb_extrud
 	}
 	
 	exec($command, $output, $ret_val);
-	if (!PrinterState_filterOutput($output)) {
+	if (!PrinterState_filterOutput($output, $command)) {
 		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
@@ -339,7 +339,7 @@ function PrinterState_getTemperature(&$val_temperature, $type = 'e', $abb_extrud
 	return ERROR_OK;
 }
 
-function PrinterState_setTemperature($val_temperature, $type = 'e') {
+function PrinterState_setTemperature($val_temperature, $type = 'e', $abb_extruder = NULL) {
 	global $CFG;
 	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
 	$output = array();
@@ -348,6 +348,18 @@ function PrinterState_setTemperature($val_temperature, $type = 'e') {
 	
 	if ($type == 'e' && $val_temperature >= PRINTERSTATE_TEMPER_MIN_E && $val_temperature <= PRINTERSTATE_TEMPER_MAX_E) {
 		$command = $arcontrol_fullpath . PRINTERSTATE_SET_TEMPEREXT . 'S' . $val_temperature;
+		switch ($abb_extruder) {
+			case 'l':
+				$command .= '\\' . PRINTERSTATE_SET_EXTRUDL;
+				break;
+				
+			case 'r':
+				$command .= '\\' . PRINTERSTATE_SET_EXTRUDR;
+				break;
+				
+			default:
+				break;
+		}
 	} elseif ($type == 'h' && $val_temperature >= PRINTERSTATE_TEMPER_MIN_H && $val_temperature <= PRINTERSTATE_TEMPER_MAX_H) {
 		$command = 'echo ok';
 	} else {
@@ -370,7 +382,7 @@ function PrinterState_setTemperature($val_temperature, $type = 'e') {
 		}
 		else {
 			exec($command, $output, $ret_val);
-			if (!PrinterState_filterOutput($output)) {
+			if (!PrinterState_filterOutput($output, $command)) {
 				PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 				return ERROR_INTERNAL;
 			}
@@ -426,7 +438,7 @@ function PrinterState_getExtruderTemperaturesAsArray() {
 	
 	$command = $arcontrol_fullpath . PRINTERSTATE_GET_ALL_TEMPER;
 	exec($command, $output, $ret_val);
-	if (!PrinterState_filterOutput($output)) {
+	if (!PrinterState_filterOutput($output, $command)) {
 		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
@@ -466,7 +478,7 @@ function PrinterState_checkInPrint() {
 
 	$command = $arcontrol_fullpath . PRINTERSTATE_CHECK_STATE;
 //	exec($command, $output, $ret_val);
-//	if (!PrinterState_filterOutput($output)) {
+//	if (!PrinterState_filterOutput($output, $command)) {
 //		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 //		return ERROR_INTERNAL;
 //	}
@@ -519,7 +531,7 @@ function PrinterState_setCartridgeCode($code_cartridge, $abb_cartridge, $power_o
 	$ret_val = FALSE; //PrinterState_checkInPrint();
 	if ($ret_val == FALSE) {
 		exec($command, $output, $ret_val);
-		if (!PrinterState_filterOutput($output)) {
+		if (!PrinterState_filterOutput($output, $command)) {
 			PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 			return ERROR_INTERNAL;
 		}
@@ -538,6 +550,7 @@ function PrinterState_setCartridgeCode($code_cartridge, $abb_cartridge, $power_o
 
 function PrinterState_getCartridgeCode(&$code_cartridge, $abb_cartridge, $power_off = TRUE) {
 	global $CFG;
+	global $PRINTER;
 	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
 	$command = '';
 	$output = array();
@@ -561,17 +574,28 @@ function PrinterState_getCartridgeCode(&$code_cartridge, $abb_cartridge, $power_
 	// check if we are in printing
 	$ret_val = FALSE; //PrinterState_checkInPrint();
 	if ($ret_val == FALSE) {
-		exec($command, $output, $ret_val);
-		if (!PrinterState_filterOutput($output)) {
-			PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
-			return ERROR_INTERNAL;
+		// check already read or not
+		if (!is_array($PRINTER)) {
+			$PRINTER = array();
 		}
-		PrinterLog_logArduino($command, $output);
-		if ($ret_val != ERROR_NORMAL_RC_OK) {
-			return ERROR_INTERNAL;
+		if (array_key_exists($abb_cartridge, $PRINTER)
+				&& array_key_exists(PRINTERSTATE_PRM_CARTRIDGE, $PRINTER[$abb_cartridge])) {
+			$code_cartridge = $PRINTER[$abb_cartridge][PRINTERSTATE_PRM_CARTRIDGE];
 		}
 		else {
-			$code_cartridge = $output ? $output[0] : NULL;
+			exec($command, $output, $ret_val);
+			if (!PrinterState_filterOutput($output, $command)) {
+				PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
+				return ERROR_INTERNAL;
+			}
+			PrinterLog_logArduino($command, $output);
+			if ($ret_val != ERROR_NORMAL_RC_OK) {
+				return ERROR_INTERNAL;
+			}
+			else {
+				$code_cartridge = $output ? $output[0] : NULL;
+				$PRINTER[$abb_cartridge][PRINTERSTATE_PRM_CARTRIDGE] = $code_cartridge;
+			}
 		}
 	} else {
 // 		return ERROR_IN_PRINT;
@@ -1023,7 +1047,7 @@ function PrinterState_beforeFileCommand() {
 	
 	$command = $arcontrol_fullpath . PRINTERSTATE_START_SD_WRITE . PRINTERSTATE_SD_FILENAME;
 	exec($command, $output, $ret_val);
-	if (!PrinterState_filterOutput($output)) {
+	if (!PrinterState_filterOutput($output, $command)) {
 		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
@@ -1055,7 +1079,7 @@ function PrinterState_afterFileCommand() {
 	foreach($array_command as $parameter) {
 		$command = $arcontrol_fullpath . $parameter;
 		exec($command, $output, $ret_val);
-		if (!PrinterState_filterOutput($output)) {
+		if (!PrinterState_filterOutput($output, $command)) {
 			PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 			return ERROR_INTERNAL;
 		}
@@ -1442,7 +1466,7 @@ function PrinterState_checkStatusAsArray() {
 	$ret_val = 0;
 	$command = $arcontrol_fullpath . PRINTERSTATE_CHECK_STATE;
 //	exec($command, $output, $ret_val);
-//	if (!PrinterState_filterOutput($output)) {
+//	if (!PrinterState_filterOutput($output, $command)) {
 //		$CI->load->helper('printerlog');
 //		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 //		return ERROR_INTERNAL;
@@ -1574,7 +1598,7 @@ function PrinterState_getFilamentStatus($abb_filament) {
 	}
 	
 	exec($command, $output, $ret_val);
-	if (!PrinterState_filterOutput($output)) {
+	if (!PrinterState_filterOutput($output, $command)) {
 		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
@@ -1648,14 +1672,25 @@ function PrinterState_loadFilament($abb_filament) {
 			PrinterLog_logArduino($command); // we can't check return output when using simulator
 		}
 		else {
+			$array_cartridge = array();
+			
 			exec($command, $output, $ret_val);
-			if (!PrinterState_filterOutput($output)) {
+			if (!PrinterState_filterOutput($output, $command)) {
 				PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 				return ERROR_INTERNAL;
 			}
 			PrinterLog_logArduino($command, $output);
 			if ($ret_val != ERROR_NORMAL_RC_OK) {
 				return ERROR_INTERNAL;
+			}
+			
+			// pre-heat nozzle
+			$ret_val = PrinterState_getCartridgeAsArray($array_cartridge, $abb_filament);
+			if ($ret_val == ERROR_OK) {
+				PrinterState_setTemperature($array_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1], 'e', $abb_filament);
+			}
+			else {
+				PrinterLog_logError('set temperature after loading error (reading cartridge)', __FILE__, __LINE__);
 			}
 		}
 	} else {
@@ -1744,7 +1779,7 @@ function PrinterState_loadFilament($abb_filament) {
 // 		}
 // 		else {
 // 			exec($command, $output, $ret_val);
-// 			if (!PrinterState_filterOutput($output)) {
+// 			if (!PrinterState_filterOutput($output, $command)) {
 // 				PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 // 				return ERROR_INTERNAL;
 // 			}
@@ -1842,7 +1877,7 @@ function PrinterState_checkAsynchronousResponse() {
 	}
 	else {
 		$array_response = @file(PRINTERSTATE_FILE_RESPONSE);
-		if (!PrinterState_filterOutput($array_response, FALSE)) {
+		if (!PrinterState_filterOutput($array_response, '', FALSE)) { //TODO test me with empty command
 			PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 			return ERROR_INTERNAL;
 		}
@@ -1868,7 +1903,7 @@ function PrinterState_checkAsynchronousResponse() {
 // 	$ret_val = 0;
 	
 // 	exec($command, $output, $ret_val);
-// 	if (!PrinterState_filterOutput($output)) {
+// 	if (!PrinterState_filterOutput($output, $command)) {
 // 		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 // 		return ERROR_INTERNAL;
 // 	}
@@ -1894,7 +1929,7 @@ function PrinterState_stopPrinting() {
 		// send stop gcode
 		$command = $arcontrol_fullpath . PRINTERSTATE_STOP_PRINT;
 		exec($command, $output, $ret_val);
-		if (!PrinterState_filterOutput($output)) {
+		if (!PrinterState_filterOutput($output, $command)) {
 			PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 			return ERROR_INTERNAL;
 		}
@@ -1938,7 +1973,7 @@ function PrinterState_runGcodeFile($gcode_path, $rewrite = TRUE) {
 		PrinterLog_logArduino($command);
 		
 // 		exec($command, $output, $ret_val);
-// 		if (!PrinterState_filterOutput($output)) {
+// 		if (!PrinterState_filterOutput($output, $command)) {
 // 			PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 // 			return ERROR_INTERNAL;
 // 		}
@@ -1968,7 +2003,7 @@ function PrinterState_runGcode($gcodes, $rewrite = TRUE, $need_return = FALSE, &
 			$command = $arcontrol_fullpath . ' "' . $gcode . '"';
 			//TO_DO some gcode will not be responsed directly when using simulator
 			exec($command, $output, $ret_val);
-			if (!PrinterState_filterOutput($output)) {
+			if (!PrinterState_filterOutput($output, $command)) {
 				PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 				return ERROR_INTERNAL;
 			}
@@ -2000,44 +2035,74 @@ function PrinterState_runGcode($gcodes, $rewrite = TRUE, $need_return = FALSE, &
 	return TRUE;
 }
 
-function PrinterState_filterOutput(&$output, $trim_ok = TRUE) {
+function PrinterState_filterOutput(&$output, $command = '', $trim_ok = TRUE) {
+	global $PRINTER;
+	
 	if (!is_array($output)) {
 		return FALSE;
 	}
 	else if (empty($output)) {
+		$PRINTER['last_command'] = $command;
 		return TRUE;
 	}
 	else {
-		// assign output to temp and empty output array
-		$array_tmp = $output;
-		$output = array();
+		$retry = 0;
 		
-		// filter empty line
-// 		$array_tmp = array_filter($array_tmp, "PrinterState__checkLine");
-		
-		// filter the output not necessary
-		foreach($array_tmp as $line) {
-			// jump the empty line
-			$line = trim($line, " \t\n\r\0\x0B");
-			if ($line == '') {
-				continue;
+		do {
+			if ($retry != 0) {
+				$output = array();
+				exec($command, $output);
 			}
 			
-			// check it start with [<-] or [->], then filter it
-			//filter the input
-			if (strpos($line, '[->]') === 0) {
-				continue;
+			// assign output to temp and empty output array
+			$array_tmp = $output;
+			$output = array();
+			$retry_flag = FALSE;
+			
+			// filter empty line
+// 			$array_tmp = array_filter($array_tmp, "PrinterState__checkLine");
+			
+			// filter the output not necessary
+			foreach($array_tmp as $line) {
+				// jump the empty line
+				$line = trim($line, " \t\n\r\0\x0B");
+				if ($line == '') {
+					continue;
+				}
+				
+				// check it start with [<-] or [->], then filter it
+				//filter the input
+				if (strpos($line, '[->]') === 0) {
+					continue;
+				}
+// 				$line = preg_replace('[\[->\]]', '', $line, 1);
+				$line = preg_replace('[\[<-\]]', '', $line, 1);
+				$line = trim($line, " \t\n\r\0\x0B");
+				if ($line == '') {
+					continue;
+				}
+				$output[] = $line;
+				if ($line == 'END_INITIALISATION') {
+					$sso_message = 'Marlin reset; current: ' . $command . ', last: '
+							. (is_array($PRINTER) && array_key_exists('last_command', $PRINTER))
+									 ? $PRINTER['last_command'] : 'N/A';
+					PrinterLog_logSSO(3, 503, $sso_message);
+					$PRINTER['last_command'] = $command;
+					
+					PrinterLog_logArduino($command, json_encode($output));
+					++$retry;
+					$retry_flag = TRUE;
+					break;
+				}
 			}
-// 			$line = preg_replace('[\[->\]]', '', $line, 1);
-			$line = preg_replace('[\[<-\]]', '', $line, 1);
-			$line = trim($line, " \t\n\r\0\x0B");
-			if ($line == '') {
-				continue;
+			
+			if ($retry_flag == FALSE) { 
+				break; // it's ok if we reach here, so breakout the loop
 			}
-			$output[] = $line;
-		}
+		} while ($retry < 2);
 		
 		if (empty($output)) {
+			$PRINTER['last_command'] = $command;
 			PrinterLog_logMessage('no return from arduino', __FILE__, __LINE__);
 			return TRUE;
 		}
@@ -2047,6 +2112,8 @@ function PrinterState_filterOutput(&$output, $trim_ok = TRUE) {
 			unset($output[count($output) - 1]);
 		}
 	}
+	
+	$PRINTER['last_command'] = $command;
 	
 	return TRUE;
 }
@@ -2084,7 +2151,7 @@ function PrinterState_getMarlinVersion(&$version_marlin) {
 	
 	$command = $arcontrol_fullpath . PRINTERSTATE_GET_MARLIN_VER;
 	exec($command, $output, $ret_val);
-	if (!PrinterState_filterOutput($output)) {
+	if (!PrinterState_filterOutput($output, $command)) {
 		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
@@ -2170,7 +2237,7 @@ function PrinterState_homing($axis = 'ALL') {
 	}
 	
 	exec($command, $output, $ret_val);
-	if (!PrinterState_filterOutput($output)) {
+	if (!PrinterState_filterOutput($output, $command)) {
 		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
@@ -2198,7 +2265,7 @@ function PrinterState_move($axis, $value, $speed = NULL) {
 	else if ($axis == 'E') {
 		$command = $arcontrol_fullpath . PRINTERSTATE_EXTRUDE_RELAT;
 		exec($command, $output, $ret_val);
-		if (!PrinterState_filterOutput($output)) {
+		if (!PrinterState_filterOutput($output, $command)) {
 			PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 			return ERROR_INTERNAL;
 		}
@@ -2232,7 +2299,7 @@ function PrinterState_move($axis, $value, $speed = NULL) {
 	}
 	
 	exec($command, $output, $ret_val);
-	if (!PrinterState_filterOutput($output)) {
+	if (!PrinterState_filterOutput($output, $command)) {
 		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
@@ -2276,7 +2343,7 @@ function PrinterState_setStripLed($value = 'off') {
 	}
 	
 	exec($command, $output, $ret_val);
-	if (!PrinterState_filterOutput($output)) {
+	if (!PrinterState_filterOutput($output, $command)) {
 		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
@@ -2298,7 +2365,7 @@ function PrinterState_getStripLedStatus(&$value) {
 	$last_output = '';
 	
 	exec($command, $output, $ret_val);
-	if (!PrinterState_filterOutput($output)) {
+	if (!PrinterState_filterOutput($output, $command)) {
 		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
@@ -2333,7 +2400,7 @@ function PrinterState_getTopLedStatus(&$value) {
 	$last_output = '';
 	
 	exec($command, $output, $ret_val);
-	if (!PrinterState_filterOutput($output)) {
+	if (!PrinterState_filterOutput($output, $command)) {
 		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
@@ -2382,7 +2449,7 @@ function PrinterState_setHeadLed($value = 'off') {
 	}
 	
 	exec($command, $output, $ret_val);
-	if (!PrinterState_filterOutput($output)) {
+	if (!PrinterState_filterOutput($output, $command)) {
 		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
@@ -2405,7 +2472,7 @@ function PrinterState_disableSteppers() {
 	$command = $arcontrol_fullpath . PRINTERSTATE_STEPPER_OFF;
 	
 	exec($command, $output, $ret_val);
-	if (!PrinterState_filterOutput($output)) {
+	if (!PrinterState_filterOutput($output, $command)) {
 		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
@@ -2433,7 +2500,7 @@ function PrinterState_relativePositioning($on = TRUE) {
 	}
 	
 	exec($command, $output, $ret_val);
-	if (!PrinterState_filterOutput($output)) {
+	if (!PrinterState_filterOutput($output, $command)) {
 		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
@@ -2459,7 +2526,7 @@ function PrinterState_pausePrinting() {
 		// send stop gcode
 		$command = $arcontrol_fullpath . PRINTERSTATE_PAUSE_PRINT;
 		exec($command, $output, $ret_val);
-		if (!PrinterState_filterOutput($output)) {
+		if (!PrinterState_filterOutput($output, $command)) {
 			PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 			return ERROR_INTERNAL;
 		}
@@ -2490,7 +2557,7 @@ function PrinterState_resumePrinting() {
 		// send stop gcode
 		$command = $arcontrol_fullpath . PRINTERSTATE_RESUME_PRINT;
 		exec($command, $output, $ret_val);
-		if (!PrinterState_filterOutput($output)) {
+		if (!PrinterState_filterOutput($output, $command)) {
 			PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 			return ERROR_INTERNAL;
 		}
@@ -2525,7 +2592,7 @@ function PrinterState_getEndstop($abb_endstop, &$status) {
 	if ($ret_val == FALSE) {
 		$command = $arcontrol_fullpath . PRINTERSTATE_GET_ENDSTOPS;
 		exec($command, $output, $ret_val);
-		if (!PrinterState_filterOutput($output)) {
+		if (!PrinterState_filterOutput($output, $command)) {
 			PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 			return ERROR_INTERNAL;
 		}
@@ -2571,7 +2638,7 @@ function PrinterState_getSpeed(&$value) {
 	$last_output = '';
 	
 	exec($command, $output, $ret_val);
-	if (!PrinterState_filterOutput($output)) {
+	if (!PrinterState_filterOutput($output, $command)) {
 		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
@@ -2601,7 +2668,7 @@ function PrinterState_getAcceleration(&$value) {
 	$last_output = '';
 	
 	exec($command, $output, $ret_val);
-	if (!PrinterState_filterOutput($output)) {
+	if (!PrinterState_filterOutput($output, $command)) {
 		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
@@ -2631,7 +2698,7 @@ function PrinterState_getColdExtrusion(&$value) {
 	$last_output = '';
 	
 	exec($command, $output, $ret_val);
-	if (!PrinterState_filterOutput($output)) {
+	if (!PrinterState_filterOutput($output, $command)) {
 		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
@@ -2678,7 +2745,7 @@ function PrinterState_setSpeed($value) {
 	}
 	
 	exec($command, $output, $ret_val);
-	if (!PrinterState_filterOutput($output)) {
+	if (!PrinterState_filterOutput($output, $command)) {
 		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
@@ -2712,7 +2779,7 @@ function PrinterState_setAcceleration($value) {
 	}
 	
 	exec($command, $output, $ret_val);
-	if (!PrinterState_filterOutput($output)) {
+	if (!PrinterState_filterOutput($output, $command)) {
 		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
@@ -2734,7 +2801,7 @@ function PrinterState_getRFIDPower(&$value) {
 	$last_output = '';
 	
 	exec($command, $output, $ret_val);
-	if (!PrinterState_filterOutput($output)) {
+	if (!PrinterState_filterOutput($output, $command)) {
 		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
@@ -2781,7 +2848,7 @@ function PrinterState_setRFIDPower($on = TRUE) {
 	}
 	
 	exec($command, $output, $ret_val);
-	if (!PrinterState_filterOutput($output)) {
+	if (!PrinterState_filterOutput($output, $command)) {
 		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
@@ -2804,7 +2871,7 @@ function PrinterState_raisePlatform() {
 	$ret_val = 0;
 	
 	exec($command, $output, $ret_val);
-	if (!PrinterState_filterOutput($output)) {
+	if (!PrinterState_filterOutput($output, $command)) {
 		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
@@ -2841,7 +2908,7 @@ function PrinterState_getOffset($axis, &$value) {
 	}
 	
 	exec($command, $output, $ret_val);
-	if (!PrinterState_filterOutput($output)) {
+	if (!PrinterState_filterOutput($output, $command)) {
 		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
@@ -2895,7 +2962,7 @@ function PrinterState_setOffset($array_data = array()) {
 		$command = str_replace('\ ', ' ', $command);
 	}
 	exec($command, $output, $ret_val);
-	if (!PrinterState_filterOutput($output)) {
+	if (!PrinterState_filterOutput($output, $command)) {
 		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}

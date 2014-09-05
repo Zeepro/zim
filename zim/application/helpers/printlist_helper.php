@@ -468,8 +468,8 @@ function ModelList__blindUrl(&$array_json) {
 		for ($i=0; $i < $nb_pic; $i++) { //we cannot use foreach to change value
 			$array_json[PRINTLIST_TITLE_PIC][$i] = PRINTLIST_GETPIC_BASE_WEB
 				. '?' . PRINTLIST_GETPIC_PRM_MID . '=' . $model_id
-				. '&' . PRINTLIST_GETPIC_PRM_PIC . '=' . ($i + 1)
-				. '&name=' . $model_id . '.jpg';
+				. '&' . PRINTLIST_GETPIC_PRM_PIC . '=' . ($i + 1);
+// 				. '&name=' . $model_id . '.jpg';
 		}
 	}
 	

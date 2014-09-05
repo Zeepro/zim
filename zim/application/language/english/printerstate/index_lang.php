@@ -23,6 +23,16 @@ $lang['led_on']
 	= 'On';
 $lang['led_off']
 	= 'Off';
+$lang['function_on']
+	= 'Yes';
+$lang['function_off']
+	= 'No';
+$lang['upgrade']
+	= 'Allow upgrades';
+$lang['tromboning']
+	= 'Allow remote access';
+$lang['remote_control']
+	= 'Allow remote support';
 $lang['set_preset']
 	= 'Slicer presets';
 $lang['nozzles_adjustments']

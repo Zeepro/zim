@@ -22,6 +22,10 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_CMD_SETHOSTNAME',	ZIMAPI_CMD_CONFIG_NET . '-n ');
 	define('ZIMAPI_CMD_GETHOSTNAME',	'cat /etc/hostname');
 	define('ZIMAPI_CMD_USB_CONNECT',	'[ `cat /sys/class/gpio/gpio3_pg9/value` -eq 0 ]');
+	define('ZIMAPI_CMD_CONFIG_SSH',		'/etc/init.d/remote_ssh ');
+	define('ZIMAPI_CMD_SSH_ON',			ZIMAPI_CMD_CONFIG_SSH . 'start');
+	define('ZIMAPI_CMD_SSH_OFF',		ZIMAPI_CMD_CONFIG_SSH . 'stop');
+	define('ZIMAPI_CMD_SSH_STATUS',		ZIMAPI_CMD_CONFIG_SSH . 'status');
 	
 	define('ZIMAPI_TITLE_TOPOLOGY',	'topology');
 	define('ZIMAPI_TITLE_MEDIUM',	'medium');
@@ -50,7 +54,7 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_FILEPATH_CAPTURE',	'/var/www/tmp/capture.jpg');
 	define('ZIMAPI_FILEPATH_UPGRADE',	'/config/conf/profile.json');
 	define('ZIMAPI_PRM_CAMERA_PRINTSTART',
-			' -v quiet -r 25 -s 320x240 -f video4linux2 -i /dev/video0 -vf "crop=320:180:0:30" -minrate 256k -maxrate 256k -bufsize 256k -map 0 -force_key_frames "expr:gte(t,n_forced*2)" -c:v libx264 -crf 35 -profile:v baseline -b:v 256k -pix_fmt yuv420p -flags -global_header -f hls -hls_time 5 -hls_wrap 20 -hls_list_size 10 /var/www/tmp/zim.m3u8');
+			' -v quiet -r 15 -s 640x480 -f video4linux2 -i /dev/video0 -vf "crop=640:360:0:60" -minrate 512k -maxrate 512k -bufsize 2512k -map 0 -force_key_frames "expr:gte(t,n_forced*2)" -c:v libx264 -r 15 -threads 2 -crf 35 -profile:v baseline -b:v 512k -pix_fmt yuv420p -flags -global_header -f hls -hls_time 5 -hls_wrap 20 -hls_list_size 10 /var/www/tmp/zim.m3u8');
 	define('ZIMAPI_PRM_CAMERA_STOP',	' stop ');
 	define('ZIMAPI_PRM_CAMERA_CAPTURE',
 			' -v quiet -f video4linux2 -i /dev/video0 -y -vframes 1 /var/www/tmp/capture.jpg');
@@ -1210,6 +1214,7 @@ function ZimAPI_getUpgradeMode(&$mode, &$profile = NULL) {
 function ZimAPI_setUpgradeMode($mode, $profile = NULL) {
 	$json_data = array();
 	$json_file = NULL;
+	$CI = &get_instance();
 	
 	$mode = strtolower($mode);
 	
@@ -1223,7 +1228,6 @@ function ZimAPI_setUpgradeMode($mode, $profile = NULL) {
 			break;
 			
 		default:
-			$CI = &get_instance();
 			$CI->load->helper('printerlog');
 			PrinterLog_logError('unknown mode in upgrade profile json', __FILE__, __LINE__);
 			return ERROR_WRONG_PRM;
@@ -1306,6 +1310,45 @@ function ZimAPI_setTromboning($mode) {
 	}
 	
 	return ERROR_OK;
+}
+
+function ZimAPI_getSSH(&$mode, &$url = NULL) {
+	$output = array();
+	$ret_val = 0;
+	
+	exec(ZIMAPI_CMD_SSH_STATUS, $output, $ret_val);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		$CI = &get_instance();
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('remote ssh status command error', __FILE__, __LINE__);
+		$mode = 'off';
+		
+		return FALSE;
+	}
+	else {
+		if (count($output)) {
+			$temp_string = $output[0];
+			if (FALSE === strstr($temp_string, 'ON')) {
+				$temp_url = NULL;
+				
+				$mode = 'on';
+				$temp_string = substr($temp_string, strstr($temp_string, '['));
+				$url = substr($temp_string, 0, strstr($temp_string, ']'));
+			}
+			//TODO finish me
+		}
+	}
+	
+	return TRUE;
+}
+
+function ZimAPI_setSSH($mode) {
+	$output = array();
+	$ret_val = 0;
+	
+	//TODO finish me
+	
+	return TRUE;
 }
 
 function ZimAPI_getPresetInfoAsArray($preset_id, &$array_info, &$system_preset = NULL) {
@@ -1768,7 +1811,7 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 	{
 		$tmp = $array_setting['extrusion_width'];
 		$pos = strpos($tmp, "%");
-		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 50 || substr($tmp, 0, $pos) > 150))
+		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 50 || substr($tmp, 0, $pos) > 300))
 				|| ($pos === FALSE && ($tmp != 0 && ($tmp < 0.25 || $tmp > 0.5))))
 		{
 			return (FALSE);
@@ -1781,7 +1824,7 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 	{
 		$tmp = $array_setting['first_layer_extrusion_width'];
 		$pos = strpos($tmp, "%");
-		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 50 || substr($tmp, 0, $pos) > 150))
+		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 50 || substr($tmp, 0, $pos) > 300))
 				|| ($pos === FALSE && ($tmp != 0 && ($tmp < 0.25 || $tmp > 0.5))))
 		{
 			return (FALSE);

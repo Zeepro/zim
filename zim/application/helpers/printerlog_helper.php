@@ -54,13 +54,39 @@ function PrinterLog_logError($msg, $file = NULL, $line = NULL, $need_trim = TRUE
 			$location = "\t(" . PrinterLog__filterAppPath($file) . ' ' . $line . ')';
 		}
 		
-		
-		
 		return PrinterLog__logToDebugFile($CFG->config['log_file'], $msg, "ERR: ", $location, $need_trim);
 	}
 	else {
 		return FALSE;
 	}
+}
+
+function PrinterLog_logSSO($level, $code, $message) {
+	$context = NULL;
+	$data = array();
+	$options = array();
+	$CI = &get_instance();
+	
+	$CI->load->helper('zimapi');
+	$data = array(
+			'printersn'		=> ZimAPI_getSerial(),
+			'printertime'	=> date("Y-m-d H:i:s\Z", time()),
+			'level'			=> $level,
+			'code'			=> $code,
+			'message'		=> $message,
+	);
+	$options = array(
+			'http' => array(
+					'header'	=> "Content-type: application/x-www-form-urlencoded\r\n",
+					'method'	=> 'POST',
+					'content'	=> http_build_query($data),
+			)
+	);
+	$context = stream_context_create($options);
+	
+	@file_get_contents('https://sso.zeepro.com/errorlog.ashx', false, $context);
+	
+	return;
 }
 
 function PrinterLog__logToFile($file_index, $command, $output = '') {

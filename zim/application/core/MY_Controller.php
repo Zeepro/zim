@@ -3,40 +3,36 @@
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
-class MY_Controller extends CI_Controller
-{	
-	function errorToSSO($level, $msg, $file, $line, $context)
-	{
+class MY_Controller extends CI_Controller {
+	
+	function errorToSSO($level, $msg, $file, $line, $context) {
+		$message = NULL;
+		
 		// do nothing when level is 0 or with @ (we don't care about error)
 		if (0 == ($level & error_reporting())) {
 			return;
 		}
 		
 		//TODO move this log function to printerlog helper
-		$this->load->helper('zimapi');
 		$json_context = json_encode($context);
-		$url = 'https://sso.zeepro.com/errorlog.ashx';
-		$data = array(	'printersn' => ZimAPI_getSerial(),
-				'printertime' => date("Y-m-d H:i:s\Z", time()),
-				'level' => $level,
-				'code' => 500,
-				'message' => strip_tags($msg . " in $file at $line with $json_context")
-		);
+		$message = strip_tags($msg . " in " . $file . " at " . $line. " with " . $json_context);
+		$this->load->helper('printerlog');
+		PrinterLog_logSSO($level, 500, $message);
 		
 		// just display error for simulator (develop staff), and return 503 for ajax call
 		if ($this->config->item('simulator')) {
 			$protocol = (isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0');
 			header($protocol . ' 503');
-			var_dump($data);
+			var_dump(array(
+					'level'		=> $level,
+					'message'	=> $message,
+			));
 			die("error");
 		}
 		
-		$options = array('http' => array('header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-				'method'  => 'POST',
-				'content' => http_build_query($data)));
-		$context  = stream_context_create($options);
-		file_get_contents($url, false, $context);
 		header('Location: /error');
+		
+		exit;
 	}
 	
 	public function __construct() {
