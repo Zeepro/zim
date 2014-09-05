@@ -184,6 +184,7 @@ class Manage extends MY_Controller {
 		
 		if ($ret_val != ERROR_MISS_LEFT_CART && $ret_val != ERROR_MISS_RIGT_CART)
 		{
+			$action = PrinterState_getFilamentStatus($side) ? t('loaded_action') : t('unloaded_action');
 			$initial = intval($json_cartridge['initial']);
 			$used = intval($json_cartridge['used']);
 			$template_data = array(
@@ -191,11 +192,21 @@ class Manage extends MY_Controller {
 								'material'	=> strtoupper($json_cartridge['material']),
 								'length'	=> number_format(round(($initial - $used) / 1000, 2, PHP_ROUND_HALF_DOWN), 2),
 								'length_text'	=> t('length_text'),
+								'action'		=> $action,
 								'material_text'	=> t('material_text'));
 			$this->parser->parse('template/manage/manage_filament_ajax', $template_data);
 		}
 		else
-			$this->parser->parse('template/plaintxt', array('display' => t('cartridge_missing')));
+		{
+			$template_data = array(
+					'color'		=> "#FFFFFF",
+					'material'	=> "N/A",
+					'length'	=> "",
+					'length_text'	=> "",
+					'action'		=> t('insert_action'),
+					'material_text'	=> t('material_text'));
+			$this->parser->parse('template/manage/manage_filament_ajax', $template_data);
+		}
 		return;
 	}
 }

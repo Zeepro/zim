@@ -3,4 +3,5 @@
 	<br />
 	{material_text}{material}
 	<br />
-	{length}{length_text}
+	{length}{length_text}<br />
+	Action : {action} 
