@@ -7,6 +7,8 @@ $lang['manage_index_pagetitle']
 	= 'Zim - Manage';
 $lang['platform_view_title']
 	= 'Platform view';
+$lang['loading_player']
+	= 'Loading the player...';
 $lang['lighting_title']
 	= 'Lighting';
 $lang['reset_title']

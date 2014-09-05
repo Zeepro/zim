@@ -31,8 +31,15 @@
 			</div>
 			<div data-role="collapsible" data-collapsed="false" style="text-align: center;">
 				<h4>{title_current}</h4>
-				<div style="height:265px">
-					<div class="ui-grid-a">
+				<div class="container_16">
+					<div id="cartridge_ajax" style="text-align:center;border: 2px solid;display:inline-block;width:45%;margin-left:2%;">
+						<img src="styles/images/ajax-loader.gif" style="opacity: 0.18;" />
+					</div>
+					<div id="cartridge_ajax2" style="text-align:center;border: 2px solid;display:inline-block;width:45%;margin-left:2%;">
+						<img src="styles/images/ajax-loader.gif" style="opacity: 0.18;" />
+					</div>
+				</div>
+					<!--<div class="ui-grid-a">
 						<div class="ui-block-a">
 							<div style="width: 75px; height: 75px; background-color: {state_c_l}; margin: 0 auto;">
 								<img src="/images/cartridge.png" style="width: 100%">
@@ -55,7 +62,7 @@
 						<div class="ui-block-b">
 							<a href="/printerstate/changecartridge?v=r&f={need_filament_r}&id={model_id}" data-role="button" data-ajax="false" data-iconpos="none" class="ui-shadow ui-corner-all">{change_filament_r}</a>
 						</div>
-					</div>
+					</div>-->
 					<div>{temp_adjustments}</div>
 					<div class="ui-grid-a">
 						<div class="ui-block-a">
@@ -66,7 +73,6 @@
 						</div>
 					</div>
 				</div>
-			</div>
 			<div style="clear: both;">
 				<input type="submit" value="{print_model}" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh" />
 			</div>
@@ -76,6 +82,40 @@
 </div>
 
 <script>
+$.ajax(
+		{
+			url: "/printmodel/detail_cartridge_ajax/l",
+			cache: false,
+			type: "GET",
+			async: "true",
+		})
+		.done(function(html)
+		{
+			$("#cartridge_ajax").html(html);
+			$("#cartridge_ajax").css('cursor', 'pointer');
+			$("#cartridge_ajax").on('click', function()
+			{
+				window.location.href = '/printerstate/changecartridge?v=l&f=0';
+			});
+		});
+
+		$.ajax(
+		{
+			url: "/printmodel/detail_cartridge_ajax/r",
+			cache: false,
+			type: "GET",
+			async: "true"
+		})
+		.done(function(html)
+		{
+			$("#cartridge_ajax2").html(html);
+			$("#cartridge_ajax2").css('cursor', 'pointer');
+			$("#cartridge_ajax2").on('click', function()
+			{
+				window.location.href = '/printerstate/changecartridge?v=r&f=0';
+			});
+		});
+
 var tmp = $("#slider-2").val();
 
 $("#slider-2").attr('min', tmp - 10); 

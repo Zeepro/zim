@@ -269,4 +269,30 @@ class Printmodel extends MY_Controller {
 		
 		return;
 	}
+
+	public function detail_cartridge_ajax($side)
+	{
+		$this->load->library('parser');
+		$this->load->helper('printerstate');
+		$this->lang->load('manage/filament_ajax', $this->config->item('language'));
+
+		$json_cartridge = array();
+		$ret_val = PrinterState_getCartridgeAsArray($json_cartridge, $side);
+
+		if ($ret_val != ERROR_MISS_LEFT_CART && $ret_val != ERROR_MISS_RIGT_CART)
+		{
+			$initial = intval($json_cartridge['initial']);
+			$used = intval($json_cartridge['used']);
+			$template_data = array(
+					'color'		=> $json_cartridge['color'],
+					'material'	=> strtoupper($json_cartridge['material']),
+					'length'	=> number_format(round(($initial - $used) / 1000, 2, PHP_ROUND_HALF_DOWN), 2),
+					'length_text'	=> t('length_text'),
+					'material_text'	=> t('material_text'));
+			$this->parser->parse('template/printlist/detail_filament_ajax', $template_data);
+		}
+		else
+			$this->parser->parse('template/plaintxt', array('display' => t('cartridge_missing')));
+		return ;
+	}
 }

@@ -11,7 +11,7 @@
 				<script type="text/javascript" src="/assets/jwplayer/jwplayer.js"></script>
 	 			<script type="text/javascript">jwplayer.key="Jh6aqwb1m2vKLCoBtS7BJxRWHnF/Qs3LMjnt13P9D6A=";</script>
 	 			<style type="text/css">div#myVideo_wrapper {margin: 0 auto;}</style>
-				<div id="myVideo">Loading the player...</div>
+				<div id="myVideo">{loading_player}</div>
 			</div>
 			<div data-role="collapsible">
 				<h4>{lighting}</h4>
@@ -66,7 +66,7 @@ function load_jwplayer_video() {
 	});
 }
 
-setTimeout(load_jwplayer_video, 7000);
+setTimeout(load_jwplayer_video, 10000);
 
 </script>
 
