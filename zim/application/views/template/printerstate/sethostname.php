@@ -8,8 +8,7 @@
 		<div id="container">
 			<h2 style="text-align: center;">{hint}</h2>
 			<form method="post" accept-charset="utf-8">
-				<input type="text" name="hostname" id="hostname" value="{hostname}" data-clear-btn="true" required />
-				<input type="hidden" name="restart" id="restart" value="{restart}" />
+				<input type="text" name="hostname" id="hostname" value="{hostname}" data-clear-btn="true" pattern=".{1,9}" required title="1 to 9 characters" />				<input type="hidden" name="restart" id="restart" value="{restart}" />
 				<br />
 				{info_text}
 				<br />
