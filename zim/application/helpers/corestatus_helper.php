@@ -8,6 +8,7 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_FILENAME_INIT',		'Boot.json');
 	define('CORESTATUS_FILENAME_CONNECT',	'Connection.json');
 	define('CORESTATUS_FILENAME_REMOTEOFF',	'tromboning_off');
+	define('CORESTATUS_FILEPATH_PRODCON',	'/tmp/ProdTmpConnection.tmp');
 	
 	define('CORESTATUS_TITLE_VERSION',		'Version');
 // 	define('CORESTATUS_TITLE_CMD',			'CommandLine');
@@ -220,6 +221,9 @@ function CoreStatus_checkInConnection() {
 	
 	// we have the json file when having finished connection config
 	if (file_exists($state_file)) {
+		return FALSE;
+	}
+	else if (file_exists(CORESTATUS_FILEPATH_PRODCON)) {
 		return FALSE;
 	}
 	else {
@@ -695,6 +699,20 @@ function CoreStatus_finishConnection($data_json = array()) {
 	}
 	
 	return CoreStatus_setInIdle();
+}
+
+function CoreStatus_prodTmpConnection() {
+	$fp = fopen(CORESTATUS_FILEPATH_PRODCON, 'w');
+	
+	if ($fp) {
+		fwrite($fp, 'prodTest');
+		fclose($fp);
+	}
+	else {
+		return FALSE;
+	}
+	
+	return TRUE;
 }
 
 function CoreStatus_setDebugLevel($level = 1) {
