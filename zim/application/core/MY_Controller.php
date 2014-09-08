@@ -60,14 +60,17 @@ class MY_Controller extends CI_Controller {
 		
 		// check tromboning autorisation
 		if (CoreStatus_checkTromboning()) {
-			$this->load->helper('printerlog');
+			$status_text = ERROR_REMOTE_REFUSE . ' ' . MyERRMSG(ERROR_REMOTE_REFUSE);
+			
+			$this->load->helper(array('printerlog', 'errorcode'));
 			PrinterLog_logMessage('detected and refused tromboning connection', __FILE__, __LINE__);
 			
 			// let request failed
 			$protocol = (isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0');
-			header($protocol . ' 500');
+			
+			header($protocol . ' ' . $status_text);
 			header('Content-type: text/plain; charset=UTF-8');
-			echo 'connection refused';
+			echo $status_text; //'connection refused';
 			exit;
 		}
 		

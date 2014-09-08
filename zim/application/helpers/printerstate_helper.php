@@ -1502,6 +1502,20 @@ function PrinterState_checkStatusAsArray() {
 			$data_json[PRINTERSTATE_TITLE_STATUS] = CORESTATUS_VALUE_PRINT;
 			$data_json[PRINTERSTATE_TITLE_PERCENT] = $output[0];
 			// we can calculate duration by mid(to get total duration) and percentage
+			
+			// add temperature
+			if ($data_json[PRINTERSTATE_TITLE_PERCENT] != 100) {
+				$data_temperature = PrinterState_getExtruderTemperaturesAsArray();
+				if (!is_array($data_temperature)) {
+					// log internal error
+					$this->load->helper('printerlog');
+					PrinterLog_logError('API error when getting temperatures in printing', __FILE__, __LINE__);
+				}
+				else {
+					$data_json[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_EXT_TEMP_L] = $data_temperature[PRINTERSTATE_LEFT_EXTRUD];
+					$data_json[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_EXT_TEMP_R] = $data_temperature[PRINTERSTATE_RIGHT_EXTRUD];
+				}
+			}
 		}
 	}
 	else {

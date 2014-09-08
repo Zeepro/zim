@@ -132,7 +132,7 @@ class Printdetail extends MY_Controller {
 		
 		if ($mid) {
 			if ($mid == ModelList_codeModelHash(PRINTLIST_MODEL_CALIBRATION)) {
-				$this->output->set_header('Location: /printmodel/printcalibration');
+				$this->output->set_header('Location: /printdetail/printcalibration');
 				return;
 			}
 			$this->set_led();
@@ -169,10 +169,14 @@ class Printdetail extends MY_Controller {
 		if ($temperature_l > 0) $array_temper['l'] = $temperature_l;
 		
 		// check model id, and then send it to print command
-		$this->load->helper('printer');
+		$this->load->helper(array('printer', 'printlist'));
 		$mid = $this->input->get('id');
 		
 		if ($mid) {
+			if ($mid == ModelList_codeModelHash(PRINTLIST_MODEL_CALIBRATION)) {
+				$this->output->set_header('Location: /printdetail/printcalibration');
+				return;
+			}
 			$this->set_led();
 			$cr = Printer_printFromModel($mid, $array_temper);
 			if ($cr != ERROR_OK) {
@@ -354,6 +358,10 @@ class Printdetail extends MY_Controller {
 		$ret_val = 0;
 		$data_status = array();
 		$time_remain = 0;
+		$temper_l = 0;
+		$temper_r = 0;
+		$finish_hint = NULL;
+		$hold_temper = NULL;
 		
 		$this->load->helper(array('printer', 'timedisplay'));
 		$this->load->library('parser');
@@ -393,14 +401,26 @@ class Printdetail extends MY_Controller {
 			$time_remain = t('Time remaining: ') . t('unknown');
 		}
 		
+		if ($data_status['print_percent'] == 100) {
+			$hold_temper = 'true';
+			$finish_hint = t('in_finish');
+		}
+		else {
+			$hold_temper = 'false';
+			$temper_l = $data_status['print_temperL'];
+			$temper_r = $data_status['print_temperR'];
+		}
+		
 		// parse the ajax part
 		$template_data = array(
 				'print_percent'	=> t('Percentage: %d%%', array($data_status['print_percent'])),
 				'print_remain'	=> $time_remain,
-				'print_temperL'	=> t('Temperature of the left extruder: %d °C', array($data_status['print_temperL'])),
-				'print_temperR'	=> t('Temperature of the right extruder: %d °C', array($data_status['print_temperR'])),
-				'value_temperL'	=> $data_status['print_temperL'],
-				'value_temperR'	=> $data_status['print_temperR'],
+				'hold_temper'	=> $hold_temper,
+				'print_temperL'	=> t('Temperature of the left extruder: %d °C', array($temper_l)),
+				'print_temperR'	=> t('Temperature of the right extruder: %d °C', array($temper_r)),
+				'value_temperL'	=> $temper_l,
+				'value_temperR'	=> $temper_r,
+				'in_finish'		=> $finish_hint,
 		);
 		$this->parser->parse('template/printdetail/status_ajax', $template_data);
 		

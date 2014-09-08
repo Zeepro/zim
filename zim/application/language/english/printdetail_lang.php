@@ -25,9 +25,9 @@ $lang['Percentage: %d%%']
 $lang['Cancel']
 	= 'Cancel';
 $lang['Temperature of the left extruder: %d °C']
-	= 'Temperature of the left extruder: %d °C';
+	= 'Temperature of the left extruder: <span id="print_detail_info_temper_l_value">%d</span> °C';
 $lang['Temperature of the right extruder: %d °C']
-	= 'Temperature of the right extruder: %d °C';
+	= 'Temperature of the right extruder: <span id="print_detail_info_temper_r_value">%d</span> °C';
 $lang['Waiting for starting...']
 	= 'Waiting for starting...';
 $lang['Printing details']
@@ -44,6 +44,8 @@ $lang['No']
 	= 'No';
 $lang['button_set_offset']
 	= 'Trim offset';
+$lang['in_finish']
+	= 'Finalizing printing...';
 
 //printdetail cancel()
 $lang['printdetail_cancel_pagetitle']

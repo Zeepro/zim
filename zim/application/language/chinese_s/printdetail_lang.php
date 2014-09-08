@@ -19,9 +19,9 @@ $lang['Percentage: %d%%']
 $lang['Cancel']
 	= '停止';
 $lang['Temperature of the left extruder: %d °C']
-	= '左喷头温度：%d °C';
+	= '左喷头温度：<span id="print_detail_info_temper_l_value">%d</span> °C';
 $lang['Temperature of the right extruder: %d °C']
-	= '右喷头温度：%d °C';
+	= '右喷头温度：<span id="print_detail_info_temper_r_value">%d</span> °C';
 $lang['Waiting for starting...']
 	= '等待开始…';
 $lang['Printing details']
@@ -36,6 +36,8 @@ $lang['Yes']
 	= '是';
 $lang['No']
 	= '否';
+$lang['in_finish']
+	= '正在结束打印…';
 
 //printdetail cancel()
 $lang['printdetail_cancel_pagetitle']

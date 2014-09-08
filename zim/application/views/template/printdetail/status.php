@@ -80,6 +80,9 @@ var var_prime = {var_prime};
 // var var_finish = false;
 var var_ajax_lock = false;
 var var_finish = false;
+var var_temper_holder;
+var var_temper_l = null;
+var var_temper_r = null;
 // var timeout_head;
 // var timeout_strip;
 

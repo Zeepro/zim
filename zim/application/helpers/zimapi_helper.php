@@ -482,7 +482,10 @@ function ZimAPI_setpEth() {
 
 function ZimAPI_setHostname($hostname, $restart = TRUE) {
 	// check characters
-	if (preg_match('/^[A-Za-z0-9]+$/', $hostname)) {
+	if (count_chars($hostname) > 9 && count_chars($hostname) == 0) {
+		return ERROR_MISS_PRM;
+	}
+	else if (preg_match('/^[A-Za-z0-9]+$/', $hostname)) {
 		$ret_val = 0;
 		$output = array();
 		$command = ZIMAPI_CMD_SETHOSTNAME . $hostname;
