@@ -16,6 +16,8 @@ $lang['cancel_confirm']
 	= "Voulez-vous vraiment arrêter l'impression ?";
 $lang['video_error']
 	= 'Nous sommes désolés, mais votre terminal ne supporte pas le streaming vidéo HLS.';
+$lang['loading_player']
+	= 'Chargement du lecteur...';
 
 //printdetail status_ajax()
 $lang['Percentage: %d%%']

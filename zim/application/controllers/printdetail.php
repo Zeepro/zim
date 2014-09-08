@@ -126,11 +126,15 @@ class Printdetail extends MY_Controller {
 		$cr = 0;
 		
 		// check model id, and then send it to print command
-		$this->load->helper('printer');
+		$this->load->helper(array('printer', 'printlist'));
 		$mid = $this->input->get('id');
 // 		$callback = $this->input->get('cb');
 		
 		if ($mid) {
+			if ($mid == ModelList_codeModelHash(PRINTLIST_MODEL_CALIBRATION)) {
+				$this->output->set_header('Location: /printmodel/printcalibration');
+				return;
+			}
 			$this->set_led();
 			$cr = Printer_printFromModel($mid);
 // 			$cr = Printer_startPrintingStatusFromModel($mid);
@@ -280,27 +284,28 @@ class Printdetail extends MY_Controller {
 		
 		// parse the main body
 		$template_data = array(
-				'title'			=> t('Control your printing'),
-				'print_detail'	=> t('Printing details'),
-				'print_stop'	=> t('Cancel'),
-				'cancel_confirm'=> t('cancel_confirm'),
- 				'wait_info'		=> t('Waiting for starting...'),
-				'finish_info'	=> t('Congratulation, your printing is complete!'),
-				'return_button'	=> t('Home'),
-				'return_url'	=> '/',
-// 				'restart_url'	=> '/printdetail/printprime?r&v=' . $abb_cartridge . '&cb=' . $callback,
-				'restart_url'	=> '/printdetail/printmodel?id=' . $id,
-				'var_prime'		=> 'false',
-				'again_button'	=> t('Print again'),
-				'video_url'		=> $this->config->item('video_url'),
-				'strip_led'		=> t('strip_led'),
-				'head_led'		=> t('head_led'),
-				'led_on'		=> t('led_on'),
-				'led_off'		=> t('led_off'),
-				'lighting'		=> t('lighting'),
-				'initial_strip'	=> ($status_strip == TRUE) ? $option_selected : NULL,
-				'initial_head'	=> ($status_head == TRUE) ? $option_selected : NULL,
-				//'video_error'	=> t('video_error')
+				'title'				=> t('Control your printing'),
+				'print_detail'		=> t('Printing details'),
+				'print_stop'		=> t('Cancel'),
+				'cancel_confirm'	=> t('cancel_confirm'),
+ 				'wait_info'			=> t('Waiting for starting...'),
+				'finish_info'		=> t('Congratulation, your printing is complete!'),
+				'return_button'		=> t('Home'),
+				'return_url'		=> '/',
+// 				'restart_url'		=> '/printdetail/printprime?r&v=' . $abb_cartridge . '&cb=' . $callback,
+				'restart_url'		=> '/printdetail/printmodel?id=' . $id,
+				'var_prime'			=> 'false',
+				'again_button'		=> t('Print again'),
+				'video_url'			=> $this->config->item('video_url'),
+				'strip_led'			=> t('strip_led'),
+				'head_led'			=> t('head_led'),
+				'led_on'			=> t('led_on'),
+				'led_off'			=> t('led_off'),
+				'lighting'			=> t('lighting'),
+				'initial_strip'		=> ($status_strip == TRUE) ? $option_selected : NULL,
+				'initial_head'		=> ($status_head == TRUE) ? $option_selected : NULL,
+				//'video_error'		=> t('video_error')
+				'loading_player'	=> t('loading_player'),
 		);
 		
 		if ($print_slice == TRUE) {

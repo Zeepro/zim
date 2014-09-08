@@ -162,20 +162,20 @@
 				<label for="severalline_v">Verbatim multiline G-code</label>
 				<textarea name="severalline_v" id="severalline_v" style="max-height:200px;"></textarea>
 				<a href="#" data-role="button" data-icon="arrow-r" data-iconpos="right" onclick="runGcodePOST('#severalline_v', 'verbatim');">Send</a>
-				<label for="severalline_v">Multiline G-code</label>
+				<label for="severalline_n">Multiline G-code</label>
 				<textarea name="severalline_n" id="severalline_n" style="max-height:200px;"></textarea>
 				<a href="#" data-role="button" data-icon="arrow-r" data-iconpos="right" onclick="runGcodePOST('#severalline_n');">Send</a>
-				<form action="/rest/gcodefile" method="post" enctype="multipart/form-data" data-ajax="false">
-					<label for="severalline_v">Verbatim file upload</label>
+				<form id="fileupload_v" action="/rest/gcodefile" method="post" enctype="multipart/form-data" data-ajax="false">
+					<label for="fileupload_v">Verbatim file upload</label>
 					<input type="file" data-clear-btn="true" name="f" id="file_v">
 					<input type="hidden" name="mode" value="verbatim">
-					<input type="submit" value="Send" data-icon="arrow-r" data-iconpos="right" onclick="spinner_start();">
+					<input type="button" value="Send" data-icon="arrow-r" data-iconpos="right" onclick="startSubmit('form#fileupload_v');">
 				</form>
 <!-- 				<a href="#" data-role="button" data-icon="arrow-r" data-iconpos="right">Send</a> -->
-				<form action="/rest/gcodefile" method="post" enctype="multipart/form-data" data-ajax="false">
-					<label for="severalline_v">File upload</label>
+				<form id="fileupload_n" action="/rest/gcodefile" method="post" enctype="multipart/form-data" data-ajax="false">
+					<label for="fileupload_n">File upload</label>
 					<input type="file" data-clear-btn="true" name="f" id="file_n">
-					<input type="submit" value="Send" data-icon="arrow-r" data-iconpos="right" onclick="spinner_start();">
+					<input type="button" value="Send" data-icon="arrow-r" data-iconpos="right" onclick="startSubmit('form#fileupload_n');">
 				</form>
 <!-- 				<a href="#" data-role="button" data-icon="arrow-r" data-iconpos="right">Send</a> -->
 <!-- 				<form action="/pronterface/emulator" method="post" enctype="multipart/form-data" data-ajax="false">
@@ -195,8 +195,13 @@
 var var_ajax;
 var var_refreshCheckTemper = 0;
 var var_ajax_lock = false;
+var var_checked_rfid = false;
+var var_verifyRFIDInterval = 0;
 
 $(document).ready(checkTemper());
+
+// $("form#fileupload_v, form#fileupload_n").submit(verifyRfid(event));
+
 
 /* 
 function checkTemper() {
@@ -540,6 +545,7 @@ function refreshRfid() {
 		var response = JSON.parse(html);
 		$("#rfid_l_current").val(response.left);
 		$("#rfid_r_current").val(response.right);
+		var_checked_rfid = true;
 	})
 	.fail(function() {
 		$("#gcode_detail_info").html('ERROR');
@@ -549,6 +555,23 @@ function refreshRfid() {
 	});
 
 	return false;
+}
+
+function verifyRfid() {
+	if (var_checked_rfid == false) {
+// 		var var_option = confirm("Haven't launched checking RFID detected, check it now before start printing?");
+// 		if (var_option == true) {
+			refreshRfid();
+			return true;
+// 		}
+// 		else {
+// 			alert("You have cancelled printing because of RFID");
+// 			return false;
+// 		}
+	}
+	else {
+		return true;
+	}
 }
 
 function runGcodeGet() {
@@ -597,12 +620,7 @@ function runGcodeGet() {
 
 function runGcodePOST(id_code, var_mode) {
 	var var_gcode;
-	if (var_ajax_lock == true) {
-		return;
-	}
-	else {
-		var_ajax_lock = true;
-	}
+	var var_verify;
 
 	id_code = typeof id_code !== 'undefined' ? id_code : 'error';
 	var_mode = typeof var_mode !== 'undefined' ? var_mode : 'normal';
@@ -611,38 +629,83 @@ function runGcodePOST(id_code, var_mode) {
 		return false;
 	}
 	
+	var_verify = verifyRfid();
+	if (var_verify == false) {
+		return;
+	}
+	
 	var_gcode = $(id_code).val();
-	var_ajax = $.ajax({
-		url: "/rest/gcode",
-		type: "POST",
-		data: {
-			v:		var_gcode,
-			mode:	var_mode,
-		},
-		cache: false,
-		beforeSend: function() {
-			$("#overlay").addClass("gray-overlay");
-			$(".ui-loader").css("display", "block");
-		},
-		complete: function() {
-			$("#overlay").removeClass("gray-overlay");
-			$(".ui-loader").css("display", "none");
-		},
-	})
-	.done(function(html) {
-		$("#gcode_detail_info").html('OK');
-	})
-	.fail(function() {
-		$("#gcode_detail_info").html('ERROR');
-	})
-	.always(function() {
-		var_ajax_lock = false;
-	});
+	
+	var_verifyRFIDInterval = setInterval(function(var_gcode, var_mode) {
+		if (var_ajax_lock == false) {
+			spinnerStart();
+			postGcodeAjax(var_gcode, var_mode);
+			clearInterval(var_verifyRFIDInterval);
+		}
+	}, 100);
+	
+	function postGcodeAjax(var_gcode, var_mode) {
+		if (var_ajax_lock == true) {
+			return;
+		}
+		else {
+			var_ajax_lock = true;
+		}
+		
+		var_ajax = $.ajax({
+			url: "/rest/gcode",
+			type: "POST",
+			data: {
+				v:		var_gcode,
+				mode:	var_mode,
+			},
+			cache: false,
+			beforeSend: function() {
+				$("#overlay").addClass("gray-overlay");
+				$(".ui-loader").css("display", "block");
+			},
+			complete: function() {
+				$("#overlay").removeClass("gray-overlay");
+				$(".ui-loader").css("display", "none");
+			},
+		})
+		.done(function(html) {
+			$("#gcode_detail_info").html('OK');
+		})
+		.fail(function() {
+			$("#gcode_detail_info").html('ERROR');
+		})
+		.always(function() {
+			var_ajax_lock = false;
+		});
+	}
 }
 
-function spinner_start() {
+function spinnerStart() {
 	$("#overlay").addClass("gray-overlay");
 	$(".ui-loader").css("display", "block");
+}
+
+function startSubmit(formid) {
+	var var_verify;
+	
+	spinnerStart();
+	var_verify = verifyRfid();
+	if (var_verify == false) {
+		$("#overlay").removeClass("gray-overlay");
+		$(".ui-loader").css("display", "none");
+		return false;
+	}
+	else {
+		var_verifyRFIDInterval = setInterval(function() {
+			if (var_ajax_lock == false) {
+				spinnerStart();
+				$(formid).submit();
+				clearInterval(var_verifyRFIDInterval);
+			}
+		}, 100);
+		return true;
+	}
 }
 
 </script>

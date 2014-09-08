@@ -16,6 +16,8 @@ $lang['cancel_confirm']
 	= "Do you really want to stop the printing ?";
 $lang['video_error']
 	= 'We\'re sorry, but your device is not compatible with HLS video streaming.';
+$lang['loading_player']
+	= 'Loading the player...';
 
 //printdetail status_ajax()
 $lang['Percentage: %d%%']
