@@ -76,7 +76,7 @@ unload_filament() {
 	arcontrol_cli M1905;
 	temper_current=`arcontrol_cli -q $gcode_temper`;
 	temper_current=`awk 'BEGIN {printf "%d\n", '$temper_current' }'`;
-	while [ $temper_current -le $2 ]
+	while [ $temper_current -lt $2 ]
 	do
 		if [ ! -e $STATUS_FILE_UNLOAD_HEAT ]
 		then
