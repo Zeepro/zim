@@ -839,13 +839,13 @@ class Printerstate extends MY_Controller {
 				if ($ret_val == $code_miss_filament) {
 					//TODO added a new temporary page here, need to remove when not needed
 // 					$this->_display_changecartridge_wait_load_filament(FALSE);
-// 					if ($temp_data[PRINTERSTATE_TITLE_CARTRIDGE] == PRINTERSTATE_DESP_CARTRIDGE_REFILL) {
-// 						$this->_display_changecartridge_write_cartridge();
-// 					}
-// 					else {
-// 						$this->_display_changecartridge_wait_load_filament(FALSE);
-// 					}
-					$this->_display_changecartridge_write_cartridge($abb_cartridge, PRINTERSTATE_CHANGECART_WAIT_F, $need_filament);
+					if ($temp_data[PRINTERSTATE_TITLE_CARTRIDGE] == PRINTERSTATE_DESP_CARTRIDGE_REFILL) {
+						$this->_display_changecartridge_write_cartridge($abb_cartridge, PRINTERSTATE_CHANGECART_WAIT_F, $need_filament);
+					}
+					else {
+						$this->_display_changecartridge_wait_load_filament(FALSE);
+					}
+// 					$this->_display_changecartridge_write_cartridge($abb_cartridge, PRINTERSTATE_CHANGECART_WAIT_F, $need_filament);
 					
 					
 					// turn off RFID power after changing
