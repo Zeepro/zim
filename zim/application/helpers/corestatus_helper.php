@@ -670,10 +670,10 @@ function CoreStatus_wantConnection() {
 	$state_file = $CFG->config['conf'] . CORESTATUS_FILENAME_CONNECT;
 	
 	if (file_exists($state_file)) {
-		$ret_val = CoreStatus__setInStatus(CORESTATUS_VALUE_WAIT_CONNECT);
-		if ($ret_val != TRUE) {
-			return FALSE;
-		}
+// 		$ret_val = CoreStatus__setInStatus(CORESTATUS_VALUE_WAIT_CONNECT);
+// 		if ($ret_val != TRUE) {
+// 			return FALSE;
+// 		}
 		
 		$ret_val = unlink($state_file);
 		return $ret_val;
@@ -698,7 +698,8 @@ function CoreStatus_finishConnection($data_json = array()) {
 		return FALSE;
 	}
 	
-	return CoreStatus_setInIdle();
+// 	return CoreStatus_setInIdle();
+	return TRUE;
 }
 
 function CoreStatus_prodTmpConnection() {

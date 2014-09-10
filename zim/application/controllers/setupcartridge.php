@@ -113,6 +113,14 @@ class Setupcartridge extends CI_Controller {
 		return;
 	}
 	
+	public function right() {
+		$this->output->set_header('Location: /setupcartridge/input?v=r');
+	}
+	
+	public function left() {
+		$this->output->set_header('Location: /setupcartridge/input?v=l');
+	}
+	
 	public function write() {
 		$cr = 0;
 		$code_write = NULL;
@@ -125,16 +133,21 @@ class Setupcartridge extends CI_Controller {
 		$month = (int)($this->input->post('month'));
 		$day = (int)($this->input->post('day'));
 		$times = (int)($this->input->post('times'));
+		$side = $this->input->post('side');
+		
+		if ($side != 'l') {
+			$side = 'r';
+		}
 		
 		if ($times > 0
 				&& $this->_get_final_code($code_write, $year, $month, $day, $type)) {
-			$cr = PrinterState_setCartridgeCode($code_write, 'r', FALSE);
+			$cr = PrinterState_setCartridgeCode($code_write, $side, FALSE);
 			if ($cr == ERROR_OK) {
 				$power_off = FALSE;
 				if ($times == 1) {
 					$power_off = TRUE;
 				}
-				$cr = PrinterState_getCartridgeCode($code_read, 'r', $power_off);
+				$cr = PrinterState_getCartridgeCode($code_read, $side, $power_off);
 				if ($cr == ERROR_OK) {
 					if ($code_write != $code_read) {
 						$cr = ERROR_WRONG_FORMAT;
@@ -161,6 +174,7 @@ class Setupcartridge extends CI_Controller {
 					'month'	=> $month,
 					'day'	=> $day,
 					'times'	=> $times,
+					'side'	=> $side,
 					'ok'	=> NULL,
 					'ko'	=> NULL,
 			);
@@ -186,7 +200,7 @@ class Setupcartridge extends CI_Controller {
 			$this->parser->parse('template/basetemplate', $template_data);
 		}
 		else {
-			$this->output->set_header('Location: /setupcartridge/input');
+			$this->output->set_header('Location: /setupcartridge/input?v=' . $side);
 		}
 		
 		return;
@@ -200,6 +214,12 @@ class Setupcartridge extends CI_Controller {
 		$month = (int)($this->input->post('month'));
 		$day = (int)($this->input->post('day'));
 		$times = (int)($this->input->post('times'));
+		$side = $this->input->post('side');
+		$hint_left = 'Attention, you are trying to write on left side 注意，您正在尝试写入左侧墨盒';
+		
+		if ($side != 'l') {
+			$side = 'r';
+		}
 		
 		if ($this->_get_type_array($array_type)) {
 			$cr = FALSE;
@@ -216,14 +236,14 @@ class Setupcartridge extends CI_Controller {
 			
 			if ($cr) {
 				if ($times == 0) {
-					$this->output->set_header('Location: /setupcartridge/input');
+					$this->output->set_header('Location: /setupcartridge/input?v=' . $side);
 					
 					return;
 				}
 				else if ($year * $month * $day == 0) {
 					$this->load->helper('printerlog');
 					PrinterLog_logError('user input error', __FILE__, __LINE__);
-					$this->output->set_header('Location: /setupcartridge/input');
+					$this->output->set_header('Location: /setupcartridge/input?v=' . $side);
 					
 					return;
 				}
@@ -237,8 +257,10 @@ class Setupcartridge extends CI_Controller {
 						'day'	=> $day,
 						'times'	=> $times,
 						'name'	=> $name,
+						'side'	=> $side,
+						'hint'	=> ($side == 'l') ? $hint_left : NULL,
 				);
-			
+				
 				$body_page = $this->parser->parse('template/setupcartridge/wait', $template_data, TRUE);
 				
 				// parse all page
@@ -252,11 +274,11 @@ class Setupcartridge extends CI_Controller {
 			else {
 				$this->load->helper('printerlog');
 				PrinterLog_logError('unknown filament type', __FILE__, __LINE__);
-				$this->output->set_header('Location: /setupcartridge/input');
+				$this->output->set_header('Location: /setupcartridge/input?v=' . $side);
 			}
 		}
 		else {
-			$this->output->set_header('Location: /setupcartridge/input');
+			$this->output->set_header('Location: /setupcartridge/input?v=' . $side);
 		}
 		
 		return;
@@ -267,11 +289,17 @@ class Setupcartridge extends CI_Controller {
 		$array_type = array();
 		$template_data = array();
 		$body_page = NULL;
+		$side = $this->input->get('v');
+		
+		if ($side != 'l') {
+			$side = 'r';
+		}
 		
 		$this->load->library('parser');
 		if ($this->_get_type_array($array_type)) {
 			$template_data = array(
 					'types'	=> $array_type,
+					'side'	=> $side,
 			);
 			
 			$body_page = $this->parser->parse('template/setupcartridge/input', $template_data, TRUE);

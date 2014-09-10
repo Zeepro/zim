@@ -14,6 +14,7 @@
 				<input type="hidden" name="month" value="{month}">
 				<input type="hidden" name="day" value="{day}">
 				<input type="hidden" name="times" value="{times}">
+				<input type="hidden" name="side" value="{side}">
 				{ok}
 			</form>
 		</div>

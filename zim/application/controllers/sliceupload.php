@@ -93,6 +93,12 @@ class Sliceupload extends MY_Controller {
 		}
 		
 		$this->load->helper('slicer');
+		if (!Slicer_checkOnline(FALSE)) {
+			$this->output->set_header('Location: /sliceupload/restart');
+			
+			return;
+		}
+		
 		if (ERROR_OK == Slicer_listModel($response) && $response != "[]") {
 			$template_data = array(
 					'text'	=> t('button_goto_slice'),
@@ -139,7 +145,7 @@ class Sliceupload extends MY_Controller {
 		$ret_val = CoreStatus_checkInIdle($status_current);
 		// check status in slicing
 		if ($ret_val == FALSE || $status_current == CORESTATUS_VALUE_SLICE) {
-			$this->output->set_header('Location: /slicestatus/slicestatus');
+			$this->output->set_header('Location: /sliceupload/slicestatus');
 			return;
 		}
 		
@@ -205,7 +211,7 @@ class Sliceupload extends MY_Controller {
 		$ret_val = CoreStatus_checkInIdle($status_current);
 		// check status in slicing
 		if ($ret_val != FALSE || $status_current != CORESTATUS_VALUE_SLICE) {
-			$this->output->set_header('Location: /slicestatus/slice');
+			$this->output->set_header('Location: /sliceupload/slice');
 			return;
 		}
 		
@@ -217,6 +223,34 @@ class Sliceupload extends MY_Controller {
 				'wait_in_slice'	=> t('wait_in_slice'),
 		);
 		$body_page = $this->parser->parse('template/sliceupload/slicestatus', $template_data, TRUE);
+		
+		// parse all page
+		$template_data = array(
+				'lang'			=> $this->config->item('language_abbr'),
+				'headers'		=> '<title>' . t('sliceupload_slice_pagetitle') . '</title>',
+				'contents'		=> $body_page,
+		);
+		
+		$this->parser->parse('template/basetemplate', $template_data);
+		
+		return;
+	}
+	
+	function restart() {
+		$template_data = array();
+		$body_page = NULL;
+		$ret_val = 0;
+		$status_current = NULL;
+		
+		$this->load->library('parser');
+		$this->lang->load('sliceupload/upload', $this->config->item('language'));
+		
+		// parse the main body
+		$template_data = array(
+				'home'				=> t('home'),
+				'wait_in_restart'	=> t('wait_in_restart'),
+		);
+		$body_page = $this->parser->parse('template/sliceupload/restart', $template_data, TRUE);
 		
 		// parse all page
 		$template_data = array(
@@ -665,6 +699,30 @@ class Sliceupload extends MY_Controller {
 		$this->output->set_content_type('txt_u');
 		$this->load->library('parser');
 		$this->parser->parse('template/plaintxt', array('display' => $display)); //optional
+		
+		return;
+	}
+	
+	function restart_ajax() {
+		$ret_val = 0;
+		$display = NULL;
+		$action = $this->input->get('action');
+		
+		$this->load->helper('slicer');
+		if (Slicer_checkOnline()) {
+			$this->output->set_status_header(202, 'Opened');
+			
+			return;
+		}
+		else if ($action) {
+			$this->load->helper('printerlog');
+			PrinterLog_logDebug('restarting slicer', __FILE__, __LINE__);
+			
+// 			Slicer_restart();
+		}
+		
+		$display = 200 . " " . t(MyERRMSG(200));
+		$this->output->set_status_header(200, $display);
 		
 		return;
 	}

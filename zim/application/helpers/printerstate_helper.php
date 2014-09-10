@@ -124,6 +124,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_JSON_PRINTER', 		'Printer.json');
 	define('PRINTERSTATE_TITLE_JSON_NB_EXTRUD', 'ExtrudersNumber');
 	define('PRINTERSTATE_JSON_REFILL_TEMPER',	'RefillTemperature.json');
+	define('PRINTERSTATE_FILE_UPDATE_RFID',		'CartridgeUpdate.json');
 	
 	define('PRINTERSTATE_MAGIC_NUMBER_V1',			23567); //v1.0
 	define('PRINTERSTATE_MAGIC_NUMBER_V2',			23568); //v1.1
@@ -594,6 +595,10 @@ function PrinterState_getCartridgeCode(&$code_cartridge, $abb_cartridge, $power_
 			}
 			else {
 				$code_cartridge = $output ? $output[0] : NULL;
+				
+				// rewrite cartridge when necessary
+				PrinterState__updateCartridge($code_cartridge, $abb_cartridge);
+				
 				$PRINTER[$abb_cartridge][PRINTERSTATE_PRM_CARTRIDGE] = $code_cartridge;
 			}
 		}
@@ -2994,6 +2999,62 @@ function PrinterState_setOffset($array_data = array()) {
 }
 
 //internal function
+function PrinterState__updateCartridge(&$code_cartridge, $abb_cartridge) {
+	$CI = &get_instance();
+	$file_path = $CI->config->item('base_data') . PRINTERSTATE_FILE_UPDATE_RFID;
+	
+	if (file_exists($file_path)) {
+		$data_json = array();
+		$temp_code = NULL;
+		
+		try {
+			$tmp_array = @json_read($file_path, TRUE);
+			if ($tmp_array['error']) {
+				throw new Exception('read json error');
+			}
+			else {
+				$data_json = $tmp_array['json'];
+			}
+		} catch (Exception $e) {
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('read cartridge update data error', __FILE__, __LINE__);
+			
+			return; // log error and return
+		}
+		
+		$temp_code = substr($code_cartridge, 0, 26);
+		if (array_key_exists($temp_code, $data_json)) {
+			$temp_hex = 0;
+			$ret_val = 0;
+			
+			// add date in the end
+			$temp_code = $data_json[$temp_code] . substr($code_cartridge, 26, 4);
+			
+			// calculate checksum
+			for($i=0; $i<=14; $i++) {
+				$string_tmp = substr($temp_code, $i*2, 2);
+				$hex_tmp = hexdec($string_tmp);
+				$temp_hex = $temp_hex ^ $hex_tmp;
+			}
+			$temp_hex = dechex($temp_hex);
+			if (strlen($temp_hex) == 1) {
+				$temp_hex = '0' . $temp_hex;
+			}
+			$temp_code .= strtoupper($temp_hex);
+			$code_cartridge = $temp_code;
+			
+			$ret_val = PrinterState_setCartridgeCode($temp_code, $abb_cartridge);
+			if ($ret_val != ERROR_OK) {
+				// log error and return
+				$CI->load->helper('printerlog');
+				PrinterLog_logError('write cartridge error when in updating cartridge from database', __FILE__, __LINE__);
+			}
+		}
+	}
+	
+	return;
+}
+
 // function PrinterState__checkLine($line) {
 // 	$line = str_replace(array("\n", "\r"), '', $line);
 // 	if ($line == '') {

@@ -2,6 +2,8 @@
 // general
 $lang['back']
 	= '返回';
+$lang['home']
+	= '首页';
 
 // upload
 $lang['sliceupload_upload_pagetitle']
@@ -22,3 +24,7 @@ $lang['fail_message']
 	= '添加模型错误';
 $lang['fin_message']
 	= '成功添加模型至分层分析软件，页面将在3秒后跳转至分析软件的页面';
+
+// restart
+$lang['wait_in_restart']
+	= '检测到分层分析软件无响应，正在重新启动软件中……';

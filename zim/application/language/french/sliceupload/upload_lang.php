@@ -2,6 +2,8 @@
 // general
 $lang['back']
 	= 'retour';
+$lang['home']
+	= 'Accueil';
 
 // upload
 $lang['sliceupload_upload_pagetitle']
@@ -28,3 +30,7 @@ $lang['fail_message']
 	= 'Erreur d\'addition de modèle dans sliceur';
 $lang['fin_message']
 	= 'Réussi à ajouter le modèle dans sliceur, la page sera changée à celle de sliceur après 3 secondes';
+
+// restart
+$lang['wait_in_restart']
+	= 'Slicer ne répond pas, relance de slicer en cours...';

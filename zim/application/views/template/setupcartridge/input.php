@@ -24,6 +24,7 @@
 					</select>
 					<label for="times">Number of tags to be printed 标签写入次数</label>
 					<input type="number" style="text-align:right;" id="times" name="times" value="1">
+					<input type="hidden" name="side" value="{side}">
 				</div>
 				<input type="submit" value="ok 确认">
 			</form>

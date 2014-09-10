@@ -2,6 +2,8 @@
 // general
 $lang['back']
 	= 'back';
+$lang['home']
+	= 'home';
 
 // upload
 $lang['sliceupload_upload_pagetitle']
@@ -28,3 +30,7 @@ $lang['fail_message']
 	= 'Error for adding model into slicer';
 $lang['fin_message']
 	= 'Succeeded adding model into slicer, the page will redirect into slicer after 3 seconds';
+
+// restart
+$lang['wait_in_restart']
+	= 'Slicer not responding detected, try to relaunch slicer...';

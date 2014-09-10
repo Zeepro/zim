@@ -42,9 +42,9 @@ if (!defined('PRINTLIST_MAX_PIC_SIZE')) {
 	define('PRINTLIST_MODEL_REPRIME_R',		'_reprime_right');
 	define('PRINTLIST_MODEL_PRINTPRIME_L',	'_print_prime_left');
 	define('PRINTLIST_MODEL_PRINTPRIME_R',	'_print_prime_right');
-	define('PRINTLIST_MODEL_CHARGE',		'_charge');
-	define('PRINTLIST_MODEL_RETRACT',		'_retract');
-	define('PRINTLIST_MODEL_CANCEL',		'_cancel');
+// 	define('PRINTLIST_MODEL_CHARGE',		'_charge');
+// 	define('PRINTLIST_MODEL_RETRACT',		'_retract');
+// 	define('PRINTLIST_MODEL_CANCEL',		'_cancel');
 	define('PRINTLIST_MODEL_CALIBRATION',	'_nozzle_calibration');
 	
 	define('PRINTLIST_FILE_GCODE',		'model.gcode');

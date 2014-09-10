@@ -54,8 +54,11 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 	define('SLICER_TIMEOUT_WITHLIMIT',	5);
 	define('SLICER_TIMEOUT_NOLIMIT',	300);
 	
-	define('SLICER_VALUE_DEFAULT_TEMPER',		240);
+	define('SLICER_VALUE_DEFAULT_TEMPER',		230);
 	define('SLICER_VALUE_DEFAULT_FIRST_TEMPER',	230);
+	
+	define('SLICER_CMD_SLICER_PS_STATUS',	'ps -A | grep slic3r.bin');
+	define('SLICER_CMD_RESTART_SLICER',		'/etc/init.d/zeepro-slic3r restart &');
 	
 // 	define('SLICER_FILENAME_ZIPMODEL',	'_model_slicer.zip');
 }
@@ -590,12 +593,11 @@ function Slicer_reset() {
 }
 
 function Slicer_reloadPreset() {
-	global $CFG;
 	$cr = 0;
 	$CI = &get_instance();
 	$url = SLICER_URL_RELOAD_PRESET;
 	
-	if ($CFG->config['use_sdcard']) {
+	if ($CI->config->item('use_sdcard')) {
 		$url .= '?' . SLICER_PRM_SDCARD . '=1';
 	}
 	$ret_val = Slicer__requestSlicer($url);
@@ -611,6 +613,47 @@ function Slicer_reloadPreset() {
 	@unlink($CI->config->item('temp') . SLICER_FILE_TEMP_DATA);
 	
 	return $cr;
+}
+
+function Slicer_restart() {
+	//exec(SLICER_CMD_RESTART_SLICER);
+	pclose(popen(SLICER_CMD_RESTART_SLICER, 'r'));
+	
+	return;
+}
+
+function Slicer_checkAlive($restart = TRUE) {
+	$ret_val = 0;
+	$output = array();
+	
+	exec(SLICER_CMD_SLICER_PS_STATUS, $output, $ret_val);
+	if ($ret_val == ERROR_NORMAL_RC_OK) {
+		return TRUE;
+	}
+	
+	if ($restart == TRUE) {
+		Slicer_restart();
+	}
+	
+	return FALSE;
+}
+
+function Slicer_checkOnline($restart = TRUE) {
+	$CI = &get_instance();
+	$ret_val = Slicer__requestSlicer('');
+	
+	if ($ret_val == SLICER_RESPONSE_OK) {
+		return TRUE;
+	}
+	
+	$CI->load->helper('printerlog');
+	PrinterLog_logDebug('slicer return code: ' . $ret_val, __FILE__, __LINE__);
+	
+	if ($restart == TRUE) {
+		Slicer_restart();
+	}
+	
+	return FALSE;
 }
 
 //internal function
