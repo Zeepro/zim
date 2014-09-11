@@ -1217,6 +1217,7 @@ class Printerstate extends MY_Controller {
 				'home_button'	=> t('home_button'),
 				'hostname'		=> $hostname,
 				'info_text'		=> t('info_text'),
+				'length_error'	=> t('length_error'),
 				'restart'		=> ($restart) ? 1 : 0,
 		);
 	
@@ -1230,7 +1231,7 @@ class Printerstate extends MY_Controller {
 		);
 	
 		$this->parser->parse('template/basetemplate', $template_data);
-	
+		
 		return;
 	}
 	

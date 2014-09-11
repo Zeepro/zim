@@ -33,5 +33,6 @@ $lang['finish_hint_norestart']
 		Reconnect to your usual network to access your printer using the link:</br>
 		</br>
 		http://%s.local/ or http://%s';
+$lang['length_error'] = "Limited to 9 characters";
 $lang['info_text']
 	= 'From your local network, you can reach your zim from "http://<span id="fqdn">xxx</span>.local" if you use an Apple, Android or Linux device, and from "http://<span id="fqdn2">xxx</span>" if you\'re using Windows.';

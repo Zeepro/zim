@@ -33,5 +33,6 @@ $lang['finish_hint_norestart']
 		http://%s.local/ or http://%s';
 $lang['home_button']
 	= 'Accueil';
+$lang['length_error'] = "Limité à 9 caractères";
 $lang['info_text']
 	= 'Depuis votre réseau local, votre zim sera accessible à l\'adresse "http://<span id="fqdn">xxx</span>.local" si vous utilisez un périphérique Apple, Android ou Linux, et à l\'adresse "http://<span id="fqdn2">xxx</span>" si vous utilisez Windows.';
