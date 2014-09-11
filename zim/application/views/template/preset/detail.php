@@ -26,7 +26,7 @@
 							<label for="layer_height">{layer_height}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" style="text-align:right;" step="0.01" min="0" data-clear-btn="false" name="layer_height" id="layer_height" value="{layer_height_value}" min="0.025" max="0.2">
+							<input type="number" style="text-align:right;" step="0.005" data-clear-btn="false" name="layer_height" id="layer_height" value="{layer_height_value}" min="0.025" max="0.2">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="first_layer_height">{first_layer_height}</label>

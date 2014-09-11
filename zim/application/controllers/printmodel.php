@@ -40,7 +40,8 @@ class Printmodel extends MY_Controller {
 					'image'	=> $model_data[PRINTLIST_TITLE_PIC][0],
 			);
 		}
-		sort($display_printlist);
+		// sort list by name of translation, by name of folder if not do so
+// 		sort($display_printlist);
 		
 		// parse the main body
 		$template_data = array(
