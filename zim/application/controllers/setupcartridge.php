@@ -375,24 +375,26 @@ class Setupcartridge extends CI_Controller {
 				'error'				=> ($cr != ERROR_OK) ? 'No cartridge / cartridge error' : NULL,
 		);
 		
-		switch ($cartridge_data[PRINTERSTATE_TITLE_MATERIAL]) {
-			case PRINTERSTATE_DESP_MATERIAL_PLA:
-				$material_value = PRINTERSTATE_VALUE_MATERIAL_PLA;
-				break;
-		
-			case PRINTERSTATE_DESP_MATERIAL_ABS:
-				$material_value = PRINTERSTATE_VALUE_MATERIAL_ABS;
-				break;
-		
-			case PRINTERSTATE_DESP_MATERIAL_PVA:
-				$material_value = PRINTERSTATE_VALUE_MATERIAL_PVA;
-				break;
-		
-			default:
-				$material_value = PRINTERSTATE_VALUE_MATERIAL_PLA;
-				break;
+		if ($cr == ERROR_OK) {
+			switch ($cartridge_data[PRINTERSTATE_TITLE_MATERIAL]) {
+				case PRINTERSTATE_DESP_MATERIAL_PLA:
+					$material_value = PRINTERSTATE_VALUE_MATERIAL_PLA;
+					break;
+			
+				case PRINTERSTATE_DESP_MATERIAL_ABS:
+					$material_value = PRINTERSTATE_VALUE_MATERIAL_ABS;
+					break;
+			
+				case PRINTERSTATE_DESP_MATERIAL_PVA:
+					$material_value = PRINTERSTATE_VALUE_MATERIAL_PVA;
+					break;
+			
+				default:
+					$material_value = PRINTERSTATE_VALUE_MATERIAL_PLA;
+					break;
+			}
+			$template_data['material_array'][$material_value]['on'] = $option_selected;
 		}
-		$template_data['material_array'][$material_value]['on'] = $option_selected;
 		
 		$body_page = $this->parser->parse('template/setupcartridge/readnwrite', $template_data, TRUE);
 		

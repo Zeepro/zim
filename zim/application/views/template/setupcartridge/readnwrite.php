@@ -46,7 +46,7 @@
 					<label for="length_input">Length</label>
 				</div></div>
 				<div class="grid_11"><div class="ui-bar ui-bar-c" style="height: 3em;">
-					<input type='range' name="l" id="length_input" value="{length_value}" max="200" />
+					<input type='range' name="l" id="length_input" value="{length_value}" min="10" max="200" />
 				</div></div>
 			</div>
 			
