@@ -878,8 +878,8 @@ function ZimAPI_cameraOff() {
 	return TRUE;
 }
 
-function ZimAPI_getPresetList() {
-	$array_data = ZimAPI_getPresetListAsArray();
+function ZimAPI_getPresetList($set_localization = TRUE) {
+	$array_data = ZimAPI_getPresetListAsArray($set_localization);
 	$CI = &get_instance();
 	
 	$CI->load->helper('json');
@@ -887,7 +887,7 @@ function ZimAPI_getPresetList() {
 	return json_encode_unicode($array_data);
 }
 
-function ZimAPI_getPresetListAsArray() {
+function ZimAPI_getPresetListAsArray($set_localization = TRUE) {
 	$json_data = array();
 	$tmp_array = NULL;
 	
@@ -912,6 +912,11 @@ function ZimAPI_getPresetListAsArray() {
 				$CI->load->helper('printerlog');
 				PrinterLog_logError('catch exception when getting preset json ' . $preset_id, __FILE__, __LINE__);
 				continue; // just jump through the wrong data file
+			}
+			
+			// localization preset name
+			if ($set_localization) {
+				ZimAPI__setPresetLocalization($tmp_array['json']);
 			}
 			
 			$json_data[] = $tmp_array['json']; //asign final data
@@ -1354,7 +1359,7 @@ function ZimAPI_setSSH($mode) {
 	return TRUE;
 }
 
-function ZimAPI_getPresetInfoAsArray($preset_id, &$array_info, &$system_preset = NULL) {
+function ZimAPI_getPresetInfoAsArray($preset_id, &$array_info, &$system_preset = NULL, $set_localization = TRUE) {
 	$presetlist_basepath = NULL;
 	$tmp_array = NULL;
 	$system_preset = FALSE;
@@ -1378,6 +1383,11 @@ function ZimAPI_getPresetInfoAsArray($preset_id, &$array_info, &$system_preset =
 		$CI->load->helper('printerlog');
 		PrinterLog_logError('catch exception when getting preset json ' . $preset_id, __FILE__, __LINE__);
 		return ERROR_INTERNAL;
+	}
+			
+	// localization preset name
+	if ($set_localization) {
+		ZimAPI__setPresetLocalization($tmp_array['json']);
 	}
 	
 	$array_info = $tmp_array['json']; //asign final data
@@ -1840,7 +1850,7 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 	{
 		$tmp = $array_setting['perimeter_extrusion_width'];
 		$pos = strpos($tmp, "%");
-		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 50 || substr($tmp, 0, $pos) > 150))
+		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 25 || substr($tmp, 0, $pos) > 150))
 				|| ($pos === FALSE && ($tmp != 0 && ($tmp < 0.25 || $tmp > 0.5))))
 		{
 			return (FALSE);
@@ -1879,7 +1889,7 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 	{
 		$tmp = $array_setting['top_infill_extrusion_width'];
 		$pos = strpos($tmp, "%");
-		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 50 || substr($tmp, 0, $pos) > 150))
+		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 25 || substr($tmp, 0, $pos) > 150))
 				|| ($pos === FALSE && ($tmp != 0 && ($tmp < 0.25 || $tmp > 0.5))))
 		{
 			return (FALSE);
@@ -1963,4 +1973,23 @@ function ZimAPI__codePresetHash($raw_name) {
 	else {
 		return md5($raw_name);
 	}
+}
+
+function ZimAPI__setPresetLocalization(&$array_json) {
+	$CI = &get_instance();
+	$lang_current = $CI->config->item('language_abbr');
+	
+	if (!is_array($array_json[ZIMAPI_TITLE_PRESET_NAME])) {
+		return; // return directly if not array (old system or user preset)
+	}
+	
+	if (isset($array_json[ZIMAPI_TITLE_PRESET_NAME][$lang_current])) {
+		$array_json[ZIMAPI_TITLE_PRESET_NAME] = $array_json[ZIMAPI_TITLE_PRESET_NAME][$lang_current];
+	}
+	else {
+		$array_json[ZIMAPI_TITLE_PRESET_NAME] = $array_json[ZIMAPI_TITLE_PRESET_NAME]['en'];
+	}
+	
+	return;
+	
 }

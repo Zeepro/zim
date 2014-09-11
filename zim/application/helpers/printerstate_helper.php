@@ -597,7 +597,9 @@ function PrinterState_getCartridgeCode(&$code_cartridge, $abb_cartridge, $power_
 				$code_cartridge = $output ? $output[0] : NULL;
 				
 				// rewrite cartridge when necessary
-				PrinterState__updateCartridge($code_cartridge, $abb_cartridge);
+				if (strlen($code_cartridge) == 32) {
+					PrinterState__updateCartridge($code_cartridge, $abb_cartridge);
+				}
 				
 				$PRINTER[$abb_cartridge][PRINTERSTATE_PRM_CARTRIDGE] = $code_cartridge;
 			}
@@ -628,7 +630,7 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge, $pow
 	}
 	
 	// check and treat output data
-	if ($last_output) {
+	if ($last_output && strlen($last_output) == 32) {
 		$version_rfid = 0;
 		$string_tmp = NULL;
 		$hex_checksum = 0;

@@ -114,6 +114,7 @@ function ModelList_add($data_array) {
 			$model_names = $tmp_array;
 			foreach ($tmp_array as $lang => $name_lang) {
 				if (is_null($model_name)) {
+					$name_lang = str_replace(' ', '_', $name_lang);
 					$model_name = ModelList__codeModelName($name_lang);
 				}
 				if (strlen($name_lang) > 50 || strlen($name_lang) == 0) {
@@ -275,7 +276,7 @@ function ModelList_add($data_array) {
 	
 	//model gcode
 // 	rename($model_gcode['full_path'], $model_path . PRINTLIST_FILE_GCODE);
-	$command = 'bzip2 -zcf ' . $model_gcode['full_path'] . ' > ' . $model_path . PRINTLIST_FILE_GCODE_BZ2;
+	$command = 'bzip2 -zcf "' . $model_gcode['full_path'] . '" > "' . $model_path . PRINTLIST_FILE_GCODE_BZ2 . '"';
 	exec($command, $output, $ret_val);
 	if ($ret_val != ERROR_NORMAL_RC_OK) {
 		return ERROR_INTERNAL;
