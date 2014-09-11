@@ -320,9 +320,15 @@ class Sliceupload extends MY_Controller {
 		$array_cartridge = array();
 		$display = NULL;
 		$id_preset = $this->input->get('id');
+		$density = $this->input->get('density');
+		$skirt = $this->input->get('skirt');
+		$raft = $this->input->get('raft');
+		$support = $this->input->get('support');
+		$array_setting = array();
 		
 		$this->load->helper('slicer');
 		
+		// set and load preset into slicer
 		if ($id_preset) {
 			$cr = ZimAPI_setPreset($id_preset);
 		}
@@ -333,6 +339,32 @@ class Sliceupload extends MY_Controller {
 		if ($cr == ERROR_OK) {
 			$cr = Slicer_reloadPreset();
 		}
+		
+		// load 4 extra parameters
+		//TODO finish me (syntax in comment need be changed to function)
+// 		if ($density !== FALSE) {
+// 			$density = (float)$density;
+// 			if ($density <= 0 || $density >= 1) {
+// 				$cr = ERROR_MISS_PRM;
+// 				break;
+// 			}
+// 			$array_setting['fill_density'] = $density;
+// 		}
+// 		if ($skirt !== FALSE) {
+// 			$array_setting['skirts'] = ((int)$skirt == 1) ? 1 : 0;
+// 		}
+// 		if ($raft !== FALSE) {
+// 			$array_setting['raft_layers'] = ((int)$raft == 1) ? 1 : 0;
+// 		}
+// 		if ($support !== FALSE) {
+// 			$array_setting['support_material'] = ((int)$support == 1) ? 1 : 0;
+// 		}
+// 		if (count($array_setting) == 0) {
+// 			$cr = ERROR_MISS_PRM;
+// 		}
+// 		else {
+// 			$cr = Slicer_changeParameter($array_setting);
+// 		}
 		
 		// check platform and filament present (do not check filament quantity)
 		if ($cr == ERROR_OK) {
