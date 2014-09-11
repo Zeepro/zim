@@ -785,8 +785,16 @@ class Rest extends MY_Controller {
 					break;
 					
 				case ZIMAPI_PRM_SSH:
-					if (ZimAPI_getSSH($display)) {
+					$status_current = NULL;
+					
+					if (ZimAPI_getSSH($status_current)) {
 						$cr = ERROR_OK;
+						if ($status_current) {
+							$display = 'on';
+						}
+						else {
+							$display = 'off';
+						}
 					}
 					else {
 						$cr = ERROR_INTERNAL;

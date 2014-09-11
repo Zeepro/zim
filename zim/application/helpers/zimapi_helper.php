@@ -1334,7 +1334,7 @@ function ZimAPI_getSSH(&$mode, &$url = NULL) {
 		$CI = &get_instance();
 		$CI->load->helper('printerlog');
 		PrinterLog_logError('remote ssh status command error', __FILE__, __LINE__);
-		$mode = 'off';
+		$mode = FALSE;
 		
 		return FALSE;
 	}
@@ -1344,12 +1344,12 @@ function ZimAPI_getSSH(&$mode, &$url = NULL) {
 			if (FALSE !== strpos($temp_string, 'ON')) {
 				$temp_url = NULL;
 				
-				$mode = 'on';
+				$mode = TRUE;
 				$temp_string = strstr($temp_string, '[');
 				$url = str_replace(array('[', ']'), '', $temp_string);
 			}
 			else {
-				$mode = 'off';
+				$mode = FALSE;
 			}
 		}
 	}
@@ -1371,7 +1371,7 @@ function ZimAPI_setSSH($mode) {
 		case 'on':
 			$mode_current = NULL;
 			if (ZimAPI_getSSH($mode_current)) {
-				if ($mode_current == 'off') {
+				if ($mode_current == FALSE) {
 					exec(ZIMAPI_CMD_SSH_ON);
 				}
 				else {

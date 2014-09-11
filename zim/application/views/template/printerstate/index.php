@@ -26,7 +26,7 @@
 						</select>
 					</div>
 				</div>
-<!-- 				<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;">
+				<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;">
 					<label for="slider"><h2>{remote_control}</h2></label>
 				</div></div>
 				<div class="ui-block-b"><div class="ui-bar ui-bar-f" style="height:3em;">
@@ -34,7 +34,7 @@
 						<option value="off">{function_off}</option>
 						<option value="on" {remote_control_on}>{function_on}</option>
 					</select>
-				</div></div> -->
+				</div></div>
 			</div>
 			<ul data-role="listview" id="listview" class="shadowBox" data-inset="true">
 				<li><a href="/preset/listpreset">

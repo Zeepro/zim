@@ -410,13 +410,18 @@ class Printerstate extends MY_Controller {
 		$ret_val = 0;
 		$status_upgrade = FALSE;
 		$status_tromboning = FALSE;
+		$status_ssh = FALSE;
 		$option_selected = 'selected="selected"';
 		
-		// get led status
+		// get function status
 		$this->load->helper('zimapi');
 		$ret_val = ZimAPI_getUpgradeMode($status_upgrade);
 		if ($ret_val != TRUE) {
 			$status_upgrade = 'off';
+		}
+		$ret_val = ZimAPI_getSSH($status_ssh);
+		if ($ret_val != TRUE) {
+			$status_ssh = FALSE;
 		}
 		$status_tromboning = ZimAPI_getTromboning();
 		
@@ -436,7 +441,7 @@ class Printerstate extends MY_Controller {
 				'upgrade'				=> t('upgrade'),
 				'tromboning'			=> t('tromboning'),
 				'remote_control'		=> t('remote_control'),
-				'remote_control_on'		=> NULL,
+				'remote_control_on'		=> ($status_ssh == TRUE) ? $option_selected : NULL,
 				'function_on'			=> t('function_on'),
 				'function_off'			=> t('function_off'),
 				'nozzles_adjustments'	=> t('nozzles_adjustments'),
@@ -462,13 +467,22 @@ class Printerstate extends MY_Controller {
 		$temp_info = array();
 		$array_info = array();
 // 		$sso_name = NULL;
+		$ssh_mode = NULL;
+		$ssh_link = NULL;
 		
 		$this->load->helper(array('printerstate', 'zimapi'));
 		$this->load->library('parser');
 		$this->lang->load('printerstate/printerinfo', $this->config->item('language'));
+		$this->lang->load('printerstate/index', $this->config->item('language'));
 // 		ZimAPI_getPrinterSSOName($sso_name);
 		
 		$temp_info = PrinterState_getInfoAsArray();
+		if (ZimAPI_getSSH($ssh_mode, $ssh_link) && $ssh_mode == TRUE) {
+			$ssh_mode = t('function_on') . ' (' . $ssh_link . ')';
+		}
+		else {
+			$ssh_mode = t('function_off');
+		}
 // 		$hostname = "no hostname";
 // 		ZimAPI_getHostname($hostname);
 		$array_info = array(
@@ -499,6 +513,10 @@ class Printerstate extends MY_Controller {
 				array(
 						'title' => t('ip_address'),
 						'value'	=> $temp_info[ZIMAPI_TITLE_IP],
+				),
+				array(
+						'title'	=> t('remote_control'),
+						'value'	=> $ssh_mode,
 				),
 				array(
 						'title' => t('sso_name'),
