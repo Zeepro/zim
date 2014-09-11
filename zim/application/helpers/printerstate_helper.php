@@ -88,7 +88,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_RIGHT_EXTRUD',	0);
 	define('PRINTERSTATE_LEFT_EXTRUD',	1);
 	define('PRINTERSTATE_TEMPER_MIN_E',	0);
-	define('PRINTERSTATE_TEMPER_MAX_E',	250);
+	define('PRINTERSTATE_TEMPER_MAX_E',	260);
 	define('PRINTERSTATE_TEMPER_MIN_H',	0);
 	define('PRINTERSTATE_TEMPER_MAX_H',	100);
 	
@@ -3029,6 +3029,8 @@ function PrinterState__updateCartridge(&$code_cartridge, $abb_cartridge) {
 			$temp_hex = 0;
 			$ret_val = 0;
 			
+			$CI->load->helper('printerlog');
+			PrinterLog_logDebug('detected a cartridge to update', __FILE__, __LINE__);
 			// add date in the end
 			$temp_code = $data_json[$temp_code] . substr($code_cartridge, 26, 4);
 			

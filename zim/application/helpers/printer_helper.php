@@ -21,7 +21,7 @@ if (!defined('PRINTER_FN_CHARGE')) {
 	define('PRINTER_PRM_TEMPER_R_F',	' -r ');	// right temperature for first layer (or all layer)
 	define('PRINTER_PRM_FILE',			' -f ');	// file path
 	
-	define('PRINTER_VALUE_DEFAULT_TEMPER',	230);
+// 	define('PRINTER_VALUE_DEFAULT_TEMPER',	230);
 }
 
 function Printer_preparePrint($need_prime = TRUE) {
@@ -585,6 +585,7 @@ function Printer__getFileFromModel($id_model, &$gcode_path, $filename = NULL, &$
 		$filename = is_null($filename) ? PRINTLIST_FILE_GCODE : $filename;
 		$gcode_path = $CI->config->item('temp') . $filename;
 		$command = 'bzip2 -dkcf ' . $bz2_path . ' > ' . $gcode_path;
+		@unlink($gcode_path); // delete old file
 		exec($command, $output, $ret_val);
 		if ($ret_val != ERROR_NORMAL_RC_OK) {
 			return ERROR_INTERNAL;
@@ -633,46 +634,60 @@ function Printer__changeTemperature(&$gcode_path, $array_temper = array()) {
 	
 	$CI->load->helper('printerstate');
 	
-	$cr = PrinterState_getCartridgeAsArray($json_cartridge, 'r');
-	if ($cr == ERROR_OK) {
-		$temp_r = $json_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER];
-		$temp_rs = $json_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1];
-	}
-	else if ($cr == ERROR_MISS_RIGT_CART) {
-		$temp_r = $temp_rs = PRINTER_VALUE_DEFAULT_TEMPER;
-	}
 	// temporary change - make it possible to change temperature not according to cartridge
 	//TODO remove me when it is necessary
 	if (array_key_exists('r', $array_temper)) {
 		$temp_r = $array_temper['r'];
-		if ($temp_r > $temp_rs) {
-			$temp_rs = $temp_r;
-		}
+		$temp_rs = $temp_r + 10;
+// 		if ($temp_r > $temp_rs) {
+// 			$temp_rs = $temp_r;
+// 		}
 	}
 	// temporary change end
+	else {
+		$cr = PrinterState_getCartridgeAsArray($json_cartridge, 'r');
+		if ($cr == ERROR_OK) {
+			$temp_r = $json_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER];
+			$temp_rs = $json_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1];
+		}
+		else if ($cr == ERROR_MISS_RIGT_CART) {
+			$CI->load->helper('slicer');
+			$temp_r = SLICER_VALUE_DEFAULT_TEMPER;
+			$temp_rs = SLICER_VALUE_DEFAULT_FIRST_TEMPER;
+// 			$temp_r = $temp_rs = PRINTER_VALUE_DEFAULT_TEMPER;
+		}
+	}
+	
 	if ($temp_r * $temp_rs == 0) {
 		// we have at least one value not initialised to call change temper program
 		return ($cr == ERROR_OK) ? ERROR_INTERNAL : $cr;
 	}
 	
 	if (PrinterState_getNbExtruder() >= 2) {
-	$cr = PrinterState_getCartridgeAsArray($json_cartridge, 'l');
-		if ($cr == ERROR_OK) {
-			$temp_l = $json_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER];
-			$temp_ls = $json_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1];
-		}
-		else if ($cr == ERROR_MISS_LEFT_CART) {
-			$temp_l = $temp_ls = PRINTER_VALUE_DEFAULT_TEMPER;
-		}
 		// temporary change - make it possible to change temperature not according to cartridge
 		//TODO remove me when it is necessary
 		if (array_key_exists('l', $array_temper)) {
 			$temp_l = $array_temper['l'];
-			if ($temp_l > $temp_ls) {
-				$temp_ls = $temp_l;
-			}
+			$temp_ls = $temp_l + 10;
+// 			if ($temp_l > $temp_ls) {
+// 				$temp_ls = $temp_l;
+// 			}
 		}
 		// temporary change end
+		else {
+			$cr = PrinterState_getCartridgeAsArray($json_cartridge, 'l');
+			if ($cr == ERROR_OK) {
+				$temp_l = $json_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER];
+				$temp_ls = $json_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1];
+			}
+			else if ($cr == ERROR_MISS_LEFT_CART) {
+				$CI->load->helper('slicer');
+				$temp_l = SLICER_VALUE_DEFAULT_TEMPER;
+				$temp_ls = SLICER_VALUE_DEFAULT_FIRST_TEMPER;
+// 				$temp_l = $temp_ls = PRINTER_VALUE_DEFAULT_TEMPER;
+			}
+		}
+		
 		if ($temp_l * $temp_ls == 0) {
 			// we have at least one value not initialised to call change temper program
 			return ($cr == ERROR_OK) ? ERROR_INTERNAL : $cr;
@@ -688,7 +703,7 @@ function Printer__changeTemperature(&$gcode_path, $array_temper = array()) {
 	$CI->load->helper('printerlog');
 	PrinterLog_logDebug('change temperature: ' . $command, __FILE__, __LINE__);
 	
-	@unlink($gcode_path . '.new');
+	@unlink($gcode_path . '.new'); // delete old file
 	exec($command, $output, $cr);
 	if ($cr != ERROR_NORMAL_RC_OK) {
 		$CI->load->helper('printerlog');
