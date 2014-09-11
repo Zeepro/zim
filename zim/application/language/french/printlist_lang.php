@@ -7,7 +7,7 @@ $lang['back']
 $lang['ZeePro Personal Printer 21 - Quick printing list']
 	= 'Zim - Liste des fichiers imprimables';
 $lang['Select a model']
-	= 'Sélection d\'un modèle';
+	= 'Sélection d&#146;un modèle';
 
 // printmodel detail()
 $lang['ZeePro Personal Printer 21 - Printing details']
