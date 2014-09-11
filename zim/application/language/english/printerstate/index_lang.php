@@ -28,7 +28,7 @@ $lang['function_on']
 $lang['function_off']
 	= 'No';
 $lang['upgrade']
-	= 'Allow upgrades';
+	= 'Automatic updates';
 $lang['tromboning']
 	= 'Allow remote access';
 $lang['remote_control']

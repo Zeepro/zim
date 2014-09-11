@@ -26,7 +26,7 @@ $lang['Home']
 $lang['ip_address']
 	= 'Local IP';
 $lang['sso_name']
-	= 'Printer name';
+	= 'zim name';
 $lang['printer_no_sso']
 	= '(Printer not activated)';
 $lang['hostname']

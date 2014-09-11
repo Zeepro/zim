@@ -148,10 +148,10 @@
 					</div>
 				</div>
 				<div class="container_16" style="text-align:center">
-					<div id="cartridge_ajax" style="text-align:center;border: 2px solid;display:inline-block;width:45%;margin-left:2%;">
+					<div id="cartridge_ajax" style="text-align:justify;border: 2px solid;display:inline-block;width:45%;margin-left:2%;">
 						<img src="styles/images/ajax-loader.gif" style="opacity: 0.18;" />
 					</div>
-					<div id="cartridge_ajax2" style="text-align:center;border: 2px solid;display:inline-block;width:45%;margin-left:2%;">
+					<div id="cartridge_ajax2" style="text-align:justify;border: 2px solid;display:inline-block;width:45%;margin-left:2%;">
 						<img src="styles/images/ajax-loader.gif" style="opacity: 0.18;" />
 					</div>
 				</div>

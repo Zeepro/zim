@@ -24,7 +24,7 @@ $lang['manage_left']
 $lang['manage_right']
 	= 'Right cartridge';
 $lang['bed_title']
-	= 'Bed levelling';
+	= 'Bed leveling';
 $lang['activate_printer']
 	= 'Activate the printer';
 $lang['left']

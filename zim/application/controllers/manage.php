@@ -192,7 +192,7 @@ class Manage extends MY_Controller {
 								'color'		=> $json_cartridge['color'],
 								'material'	=> "<br />" . strtoupper($json_cartridge['material'])."<br />",
 								'length'	=> number_format(round(($initial - $used) / 1000, 2, PHP_ROUND_HALF_DOWN), 2),
-								'length_text'	=> t('length_text') . "<br />",
+								'length_text'	=> t('length_text'),
 								'action'		=> $action);
 			$this->parser->parse('template/manage/manage_filament_ajax', $template_data);
 		}
