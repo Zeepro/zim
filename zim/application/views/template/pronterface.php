@@ -186,7 +186,7 @@
 				<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete" onclick="javascript: window.location.href='/pronterface/stop';">Stop</button>
 			</div>
 			<label for="gcode_detail_info">Output</label>
-			<textarea name="gcode_detail_info" id="gcode_detail_info" disabled></textarea>
+			<textarea name="gcode_detail_info" id="gcode_detail_info" style="height: 300px !important;" disabled></textarea>
 <!-- 			<div id="gcode_detail_info"></div> -->
 		</div>
 	</div>

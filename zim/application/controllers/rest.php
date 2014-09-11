@@ -784,6 +784,15 @@ class Rest extends MY_Controller {
 					$cr = ERROR_OK;
 					break;
 					
+				case ZIMAPI_PRM_SSH:
+					if (ZimAPI_getSSH($display)) {
+						$cr = ERROR_OK;
+					}
+					else {
+						$cr = ERROR_INTERNAL;
+					}
+					break;
+					
 				default:
 					$cr = ERROR_WRONG_PRM;
 					break;
@@ -1055,7 +1064,16 @@ class Rest extends MY_Controller {
 						$cr = ERROR_MISS_PRM;
 					}
 					break;
-					//TODO finish me
+					
+				case ZIMAPI_PRM_SSH:
+					$status_set = $this->input->get('v');
+					
+					if ($status_set) {
+						$cr = ZimAPI_setSSH($status_set);
+					}
+					else {
+						$cr = ERROR_MISS_PRM;
+					}
 					break;
 					
 				default:

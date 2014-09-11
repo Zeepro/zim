@@ -2992,7 +2992,7 @@ function PrinterState_setOffset($array_data = array()) {
 		PrinterLog_logError('set offset command error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
-	else if (count($output) && FALSE !== strstr($output[0], 'Error')) {
+	else if (count($output) && FALSE !== strpos($output[0], 'Error')) {
 		PrinterLog_logError('set offset command message error', __FILE__, __LINE__);
 		return ERROR_WRONG_PRM;
 	}

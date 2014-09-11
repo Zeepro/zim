@@ -236,7 +236,12 @@ function ZimAPI_getNetworkInfoAsArray(&$array_data) {
 		if ($ret_val != ERROR_NORMAL_RC_OK) {
 			return ERROR_INTERNAL;
 		}
-		$array_data[ZIMAPI_TITLE_DNS] = $output[0];
+		if (count($output)) {
+			$array_data[ZIMAPI_TITLE_DNS] = $output[0];
+		}
+		else {
+			$array_data[ZIMAPI_TITLE_DNS] = NULL;
+		}
 		
 	} catch (Exception $e) {
 		return ERROR_INTERNAL;
@@ -1336,14 +1341,16 @@ function ZimAPI_getSSH(&$mode, &$url = NULL) {
 	else {
 		if (count($output)) {
 			$temp_string = $output[0];
-			if (FALSE === strstr($temp_string, 'ON')) {
+			if (FALSE !== strpos($temp_string, 'ON')) {
 				$temp_url = NULL;
 				
 				$mode = 'on';
-				$temp_string = substr($temp_string, strstr($temp_string, '['));
-				$url = substr($temp_string, 0, strstr($temp_string, ']'));
+				$temp_string = strstr($temp_string, '[');
+				$url = str_replace(array('[', ']'), '', $temp_string);
 			}
-			//TODO finish me
+			else {
+				$mode = 'off';
+			}
 		}
 	}
 	
@@ -1354,9 +1361,36 @@ function ZimAPI_setSSH($mode) {
 	$output = array();
 	$ret_val = 0;
 	
-	//TODO finish me
+	$mode = strtolower($mode);
 	
-	return TRUE;
+	switch ($mode) {
+		case 'off':
+			exec(ZIMAPI_CMD_SSH_OFF);
+			break;
+			
+		case 'on':
+			$mode_current = NULL;
+			if (ZimAPI_getSSH($mode_current)) {
+				if ($mode_current == 'off') {
+					exec(ZIMAPI_CMD_SSH_ON);
+				}
+				else {
+					$CI = &get_instance();
+					$CI->load->helper('printerlog');
+					PrinterLog_logMessage('remote ssh already opened', __FILE__, __LINE__);
+				}
+			}
+			else {
+				return ERROR_INTERNAL;
+			}
+			break;
+			
+		default:
+			return ERROR_WRONG_PRM;
+			break;
+	}
+	
+	return ERROR_OK;
 }
 
 function ZimAPI_getPresetInfoAsArray($preset_id, &$array_info, &$system_preset = NULL, $set_localization = TRUE) {
