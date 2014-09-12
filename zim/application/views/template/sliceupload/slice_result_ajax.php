@@ -53,13 +53,15 @@ if ($("#slider_right").attr('value') == "---")
 	$("#temper_r").css('display', 'none');
 
 var tmp = $("#slider_right").val();
+var min_tmp = tmp - 10;
 
-$("#slider_right").attr('min', tmp - 10); 
+$("#slider_right").attr('min', (min_tmp < 165) ? 165 : min_tmp); 
 $("#slider_right").attr('max', parseInt(tmp) + 10);
 
 tmp = $("#slider_left").val();
+min_tmp = tmp - 10;
 
-$("#slider_left").attr('min', tmp - 10); 
+$("#slider_left").attr('min', (min_tmp < 165) ? 165 : min_tmp); 
 $("#slider_left").attr('max', parseInt(tmp) + 10);
 
 $('#detail_zone').trigger("create");

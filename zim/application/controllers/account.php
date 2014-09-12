@@ -46,6 +46,11 @@ class Account extends MY_Controller
 				}
 			}
 		}
+		else {
+			// simply protect when not in post method
+			$this->output->set_header('Location: /activation');
+			return;
+		}
 		
 		$body_page = $this->parser->parse($file, $data, TRUE);
 		

@@ -77,13 +77,15 @@
 
 <script>
 var tmp = $("#slider-2").val();
+var min_tmp = tmp - 10;
 
-$("#slider-2").attr('min', tmp - 10); 
+$("#slider-2").attr('min', (min_tmp < 165) ? 165 : min_tmp); 
 $("#slider-2").attr('max', parseInt(tmp) + 10);
 
 tmp = $("#slider-1").val();
+min_tmp = tmp - 10;
 
-$("#slider-1").attr('min', tmp - 10); 
+$("#slider-1").attr('min', (min_tmp < 165) ? 165 : min_tmp); 
 $("#slider-1").attr('max', parseInt(tmp) + 10);
 
 $("input[type=submit]").on('click', function()
