@@ -337,12 +337,12 @@ function ZimAPI_setsWifi($nameWifi, $passWifi = '') {
 				$command = ZIMAPI_CMD_SWIFI . ' ' . $nameWifi;
 			}
 			else {
-				$passWifi = ZimAPI__filterCharacter($passWifi); //str_replace('"', '\"', $passWifi);
-				
 				// check password length
 				if (strlen($passWifi) < 8 || strlen($passWifi) > 64) {
 					return ERROR_WRONG_PRM;
 				}
+				
+				$passWifi = ZimAPI__filterCharacter($passWifi); //str_replace('"', '\"', $passWifi);
 				
 				// use WPA crypt as default
 				$command = ZIMAPI_CMD_SWIFI . ' ' . $nameWifi . ' wpa ' . $passWifi;
@@ -396,12 +396,12 @@ function ZimAPI_setcWifi($nameWifi, $passWifi = '') {
 				$command = ZIMAPI_CMD_CWIFI . ' ' . $nameWifi;
 			}
 			else {
-				$passWifi = ZimAPI__filterCharacter($passWifi); //str_replace('"', '\"', $passWifi);
-				
 				// check password length
 				if (strlen($passWifi) < 8 || strlen($passWifi) > 64) {
 					return ERROR_WRONG_PRM;
 				}
+				
+				$passWifi = ZimAPI__filterCharacter($passWifi); //str_replace('"', '\"', $passWifi);
 				
 				// use WPA crypt as default
 				$command = ZIMAPI_CMD_CWIFI . ' ' . $nameWifi . ' ' . $passWifi;
@@ -428,7 +428,7 @@ function ZimAPI_setcWifi($nameWifi, $passWifi = '') {
 	$ret_val = CoreStatus_finishConnection(array('type'=>'cWifi', "name"=>$nameWifi, "passwd"=>$passWifi));
 	if ($ret_val == FALSE) {
 		$CI->load->helper('printerlog');
-		PrinterLog_logError('finish connection in sWifi error', __FILE__, __LINE__);
+		PrinterLog_logError('finish connection in cWifi error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
 	
