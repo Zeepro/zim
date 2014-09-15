@@ -55,6 +55,7 @@ function CoreStatus_initialFile() {
 	$CI = &get_instance();
 	$state_file = NULL;
 	$sdcard = FALSE;
+	$check_onboot = FALSE;
 	
 	// for the first time, check if we can use all files in sdcard instead of config partition
 	// then save the choice in a status file in the temp to remember it
@@ -64,26 +65,30 @@ function CoreStatus_initialFile() {
 	else if (file_exists($CI->config->item('temp') . CORESTATUS_FILE_SD_OFF)) {
 		$sdcard = FALSE;
 	}
-	if (is_writable($CI->config->item('sdcard'))) {
-		$cr = 0;
-		$command = CORESTATUS_CMD_CHECK_SD . $CI->config->item('sdcard') . '.phptest.tmp';
-		$output = array();
-		
-		$CI->load->helper('errorcode');
-		exec($command, $output, $cr);
-		
-		if ($cr == ERROR_NORMAL_RC_OK) {
-			$sdcard = TRUE;
-			$command = CORESTATUS_CMD_CHECK_SD . $CI->config->item('temp') . CORESTATUS_FILE_SD_ON;
+	else {
+		if (is_writable($CI->config->item('sdcard'))) {
+			$cr = 0;
+			$command = CORESTATUS_CMD_CHECK_SD . $CI->config->item('sdcard') . '.phptest.tmp';
+			$output = array();
+			
+			$CI->load->helper('errorcode');
+			exec($command, $output, $cr);
+			
+			if ($cr == ERROR_NORMAL_RC_OK) {
+				$sdcard = TRUE;
+				$command = CORESTATUS_CMD_CHECK_SD . $CI->config->item('temp') . CORESTATUS_FILE_SD_ON;
+			}
+			else {
+				$command = CORESTATUS_CMD_CHECK_SD . $CI->config->item('temp') . CORESTATUS_FILE_SD_OFF;
+			}
 		}
 		else {
 			$command = CORESTATUS_CMD_CHECK_SD . $CI->config->item('temp') . CORESTATUS_FILE_SD_OFF;
 		}
+		exec($command);
+		
+		$check_onboot = TRUE;
 	}
-	else {
-		$command = CORESTATUS_CMD_CHECK_SD . $CI->config->item('temp') . CORESTATUS_FILE_SD_OFF;
-	}
-	exec($command);
 	
 	$array_change = array(
 			'conf'			=> CORESTATUS_SUFFIX_CONF,
@@ -133,6 +138,17 @@ function CoreStatus_initialFile() {
 		}
 		else {
 			return FALSE;
+		}
+	}
+	else if ($check_onboot == TRUE) {
+		// change loading and unloading status into idle on the first boot checking
+		$status_check = NULL;
+		CoreStatus_checkInIdle($status_check);
+		if (in_array($status_check, array(
+				CORESTATUS_VALUE_LOAD_FILA_L, CORESTATUS_VALUE_UNLOAD_FILA_L,
+				CORESTATUS_VALUE_LOAD_FILA_R, CORESTATUS_VALUE_UNLOAD_FILA_R,
+		))) {
+			CoreStatus_setInIdle();
 		}
 	}
 	
