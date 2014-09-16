@@ -439,38 +439,47 @@ class Sliceupload extends MY_Controller {
 						$volume_need = $array_temp[PRINTERSTATE_TITLE_NEED_L];
 						
 						$tmp_ret = PrinterState_checkFilament($abb_filament, $volume_need, $data_cartridge);
-						$array_data[$abb_filament] = array(
-								PRINTERSTATE_TITLE_COLOR		=> $data_cartridge[PRINTERSTATE_TITLE_COLOR],
-								PRINTERSTATE_TITLE_EXT_TEMPER	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER],
-								PRINTERSTATE_TITLE_EXT_TEMP_1	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1],
-								PRINTERSTATE_TITLE_NEED_L		=> $volume_need,
-						);
+						if (in_array($tmp_ret, array(
+								ERROR_OK, ERROR_MISS_LEFT_FILA, ERROR_MISS_RIGT_FILA,
+								ERROR_LOW_LEFT_FILA, ERROR_LOW_RIGT_FILA,
+						))) {
+							$array_data[$abb_filament] = array(
+									PRINTERSTATE_TITLE_COLOR		=> $data_cartridge[PRINTERSTATE_TITLE_COLOR],
+									PRINTERSTATE_TITLE_EXT_TEMPER	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER],
+									PRINTERSTATE_TITLE_EXT_TEMP_1	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1],
+									PRINTERSTATE_TITLE_NEED_L		=> $volume_need,
+							);
+						}
 						// only assign return code when success to make a tour of used cartridges
 						if ($cr == ERROR_OK) {
-							$cr = $tmp_ret;
+							$cr = $tmp_ret; //FIXME if we have several error code, it only returns one of it
 						}
 						// check material difference for all used cartridges
-						if ($material == NULL) {
-							$material = $data_cartridge[PRINTERSTATE_TITLE_MATERIAL];
-						}
-						else if ($material != $data_cartridge[PRINTERSTATE_TITLE_MATERIAL]) {
-							$error .= t('cartridge_material_diff_msg') . '<br>';
-						}
-						if ($array_temp[PRINTERSTATE_TITLE_EXT_TEMPER] != $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER]) {
-							$error .= t('temper_diff_msg',
-									array(
-											$array_temp[PRINTERSTATE_TITLE_EXT_TEMPER],
-											$data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER],
-									)
-							) . '<br>';
-						}
-						if ($array_temp[PRINTERSTATE_TITLE_EXT_TEMP_1] != $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1]) {
-							$error .= t('first_temper_diff_msg',
-									array(
-											$array_temp[PRINTERSTATE_TITLE_EXT_TEMP_1],
-											$data_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1],
-									)
-							) . '<br>';
+						if (!in_array($tmp_ret, array(
+								ERROR_INTERNAL, ERROR_MISS_LEFT_CART, ERROR_MISS_RIGT_CART,
+						))) {
+							if ($material == NULL) {
+								$material = $data_cartridge[PRINTERSTATE_TITLE_MATERIAL];
+							}
+							else if ($material != $data_cartridge[PRINTERSTATE_TITLE_MATERIAL]) {
+								$error .= t('cartridge_material_diff_msg') . '<br>';
+							}
+							if ($array_temp[PRINTERSTATE_TITLE_EXT_TEMPER] != $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER]) {
+								$error .= t('temper_diff_msg',
+										array(
+												$array_temp[PRINTERSTATE_TITLE_EXT_TEMPER],
+												$data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER],
+										)
+								) . '<br>';
+							}
+							if ($array_temp[PRINTERSTATE_TITLE_EXT_TEMP_1] != $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1]) {
+								$error .= t('first_temper_diff_msg',
+										array(
+												$array_temp[PRINTERSTATE_TITLE_EXT_TEMP_1],
+												$data_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1],
+										)
+								) . '<br>';
+							}
 						}
 					}
 					if (!is_null($error)) {
