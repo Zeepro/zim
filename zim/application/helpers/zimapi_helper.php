@@ -496,7 +496,7 @@ function ZimAPI_setpEth() {
 
 function ZimAPI_setHostname($hostname, $restart = TRUE) {
 	// check characters
-	if (count_chars($hostname) > 9 || count_chars($hostname) == 0) {
+	if (strlen($hostname) > 9 || strlen($hostname) == 0) {
 		return ERROR_MISS_PRM;
 	}
 	else if (preg_match('/^[A-Za-z0-9]+$/', $hostname)) {
@@ -1156,7 +1156,7 @@ function ZimAPI_setPrinterSSOName($value, $set_hostname = TRUE) {
 	}
 	else {
 		//TODO check if it is necessary to add verification here
-		if (count_chars($value) > 9 || count_chars($value) == 0
+		if (strlen($value) > 9 || strlen($value) == 0
 				|| !preg_match('/^[A-Za-z0-9]+$/', $hostname)) {
 			return ERROR_WRONG_PRM;
 		}
