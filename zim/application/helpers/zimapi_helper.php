@@ -496,7 +496,7 @@ function ZimAPI_setpEth() {
 
 function ZimAPI_setHostname($hostname, $restart = TRUE) {
 	// check characters
-	if (count_chars($hostname) > 9 && count_chars($hostname) == 0) {
+	if (count_chars($hostname) > 9 || count_chars($hostname) == 0) {
 		return ERROR_MISS_PRM;
 	}
 	else if (preg_match('/^[A-Za-z0-9]+$/', $hostname)) {
@@ -1144,14 +1144,26 @@ function ZimAPI_getPrinterSSOName(&$value) {
 	return ERROR_OK;
 }
 
-function ZimAPI_setPrinterSSOName($value) {
+function ZimAPI_setPrinterSSOName($value, $set_hostname = TRUE) {
 	$CI = &get_instance();
 	$filename = $CI->config->item('conf') . ZIMAPI_FILE_SSO_NAME;
 	
+	if ($set_hostname == TRUE) {
+		$cr = ZimAPI_setHostname($value);
+		if ($cr != ERROR_OK) {
+			return $cr;
+		}
+	}
+	else {
+		//TODO check if it is necessary to add verification here
+		if (count_chars($value) > 9 || count_chars($value) == 0
+				|| !preg_match('/^[A-Za-z0-9]+$/', $hostname)) {
+			return ERROR_WRONG_PRM;
+		}
+	}
+	
 	if ($value == NULL) {
 		unlink($filename);
-		
-		//TODO disactivate the tromboning
 	}
 	else {
 		try {
