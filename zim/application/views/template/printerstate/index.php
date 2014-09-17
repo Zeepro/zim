@@ -45,9 +45,9 @@
 				<li><a href="/printerstate/resetnetwork">
 					<h2>{reset_network}</h2></a>
 				</li>
-				<li><a href="/printerstate/sethostname">
-					<h2>{set_hostname}</h2></a>
-				</li>
+<!-- 				<li><a href="/printerstate/sethostname"> -->
+<!-- 					<h2>{set_hostname}</h2></a> -->
+<!-- 				</li> -->
 			</ul>
 			<img src="/assets/images/shadow2.png" class="shadow" alt="shadow">
 		</div>
