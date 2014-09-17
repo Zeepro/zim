@@ -71,7 +71,7 @@ class Connection extends MY_Controller {
 		return;
 	}
 	
-	public function wifissid() {
+	public function wifissid($mode = NULL) {
 		$template_data = array();
 		$list_ssid = array();
 		$body_page = NULL;
@@ -100,6 +100,7 @@ class Connection extends MY_Controller {
 					'title'			=> t('WiFi network connected to the Internet'),
 					'back'			=> t('Back'),
 					'list_ssid'		=> $list_ssid,
+					'wizard'		=> 'mode=' . (($mode == 'wizard') ? 'wizard' : 'normal'),
 					'no_visable'	=> htmlspecialchars(t("Not visible...")),
 			);
 			
@@ -118,6 +119,7 @@ class Connection extends MY_Controller {
 	public function wifinotvisiblessid() {
 		$template_data = array();
 		$body_page = NULL;
+		$mode = $this->input->get('mode');
 		
 		$this->lang->load('connection/master', $this->config->item('language'));
 		$this->lang->load('connection/wifinotvisiblessid', $this->config->item('language'));
@@ -132,7 +134,7 @@ class Connection extends MY_Controller {
 		$this->form_validation->set_rules('ssid', 'SSID', 'required');
 		$this->form_validation->set_message('required', t('required ssid'));
 		
-		if ($this->form_validation->run () == FALSE) {
+		if ($this->form_validation->run() == FALSE) {
 			// parse the main body
 			$template_data = array(
 					'title'		=> t('WiFi network connected to the Internet'),
@@ -146,7 +148,8 @@ class Connection extends MY_Controller {
 			// parse all page
 			$this->_generate_framePage($body_page);
 		} else {
-			$this->output->set_header('Location: /connection/wifipswd?ssid=' . rawurlencode($this->input->post('ssid')));
+			$this->output->set_header('Location: /connection/wifipswd?ssid=' . rawurlencode($this->input->post('ssid'))
+					. '&mode=' . (($mode == 'wizard') ? 'wizard' : 'normal'));
 		}
 		
 		return;
@@ -157,7 +160,7 @@ class Connection extends MY_Controller {
 		$body_page = NULL;
 		
 		$this->load->library('form_validation');
-		$this->load->helper(array('zimapi'));
+		$this->load->helper(array('zimapi', 'corestatus'));
 		
 		$this->form_validation->set_rules('password', 'password', '');
 		
@@ -166,6 +169,7 @@ class Connection extends MY_Controller {
 		
 		if ($this->form_validation->run() == FALSE) {
 			$ssid = $this->input->get('ssid');
+			$mode = $this->input->get('mode');
 			
 			$this->load->library('parser');
 			$template_data = array(
@@ -174,6 +178,7 @@ class Connection extends MY_Controller {
 					'label'		=> htmlspecialchars(t("network password")),
 					'back'		=> t('Back'),
 					'submit'	=> htmlspecialchars(t("OK")),
+					'mode'		=> ($mode == 'wizard') ? 'wizard' : 'normal',
 			);
 			$body_page = $this->parser->parse('template/connection/wifipswd', $template_data, TRUE);
 				
@@ -182,6 +187,7 @@ class Connection extends MY_Controller {
 		} else {
 			$ssid = $this->input->post('ssid');
 			$passwd = $this->input->post('password');
+			$mode = $this->input->post('mode');
 			
 			$ret_val = ZimAPI_setcWifi($ssid, $passwd);
 			if ($ret_val != ERROR_OK) {
@@ -191,7 +197,21 @@ class Connection extends MY_Controller {
 			else
 			{
 				//$this->confirmation();
-				$this->output->set_header("Location:/printerstate/sethostname");
+				if ($mode == 'wizard') {
+					$this->confirmation_wizard();
+					if (!CoreStatus_wantActivation()) {
+						$this->load->helper('printerlog');
+						PrinterLog_logError('can not set need activation status', __FILE__, __LINE__);
+					}
+					ZimAPI_restartNetwork();
+				}
+				else {
+					if (!CoreStatus_wantHostname()) {
+						$this->load->helper('printerlog');
+						PrinterLog_logError('can not set need hostname status', __FILE__, __LINE__);
+					}
+					$this->output->set_header("Location:/printerstate/sethostname");
+				}
 			}
 		}
 		
@@ -212,7 +232,7 @@ class Connection extends MY_Controller {
 		$this->template->set ( 'lang', $this->config->item('language_abbr') );
 		$this->template->set ( 'header', "<title>" . t ( 'ZeePro Personal Printer 21 - Connection configuration' ) . "</title>" );
 		
-		if ($this->form_validation->run () == FALSE) {
+// 		if ($this->form_validation->run() == FALSE) {
 			$template_data = array(
 					'title'		=> t('Wired network connection'),
 					'back'		=> t('Back'),
@@ -225,10 +245,10 @@ class Connection extends MY_Controller {
 				
 			// parse all page
 			$this->_generate_framePage($body_page);
-		}
-		else {
-			$this->confirmation();
-		}
+// 		}
+// 		else {
+// 			$this->confirmation();
+// 		}
 		
 		return;
 	}
@@ -244,8 +264,12 @@ class Connection extends MY_Controller {
 		}
 		else
 		{
-			$this->confirmation();
+// 			$this->confirmation();
 			$this->output->set_header("Location:/printerstate/sethostname");
+			if (!CoreStatus_wantHostname()) {
+				$this->load->helper('printerlog');
+				PrinterLog_logError('can not set need hostname status', __FILE__, __LINE__);
+			}
 		}
 		
 		return;
@@ -318,6 +342,10 @@ class Connection extends MY_Controller {
 			{
 				//$this->confirmation();
 				$this->output->set_header("Location:/printerstate/sethostname");
+				if (!CoreStatus_wantHostname()) {
+					$this->load->helper('printerlog');
+					PrinterLog_logError('can not set need hostname status', __FILE__, __LINE__);
+				}
 			}
 		}
 		
@@ -357,8 +385,12 @@ class Connection extends MY_Controller {
 					}
 					else {
 // 						$this->output->set_header("Location:/connection/confirmation");
-						$this->confirmation();
+// 						$this->confirmation();
 						$this->output->set_header("Location:/printerstate/sethostname");
+						if (!CoreStatus_wantHostname()) {
+							$this->load->helper('printerlog');
+							PrinterLog_logError('can not set need hostname status', __FILE__, __LINE__);
+						}
 						return; // end generating if successed
 					}
 				}
@@ -383,6 +415,34 @@ class Connection extends MY_Controller {
 		// parse all page
 		$this->_generate_framePage($body_page);
 		
+		return;
+	}
+	
+	public function confirmation_wizard() {
+		$template_data = array();
+		$body_page = NULL;
+		$hostname = NULL;
+		
+		$this->load->library('parser');
+		$this->load->helper('zimapi');
+		$this->lang->load('connection/master', $this->config->item('language'));
+		$this->lang->load('connection/confirmation', $this->config->item('language'));
+		
+		if (ERROR_OK != ZimAPI_getHostname($hostname)) {
+			$this->load->helper('printerlog');
+			PrinterLog_logError('can not get hostname', __FILE__, __LINE__);
+		}
+		
+		// parse the main body
+		$template_data = array(
+				'thank_you'	=> t('thank you'),
+				'confirm'	=> t("confirmation text", array($hostname, $hostname, $hostname, $hostname)),
+		);
+		
+		$body_page = $this->parser->parse('template/connection/in_progress', $template_data, TRUE);
+				
+		// parse all page
+		$this->_generate_framePage($body_page);
 		return;
 	}
 	

@@ -1168,7 +1168,11 @@ class Printerstate extends MY_Controller {
 			if ($hostname) {
 				$this->load->helper('zimapi');
 				
-				$code = ZimAPI_setHostname($hostname, $restart); 
+				$code = ZimAPI_setHostname($hostname, $restart);
+				if (!CoreStatus_finishHostname()) {
+					$this->load->helper('printerlog');
+					PrinterLog_logError('can not remove need hostname status', __FILE__, __LINE__);
+				}
 				if ($code == ERROR_OK)
 				{
 					$hint_message = NULL;

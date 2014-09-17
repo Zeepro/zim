@@ -13,6 +13,7 @@
 
 				<label for="ip">{label}</label>
 				<input type="hidden" name="ssid" id="ssid" value="{ssid}">
+				<input type="hidden" name="mode" id="mode" value="{mode}">
 				<input type="password" name="password" id="password" value=""/>
 
 				<div>

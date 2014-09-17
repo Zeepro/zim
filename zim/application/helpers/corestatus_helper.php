@@ -7,6 +7,8 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_FILENAME_WORK',		'Work.json');
 	define('CORESTATUS_FILENAME_INIT',		'Boot.json');
 	define('CORESTATUS_FILENAME_CONNECT',	'Connection.json');
+	define('CORESTATUS_FILENAME_NOACTIVE',	'NeedActive.tmp');
+	define('CORESTATUS_FILENAME_NOHOST',	'NeedHostname.tmp');
 	define('CORESTATUS_FILENAME_REMOTEOFF',	'tromboning_off');
 	define('CORESTATUS_FILEPATH_PRODCON',	'/tmp/ProdTmpConnection.tmp');
 	
@@ -234,12 +236,15 @@ function CoreStatus_checkInInitialization() {
 function CoreStatus_checkInConnection() {
 	global $CFG;
 	$state_file = $CFG->config['conf'] . CORESTATUS_FILENAME_CONNECT;
+	$active_file = $CFG->config['conf'] . CORESTATUS_FILENAME_NOACTIVE;
+	$host_file = $CFG->config['conf'] . CORESTATUS_FILENAME_NOHOST;
 	
 	// we have the json file when having finished connection config
-	if (file_exists($state_file)) {
+	if (file_exists(CORESTATUS_FILEPATH_PRODCON)) {
 		return FALSE;
 	}
-	else if (file_exists(CORESTATUS_FILEPATH_PRODCON)) {
+	else if (file_exists($state_file)
+			&& !file_exists($active_file) && !file_exists($host_file)) {
 		return FALSE;
 	}
 	else {
@@ -276,7 +281,17 @@ function CoreStatus_checkCallInitialization(&$url_redirect = '') {
 }
 
 function CoreStatus_checkCallConnection(&$url_redirect = '') {
-	$url_redirect = '/connection';
+	global $CFG;
+	
+	if (file_exists($CFG->config['conf'] . CORESTATUS_FILENAME_NOACTIVE)) {
+		$url_redirect = '/account/signup?mode=wizard';
+	}
+	else if (file_exists($CFG->config['conf'] . CORESTATUS_FILENAME_NOHOST)) {
+		$url_redirect = '/printerstate/sethostname';
+	}
+	else {
+		$url_redirect = '/connection/wifissid/wizard';
+	}
 	
 	return CoreStatus__checkCallController('connection');
 }
@@ -393,8 +408,7 @@ function CoreStatus_checkCallSlicing(&$url_redirect = '') {
 
 function CoreStatus_checkCallDebug() {
 	// test_log & test_video & test_cartridge controller is not in My_controller's control
-	return (CoreStatus__checkCallController('gcode')
-			|| CoreStatus__checkCallController('pronterface'));
+	return CoreStatus__checkCallController(array('gcode', 'pronterface'));
 }
 
 function CoreStatus_checkCallNoBlockREST() {
@@ -452,10 +466,10 @@ function CoreStatus_checkCallNoBlockRESTInSlice() {
 	));
 }
 
-function CoreStatus_checkCallNoBlockPage() {
-	return CoreStatus__checkCallURI(array(
-			'/printerstate/sethostname'	=> NULL,
-	));
+function CoreStatus_checkCallNoBlockPageInConnection() {
+	return (CoreStatus__checkCallController(array('account', 'activation'))
+			|| CoreStatus__checkCallURI(array('/printerstate/sethostname' => NULL))
+	);
 }
 
 function CoreStatus_setInIdle($last_error = FALSE, $error_message = FALSE) {
@@ -718,6 +732,60 @@ function CoreStatus_finishConnection($data_json = array()) {
 	return TRUE;
 }
 
+function CoreStatus_wantHostname() {
+	global $CFG;
+	$host_file = $CFG->config['conf'] . CORESTATUS_FILENAME_NOHOST;
+
+	$fp = fopen($host_file, 'w');
+	if ($fp) {
+		fwrite($fp, CORESTATUS_FILENAME_NOHOST);
+		fclose($fp);
+	}
+	else {
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+function CoreStatus_finishHostname() {
+	global $CFG;
+	$host_file = $CFG->config['conf'] . CORESTATUS_FILENAME_NOHOST;
+	
+	if (file_exists($host_file)) {
+		return unlink($host_file);
+	}
+	
+	return TRUE;
+}
+
+function CoreStatus_wantActivation() {
+	global $CFG;
+	$active_file = $CFG->config['conf'] . CORESTATUS_FILENAME_NOACTIVE;
+
+	$fp = fopen($active_file, 'w');
+	if ($fp) {
+		fwrite($fp, CORESTATUS_FILENAME_NOACTIVE);
+		fclose($fp);
+	}
+	else {
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+function CoreStatus_finishActivation() {
+	global $CFG;
+	$active_file = $CFG->config['conf'] . CORESTATUS_FILENAME_NOACTIVE;
+	
+	if (file_exists($active_file)) {
+		return unlink($active_file);
+	}
+	
+	return TRUE;
+}
+
 function CoreStatus_prodTmpConnection() {
 	$fp = fopen(CORESTATUS_FILEPATH_PRODCON, 'w');
 	
@@ -804,12 +872,24 @@ function CoreStatus_setDebugLevel($level = 1) {
 // internal function
 function CoreStatus__checkCallController($name_controller) {
 	$CI = &get_instance();
-	if ($CI->router->class == $name_controller) {
+	
+	if (is_array($name_controller)) {
+		foreach ($name_controller as $element_name) {
+			if ($CI->router->class == $element_name) {
+				return TRUE;
+			}
+		}
+		
+		return FALSE;
+	}
+	else if ($CI->router->class == $name_controller) {
 		return TRUE;
 	}
 	else {
 		return FALSE;
 	}
+	
+	return FALSE; // never reach here
 }
 
 // function CoreStatus__checkCallURI($array_URI) {

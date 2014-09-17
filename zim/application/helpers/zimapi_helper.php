@@ -368,7 +368,7 @@ function ZimAPI_setsWifi($nameWifi, $passWifi = '') {
 // 				} while (($ret_val != ERROR_NORMAL_RC_OK)
 // 						&& ($retry_once == TRUE) && ($retry_once = FALSE));
 				// we can not get return value because of '&'
-			//	exec(ZIMAPI_CMD_RESTART_WEB);
+			//	ZimAPI_restartNetwork();
 			}
 		} catch (Exception $e) {
 			return ERROR_INTERNAL;
@@ -427,7 +427,7 @@ function ZimAPI_setcWifi($nameWifi, $passWifi = '') {
 // 				} while (($ret_val != ERROR_NORMAL_RC_OK)
 // 						&& ($retry_once == TRUE) && ($retry_once = FALSE));
 				// we can not get return value because of '&'
-			//	exec(ZIMAPI_CMD_RESTART_WEB);
+			//	ZimAPI_restartNetwork();
 			}
 		} catch (Exception $e) {
 			return ERROR_INTERNAL;
@@ -476,7 +476,7 @@ function ZimAPI_setcEth($ip = '', $mask = '', $gateWay = '') {
 			return ERROR_INTERNAL;
 		}
 		else {
-		//	exec(ZIMAPI_CMD_RESTART_WEB);
+		//	ZimAPI_restartNetwork();
 		}
 	}
 	
@@ -517,7 +517,7 @@ function ZimAPI_setHostname($hostname, $restart = TRUE) {
 			}
 			else {
 				if ($restart == TRUE) {
-					exec(ZIMAPI_CMD_RESTART_WEB);
+					ZimAPI_restartNetwork();
 				}
 				
 				return ERROR_OK;
@@ -620,6 +620,10 @@ function ZimAPI_setNetwork($string_json) {
 	}
 }
 
+function ZimAPI_restartNetwork() {
+	exec(ZIMAPI_CMD_RESTART_WEB);
+}
+
 function ZimAPI_resetNetwork() {
 	$CI = &get_instance();
 	$CI->load->helper(array('corestatus'));
@@ -644,7 +648,7 @@ function ZimAPI_resetNetwork() {
 // 				} while (($ret_val != ERROR_NORMAL_RC_OK)
 // 						&& ($retry_once == TRUE) && ($retry_once = FALSE));
 				// we can not get return value because of '&'
-				exec(ZIMAPI_CMD_RESTART_WEB);
+				ZimAPI_restartNetwork();
 			}
 		} catch (Exception $e) {
 			return ERROR_INTERNAL;
@@ -1149,7 +1153,7 @@ function ZimAPI_setPrinterSSOName($value, $set_hostname = TRUE) {
 	$filename = $CI->config->item('conf') . ZIMAPI_FILE_SSO_NAME;
 	
 	if ($set_hostname == TRUE) {
-		$cr = ZimAPI_setHostname($value);
+		$cr = ZimAPI_setHostname($value, FALSE);
 		if ($cr != ERROR_OK) {
 			return $cr;
 		}

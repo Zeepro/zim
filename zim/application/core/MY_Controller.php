@@ -82,10 +82,6 @@ class MY_Controller extends CI_Controller {
 			// and we do not need them in normal condition
 			return;
 		}
-		else if (CoreStatus_checkCallNoBlockPage()) {
-			// always allow certains pages pass, for example, set host name service
-			return;
-		}
 		else {
 			$status_current = '';
 			$url_redirect = '';
@@ -110,6 +106,9 @@ class MY_Controller extends CI_Controller {
 			}
 			// check connection issue
 			else if (CoreStatus_checkInConnection()) {
+				if (CoreStatus_checkCallNoBlockPageInConnection()) {
+					return; // we are calling set hostname, activation or account page
+				}
 				if (CoreStatus_checkCallConnection($url_redirect)) {
 					return; // we are calling the right page
 				}

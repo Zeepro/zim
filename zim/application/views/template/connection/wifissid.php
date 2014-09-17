@@ -10,9 +10,9 @@
 			<ul data-role="listview" data-inset="true" id="listview"
 				class="shadowBox">
 				{list_ssid}
-				<li><a href="/connection/wifipswd?ssid={link}">{name}</a></li>
+				<li><a href="/connection/wifipswd?ssid={link}&{wizard}">{name}</a></li>
 				{/list_ssid}
-				<li><a href="/connection/wifinotvisiblessid" data-prefetch>{no_visable}</a></li>
+				<li><a href="/connection/wifinotvisiblessid?{wizard}" data-prefetch>{no_visable}</a></li>
 			</ul>
 			<img src="/assets/images/shadow2.png" class="shadow" alt="shadow">
 		</div>
