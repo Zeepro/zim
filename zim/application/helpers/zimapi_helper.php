@@ -194,14 +194,23 @@ function ZimAPI_getNetworkInfoAsArray(&$array_data) {
 		// get ip, mask and mac
 		if ($array_data[ZIMAPI_TITLE_MEDIUM] == ZIMAPI_VALUE_ETH) {
 			$line_output_ip = 2;
+			if (count($output) != 4) {
+				throw new Exception('network setting error in eth mode');
+			}
 		}
 		else if ($array_data[ZIMAPI_TITLE_TOPOLOGY] == ZIMAPI_VALUE_NETWORK) {
 			$line_output_ip = 3;
 			$array_data[ZIMAPI_TITLE_SSID] = substr($output[1], strpos($output[1], 'ssid=') + 6, -1);
+			if (count($output) != 5) {
+				throw new Exception('network setting error in cwifi mode');
+			}
 		}
 		else { // mode sWifi
 			$line_output_ip = 4;
 			$array_data[ZIMAPI_TITLE_SSID] = substr($output[1], strpos($output[1], 'SSID:') + 6);
+			if (count($output) != 6) {
+				throw new Exception('network setting error in swifi mode');
+			}
 		}
 		$array_temp = explode(' ', str_replace('  ', ' ', $output[$line_output_ip]));
 		$array_data[ZIMAPI_TITLE_IP] = substr($array_temp[0], 5);
