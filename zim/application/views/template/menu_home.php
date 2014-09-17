@@ -4,7 +4,7 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
-<!-- 			<h2>DNJNFDJSNFJKSN{title}</h2> -->
+<!-- 			<h2>{title}</h2> -->
 			{activation_btn}
 			<ul data-role="listview" id="listview" class="shadowBox" data-inset="true">
 				<li><a href="/printmodel/listmodel">
