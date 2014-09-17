@@ -524,11 +524,11 @@ class Printerstate extends MY_Controller {
 								. (array_key_exists(PRINTERSTATE_TITLE_SSO_NAME, $temp_info) ? $temp_info[PRINTERSTATE_TITLE_SSO_NAME] : "")
 								. "<a data-role='button' href='/activation/?returnUrl=printerstate/printerinfo'>{button_sso}</a></div>",
 				),
-				array(
-						'title'	=> t('hostname'),
-						'value'	=> "<div style='text-align:center'>" . $temp_info[PRINTERSTATE_TITLE_HOSTNAME]
-								. "<a data-ajax=false data-role='button' href='/printerstate/sethostname'>{button_fqdn}</a></div>"
-				),
+// 				array(
+// 						'title'	=> t('hostname'),
+// 						'value'	=> "<div style='text-align:center'>" . $temp_info[PRINTERSTATE_TITLE_HOSTNAME]
+// 								. "<a data-ajax=false data-role='button' href='/printerstate/sethostname'>{button_fqdn}</a></div>"
+// 				),
 		);
 		
 		// parse the main body
@@ -857,14 +857,14 @@ class Printerstate extends MY_Controller {
 				if ($ret_val == $code_miss_filament) {
 					//TODO added a new temporary page here, need to remove when not needed
 // 					$this->_display_changecartridge_wait_load_filament(FALSE);
-					if ($temp_data[PRINTERSTATE_TITLE_CARTRIDGE] == PRINTERSTATE_DESP_CARTRIDGE_REFILL) {
-						$this->_display_changecartridge_write_cartridge($abb_cartridge, PRINTERSTATE_CHANGECART_WAIT_F, $need_filament);
-					}
-					else {
-						$this->_display_changecartridge_wait_load_filament(FALSE);
-					}
-// 					$this->_display_changecartridge_write_cartridge($abb_cartridge, PRINTERSTATE_CHANGECART_WAIT_F, $need_filament);
-					
+// 					if ($temp_data[PRINTERSTATE_TITLE_CARTRIDGE] == PRINTERSTATE_DESP_CARTRIDGE_REFILL) {
+// 						$this->_display_changecartridge_write_cartridge($abb_cartridge, PRINTERSTATE_CHANGECART_WAIT_F, $need_filament);
+// 					}
+// 					else {
+// 						$this->_display_changecartridge_wait_load_filament(FALSE);
+// 					}
+					$this->_display_changecartridge_write_cartridge($abb_cartridge, PRINTERSTATE_CHANGECART_WAIT_F, $need_filament);
+					//TODO a new filament quantity verification system
 					
 					// turn off RFID power after changing
 					$ret_val = PrinterState_setRFIDPower(FALSE);
@@ -1281,7 +1281,6 @@ class Printerstate extends MY_Controller {
 		$body_page = NULL;
 		$error = '';
 		
-		//TODO use PrinterState_getOffset('X' / 'Y', $value) & PrinterState_setOffset(array('X'=>$value)) ERROR_OK
 		$this->load->library('parser');
 		$this->lang->load('printerstate/nozzles', $this->config->item('language'));
 		
