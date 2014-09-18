@@ -12,11 +12,15 @@
 setTimeout(function()
 {
 	var interval;
-	
+	var counter = 0;
+
 	interval = setInterval(function()
 	{
 		var image = new Image();
 
+		counter += 1;
+		if (counter >= 90)
+			window.location.href = "/connection/host_not_up";
 		image.src = "http://{hostname}.local/assets/images/pixel.png";
 		setTimeout(function()
 		{
@@ -28,6 +32,9 @@ setTimeout(function()
 		}, 1000);
 	}, 2000);
 }, 30000);
+
+
+
 </script>
 
 </div>
