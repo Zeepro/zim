@@ -8,22 +8,25 @@
 	</div>
 
 <script>
-setTimeout(function() {
+
+setTimeout(function()
+{
 	var interval;
 	
-	interval = setInterval(function() {
-		$.ajax(
+	interval = setInterval(function()
+	{
+		var image = new Image();
+
+		image.src = "http://{hostname}.local/assets/images/pixel.png";
+		setTimeout(function()
 		{
-			url: "http://{hostname}.local",
-			type: "GET",
-			statusCode: {
-				200: function() {
-					clearInterval(interval);
-					window.location.href="http://{hostname}.local";
-				}
+			if (image.height != 0)
+			{
+				clearInterval(interval);
+				window.location.href="http://{hostname}.local";
 			}
-		});
-	}, 1000);
+		}, 1000);
+	}, 2000);
 }, 30000);
 </script>
 
