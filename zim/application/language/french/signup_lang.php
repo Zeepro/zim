@@ -7,3 +7,4 @@ $lang['signup_text'] = 'Créez votre compte Zeepro';
 $lang['confcode_hint'] = 'Un email de confirmation vous sera envoyé à cette adresse.';
 $lang['password'] = 'Mot de passe';
 $lang['confirm_password'] = 'Confirmez votre mot de passe';
+$lang['button_skip'] = 'Omettre';

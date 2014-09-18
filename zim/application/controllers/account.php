@@ -250,6 +250,7 @@ class Account extends MY_Controller {
 		$data['confcode_hint'] = t('confcode_hint');
 		$data['signup_title'] = t('signup_title');
 		$data['signup_text'] = t('signup_text');
+		$data['skip_title'] = t('button_skip');
 		$body_page = $this->parser->parse('template/account/signup', $data, TRUE);
 		
 		// parse all page
