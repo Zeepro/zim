@@ -3,7 +3,7 @@
 $lang['ZeePro Personal Printer 21 - Activation']
 	= 'Zim - 激活';
 $lang['hint_title']
-	= '恭喜您！';
+	= '网络设置：';
 $lang['wizard_success_hint']
 	= '您可以使用您的打印机名称 %s 登录<a href="http://home.zeepro.com">http://home.zeepro.com</a>，或者<a href="http://%s/">http://%s/</a>.';
 $lang['wizard_fail_hint']
