@@ -45,6 +45,12 @@ class Connection extends MY_Controller {
 	}
 	
 	public function index() {
+		$this->output->set_header("Location:/connection/wifissid/wizard");
+		
+		return;
+	}
+	
+	public function advanced() {
 		$template_data = array();
 		$body_page = NULL;
 		
@@ -198,7 +204,8 @@ class Connection extends MY_Controller {
 			{
 				//$this->confirmation();
 				if ($mode == 'wizard') {
-					$this->confirmation_wizard();
+// 					$this->confirmation_wizard();
+					$this->in_progress();
 					if (!CoreStatus_wantActivation()) {
 						$this->load->helper('printerlog');
 						PrinterLog_logError('can not set need activation status', __FILE__, __LINE__);
@@ -260,7 +267,7 @@ class Connection extends MY_Controller {
 		
 		$cr = ZimAPI_setpEth();
 		if ($cr != ERROR_OK) {
-			$this->output->set_header("Location:/connection");
+			$this->output->set_header("Location:/connection/advanced");
 		}
 		else
 		{
@@ -336,7 +343,7 @@ class Connection extends MY_Controller {
 			
 			$cr = ZimAPI_setcEth($ip, $mask, $gateWay);
 			if ($cr != ERROR_OK) {
-				$this->output->set_header("Location:/connection");
+				$this->output->set_header("Location:/connection/advanced");
 			}
 			else
 			{
@@ -473,30 +480,30 @@ class Connection extends MY_Controller {
 		$this->_generate_framePage($body_page);
 		return;
 	}
-	public function in_progress()
-	{
+	
+	public function in_progress() {
 		$template_data = array();
 		$body_page = NULL;
 		$hostname = NULL;
-
+		
 		$this->load->library('parser'); 
 		$this->load->helper('zimapi');
 		$this->lang->load('connection/in_progress', $this->config->item('language'));
-
-		if (ZimAPI_getHostname($hostname) != ERROR_OK)
-		{
-		   $this->load->helper('printerlog');
-		   PrinterLog_logError('cannot get hostname', __FILE__, __LINE__);
+		
+		if (ERROR_OK != ZimAPI_getHostname($hostname)) {
+			$this->load->helper('printerlog');
+			PrinterLog_logError('cannot get hostname', __FILE__, __LINE__);
 		}
-
+		
 		$template_data = array(
-				'hostname'	 => $hostname,
-				'config_printer' => t('config_printer')
+				'hostname'			=> $hostname,
+				'config_printer'	=> t('config_printer'),
 		);
-
-		$body_page = $this->parser->parse('template/connection/confirmation', $template_data, TRUE);
+		
+		$body_page = $this->parser->parse('template/connection/in_progress', $template_data, TRUE);
 		$this->_generate_framePage($body_page);
-		return ;
+		
+		return;
 	}
 }
 //TODO test me

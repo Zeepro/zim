@@ -1,3 +1,3 @@
 <?php
 
-$lang['config_printer'] = "Configuration de votre zim..."
+$lang['config_printer'] = "Configuration de votre zim...";
