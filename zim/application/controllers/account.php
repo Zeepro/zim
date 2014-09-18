@@ -179,11 +179,10 @@ class Account extends MY_Controller {
 		$data = array();
 		
 		$this->load->library('parser');
-		$this->load->helper('url');
+		$this->load->helper(array('url','corestatus'));
 		
 		// check network
 		if (@file_get_contents("https://sso.zeepro.com/login.ashx") === FALSE) {
-			$this->load->helper('corestatus');
 			if (CoreStatus_checkInConnection()) {
 				$this->output->set_header('Location: /activation/wizard_confirm/fail');
 			}
@@ -232,6 +231,14 @@ class Account extends MY_Controller {
 					redirect('/account/signup_confirmation');
 				}
 			}
+		}
+		
+		// add skip button if in wizard
+		if (CoreStatus_checkInConnection()) {
+			$data['wizard_mode'] = 'true';
+		}
+		else {
+			$data['wizard_mode'] = 'false';
 		}
 		$body_page = $this->parser->parse('template/account/signup', $data, TRUE);
 		
