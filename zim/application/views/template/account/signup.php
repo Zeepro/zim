@@ -5,8 +5,8 @@
 	</div>
 	<div data-role="content">
 		<div id="container">
-			<h1>{signup_title}Sign Up</h1>
-				<h3>{signup_text}Create your Zeepro account</h3>
+			<h1>{signup_title}</h1>
+				<h3>{signup_text}</h3>
 		<?php
 			$this->load->helper('form');
 			
@@ -22,7 +22,7 @@
 			echo form_close();
 		?>
 	<div>
-		<p>{confcode_hint}An email with a confirmation code will be sent to this address</p>
+		<p>{confcode_hint}</p>
 	</div>
 		<a href="{btn_url}" data-role="button">{back_or_arleady}</a>
 		<a href="/activation/wizard_confirm/skip" data-role="button" style="display:{has_skip}">{skip_title}</a>

@@ -179,6 +179,7 @@ class Account extends MY_Controller {
 		$data = array();
 		
 		$this->load->library('parser');
+		$this->lang->load('signup', $this->config->item('language'));
 		$this->load->helper(array('url','corestatus'));
 		
 		// check network
