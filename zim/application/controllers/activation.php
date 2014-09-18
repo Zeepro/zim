@@ -87,7 +87,7 @@ class Activation extends MY_Controller
 				'back'			=> t('back'),
 				'congrats'		=> t('congrats'),
 				'confirmation_message'	=> t('confirmation_message'),
-				'returnUrl'		=> isset($_GET['returnUrl']) ? $_GET['returnUrl'] : "/"
+				'returnUrl'		=> isset($_GET['returnUrl']) ? "/" . $_GET['returnUrl'] : "/"
 		);
 		$this->parser->parse('template/basetemplate', $template_data);
 	}
