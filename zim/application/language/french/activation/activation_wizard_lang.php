@@ -3,7 +3,7 @@
 $lang['ZeePro Personal Printer 21 - Activation']
 	= 'Zim - Activation';
 $lang['hint_title']
-	= 'Félicitations !';
+	= 'Configuration réseau :';
 $lang['wizard_success_hint']
 	= 'Vous pouvez connecter à <a href="http://home.zeepro.com">http://home.zeepro.com</a> avec le nom de l\'imprimante %s, ou <a href="http://%s/">http://%s/</a>.';
 $lang['wizard_fail_hint']

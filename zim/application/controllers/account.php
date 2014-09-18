@@ -234,12 +234,21 @@ class Account extends MY_Controller {
 		}
 		
 		// add skip button if in wizard
-		if (CoreStatus_checkInConnection()) {
-			$data['wizard_mode'] = 'true';
+		if (CoreStatus_checkInConnection())
+		{
+			$data['back_or_already'] = t('already');
+			$data['has_skip'] = "block"; 			
+			$data['btn_url'] ='/account/signin';
 		}
-		else {
-			$data['wizard_mode'] = 'false';
+		else
+		{
+			$data['back_or_already'] = t('back');
+			$data['has_skip'] = "none";
+			$data['btn_url'] ='javascript:history.back()';
 		}
+		$data['confcode_hint'] = t('confcode_hint');
+		$data['signup_title'] = t('signup_title');
+		$data['signup_text'] = t('signup_text');
 		$body_page = $this->parser->parse('template/account/signup', $data, TRUE);
 		
 		// parse all page
