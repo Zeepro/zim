@@ -473,5 +473,30 @@ class Connection extends MY_Controller {
 		$this->_generate_framePage($body_page);
 		return;
 	}
+	public function in_progress()
+	{
+		$template_data = array();
+		$body_page = NULL;
+		$hostname = NULL;
+
+		$this->load->library('parser'); 
+		$this->load->helper('zimapi');
+		$this->lang->load('connection/in_progress', $this->config->item('language'));
+
+		if (ZimAPI_getHostname($hostname) != ERROR_OK)
+		{
+		   $this->load->helper('printerlog');
+		   PrinterLog_logError('cannot get hostname', __FILE__, __LINE__);
+		}
+
+		$template_data = array(
+				'hostname'	 => $hostname,
+				'config_printer' => t('config_printer')
+		);
+
+		$body_page = $this->parser->parse('template/connection/confirmation', $template_data, TRUE);
+		$this->_generate_framePage($body_page);
+		return ;
+	}
 }
 //TODO test me
