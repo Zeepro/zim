@@ -5,6 +5,7 @@ if (!defined('BASEPATH'))
 
 class Activation extends MY_Controller
 {
+	//FIXME rewrite totally this controller and pass core function to helper
 	public function index()
 	{
 		$network_ok = false;
@@ -89,5 +90,61 @@ class Activation extends MY_Controller
 				'returnUrl'		=> isset($_GET['returnUrl']) ? $_GET['returnUrl'] : "/"
 		);
 		$this->parser->parse('template/basetemplate', $template_data);
+	}
+	
+	public function wizard_confirm($mode = NULL) {
+		$body_page = NULL;
+		$hint_txt = NULL;
+		$hostname = NULL;
+		$template_data = array();
+		
+		$this->load->library('parser');
+		$this->load->helper(array('corestatus', 'zimapi'));
+		$this->lang->load('activation/activation_wizard', $this->config->item('language'));
+		
+		if (!CoreStatus_finishActivation()) {
+			$this->load->helper('printerlog');
+			PrinterLog_LogError('can not finish need activation mode', __FILE__, __LINE__);
+		}
+		if (ERROR_OK != ZimAPI_getHostname($hostname)) {
+			$this->load->helper('printerlog');
+			PrinterLog_logError('can not get hostname', __FILE__, __LINE__);
+		}
+		
+		switch ($mode) {
+			case NULL:
+				$hint_txt = t('wizard_success_hint', array($hostname, $hostname, $hostname));
+				break;
+				
+			case 'fail':
+				$hint_txt = t('wizard_fail_hint', array($hostname, $hostname));
+				break;
+				
+			case 'skip':
+			default:
+				if ($mode != 'skip') {
+					$this->load->helper('printerlog');
+					PrinterLog_LogError('unknown mode for wizard, mode: ' . $mode, __FILE__, __LINE__);
+				}
+				$hint_txt = t('wizard_skip_hint', array($hostname, $hostname));
+				break;
+		}
+		
+		$template_data = array(
+				'hint_title'	=> t('hint_title'),
+				'hint_txt'		=> $hint_txt,
+				'button_ok'		=> t('button_ok'),
+		);
+		$body_page = $this->parser->parse('template/activation/activation_wizard', $template_data, TRUE);
+		
+		// parse all page
+		$template_data = array(
+				'lang'			=> $this->config->item('language_abbr'),
+				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Activation') . '</title>',
+				'contents'		=> $body_page,
+		);
+		$this->parser->parse('template/basetemplate', $template_data);
+		
+		return;
 	}
 }

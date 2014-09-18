@@ -14,7 +14,7 @@ class MY_Controller extends CI_Controller {
 		}
 		
 		//TODO move this log function to printerlog helper
-		$json_context = json_encode($context);
+		$json_context = @json_encode($context);
 		$message = strip_tags($msg . " in " . $file . " at " . $line. " with " . $json_context);
 		$this->load->helper('printerlog');
 		PrinterLog_logSSO($level, 500, $message);

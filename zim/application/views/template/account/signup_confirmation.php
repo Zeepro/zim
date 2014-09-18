@@ -11,6 +11,7 @@
 			
 				echo form_open('/account/signup_confirmation', array('data-ajax' => 'false'));
 				echo form_hidden('email', $this->session->flashdata('email'));
+				echo form_hidden('password', $this->session->flashdata('password'));
 				echo '<p>Enter the confirmation code you got by email here :</p>';
 				echo form_input('code');
 				echo '<br />';
