@@ -13,15 +13,20 @@ setTimeout(function()
 {
 	var interval;
 	var counter = 0;
-
+	
 	interval = setInterval(function()
 	{
 		var image = new Image();
-
-		counter += 1;
-		if (counter >= 90)
+		
+		if (counter >= 90) {
+			clearInterval(interval);
 			window.location.href = "/connection/host_not_up";
-		image.src = "http://{hostname}.local/assets/images/pixel.png";
+		}
+		else {
+			counter += 1;
+		}
+		
+		image.src = "http://{hostname}.local/assets/images/pixel.png?_=" + (new Date()).getTime();
 		setTimeout(function()
 		{
 			if (image.height != 0)

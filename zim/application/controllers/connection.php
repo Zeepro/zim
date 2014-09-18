@@ -488,6 +488,7 @@ class Connection extends MY_Controller {
 		
 		$this->load->library('parser'); 
 		$this->load->helper('zimapi');
+		$this->lang->load('connection/master', $this->config->item('language'));
 		$this->lang->load('connection/in_progress', $this->config->item('language'));
 		
 		if (ERROR_OK != ZimAPI_getHostname($hostname)) {
@@ -501,6 +502,20 @@ class Connection extends MY_Controller {
 		);
 		
 		$body_page = $this->parser->parse('template/connection/in_progress', $template_data, TRUE);
+		$this->_generate_framePage($body_page);
+		
+		return;
+	}
+	
+	public function host_not_up() {
+		$template_data = array();
+		$body_page = NULL;
+		$hostname = NULL;
+		
+		$this->load->library('parser'); 
+		$this->lang->load('connection/master', $this->config->item('language'));
+		
+		$body_page = $this->parser->parse('template/connection/host_not_up', array(), TRUE);
 		$this->_generate_framePage($body_page);
 		
 		return;
