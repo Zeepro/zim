@@ -165,7 +165,7 @@ class Connection extends MY_Controller {
 		$template_data = array();
 		$body_page = NULL;
 		
-		$this->load->library('form_validation');
+		$this->load->library(array('parser', 'form_validation'));
 		$this->load->helper(array('zimapi', 'corestatus'));
 		
 		$this->form_validation->set_rules('password_confirm', 'Password confirmation', '');
@@ -177,20 +177,6 @@ class Connection extends MY_Controller {
 		if ($this->form_validation->run() == FALSE) {
 			$ssid = $this->input->get('ssid');
 			$mode = $this->input->get('mode');
-			
-			$this->load->library('parser');
-			$template_data = array(
-					'title'		=> htmlspecialchars(t("network", $ssid)),
-					'ssid'		=> $ssid,
-					'label'		=> htmlspecialchars(t("network password")),
-					'back'		=> t('Back'),
-					'submit'	=> htmlspecialchars(t("OK")),
-					'mode'		=> ($mode == 'wizard') ? 'wizard' : 'normal',
-			);
-			$body_page = $this->parser->parse('template/connection/wifipswd', $template_data, TRUE);
-				
-			// parse all page
-			$this->_generate_framePage($body_page);
 		} else {
 			$ssid = $this->input->post('ssid');
 			$passwd = $this->input->post('password');
@@ -199,7 +185,9 @@ class Connection extends MY_Controller {
 			$ret_val = ZimAPI_setcWifi($ssid, $passwd);
 			if ($ret_val != ERROR_OK) {
 // 				$error = t('invalid data');
-				$this->output->set_header("Location:/connection/wifissid");
+				$this->output->set_header("Location:/connection/wifissid" . ($mode == 'wizard') ? '/wizard' : NULL);
+				
+				return;
 			}
 			else
 			{
@@ -219,9 +207,25 @@ class Connection extends MY_Controller {
 						PrinterLog_logError('can not set need hostname status', __FILE__, __LINE__);
 					}
 					$this->output->set_header("Location:/printerstate/sethostname");
+					
+					return;
 				}
 			}
 		}
+		
+		$template_data = array(
+				'title'				=> htmlspecialchars(t("network", $ssid)),
+				'ssid'				=> $ssid,
+				'label'				=> htmlspecialchars(t("network password")),
+				'back'				=> t('Back'),
+				'submit'			=> htmlspecialchars(t("OK")),
+				'mode'				=> ($mode == 'wizard') ? 'wizard' : 'normal',
+				'confirm_password'	=> t('confirm_password'),
+		);
+		$body_page = $this->parser->parse('template/connection/wifipswd', $template_data, TRUE);
+			
+		// parse all page
+		$this->_generate_framePage($body_page);
 		
 		return;
 	}
@@ -500,23 +504,10 @@ class Connection extends MY_Controller {
 		$template_data = array(
 				'hostname'			=> $hostname,
 				'config_printer'	=> t('config_printer'),
+				'connect_error_msg'	=> t('connect_error_msg'),
 		);
 		
 		$body_page = $this->parser->parse('template/connection/in_progress', $template_data, TRUE);
-		$this->_generate_framePage($body_page);
-		
-		return;
-	}
-	
-	public function host_not_up() {
-		$template_data = array();
-		$body_page = NULL;
-		$hostname = NULL;
-		
-		$this->load->library('parser'); 
-		$this->lang->load('connection/master', $this->config->item('language'));
-		
-		$body_page = $this->parser->parse('template/connection/host_not_up', array(), TRUE);
 		$this->_generate_framePage($body_page);
 		
 		return;

@@ -3,7 +3,7 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container" style="text-align:center;">
-			{config_printer}
+			<p id="hint_box">{config_printer}</p>
 		</div>
 	</div>
 
@@ -22,8 +22,8 @@ var suffix = '.local';
 if (isAndroid)
 {
 	var match = ua.match(/Android\s([0-9\.]*)/);
-    if (match[1][0] < '4' || (match[1][0] == '4' && match[1][2] < '3'))
-        suffix = '';
+	if (match[1][0] < '4' || (match[1][0] == '4' && match[1][2] < '3'))
+		suffix = '';
 }
 
 if (ua.search('Windows') != -1)
@@ -43,7 +43,8 @@ setTimeout(function()
 		
 		if (counter >= 90) {
 			clearInterval(interval);
-			window.location.href = "/connection/host_not_up";
+			$("p#hint_box").html("{connect_error_msg}");
+			$(".ui-loader").css("display", "none");
 		}
 		else {
 			counter += 1;
