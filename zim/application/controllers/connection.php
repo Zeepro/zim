@@ -168,7 +168,8 @@ class Connection extends MY_Controller {
 		$this->load->library('form_validation');
 		$this->load->helper(array('zimapi', 'corestatus'));
 		
-		$this->form_validation->set_rules('password', 'password', '');
+		$this->form_validation->set_rules('password_confirm', 'Password confirmation', '');
+		$this->form_validation->set_rules('password', 'Password', 'matches[password_confirm]');
 		
 		$this->lang->load('connection/master', $this->config->item('language'));
 		$this->lang->load('connection/wifipswd', $this->config->item('language'));

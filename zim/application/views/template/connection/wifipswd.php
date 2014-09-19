@@ -10,16 +10,16 @@
 
 			<form action="/connection/wifipswd" method="post"
 				accept-charset="utf-8">
-
 				<label for="ip">{label}</label>
 				<input type="hidden" name="ssid" id="ssid" value="{ssid}">
 				<input type="hidden" name="mode" id="mode" value="{mode}">
-				<input type="password" name="password" id="password" value=""/>
-
+				<input type="password" name="password" id="password" value="" required />
+				<label>{confirm_password}</label>
+				<input type="password" name="password_confirm" required />
 				<div>
 					<input type="submit" value="{submit}" />
 				</div>
-
+\
 			</form>
 		</div>
 	</div>

@@ -69,13 +69,18 @@ class Activation extends MY_Controller
 				$context  = stream_context_create($options);
 				@file_get_contents($url, false, $context);
 				$result = substr($http_response_header[0], 9, 3);
+				echo "<script>console.log(".$result.");</script>";
 				if ($result == 200)
 				{
 					ZimAPI_setPrinterSSOName($printer_name);
 					$file = 'template/activation/activation_confirm';
+					if (isset($_GET['returnUrl']))
+						$this->output->set_header("Location:/" . $_GET['returnUrl']);
+					else
+						$this->output->set_header("Location:/");
 				}
-				else //TODO: gestion erreur echo '<script>console.log("FAIL");</script>'
-					;
+				else
+					$this->output->set_header("Location:/activation/activation_form");
 			}
 		}
 		$body_page = $this->parser->parse($file, array(), TRUE);
