@@ -136,7 +136,7 @@ function CoreStatus_initialFile() {
 		if ($fp) {
 			fwrite($fp, json_encode($data_json));
 			fclose($fp);
-			chmod($fp, '0777');
+			chmod($state_file, 0777);
 		}
 		else {
 			return FALSE;
