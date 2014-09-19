@@ -705,11 +705,13 @@ function CoreStatus_wantConnection() {
 // 			return FALSE;
 // 		}
 		
-		$ret_val = unlink($state_file);
-		return $ret_val;
+// 		$ret_val = unlink($state_file);
+		return unlink($state_file);
 	}
+	else if (file_exists(CORESTATUS_FILEPATH_PRODCON))
+		return unlink(CORESTATUS_FILEPATH_PRODCON);
 	else {
-		return FALSE;
+		return TRUE;
 	}
 	
 	return FALSE;
