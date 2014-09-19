@@ -12,6 +12,4 @@ $lang['Press to reset network']
 $lang['Reset error']
 	= 'Erreur de réinitialisation';
 $lang['Connect to the new printer\'s network, then press OK']
-	= 'Connectez-vous au nouveau réseau de l\'imprimante, et appuyez OK';
-$lang['OK']
-	= 'OK';
+	= 'Connectez-vous au réseau WiFi nommé Zim_initialisation_XXXX, puis ouvrez un navigateur web et accédez à l\'adresse http://10.0.0.1 pour configurer zim.';

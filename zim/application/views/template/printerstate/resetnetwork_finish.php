@@ -6,9 +6,6 @@
 		<div id="container">
 			<h2 style="text-align: center;">{hint}</h2>
 			<form method="get" accept-charset="utf-8">
-				<div>
-					<input type="submit" value="{ok_button}" />
-				</div>
 			</form>
 		</div>
 	</div>
