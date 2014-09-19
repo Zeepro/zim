@@ -2105,8 +2105,8 @@ function PrinterState_filterOutput(&$output, $command = '', $trim_ok = TRUE) {
 				$output[] = $line;
 				if ($line == 'END_INITIALISATION') {
 					$sso_message = 'Marlin reset; current: ' . $command . ', last: '
-							. (is_array($PRINTER) && array_key_exists('last_command', $PRINTER))
-									 ? $PRINTER['last_command'] : 'N/A';
+							. ((is_array($PRINTER) && array_key_exists('last_command', $PRINTER))
+									 ? $PRINTER['last_command'] : 'N/A');
 					PrinterLog_logSSO(3, 503, $sso_message);
 					$PRINTER['last_command'] = $command;
 					
