@@ -308,7 +308,7 @@ class Printdetail extends MY_Controller {
 				'lighting'			=> t('lighting'),
 				'initial_strip'		=> ($status_strip == TRUE) ? $option_selected : NULL,
 				'initial_head'		=> ($status_head == TRUE) ? $option_selected : NULL,
-				//'video_error'		=> t('video_error')
+				'video_error'		=> t('video_error'),
 				'loading_player'	=> t('loading_player'),
 		);
 		

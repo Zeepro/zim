@@ -12,6 +12,10 @@ $lang['Control your printing']
 	= '控制您的打印';
 $lang['Printing details']
 	= '打印详情';
+$lang['video_error']
+	= '非常抱歉，您的设备并不兼容HLS视频流。';
+$lang['loading_player']
+	= '加载播放器中…';
 
 //printdetail status_ajax()
 $lang['Percentage: %d%%']
