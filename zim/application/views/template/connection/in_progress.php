@@ -13,6 +13,25 @@ $(document).ready(function()
 	$(".ui-loader").css("display", "block");
 });
 
+var ua = navigator.userAgent;
+var isAndroid = ua.indexOf("android") > -1;
+var version = "N/A";
+
+var suffix = '.local';
+
+if (isAndroid)
+{
+	var match = ua.match(/Android\s([0-9\.]*)/);
+    if (match[1][0] < '4' || (match[1][0] == '4' && match[1][2] < '3'))
+        suffix = '';
+}
+
+if (ua.search('Windows') != -1)
+{
+	suffix = '';
+}
+
+
 setTimeout(function()
 {
 	var interval;
@@ -30,7 +49,7 @@ setTimeout(function()
 			counter += 1;
 		}
 		
-		image.src = "http://{hostname}.local/assets/images/pixel.png?_=" + (new Date()).getTime();
+		image.src = "http://{hostname}"+ suffix +"/assets/images/pixel.png?_=" + (new Date()).getTime();
 		setTimeout(function()
 		{
 			if (image.height != 0)
