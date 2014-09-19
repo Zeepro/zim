@@ -18,7 +18,7 @@ $lang['extruder_title']
 $lang['marlin_title']
 	= 'Version de firmware';
 $lang['button_active_sso']
-	= 'Activer';
+	= 'Nommer votre zim';
 $lang['button_rename_sso']
 	= 'Renommer';
 $lang['Home']
