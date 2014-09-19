@@ -12,6 +12,8 @@
 				<li><a href="/sliceupload/upload">
 					<h2>{upload}</h2></a>
 				</li>
+			</ul>
+			<ul data-role="listview" id="listview" class="shadowBox" data-inset="true">
 				<li><a href="/manage" data-ajax="false">
 					<h2>{manage}</h2></a>
 				</li>
