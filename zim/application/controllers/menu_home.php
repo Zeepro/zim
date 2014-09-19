@@ -20,25 +20,19 @@ class Menu_home extends MY_Controller {
 		$this->lang->load('menu_home', $this->config->item('language'));
 		$this->load->helper('zimapi');
 		
-		if (!ZimAPI_cameraOff()) {
+		if (!ZimAPI_cameraOff())
+		{
 			$this->load->helper('printerlog');
 			PrinterLog_logError('can not turn off camera', __FILE__, __LINE__);
 		}
 		
 		// parse the main body
-		if (ZimAPI_getPrinterSSOName($value) != ERROR_OK);
-			;
-		if ($value == '')
-			$activation_btn = $this->parser->parse('template/activation/activation_btn', array('activate_printer' => t('activate_printer')), true);
-		else
-			$activation_btn = NULL;
 		$template_data = array(
 // 				'title'				=> t('Home'),
 				'menu_printlist'	=> t('Quick print'),
 				'menu_printerstate'	=> t('Configuration'),
 				'manage'			=> t('manage'),
 				'upload'			=> t('upload'),
-				'activation_btn'	=> $activation_btn,
 				'about'				=> t('about')
 		);
 		
