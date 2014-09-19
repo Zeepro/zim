@@ -8,6 +8,10 @@
 	</div>
 
 <script>
+$(document).ready(function()
+{
+	$(".ui-loader").css("display", "block");
+});
 
 setTimeout(function()
 {
