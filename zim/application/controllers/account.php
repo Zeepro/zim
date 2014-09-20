@@ -115,6 +115,7 @@ class Account extends MY_Controller {
 		$data = array();
 		$this->load->library('parser');
 		$this->load->helper('url');
+		$this->lang->load('signup_confirmation', $this->config->item('language'));
 		
 		// try to keep flashdata, but it seems not working
 		$this->session->keep_flashdata('email');
@@ -123,7 +124,7 @@ class Account extends MY_Controller {
 		if ($this->input->server('REQUEST_METHOD') == 'POST')
 		{
 			$this->load->library('form_validation');
-			$this->form_validation->set_rules('code', 'Confirmation code', 'required');
+			$this->form_validation->set_rules('code', 'Code', 'required');
 			if ($this->form_validation->run())
 			{
 				extract($_POST);
@@ -169,6 +170,7 @@ class Account extends MY_Controller {
 				'give_name'		=> t('give_name'),
 				'activate'		=> t('activate'),
 				'name_printer'	=> t('name_printer'),
+				'code_title'	=> t('code_title')
 		);
 		$this->parser->parse('template/basetemplate', $template_data);
 		return;

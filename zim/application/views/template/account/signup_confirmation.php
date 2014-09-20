@@ -5,17 +5,17 @@
 	</div>
 	<div data-role="content">
 		<div id="container">
-			<h3>Confirm your Zeepro account</h3>
+			<h3>{code_title}</h3>
 			<?php
 				$this->load->helper('form');
 			
 				echo form_open('/account/signup_confirmation', array('data-ajax' => 'false'));
 				echo form_hidden('email', $this->session->flashdata('email'));
 				echo form_hidden('password', $this->session->flashdata('password'));
-				echo '<p>Enter the confirmation code you got by email here :</p>';
+				echo '<p>'.t("code_text").'</p>';
 				echo form_input('code');
 				echo '<br />';
-				echo form_submit('submit', 'Send code');
+				echo form_submit('submit', 'Ok');
 				echo form_close();
 			?>
 		</div>

@@ -1,3 +1,6 @@
 <?php
 
-$lang['config_printer'] = "Configuration de votre zim...";
+$lang['config_printer'] = "Raccorder zim à votre réseau WiFi peut prendre un certain temps (jusqu'à environ 3 minutes). Veuillez ne pas fermer ou rafraîchir cette page.";
+$lang['connect_error_msg'] = 'L\'enregistrement de votre zim a échoué.<br/>Veuillez suivre les étapes suivantes :<br/><br/>1. Allez à la liste de réseaux WiFi sur votre appareil.<br/>2. Si vous voyez "ZIM_INITIALISATION" dans la liste sélectionnez-le et allez à <a href="http://10.0.0.1">http://10.0.0.1</a> pour recommencer la configuration de votre zim.<br/>3. Si votre appareil est connecté au réseau Wi-Fi que vous avez sélectionné pour zim, veuillez aller à <a href="http://zim.local">http://zim.local</a> ou <a href="http://zim">http://zim</a><br/><br/>
+Si la configuration de votre zim n\'est pas réussie, veuillez envoyer un e-mail à <a href="mailto:support@zeepro.com">support@zeepro.com</a> avec les éléments suivants :<br/>
+Le type d\'appareil que vous utilisez pour configurer zim (ainsi que la version de son système d\'exploitation) et le type de routeur Wi-Fi qui gère votre réseau.';

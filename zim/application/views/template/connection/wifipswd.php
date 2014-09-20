@@ -13,9 +13,9 @@
 				<label for="password">{label}</label>
 				<input type="hidden" name="ssid" id="ssid" value="{ssid}">
 				<input type="hidden" name="mode" id="mode" value="{mode}">
-				<input type="password" name="password" id="password" value="" required />
+				<input type="password" name="password" id="password" value="" />
 				<label for="password_confirm">{confirm_password}</label>
-				<input type="password" name="password_confirm" required />
+				<input type="password" name="password_confirm" />
 				<div>
 					<input type="submit" value="{submit}" />
 				</div>

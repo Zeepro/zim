@@ -6,7 +6,7 @@ $lang['back']
 $lang['printerstate_index_pagetitle']
 	= 'Zim - Configuration';
 $lang['reset_network']
-	= 'Réinitialiser la connection de ma zim';
+	= 'Réinitialiser les réglages réseau de ma zim';
 $lang['change_left']
 	= 'Changer la cartouche gauche';
 $lang['change_right']
