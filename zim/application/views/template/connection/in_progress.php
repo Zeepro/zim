@@ -43,7 +43,7 @@ setTimeout(function()
 		
 		if (counter >= 90) {
 			clearInterval(interval);
-			$("p#hint_box").html("{connect_error_msg}");
+			$("p#hint_box").html('{connect_error_msg}');
 			$(".ui-loader").css("display", "none");
 		}
 		else {
