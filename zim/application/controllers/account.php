@@ -102,7 +102,8 @@ class Account extends MY_Controller {
 				'contents'		=> $body_page,
 				'back'			=> t('back'),
 				'give_name'		=> t('give_name'),
-				'activate'		=> t('activate')
+				'activate'		=> t('activate'),
+				'name_printer'	=> t('name_printer'),
 		);
 		$this->parser->parse('template/basetemplate', $template_data);
 		return;
@@ -166,7 +167,8 @@ class Account extends MY_Controller {
 				'contents'		=> $body_page,
 				'back'			=> t('back'),
 				'give_name'		=> t('give_name'),
-				'activate'		=> t('activate')
+				'activate'		=> t('activate'),
+				'name_printer'	=> t('name_printer'),
 		);
 		$this->parser->parse('template/basetemplate', $template_data);
 		return;
