@@ -175,8 +175,14 @@ class Connection extends MY_Controller {
 		$this->lang->load('connection/wifipswd', $this->config->item('language'));
 		
 		if ($this->form_validation->run() == FALSE) {
-			$ssid = $this->input->get('ssid');
-			$mode = $this->input->get('mode');
+			if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+				$ssid = $this->input->post('ssid');
+				$mode = $this->input->post('mode');
+			}
+			else {
+				$ssid = $this->input->get('ssid');
+				$mode = $this->input->get('mode');
+			}
 		} else {
 			$ssid = $this->input->post('ssid');
 			$passwd = $this->input->post('password');
@@ -194,12 +200,15 @@ class Connection extends MY_Controller {
 				//$this->confirmation();
 				if ($mode == 'wizard') {
 // 					$this->confirmation_wizard();
-					$this->in_progress();
+// 					$this->in_progress();
 					if (!CoreStatus_wantActivation()) {
 						$this->load->helper('printerlog');
 						PrinterLog_logError('can not set need activation status', __FILE__, __LINE__);
 					}
 					ZimAPI_restartNetwork();
+					$this->output->set_header("Location:/connection/in_progress");
+					
+					return;
 				}
 				else {
 					if (!CoreStatus_wantHostname()) {

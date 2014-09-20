@@ -8,7 +8,7 @@
 		<div id="container">
 			<h2>{title}</h2>
 
-			<form action="/connection/wifipswd" method="post"
+			<form action="/connection/wifipswd" method="post" data-ajax="false"
 				accept-charset="utf-8">
 				<label for="password">{label}</label>
 				<input type="hidden" name="ssid" id="ssid" value="{ssid}">
