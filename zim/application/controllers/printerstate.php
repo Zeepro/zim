@@ -250,6 +250,8 @@ class Printerstate extends MY_Controller {
 		$template_data = array (
 				'next_phase'	=> PRINTERSTATE_CHANGECART_NEED_P,
 				'load_info'		=> t('Waiting for loading...'),
+				'cancel_button'	=> t('cancel_button'),
+				'cancel_info'	=> t('cancel_info'),
 		);
 		$template_name = 'template/printerstate/changecartridge_ajax/in_load_filament';
 		$this->_display_changecartridge_base($template_name, $template_data);
@@ -274,7 +276,7 @@ class Printerstate extends MY_Controller {
 			$yes_url .= '&cb=' . $id_model;
 		}
 		else {
-			$no_url = '/';
+			$no_url = '/manage';
 		}
 		
 		$template_data = array (

@@ -15,7 +15,7 @@ $lang['Unload the filament']
 $lang['Waiting for getting information...']
 	= 'Waiting for information...';
 $lang['Wait for unloading...']
-	= 'Wait for unloading...';
+	= 'Unloading...';
 $lang['Not enough filament']
 	= 'Not enough filament';
 $lang['Load the filament']
@@ -25,7 +25,7 @@ $lang['Your cartridge is loaded']
 $lang['Change the cartridge']
 	= 'Change the cartridge';
 $lang['Waiting for loading...']
-	= 'Waiting for loading...';
+	= 'Loading...';
 $lang['Prime?']
 	= 'Prime?';
 $lang['Yes']
@@ -62,3 +62,7 @@ $lang['cancel_button']
 	= 'Cancel';
 $lang['hint_unload_temper']
 	= 'Heating...';
+$lang['cancel_button']
+	= 'Cancel';
+$lang['cancel_info']
+	= 'Cancelling...';

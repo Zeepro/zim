@@ -62,3 +62,7 @@ $lang['cancel_button']
 	= 'Annuler';
 $lang['hint_unload_temper']
 	= 'Chauffage...';
+$lang['cancel_button']
+	= 'Annuler';
+$lang['cancel_info']
+	= 'Annulation en cours...';

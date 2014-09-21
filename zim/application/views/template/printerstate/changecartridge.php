@@ -20,6 +20,7 @@ var var_refreshChangeStatus;
 var var_ajax;
 var var_ajax_lock = false;
 var var_next_phase = '{first_status}';
+var var_auto_prime = -1;
 $(document).ready(checkChangeStatus());
 
 function checkChangeStatus() {

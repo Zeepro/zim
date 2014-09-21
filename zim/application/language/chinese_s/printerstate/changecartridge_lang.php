@@ -62,3 +62,7 @@ $lang['cancel_button']
 	= '取消';
 $lang['hint_unload_temper']
 	= '加热中…';
+$lang['cancel_button']
+	= '取消';
+$lang['cancel_info']
+	= '取消中…';
