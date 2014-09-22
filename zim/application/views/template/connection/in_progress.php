@@ -8,6 +8,7 @@
 	</div>
 
 <script>
+
 $(document).ready(function()
 {
 	$(".ui-loader").css("display", "block");
@@ -22,7 +23,9 @@ var suffix = '.local';
 if (isAndroid)
 {
 	var match = ua.match(/Android\s([0-9\.]*)/);
-	if (match[1][0] < '4' || (match[1][0] == '4' && match[1][2] < '3'))
+	if (match[1][0] < '4' || (match[1][0] == '4' && match[1][2] < '4'))
+		window.location.href = "/connection/android_oldversions";
+	else
 		suffix = '';
 }
 
@@ -50,13 +53,13 @@ setTimeout(function()
 			counter += 1;
 		}
 		
-		image.src = "http://{hostname}"+ suffix +"/assets/images/pixel.png?_=" + (new Date()).getTime();
+		image.src = "http://{hostname}" + "/assets/images/pixel.png?_=" + (new Date()).getTime();
 		setTimeout(function()
 		{
 			if (image.height != 0)
 			{
 				clearInterval(interval);
-				window.location.href="http://{hostname}.local";
+				window.location.href = "http://{hostname}" + "/account/first_signup/";
 			}
 		}, 1000);
 	}, 2000);

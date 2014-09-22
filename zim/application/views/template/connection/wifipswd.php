@@ -23,4 +23,10 @@
 			</form>
 		</div>
 	</div>
+	<script>
+		$("input[type=submit]").on('click', function()
+		{
+			$(".ui-loader").css('display', 'block');
+		});
+	</script>
 </div>

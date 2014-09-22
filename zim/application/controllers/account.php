@@ -85,6 +85,8 @@ class Account extends MY_Controller {
 					$file = 'template/activation/activation_form';
 					$data = array('email' =>$email, 'password' => $password, 'returnUrl' => isset($_GET['returnUrl']) ? ('?returnUrl='.$_GET['returnUrl']) : '');
 				}
+				else //error, for example bad password
+					$this->output->set_header('Location: /activation');
 			}
 		}
 		else {
@@ -177,6 +179,21 @@ class Account extends MY_Controller {
 		return;
 	}
 	
+	public function first_signup()
+	{
+//		var_dump($hostname);
+//		$ip = gethostbyname($hostname);
+//		var_dump($ip);
+//		var_dump($_SERVER);
+//		die();
+//		$this->output->set_header('Location: ' . $ip . '/account/signup');
+		$location = 'http://' . $_SERVER["SERVER_ADDR"] . '/account/signup';
+// 		var_dump($location);
+// 		var_dump($_SERVER);
+		$this->output->set_header('Location: ' . $location);
+		return;
+	}
+	
 	public function signup()
 	{
 		$body_page = NULL;
@@ -189,7 +206,8 @@ class Account extends MY_Controller {
 		
 		// check network
 		if (@file_get_contents("https://sso.zeepro.com/login.ashx") === FALSE) {
-			if (CoreStatus_checkInConnection()) {
+			if (CoreStatus_checkInConnection())
+			{
 				$this->output->set_header('Location: /activation/wizard_confirm/fail');
 			}
 			else {

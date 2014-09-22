@@ -1169,9 +1169,10 @@ class Printerstate extends MY_Controller {
 			
 			if ($hostname) {
 				$this->load->helper('zimapi');
-				
+
 				$code = ZimAPI_setHostname($hostname, $restart);
-				if (!CoreStatus_finishHostname()) {
+				if (!CoreStatus_finishHostname())
+				{
 					$this->load->helper('printerlog');
 					PrinterLog_logError('can not remove need hostname status', __FILE__, __LINE__);
 				}
@@ -1193,7 +1194,7 @@ class Printerstate extends MY_Controller {
 					);
 					
 					$body_page = $this->parser->parse('template/printerstate/sethostname_finish', $template_data, TRUE);
-					
+
 					// parse all page
 					$template_data = array(
 							'lang'			=> $this->config->item('language_abbr'),
@@ -1213,16 +1214,19 @@ class Printerstate extends MY_Controller {
 					$error = t('set_error');
 				}
 			}
-			else {
+			else
+			{
 				$error = t('no_input');
 			}
 		}
 		
 		if ($restart === NULL) {
-			if (FALSE === $this->input->get('norestart')) {
+			if (FALSE === $this->input->get('norestart'))
+			{
 				$restart = TRUE;
 			}
-			else {
+			else
+			{
 				$restart = FALSE;
 			}
 		}
@@ -1333,7 +1337,8 @@ class Printerstate extends MY_Controller {
 							$array_data[$axis] += $value; // add new offset on the ancient offset
 						}
 					}
-					if (count($error)) {
+					if (count($error))
+					{
 						// we have no error for getting ancient offset, goto setting offset
 						$cr = PrinterState_setOffset($array_data);
 						if ($cr == ERROR_WRONG_PRM) {

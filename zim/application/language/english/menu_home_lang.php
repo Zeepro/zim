@@ -8,7 +8,7 @@ $lang['Configuration']
 $lang['ZeePro Personal Printer 21 - Home']
 	= 'Zim - Home';
 $lang['manage']
-	= 'Manage your zim';
+	= 'Manage my zim';
 $lang['upload']
 	= 'Import a model';
 $lang['about']

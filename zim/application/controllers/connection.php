@@ -466,8 +466,9 @@ class Connection extends MY_Controller {
 		$this->_generate_framePage($body_page);
 		return;
 	}
-	
-	public function in_progress() {
+
+	public function in_progress()
+	{
 		$template_data = array();
 		$body_page = NULL;
 		$hostname = NULL;

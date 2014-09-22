@@ -100,6 +100,7 @@ class Activation extends MY_Controller
 	public function wizard_confirm($mode = NULL) {
 		$body_page = NULL;
 		$hint_txt = NULL;
+		$hint_title = NULL;
 		$hostname = NULL;
 		$template_data = array();
 		
@@ -107,7 +108,8 @@ class Activation extends MY_Controller
 		$this->load->helper(array('corestatus', 'zimapi'));
 		$this->lang->load('activation/activation_wizard', $this->config->item('language'));
 		
-		if (!CoreStatus_finishActivation()) {
+		if (!CoreStatus_finishActivation())
+		{
 			$this->load->helper('printerlog');
 			PrinterLog_LogError('can not finish need activation mode', __FILE__, __LINE__);
 		}
@@ -116,15 +118,18 @@ class Activation extends MY_Controller
 			PrinterLog_logError('can not get hostname', __FILE__, __LINE__);
 		}
 		
-		switch ($mode) {
+		switch ($mode)
+		{
 			case NULL:
 				$hint_txt = t('wizard_success_hint', array($hostname, $hostname, $hostname));
+				$hint_title = t('hint_title_success');
 				break;
 				
 			case 'fail':
 				$hint_txt = t('wizard_fail_hint', array($hostname, $hostname));
+				$hint_title = t('hint_title');
 				break;
-				
+
 			case 'skip':
 			default:
 				if ($mode != 'skip') {
@@ -136,7 +141,7 @@ class Activation extends MY_Controller
 		}
 		
 		$template_data = array(
-				'hint_title'	=> t('hint_title'),
+				'hint_title'	=> $hint_title,
 				'hint_txt'		=> $hint_txt,
 				'button_ok'		=> t('button_ok'),
 		);
