@@ -22,6 +22,40 @@ use constant EXIT_ERROR_INTERNAL => -9;
 
 use constant CEILING_HEAT => 50;
 
+use constant ALLOW_COMMAND_LIST => [
+	'T0',		# switch to right extruder
+	'T1',		# switch to left extruder
+	'G90',		# absolute coordinate
+	'G91',		# relative coordinate
+	'M82',		# absolute extrusion length
+	'M83',		# relative extrusion length
+	'M203',		# set maximum speed
+	'G0',		# same as g1
+	'G1',		# movement
+	'G2',		# movement cw
+	'G3',		# movement ccw
+	'G4',		# wait
+	'G28',		# home
+	'M84',		# disable stepper
+	'M104',		# set extruder temperature
+	'M109',		# wait extruder temperature
+	'M140',		# set bed temperature
+#	'M190',		# wait bed temperature
+	'M106',		# fan on
+	'M107',		# fan off
+	'M400',		# finish movements
+	'M1200',	# head led on
+	'M1201',	# head led off
+	'M1202',	# strip led on
+	'M1203',	# strip led off
+	'M1621',	# set current speed
+	'M1624',	# set current acceleration
+	'M1650',	# compensation of retraction for left extruder
+	'M1651',	# compensation of retraction for right extruder
+	'M1652',	# retraction for left extruder
+	'M1653',	# retraction for right extruder
+];
+
 # our global variable here
 my $is_windows;
 my $myself;
@@ -370,6 +404,66 @@ sub change_extruder {
 	return RC_OK;
 }
 
+sub check_file {
+	my @lines;
+	my $line_num = 0;
+	my $check_status = 'ok';
+	my ($filename) = @_;
+	my %array_check = ();
+	
+	open my $fh, '<', $filename;
+	if (tell($fh) != -1) {
+		@lines = <$fh>;
+		close $fh;
+	} else {
+		return EXIT_NO_FILE; #todo here
+	}
+	
+	foreach my $line (@lines) {
+		my @parameter;
+		my $pos_comment = -1;
+		
+		# treat line
+		++$line_num;
+		chomp($line);
+		$pos_comment = index($line, ';');
+		if ($line eq "" || $pos_comment == 0) {
+			next;
+		}
+		
+		if ($pos_comment != -1) {
+			$line = substr($line, 0, $pos_comment);
+		}
+		$line =~ s/^\s+|\s+$//g;
+		
+		@parameter = split(/ /, $line);
+		if (scalar @parameter > 0) {
+			unless ($parameter[0] ~~ ALLOW_COMMAND_LIST) {
+				$check_status = 'ko';
+				$array_check{$line_num} = $parameter[0];
+				next;
+			}
+		}
+		else { # internal error (can not split line)
+			$array_check{$line_num} = undef;
+		}
+		
+#		print $line . "\n";
+	}
+	
+	{
+		use JSON;
+		
+		my %array_output = ();
+	
+		$array_output{status} = $check_status;
+		$array_output{result} = \%array_check;
+		print to_json(\%array_output);
+	}
+	
+	return 0;
+}
+
 #=========================
 # main function below
 #=========================
@@ -394,6 +488,7 @@ my %opt = ();
 		'temp_rs|rr=s' => \$opt{temp_rs},	# right temperature for other layer (if exists)
 		'analyze|a'    => \$opt{analyze},
 		'change|c'     => \$opt{change_e},
+		'verify|v'     => \$opt{verify},
 	);
 	GetOptions(%options);
 }
@@ -429,6 +524,18 @@ elsif ( $opt{analyze} ) {
 	}
 	else {
 		my $rc = analyze_file($opt{openfile});
+	
+		exit($rc);
+	}
+}
+elsif ( $opt{verify} ) {
+	unless ( $opt{openfile} ) {
+		my $rc = usage(EXIT_ERROR_PRM);
+		
+		exit($rc);
+	}
+	else {
+		my $rc = check_file($opt{openfile});
 	
 		exit($rc);
 	}
