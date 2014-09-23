@@ -5,13 +5,24 @@ if "%1"=="unload" goto :unload
 exit 0;
 
 :unload
-echo "
+echo "in unloading"
+
+if "%2"=="l" set extruder="T1"
+if "%2"=="l" set unload_cmd="M1607"
+if "%2"=="r" set extruder="T0"
+if "%2"=="r" set unload_cmd="M1606"
+
 
 setlocal
 call :GetUnixTime UNIX_TIME
-echo %UNIX_TIME%> C:/wamp/sites/zim/tmp/printer_unload_heat
-timeout 60
-del C:\wamp\sites\zim\tmp\printer_unload_heat
+echo %UNIX_TIME% > ./tmp/printer_unload_heat
+perl ./bin/arcontrol/Arcontrol_cli.pl %extruder%
+perl ./bin/arcontrol/Arcontrol_cli.pl M104 S200
+@rem timeout 60
+ping -n 61 127.0.0.1 > nul
+del .\tmp\printer_unload_heat
+perl ./bin/arcontrol/Arcontrol_cli.pl %unload_cmd%
+perl ./bin/arcontrol/Arcontrol_cli.pl M104 S20
 goto :EOF
 
 :GetUnixTime

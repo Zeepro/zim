@@ -77,13 +77,25 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_OFFSET_X_LABEL',	'\ X');
 	define('PRINTERSTATE_OFFSET_Y_LABEL',	'\ Y');
 	
-// 	define('PRINTERSTATE_TEMP_PRINT_FILENAME',	'/tmp/printer_percentage'); // fix the name on SD card
-	define('PRINTERSTATE_FILE_PRINTLOG',	'/tmp/printlog.log');
-	define('PRINTERSTATE_FILE_RESPONSE',	'/tmp/printer_response.log');
-	define('PRINTERSTATE_FILE_STOPFILE',	'/tmp/printer_stop');
-	define('PRINTERSTATE_FILE_PAUSEFILE',	'/tmp/printer_pause');
-	define('PRINTERSTATE_FILE_RESUMEFILE',	'/tmp/printer_resume');
-	define('PRINTERSTATE_FILE_UNLOAD_HEAT',	'/tmp/printer_unload_heat');
+	global $CFG;
+	if ($CFG->config['simulator']) {
+// 		define('PRINTERSTATE_TEMP_PRINT_FILENAME',	'./tmp/printer_percentage'); // fix the name on SD card
+		define('PRINTERSTATE_FILE_PRINTLOG',	'./tmp/printlog.log');
+		define('PRINTERSTATE_FILE_RESPONSE',	'./tmp/printer_response.log');
+		define('PRINTERSTATE_FILE_STOPFILE',	'./tmp/printer_stop');
+		define('PRINTERSTATE_FILE_PAUSEFILE',	'./tmp/printer_pause');
+		define('PRINTERSTATE_FILE_RESUMEFILE',	'./tmp/printer_resume');
+		define('PRINTERSTATE_FILE_UNLOAD_HEAT',	'./tmp/printer_unload_heat');
+	}
+	else {
+// 		define('PRINTERSTATE_TEMP_PRINT_FILENAME',	'/tmp/printer_percentage'); // fix the name on SD card
+		define('PRINTERSTATE_FILE_PRINTLOG',	'/tmp/printlog.log');
+		define('PRINTERSTATE_FILE_RESPONSE',	'/tmp/printer_response.log');
+		define('PRINTERSTATE_FILE_STOPFILE',	'/tmp/printer_stop');
+		define('PRINTERSTATE_FILE_PAUSEFILE',	'/tmp/printer_pause');
+		define('PRINTERSTATE_FILE_RESUMEFILE',	'/tmp/printer_resume');
+		define('PRINTERSTATE_FILE_UNLOAD_HEAT',	'/tmp/printer_unload_heat');
+	}
 	
 	define('PRINTERSTATE_RIGHT_EXTRUD',	0);
 	define('PRINTERSTATE_LEFT_EXTRUD',	1);
@@ -1855,6 +1867,9 @@ function PrinterState_unloadFilament($abb_filament) {
 	if ($CI->config->item('simulator') == FALSE && !DectectOS_checkWindows()) {
 // 		$command .= ' > ' . PRINTERSTATE_FILE_RESPONSE . ' &';
 		$command .= ' &';
+	}
+	else {
+		$command = 'start /B ' . $command;
 	}
 	
 	// check if we are in printing
