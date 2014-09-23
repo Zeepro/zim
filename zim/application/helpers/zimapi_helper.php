@@ -16,7 +16,8 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_CMD_RESTART_WEB',	'sudo /etc/init.d/zeepro-network delayed-restart >> /var/log/network.log 2>&1 &');
 	define('ZIMAPI_CMD_GATEWAY',		'route -n | awk \'$2 != "0.0.0.0" { print $2 }\' | sed -n 3p');
 	define('ZIMAPI_CMD_DNS',			'grep nameserver /etc/resolv.conf | awk \'{print $2}\'');
-	define('ZIMAPI_CMD_SERIAL',			'ifconfig -a | grep eth0 | awk \'{print $5}\'');
+// 	define('ZIMAPI_CMD_SERIAL',			'ifconfig -a | grep eth0 | awk \'{print $5}\' | head -n 1');
+	define('ZIMAPI_CMD_SERIAL',			'[ -f /fab/macaddr.txt ] && cat /fab/macaddr.txt || ifconfig -a | grep eth0 | awk \'{print $5}\' | head -n 1');
 	define('ZIMAPI_CMD_VERSION',		'zfw_printenv version`zfw_printenv last_good`');
 	define('ZIMAPI_CMD_VERSION_REBOOT',	'zfw_printenv version`zfw_printenv update` || zfw_printenv version`zfw_printenv last_good`');
 	define('ZIMAPI_CMD_SETHOSTNAME',	ZIMAPI_CMD_CONFIG_NET . '-n ');
@@ -1098,7 +1099,7 @@ function ZimAPI_getSerial() {
 			$address_mac = 'ff:ff:ff:ff:ff:ff';
 		}
 	}
-	$address_mac = str_replace(':', '', $address_mac);
+	$address_mac = strtoupper(str_replace(':', '', $address_mac));
 	
 	return $address_mac;
 }
