@@ -84,7 +84,7 @@ if (var_enable_print == false) {
 }
 if (var_reslice == true) {
 	$('<div>').appendTo('#detail_zone')
-	.attr({'id': 'reslice_button', 'onclick': 'javascript: startSlice();'}).html('{reslice_button}')
+	.attr({'id': 'reslice_button', 'onclick': 'javascript: startSlice(true);'}).html('{reslice_button}')
 	.button().button('refresh');
 }
 </script>

@@ -330,7 +330,12 @@ class Sliceupload extends MY_Controller {
 		
 		// set and load preset into slicer
 		if ($id_preset) {
-			$cr = ZimAPI_setPreset($id_preset);
+			if ($id_preset == 'previous') {
+				$cr = ZimAPI_getPreset($id_preset);
+			}
+			else {
+				$cr = ZimAPI_setPreset($id_preset);
+			}
 		}
 		else {
 			$cr = ERROR_MISS_PRM;

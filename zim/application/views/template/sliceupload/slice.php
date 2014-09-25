@@ -341,15 +341,17 @@ function changeModel(var_action) {
 	return;
 }
 
-function startSlice() {
+function startSlice(var_restart) {
 	if (var_slice_status_lock == true) {
 		return;
 	}
 	else {
 		var_slice_status_lock = true;
 	}
-	
-	var var_id_preset = $("select#preset_menu").val();
+
+
+	var_restart = typeof var_restart !== 'undefined' ? var_restart : false;
+	var var_id_preset = (var_restart == true) ? 'previous' : $("select#preset_menu").val();
 	
 	// disable slice button
 	$("a#slice_button").addClass("ui-disabled");
