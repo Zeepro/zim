@@ -272,8 +272,13 @@ class Printerstate extends MY_Controller {
 // 			$yes_url .= ModelList_codeModelHash(PRINTLIST_MODEL_PRIME_L);
 // 		}
 		if ($id_model) {
-			$no_url = '/printmodel/detail?id=' . $id_model;
 			$yes_url .= '&cb=' . $id_model;
+			if ($id_model == 'slice') {
+				$no_url = '/sliceupload/slice?callback';
+			}
+			else {
+				$no_url = '/printmodel/detail?id=' . $id_model;
+			}
 		}
 		else {
 			$no_url = '/manage';
