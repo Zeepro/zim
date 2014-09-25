@@ -37,7 +37,7 @@
 					</div></div>
 					<div class="ui-block-b">
 						<div class="ui-bar ui-bar-f" style="height:3em;">
-							<select name="exchange" id="exchange_extruder" data-role="slider" data-track-theme="a" data-theme="a">
+							<select name="exchange" id="exchange_extruder" data-role="slider" data-track-theme="a" data-theme="a" {enable_exchange}>
 								<option value="0">{exchange_off}</option>
 								<option value="1">{exchange_on}</option>
 							</select>
@@ -90,7 +90,6 @@
 <script>
 var tmp = $("#slider-2").val();
 var min_tmp = tmp - 10;
-var enable_exchange = {enable_exchange};
 
 $("#slider-2").attr('min', (min_tmp < 165) ? 165 : min_tmp); 
 $("#slider-2").attr('max', parseInt(tmp) + 10);
@@ -115,10 +114,6 @@ if ("{state_f_l}" == "{error}" || "{state_f_r}" == "{error}")
 if ("{state_f_l}" != "ok" || "{state_f_r}" != "ok")
 {
 	$("input[type=submit]").attr("disabled", "disabled");
-}
-
-if (enable_exchange == false) {
-	$('select#exchange_extruder').slider({disabled: true});
 }
 </script>
 </div>

@@ -83,6 +83,7 @@ class Printmodel extends MY_Controller {
 		$body_page = NULL;
 		$mono_color = FALSE;
 		$nb_extruder = 0;
+		$select_disable = 'disabled="disabled"';
 		
 		$this->load->helper(array('printlist', 'printerstate', 'timedisplay'));
 		$this->load->library('parser');
@@ -234,7 +235,7 @@ class Printmodel extends MY_Controller {
 				'color_suggestion'	=> t('color_suggestion'),
 				'temp_adjustments'	=> t('temp_adjustments'),
 				'error'				=> t('error'),
-				'enable_exchange'	=> 'false',
+				'enable_exchange'	=> $select_disable,
 		);
 		if ($nb_extruder >= 2) {
 			$template_data['state_c_l'] = $color_left_filament;
@@ -248,7 +249,7 @@ class Printmodel extends MY_Controller {
 			if ($cr == ERROR_OK) {
 				$cr = PrinterState_checkFilament('r', $model_data[PRINTLIST_TITLE_LENG_F2]);
 				if ($cr == ERROR_OK) {
-					$template_data['enable_exchange'] = 'true';
+					$template_data['enable_exchange'] = NULL;
 				}
 			}
 			
