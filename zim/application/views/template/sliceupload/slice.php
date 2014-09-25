@@ -36,7 +36,9 @@ var var_model_change;
 var var_current_rho = {value_rho};
 var var_current_delta = {value_delta};
 var var_current_theta = {value_theta};
-var var_color_inverse = 0;
+// var var_color_inverse = 0;
+var var_color_right = '{color_default}';
+var var_color_left = '{color_default}';
 
 var var_model_scale = 100;
 var var_model_zrot = 0;
@@ -67,7 +69,7 @@ function prepareDisplay() {
 	else if (var_stage == "wait_print") {
 		// try to get sliced info
 		$("#detail_zone").html("");
-		getPreview(false);
+// 		getPreview(false);
 		getSlice();
 	}
 	else {
@@ -96,7 +98,9 @@ function getPreview(var_control) {
 			rho: var_current_rho,
 			delta: var_current_delta,
 			theta: var_current_theta,
-			inverse: var_color_inverse,
+// 			inverse: var_color_inverse,
+			color_right: var_color_right,
+			color_left: var_color_left,
 			},
 		cache: false,
 		beforeSend: function()
@@ -398,8 +402,8 @@ function checkSlice() {
 	.done(function(html) {
 		if (var_slice_status.status == 202) { // finished checking, wait user to input
 			clearInterval(var_slice_interval);
-			$("#preview_zone").show();
-			getPreview(false);
+// 			$("#preview_zone").show();
+// 			getPreview(false);
 			$("#detail_zone").html(html);
 		}
 		else if (var_slice_status.status == 200) { // in checking
@@ -431,6 +435,16 @@ function getSlice() {
 			callback: 1,
 		},
 		cache: false,
+		beforeSend: function()
+		{
+			$("#overlay").addClass("gray-overlay");
+			$(".ui-loader").css("display", "block");
+		},
+		complete: function()
+		{	
+			$("#overlay").removeClass("gray-overlay");
+			$(".ui-loader").css("display", "none");
+		},
 	})
 	.done(function(html) {
 		if (var_slice_status.status == 202) { // finished checking, wait user to input
@@ -438,7 +452,8 @@ function getSlice() {
 		}
 		else if (var_slice_status.status == 200) { // in checking
 			$("#detail_zone").html("{wait_in_slice} " + html);
-			getPreview(false); // redo previewing for changing color to cartridge's one
+// 			var_slice_status_lock = false;
+// 			getPreview(false); // redo previewing for changing color to cartridge's one
 		}
 	})
 	.fail(function() { // not allowed

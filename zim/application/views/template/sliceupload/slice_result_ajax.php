@@ -44,6 +44,7 @@
 <script type="text/javascript">
 var var_enable_print = {enable_print};
 var var_reslice = {enable_reslice};
+var var_need_refresh_preview = false;
 
 $("input[type=submit]").on('click', function()
 {
@@ -87,4 +88,20 @@ if (var_reslice == true) {
 	.attr({'id': 'reslice_button', 'onclick': 'javascript: startSlice(true);'}).html('{reslice_button}')
 	.button().button('refresh');
 }
+
+// assign new preview color
+if (var_color_right != '{cartridge_c_r}') {
+	var_color_right = '{cartridge_c_r}';
+	var_need_refresh_preview = true;
+}
+if (var_color_left != '{cartridge_c_l}') {
+	var_color_left = '{cartridge_c_l}';
+	var_need_refresh_preview = true;
+}
+
+$("#preview_zone").show();
+if (var_need_refresh_preview) {
+	getPreview(false);
+}
+
 </script>

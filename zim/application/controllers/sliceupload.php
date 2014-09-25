@@ -149,18 +149,20 @@ class Sliceupload extends MY_Controller {
 			return;
 		}
 		
-		$this->load->helper('zimapi');
-		$list_preset = ZimAPI_getPresetListAsArray();
+		$this->load->helper(array('zimapi', 'printerstate'));
 		
 		if ($this->input->get('callback') !== FALSE) {
 			$current_stage = 'wait_print';
 		}
-		
-		foreach ($list_preset as $preset) {
-			$list_display[] = array(
-					'id'	=> $preset[ZIMAPI_TITLE_PRESET_ID],
-					'name'	=> $preset[ZIMAPI_TITLE_PRESET_NAME],
-			);
+		else { // need preset list only in wait slice mode
+			$list_preset = ZimAPI_getPresetListAsArray();
+			
+			foreach ($list_preset as $preset) {
+				$list_display[] = array(
+						'id'	=> $preset[ZIMAPI_TITLE_PRESET_ID],
+						'name'	=> $preset[ZIMAPI_TITLE_PRESET_NAME],
+				);
+			}
 		}
 		
 		$this->load->library('parser');
@@ -186,6 +188,7 @@ class Sliceupload extends MY_Controller {
 				'far_button'	=> t('far_button'),
 				'small_button'	=> t('small_button'),
 				'big_button'	=> t('big_button'),
+				'color_default'	=> PRINTERSTATE_VALUE_DEFAULT_COLOR,
 		);
 		$body_page = $this->parser->parse('template/sliceupload/slice', $template_data, TRUE);
 		
@@ -395,6 +398,7 @@ class Sliceupload extends MY_Controller {
 	}
 	
 	function slice_status_ajax() {
+		//FIXME need to rewrite this function to read always two cartridges and treat with temporary sliced model information
 		$template_data = array();
 		$ret_val = 0;
 		$array_data = array();
@@ -666,9 +670,18 @@ class Sliceupload extends MY_Controller {
 			$rho = $this->input->get('rho');
 			$theta = $this->input->get('theta');
 			$delta = $this->input->get('delta');
-			$inverse = (int) $this->input->get('inverse');
+			$color1 = $this->input->get('color_right');
+			$color2 = $this->input->get('color_left');
+// 			$inverse = (int) $this->input->get('inverse');
 			
-			$inverse = ($inverse != 0) ? TRUE : FALSE;
+// 			$inverse = ($inverse != 0) ? TRUE : FALSE;
+			// check color input
+			if (!preg_match('/^#[0-9A-Fa-f]{6}$/', $color1)) {
+				$color1 = NULL;
+			}
+			if (!preg_match('/^#[0-9A-Fa-f]{6}$/', $color2)) {
+				$color2 = NULL;
+			}
 			
 			if ($rho === FALSE || $theta === FALSE || $delta === FALSE) {
 				$cr = ERROR_MISS_PRM;
@@ -679,61 +692,64 @@ class Sliceupload extends MY_Controller {
 			else {
 				$file_info = array();
 				$file_cartridge = NULL;
-				$color1 = NULL;
-				$color2 = NULL;
+// 				$color1 = NULL;
+// 				$color2 = NULL;
 				
-				$cr = ERROR_OK;
 				$this->load->helper('slicer');
-				$file_cartridge = $this->config->item('temp') . SLICER_FILE_TEMP_DATA;
-				if (file_exists($file_cartridge)) {
-					$this->load->helper(array('json', 'printerstate'));
-					$temp_json = json_read($file_cartridge, TRUE);
+				
+// 				// load color from slicer temp data
+// 				$cr = ERROR_OK;
+// 				$file_cartridge = $this->config->item('temp') . SLICER_FILE_TEMP_DATA;
+// 				if (file_exists($file_cartridge)) {
+// 					$this->load->helper(array('json', 'printerstate'));
+// 					$temp_json = json_read($file_cartridge, TRUE);
 					
-					if (isset($temp_json['error'])) {
-						$this->load->helper('printerlog');
-						PrinterLog_logError('read temp data file error', __FILE__, __LINE__);
-						$cr = ERROR_INTERNAL;
-					}
-					else {
-// 						unset($temp_json['json']['e']); //FIXME try to find a better way to remove error code
-// 						$nb_cartridge = count($temp_json['json']);
-// 						$inverse = ($inverse != 0 && $nb_cartridge > 1) ? TRUE : FALSE;
+// 					if (isset($temp_json['error'])) {
+// 						$this->load->helper('printerlog');
+// 						PrinterLog_logError('read temp data file error', __FILE__, __LINE__);
+// 						$cr = ERROR_INTERNAL;
+// 					}
+// 					else {
+// // 						unset($temp_json['json']['e']); //FIX/ME try to find a better way to remove error code
+// // 						$nb_cartridge = count($temp_json['json']);
+// // 						$inverse = ($inverse != 0 && $nb_cartridge > 1) ? TRUE : FALSE;
 						
-						foreach ($temp_json['json'] as $abb_cartridge => $data_cartridge) {
-							switch ($abb_cartridge) {
-								case 'r':
-									if ($inverse) {
-										$color2 = $data_cartridge[PRINTERSTATE_TITLE_COLOR];
-									}
-									else {
-										$color1 = $data_cartridge[PRINTERSTATE_TITLE_COLOR];
-									}
-									break;
+// 						foreach ($temp_json['json'] as $abb_cartridge => $data_cartridge) {
+// 							switch ($abb_cartridge) {
+// 								case 'r':
+// 									if ($inverse) {
+// 										$color2 = $data_cartridge[PRINTERSTATE_TITLE_COLOR];
+// 									}
+// 									else {
+// 										$color1 = $data_cartridge[PRINTERSTATE_TITLE_COLOR];
+// 									}
+// 									break;
 									
-								case 'l':
-									if ($inverse) {
-										$color1 = $data_cartridge[PRINTERSTATE_TITLE_COLOR];
-									}
-									else {
-										$color2 = $data_cartridge[PRINTERSTATE_TITLE_COLOR];
-									}
-									break;
+// 								case 'l':
+// 									if ($inverse) {
+// 										$color1 = $data_cartridge[PRINTERSTATE_TITLE_COLOR];
+// 									}
+// 									else {
+// 										$color2 = $data_cartridge[PRINTERSTATE_TITLE_COLOR];
+// 									}
+// 									break;
 									
-								default:
-									$this->load->helper('printerlog');
-									PrinterLog_logError('unknown cartridge abb: ' . $abb_cartridge, __FILE__, __LINE__);
-									$cr = ERROR_INTERNAL;
-									break;
-							}
-							if ($cr != ERROR_OK) {
-								break;
-							}
-						}
-					}
-				}
-				if ($cr == ERROR_OK) {
+// 								default:
+// 									$this->load->helper('printerlog');
+// 									PrinterLog_logError('unknown cartridge abb: ' . $abb_cartridge, __FILE__, __LINE__);
+// 									$cr = ERROR_INTERNAL;
+// 									break;
+// 							}
+// 							if ($cr != ERROR_OK) {
+// 								break;
+// 							}
+// 						}
+// 					}
+// 				}
+				
+// 				if ($cr == ERROR_OK) {
 					$cr = Slicer_rendering((int)$rho, (int)$theta, (int)$delta, $path_image, $color1, $color2);
-				}
+// 				}
 				if ($cr == ERROR_OK) {
 					//TODO add the possibility of making path everywhere, but not only in /var/www/tmp/
 					$this->load->helper('file');
