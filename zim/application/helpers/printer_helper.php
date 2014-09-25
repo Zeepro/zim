@@ -157,6 +157,9 @@ function Printer_printFromModel($id_model, $exchange_extruder = FALSE, $array_te
 		
 // 		$ret_val = Printer_printFromFile($gcode_path, TRUE, $stop_printing);
 		if (Printer__getLengthFromJson($array_info, $array_filament)) {
+			if ($exchange_extruder) {
+				Printer__inverseFilament($array_filament);
+			}
 			$ret_val = Printer_printFromFile($gcode_path, TRUE, $array_filament);
 		}
 		else {
@@ -197,6 +200,9 @@ function Printer_printFromSlice($exchange_extruder = FALSE, $array_temper = arra
 		$data_json = $temp_json['json'];
 		foreach ($data_json as $abb_filament => $array_temp) {
 			$array_filament[$abb_filament] = $array_temp[PRINTERSTATE_TITLE_NEED_L];
+		}
+		if ($exchange_extruder) {
+			Printer__inverseFilament($array_filament);
 		}
 	}
 	
@@ -620,6 +626,31 @@ function Printer__getLengthFromJson($array_info, &$array_filament) {
 	}
 	
 	return TRUE;
+}
+
+function Printer__inverseFilament(&$array_filament) {
+	$array_temp = $array_filament;
+	
+	$array_filament = array(); // reset array
+	foreach ($array_temp as $abb_filament => $value_filament) {
+		switch($abb_filament) {
+			case 'r':
+				$array_filament['l'] = $value_filament;
+				break;
+				
+			case 'l':
+				$array_filament['r'] = $value_filament;
+				break;
+				
+			default:
+				$CI = &get_instance();
+				$CI->load->helper('printerlog');
+				PrinterLog_logError('unknown abb filament: ' . $abb_filament, __FILE__, __LINE__);
+				break;
+		}
+	}
+	
+	return;
 }
 
 function Printer__changeGcode(&$gcode_path, $exchange_extruder = FALSE, $array_temper = array()) {

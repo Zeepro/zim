@@ -86,11 +86,11 @@
 			</form>
 		</div>
 	</div>
-</div>
 
 <script>
 var tmp = $("#slider-2").val();
 var min_tmp = tmp - 10;
+var enable_exchange = {enable_exchange};
 
 $("#slider-2").attr('min', (min_tmp < 165) ? 165 : min_tmp); 
 $("#slider-2").attr('max', parseInt(tmp) + 10);
@@ -116,4 +116,9 @@ if ("{state_f_l}" != "ok" || "{state_f_r}" != "ok")
 {
 	$("input[type=submit]").attr("disabled", "disabled");
 }
+
+if (enable_exchange == false) {
+	$('select#exchange_extruder').slider({disabled: true});
+}
 </script>
+</div>

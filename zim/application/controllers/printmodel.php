@@ -158,12 +158,12 @@ class Printmodel extends MY_Controller {
 		}
 		
 		if ($nb_extruder >= 2) {
-			if ($mono_color == FALSE) {
+// 			if ($mono_color == FALSE) {
 				$cr = PrinterState_checkFilament('l', $model_data[PRINTLIST_TITLE_LENG_F2], $cartridge_data);
-			}
-			else {
-				$cr = PrinterState_getCartridgeAsArray($cartridge_data, 'l');
-			}
+// 			}
+// 			else {
+// 				$cr = PrinterState_getCartridgeAsArray($cartridge_data, 'l');
+// 			}
 			$check_left_filament = t('ok');
 			$change_left_filament = t('Change');
 			switch ($cr) {
@@ -233,7 +233,8 @@ class Printmodel extends MY_Controller {
 				'desp_title'		=> t('Description'),
 				'color_suggestion'	=> t('color_suggestion'),
 				'temp_adjustments'	=> t('temp_adjustments'),
-				'error'				=> t('error')
+				'error'				=> t('error'),
+				'enable_exchange'	=> 'false',
 		);
 		if ($nb_extruder >= 2) {
 			$template_data['state_c_l'] = $color_left_filament;
@@ -241,6 +242,15 @@ class Printmodel extends MY_Controller {
 			$template_data['change_filament_l'] = $change_left_filament;
 			$template_data['temper_filament_l'] = $temper_left_filament;
 			$template_data['exchange_extruder'] = t('exchange_extruder');
+			
+			// check if we can inverse filament / exchange extruder or not
+			$cr = PrinterState_checkFilament('l', $model_data[PRINTLIST_TITLE_LENG_F1]);
+			if ($cr == ERROR_OK) {
+				$cr = PrinterState_checkFilament('r', $model_data[PRINTLIST_TITLE_LENG_F2]);
+				if ($cr == ERROR_OK) {
+					$template_data['enable_exchange'] = 'true';
+				}
+			}
 			
 			if ($mono_color == FALSE) {
 				$template_data['model_c_l'] = $model_data[PRINTLIST_TITLE_COLOR_F2];
