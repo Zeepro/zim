@@ -362,13 +362,13 @@ function ModelList_getPic($id_model, $id_picture, &$path_pid) {
 }
 
 // leave this function here for having no interface change
-function ModelList_print($id_model) {
+function ModelList_print($id_model, $exchange_extruder = FALSE, $array_temper = array()) {
 	$ret_val = 0;
 
 	$CI = &get_instance();
 	$CI->load->helper('printer');
 	
-	$ret_val = Printer_printFromModel($id_model);
+	$ret_val = Printer_printFromModel($id_model, $exchange_extruder, $array_temper);
 	
 	return $ret_val;
 }

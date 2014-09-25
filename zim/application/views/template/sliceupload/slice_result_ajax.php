@@ -17,15 +17,28 @@
 				</div>
 				<p style="text-align: left;">{error_msg}</p>
 				<form action="/printdetail/printslice_temp" method="POST" data-ajax="false">
-					<div id="temper_l">
-						<label>Left temperature</label>
-						<input type="range" id="slider_left" name="l" value="{temper_l}" min="160" max="260" />
+					<div class="ui-grid-a">
+						<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;">
+							<label for="exchange_extruder"><h2>{exchange_extruder}</h2></label>
+						</div></div>
+						<div class="ui-block-b">
+							<div class="ui-bar ui-bar-f" style="height:3em;">
+								<select name="exchange" id="exchange_extruder" data-role="slider" data-track-theme="a" data-theme="a">
+									<option value="{exchange_o1_val}">{exchange_o1}</option>
+									<option value="{exchange_o2_val}" {exchange_o2_sel}>{exchange_o2}</option>
+								</select>
+							</div>
+						</div>
+						<div id="temper_l">
+							<label>Left temperature</label>
+							<input type="range" id="slider_left" name="l" value="{temper_l}" min="160" max="260" />
+						</div>
+						<div id="temper_r">
+							<label>Right temperature</label>
+							<input type="range" id="slider_right" name="r" value="{temper_r}" min="160" max="260" />
+						</div>
+						<input type="submit" id="print_slice" value="{print_button}">
 					</div>
-					<div id="temper_r">
-						<label>Right temperature</label>
-						<input type="range" id="slider_right" name="r" value="{temper_r}" min="160" max="260" />
-					</div>
-					<input type="submit" id="print_slice" value="{print_button}">
 				</form>
 
 <script type="text/javascript">

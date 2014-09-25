@@ -404,6 +404,7 @@ class Sliceupload extends MY_Controller {
 		$file_temp_data = NULL;
 // 		$array_key_real_temper = 'real_temperature'; //TODO think about if we need to declare this key name in helper or not
 		$error = NULL;
+		$option_selected = 'selected="selected"';
 		
 		$callback_return = $this->input->get('callback');
 		$this->load->helper(array('printerstate', 'slicer'));
@@ -618,7 +619,28 @@ class Sliceupload extends MY_Controller {
 				'error_msg'			=> $error,
 				'enable_reslice'	=> $error ? 'true' : 'false',
 				'reslice_button'	=> t('reslice_button'),
+				'exchange_extruder'	=> t('exchange_extruder'),
+				'exchange_o1_val'	=> 0,
+				'exchange_o2_val'	=> 1,
+				'exchange_o2_sel'	=> NULL,
+				'exchange_o1'		=> t('exchange_straight'),
+				'exchange_o2'		=> t('exchange_crossover'),
+				'bicolor_model'		=> 'false',
 		);
+		
+		if (isset($array_data['r']) && isset($array_data['l'])) {
+			$template_data['bicolor_model'] = 'true';
+		}
+		else {
+			$template_data['exchange_o1']		= t('exchange_left');
+			$template_data['exchange_o2']		= t('exchange_right');
+			
+			if (isset($array_data['r'])) {
+				$template_data['exchange_o1_val']	= 1;
+				$template_data['exchange_o2_val']	= 0;
+				$template_data['exchange_o2_sel']	= $option_selected;
+			}
+		}
 		
 		$this->output->set_status_header(202);
 		$this->parser->parse('template/sliceupload/slice_result_ajax', $template_data); //optional
@@ -639,6 +661,9 @@ class Sliceupload extends MY_Controller {
 			$rho = $this->input->get('rho');
 			$theta = $this->input->get('theta');
 			$delta = $this->input->get('delta');
+			$inverse = (int) $this->input->get('inverse');
+			
+			$inverse = ($inverse != 0) ? TRUE : FALSE;
 			
 			if ($rho === FALSE || $theta === FALSE || $delta === FALSE) {
 				$cr = ERROR_MISS_PRM;
@@ -666,15 +691,27 @@ class Sliceupload extends MY_Controller {
 					}
 					else {
 // 						unset($temp_json['json']['e']); //FIXME try to find a better way to remove error code
+// 						$nb_cartridge = count($temp_json['json']);
+// 						$inverse = ($inverse != 0 && $nb_cartridge > 1) ? TRUE : FALSE;
 						
 						foreach ($temp_json['json'] as $abb_cartridge => $data_cartridge) {
 							switch ($abb_cartridge) {
 								case 'r':
-									$color1 = $data_cartridge[PRINTERSTATE_TITLE_COLOR];
+									if ($inverse) {
+										$color2 = $data_cartridge[PRINTERSTATE_TITLE_COLOR];
+									}
+									else {
+										$color1 = $data_cartridge[PRINTERSTATE_TITLE_COLOR];
+									}
 									break;
 									
 								case 'l':
-									$color2 = $data_cartridge[PRINTERSTATE_TITLE_COLOR];
+									if ($inverse) {
+										$color1 = $data_cartridge[PRINTERSTATE_TITLE_COLOR];
+									}
+									else {
+										$color2 = $data_cartridge[PRINTERSTATE_TITLE_COLOR];
+									}
 									break;
 									
 								default:

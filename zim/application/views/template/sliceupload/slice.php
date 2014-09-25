@@ -36,7 +36,7 @@ var var_model_change;
 var var_current_rho = {value_rho};
 var var_current_delta = {value_delta};
 var var_current_theta = {value_theta};
-var var_interval_rho = 100;
+var var_color_inverse = 0;
 
 var var_model_scale = 100;
 var var_model_zrot = 0;
@@ -46,6 +46,7 @@ var var_factor_scale = 2;
 var var_interval_zrot = 30;
 var var_interval_xrot = 30;
 var var_interval_yrot = 30;
+var var_interval_rho = 100;
 
 
 $(document).ready(prepareDisplay());
@@ -95,6 +96,7 @@ function getPreview(var_control) {
 			rho: var_current_rho,
 			delta: var_current_delta,
 			theta: var_current_theta,
+			inverse: var_color_inverse,
 			},
 		cache: false,
 		beforeSend: function()

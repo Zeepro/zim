@@ -20,6 +20,7 @@ if (!defined('PRINTER_FN_CHARGE')) {
 	define('PRINTER_PRM_TEMPER_R_N',	' -rr ');	// right temperature for other layer (if exist)
 	define('PRINTER_PRM_TEMPER_R_F',	' -r ');	// right temperature for first layer (or all layer)
 	define('PRINTER_PRM_FILE',			' -f ');	// file path
+	define('PRINTER_PRM_EXCHANGE_E',	' -c ');	// exchange extrduer
 	
 // 	define('PRINTER_VALUE_DEFAULT_TEMPER',	230);
 }
@@ -109,7 +110,7 @@ function Printer_printFromPrime($abb_extruder, $first_run = TRUE) {
 		
 		// modify the temperature of gcode file according to cartridge info
 		//TODO test me
-		$ret_val = Printer__changeTemperature($gcode_path);
+		$ret_val = Printer__changeGcode($gcode_path);
 		if ($ret_val != ERROR_OK) {
 			return $ret_val;
 		}
@@ -125,15 +126,15 @@ function Printer_printFromPrime($abb_extruder, $first_run = TRUE) {
 	return $ret_val;
 }
 
-function Printer_printFromCalibration() {
-	$CI = &get_instance();
-	$CI->load->helper('printlist');
+// function Printer_printFromCalibration() {
+// 	$CI = &get_instance();
+// 	$CI->load->helper('printlist');
 	
-	return Printer_printFromModel(ModelList_codeModelHash(PRINTLIST_MODEL_CALIBRATION));
-}
+// 	return Printer_printFromModel(ModelList_codeModelHash(PRINTLIST_MODEL_CALIBRATION));
+// }
 
 // function Printer_printFromModel($id_model, $stop_printing = FALSE) {
-function Printer_printFromModel($id_model, $array_temper = array()) {
+function Printer_printFromModel($id_model, $exchange_extruder = FALSE, $array_temper = array()) {
 	$gcode_path = NULL;
 	$ret_val = 0;
 	$array_info = array();
@@ -144,8 +145,8 @@ function Printer_printFromModel($id_model, $array_temper = array()) {
 		
 		// temporary change - modify the temperature of gcode file according to cartridge info
 		//TODO test me and remove me if it is necessary
-// 		$ret_val = Printer__changeTemperature($gcode_path);
-		$ret_val = Printer__changeTemperature($gcode_path, $array_temper);
+// 		$ret_val = Printer__changeGcode($gcode_path);
+		$ret_val = Printer__changeGcode($gcode_path, $exchange_extruder, $array_temper);
 		if ($ret_val != ERROR_OK) {
 			return $ret_val;
 		}
@@ -166,7 +167,7 @@ function Printer_printFromModel($id_model, $array_temper = array()) {
 	return $ret_val;
 }
 
-function Printer_printFromSlice($array_temper = array()) {
+function Printer_printFromSlice($exchange_extruder = FALSE, $array_temper = array()) {
 	$ret_val = 0;
 	$file_temp_data = NULL;
 	$temp_json = array();
@@ -201,7 +202,7 @@ function Printer_printFromSlice($array_temper = array()) {
 	
 	// temporary change
 	//TODO remove me if it is necessary
-	$ret_val = Printer__changeTemperature($gcode_path, $array_temper);
+	$ret_val = Printer__changeGcode($gcode_path, $exchange_extruder, $array_temper);
 	if ($ret_val != ERROR_OK) {
 		return $ret_val;
 	}
@@ -621,18 +622,37 @@ function Printer__getLengthFromJson($array_info, &$array_filament) {
 	return TRUE;
 }
 
-function Printer__changeTemperature(&$gcode_path, $array_temper = array()) {
+function Printer__changeGcode(&$gcode_path, $exchange_extruder = FALSE, $array_temper = array()) {
 	$temp_r = 0; // right normal temper
 	$temp_rs = 0; // right start temper
 	$temp_l = 0; // left normal temper
 	$temp_ls = 0; // left start temper
 	$cr = 0;
-	$command = '';
+	$command = NULL;
 	$output = array();
 	$json_cartridge = array();
 	$CI = &get_instance();
 	
 	$CI->load->helper('printerstate');
+	
+	if ($exchange_extruder) {
+		$command = $CI->config->item('gcdaemon')
+				. PRINTER_PRM_EXCHANGE_E . PRINTER_PRM_FILE . $gcode_path . ' > ' . $gcode_path . '.new';
+		
+		//TODO remove the debug message after test
+		$CI->load->helper('printerlog');
+		PrinterLog_logDebug('change extruder: ' . $command, __FILE__, __LINE__);
+		
+		@unlink($gcode_path . '.new'); // delete old file
+		exec($command, $output, $cr);
+		if ($cr != ERROR_NORMAL_RC_OK) {
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('change extruder error', __FILE__, __LINE__);
+			return ERROR_INTERNAL;
+		}
+		
+		$gcode_path = $gcode_path . '.new';
+	}
 	
 	// temporary change - make it possible to change temperature not according to cartridge
 	//TODO remove me when it is necessary

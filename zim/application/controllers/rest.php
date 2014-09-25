@@ -434,13 +434,15 @@ class Rest extends MY_Controller {
 	public function preslicedprint() {
 		$mid = '';
 		$cr = 0; //return code
+		$exchange_extruder = $this->input->get('filament');
 		
-		$this->load->helper('printlist');
+		$this->load->helper('printer');
+		$exchange_extruder = ($exchange_extruder == 'crossover') ? TRUE : FALSE;
 		
 		$mid = $this->input->get('id'); //return false if missing
 		
 		if ($mid) {
-			$cr = ModelList_print($mid);
+			$cr = Printer_printFromModel($mid, $exchange_extruder);
 		}
 		else {
 			$cr = ERROR_MISS_PRM;
@@ -1489,9 +1491,11 @@ class Rest extends MY_Controller {
 	
 	public function platformprint() {
 		$cr = 0;
+		$exchange_extruder = $this->input->get('filament');
 		
 		$this->load->helper('printer');
-		$cr = Printer_printFromSlice();
+		$exchange_extruder = ($exchange_extruder == 'crossover') ? TRUE : FALSE;
+		$cr = Printer_printFromSlice($exchange_extruder);
 		
 		$this->_return_cr($cr);
 		

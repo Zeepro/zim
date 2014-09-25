@@ -93,6 +93,9 @@ class Printmodel extends MY_Controller {
 		
 		// check model id, resend user to if not valid
 		if ($mid) {
+			if ($mid == 'calibration') {
+				$mid = ModelList_codeModelHash(PRINTLIST_MODEL_CALIBRATION);
+			}
 			$cr = ModelList__getDetailAsArray($mid, $model_data, TRUE);
 			if (($cr != ERROR_OK) || is_null($model_data)) {
 				$this->output->set_header('Location: /printmodel/listmodel');
@@ -237,14 +240,19 @@ class Printmodel extends MY_Controller {
 			$template_data['state_f_l'] = $check_left_filament;
 			$template_data['change_filament_l'] = $change_left_filament;
 			$template_data['temper_filament_l'] = $temper_left_filament;
+			$template_data['exchange_extruder'] = t('exchange_extruder');
 			
 			if ($mono_color == FALSE) {
 				$template_data['model_c_l'] = $model_data[PRINTLIST_TITLE_COLOR_F2];
 				$template_data['need_filament_l'] = $model_data[PRINTLIST_TITLE_LENG_F2];
+				$template_data['exchange_off'] = t('exchange_straight');
+				$template_data['exchange_on'] = t('exchange_crossover');
 				$body_page = $this->parser->parse('template/printlist/detail_2extrud_2color', $template_data, TRUE);
 			}
 			else {
 				$template_data['need_filament_l'] = 0;
+				$template_data['exchange_off'] = t('exchange_right');
+				$template_data['exchange_on'] = t('exchange_left');
 				$body_page = $this->parser->parse('template/printlist/detail_2extrud_1color', $template_data, TRUE);
 			}
 		}

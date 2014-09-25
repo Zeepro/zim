@@ -63,27 +63,28 @@ class Printdetail extends MY_Controller {
 	}
 	
 	public function index() {
+		$this->output->set_header('Location: /');
 		return;
 	}
 	
-	public function printcalibration() {
-		$mid = NULL;
-		$cr = 0;
+// 	public function printcalibration() {
+// 		$mid = NULL;
+// 		$cr = 0;
 		
-		// check model id, and then send it to print command
-		$this->load->helper('printer');
+// 		// check model id, and then send it to print command
+// 		$this->load->helper('printer');
 		
-		$this->set_led();
-		$cr = Printer_printFromCalibration();
-		if ($cr != ERROR_OK) {
-			$this->output->set_header('Location: /printmodel/listmodel');
-			return;
-		}
+// 		$this->set_led();
+// 		$cr = Printer_printFromCalibration();
+// 		if ($cr != ERROR_OK) {
+// 			$this->output->set_header('Location: /printmodel/listmodel');
+// 			return;
+// 		}
 		
-		$this->output->set_header('Location: /printdetail/status?id=calibration');
+// 		$this->output->set_header('Location: /printdetail/status?id=calibration');
 		
-		return;
-	}
+// 		return;
+// 	}
 	
 	public function printprime() {
 		$abb_cartridge = NULL;
@@ -122,24 +123,33 @@ class Printdetail extends MY_Controller {
 	}
 	
 	public function printmodel() {
-		$mid = NULL;
 		$cr = 0;
+		$model_calibration = FALSE;
+		$mid = $this->input->get('id');
+		$exchange_extruder = (int) $this->input->post('exchange');
 		
 		// check model id, and then send it to print command
 		$this->load->helper(array('printer', 'printlist'));
-		$mid = $this->input->get('id');
 // 		$callback = $this->input->get('cb');
+		
+		$exchange_extruder = ($exchange_extruder != 0) ? TRUE : FALSE;
 		
 		if ($mid) {
 			if ($mid == ModelList_codeModelHash(PRINTLIST_MODEL_CALIBRATION)) {
-				$this->output->set_header('Location: /printdetail/printcalibration');
-				return;
+// 				$this->output->set_header('Location: /printdetail/printcalibration');
+// 				return;
+				$model_calibration = TRUE;
 			}
 			$this->set_led();
-			$cr = Printer_printFromModel($mid);
+			$cr = Printer_printFromModel($mid, $exchange_extruder);
 // 			$cr = Printer_startPrintingStatusFromModel($mid);
 			if ($cr != ERROR_OK) {
-				$this->output->set_header('Location: /printmodel/listmodel');
+				if ($model_calibration) {
+					$this->output->set_header('Location: /printmodel/detail?id=calibration');
+				}
+				else {
+					$this->output->set_header('Location: /printmodel/listmodel');
+				}
 				return;
 			}
 		}
@@ -154,33 +164,47 @@ class Printdetail extends MY_Controller {
 // 		else {
 //  			$this->output->set_header('Location: /printdetail/status');
 // 		}
-		$this->output->set_header('Location: /printdetail/status?id=' . $mid);
+		if ($model_clibration) {
+			$this->output->set_header('Location: /printdetail/status?id=calibration');
+		}
+		else {
+			$this->output->set_header('Location: /printdetail/status?id=' . $mid);
+		}
 		
 		return;
 	}
 	
 	public function printmodel_temp() {
-		$mid = NULL;
 		$cr = 0;
+		$model_calibration = FALSE;
+		$mid = $this->input->get('id');
 		$temperature_r = (int) $this->input->post('r');
 		$temperature_l = (int) $this->input->post('l');
+		$exchange_extruder = (int) $this->input->post('exchange');
 		$array_temper = array();
-		if ($temperature_r > 0) $array_temper['r'] = $temperature_r;
-		if ($temperature_l > 0) $array_temper['l'] = $temperature_l;
 		
 		// check model id, and then send it to print command
 		$this->load->helper(array('printer', 'printlist'));
-		$mid = $this->input->get('id');
+		
+		if ($temperature_r > 0) $array_temper['r'] = $temperature_r;
+		if ($temperature_l > 0) $array_temper['l'] = $temperature_l;
+		$exchange_extruder = ($exchange_extruder != 0) ? TRUE : FALSE;
 		
 		if ($mid) {
 			if ($mid == ModelList_codeModelHash(PRINTLIST_MODEL_CALIBRATION)) {
-				$this->output->set_header('Location: /printdetail/printcalibration');
-				return;
+// 				$this->output->set_header('Location: /printdetail/printcalibration');
+// 				return;
+				$model_calibration = TRUE;
 			}
 			$this->set_led();
-			$cr = Printer_printFromModel($mid, $array_temper);
+			$cr = Printer_printFromModel($mid, $exchange_extruder, $array_temper);
 			if ($cr != ERROR_OK) {
-				$this->output->set_header('Location: /printmodel/listmodel');
+				if ($model_calibration) {
+					$this->output->set_header('Location: /printmodel/detail?id=calibration');
+				}
+				else {
+					$this->output->set_header('Location: /printmodel/listmodel');
+				}
 				return;
 			}
 		}
@@ -189,18 +213,25 @@ class Printdetail extends MY_Controller {
 			return;
 		}
 		
-		$this->output->set_header('Location: /printdetail/status?id=' . $mid);
+		if ($model_calibration) {
+			$this->output->set_header('Location: /printdetail/status?id=calibration');
+		}
+		else {
+			$this->output->set_header('Location: /printdetail/status?id=' . $mid);
+		}
 		
 		return;
 	}
 	
 	public function printslice() {
 		$cr = 0;
+		$exchange_extruder = (int) $this->input->post('exchange');
 		
 		$this->load->helper('printer');
+		$exchange_extruder = ($exchange_extruder != 0) ? TRUE : FALSE;
 		
 		$this->set_led();
-		$cr = Printer_printFromSlice();
+		$cr = Printer_printFromSlice($exchange_extruder);
 		if ($cr != ERROR_OK) {
 			$this->output->set_header('Location: /sliceupload/slice?callback');
 			return;
@@ -216,14 +247,17 @@ class Printdetail extends MY_Controller {
 		$cr = 0;
 		$temperature_r = (int) $this->input->post('r');
 		$temperature_l = (int) $this->input->post('l');
+		$exchange_extruder = (int) $this->input->post('exchange');
 		$array_temper = array();
-		if ($temperature_r > 0) $array_temper['r'] = $temperature_r;
-		if ($temperature_l > 0) $array_temper['l'] = $temperature_l;
 		
 		$this->load->helper('printer');
 		
+		if ($temperature_r > 0) $array_temper['r'] = $temperature_r;
+		if ($temperature_l > 0) $array_temper['l'] = $temperature_l;
+		$exchange_extruder = ($exchange_extruder != 0) ? TRUE : FALSE;
+		
 		$this->set_led();
-		$cr = Printer_printFromSlice($array_temper);
+		$cr = Printer_printFromSlice($exchange_extruder, $array_temper);
 		if ($cr != ERROR_OK) {
 			$this->output->set_header('Location: /sliceupload/slice?callback');
 			return;
@@ -316,7 +350,8 @@ class Printdetail extends MY_Controller {
 			$template_data['restart_url'] = '/printdetail/printslice';
 		}
 		else if ($print_calibration == TRUE) {
-			$template_data['restart_url'] = '/printdetail/printcalibration';
+// 			$template_data['restart_url'] = '/printdetail/printcalibration';
+			$template_data['restart_url'] = '/printmodel/detail?id=calibration';
 		} else if ($abb_cartridge) {
 			$template_data['finish_info']	= t('Restart?');
 // 			$template_data['return_url']	= '/printmodel/detail?id=' . $callback;

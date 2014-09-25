@@ -9,7 +9,7 @@
 		<div id="container">
 			<ul data-role="listview" id="listview" class="shadowBox" data-inset="true">
 				<li>
-					<a href="/printmodel/detail?id=a01f6d00f8be78764b11ff45e0d83787" data-ajax="false" onclick="javascript: load_wait();">
+					<a href="/printmodel/detail?id=calibration" data-ajax="false" onclick="javascript: load_wait();">
 						<h2>{print_calibration}</h2>
 					</a>
 				</li>
