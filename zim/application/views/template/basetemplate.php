@@ -55,6 +55,10 @@
 		color:red;
 		font-weight: bold;
 	}
+	.ui-grid-a .ui-block-b .ui-slider-switch {
+		width: 9em;
+		max-width: 100%;
+	}
 </style>
 <script type="text/javascript">
 	$(document).on("pageinit", function() {
