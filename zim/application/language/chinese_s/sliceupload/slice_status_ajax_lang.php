@@ -26,3 +26,13 @@ $lang['print_button']
 	= '打印';
 $lang['reslice_button']
 	= '重新分析';
+$lang['exchange_extruder']
+	= '墨盒交换';
+$lang['exchange_straight']
+	= '笔直';
+$lang['exchange_crossover']
+	= '交叉';
+$lang['exchange_right']
+	= '右';
+$lang['exchange_left']
+	= '左';

@@ -88,6 +88,7 @@
 	</div>
 
 <script>
+var var_enable_print = {enable_print};
 var tmp = $("#slider-2").val();
 var min_tmp = tmp - 10;
 
@@ -111,9 +112,32 @@ if ("{state_f_l}" == "{error}" || "{state_f_r}" == "{error}")
 	$("#slider-" + ("{state_f_l}" == "{error}" ? "1" : "2")).attr("disabled", "disabled");
 }
 
-if ("{state_f_l}" != "ok" || "{state_f_r}" != "ok")
-{
-	$("input[type=submit]").attr("disabled", "disabled");
-}
+// if ("{state_f_l}" != "ok" || "{state_f_r}" != "ok")
+// {
+// 	$("input[type=submit]").attr("disabled", "disabled");
+// }
+$(document).on("pagecreate",function() {
+	if (var_enable_print == false) {
+// 		$("input[type=submit]").attr("disabled", "disabled");
+		$("input[type=submit]").button("disable");
+	}
+});
+
+//assign trigger for exchange extruder
+$("select#exchange_extruder").change(function() {
+	// switch print on and exchange off in some special cases
+	if (var_enable_print == false) {
+		$("select#exchange_extruder").slider({disabled: true});
+		$("select#exchange_extruder").slider("refresh");
+		$("input[type=submit]").button("refresh");
+		$("input[type=submit]").button("enable");
+	}
+	
+	$("p#state_f_r").html('{filament_ok}');
+	$("p#state_f_l").html('{filament_ok}');
+});
+
 </script>
 </div>
+
+<?php //TODO exchange also filament quantity in change cartridge link - need to create new javascript function instead of a fixed link ?>

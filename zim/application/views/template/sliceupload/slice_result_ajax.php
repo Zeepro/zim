@@ -4,14 +4,14 @@
 						<div style="width: 75px; height: 75px; background-color: {cartridge_c_l}; margin: 0 auto;">
 							<img src="/images/cartridge.png" style="width: 100%">
 						</div>
-						<p>{state_f_l}</p>
+						<p id="state_f_l">{state_f_l}</p>
 						<p>{temper_l} °C</p>
 					</div></div>
 					<div class="ui-block-b"><div id="right_cartridge" class="ui-bar ui-bar-f">
 						<div style="width: 75px; height: 75px; background-color: {cartridge_c_r}; margin: 0 auto;">
 							<img src="/images/cartridge.png" style="width: 100%">
 						</div>
-						<p>{state_f_r}</p>
+						<p id="state_f_r">{state_f_r}</p>
 						<p>{temper_r} °C</p>
 					</div></div>
 				</div>
@@ -23,7 +23,7 @@
 						</div></div>
 						<div class="ui-block-b">
 							<div class="ui-bar ui-bar-f" style="height:3em;">
-								<select name="exchange" id="exchange_extruder" data-role="slider" data-track-theme="a" data-theme="a">
+								<select name="exchange" id="exchange_extruder" data-role="slider" data-track-theme="a" data-theme="a" {enable_exchange}>
 									<option value="{exchange_o1_val}">{exchange_o1}</option>
 									<option value="{exchange_o2_val}" {exchange_o2_sel}>{exchange_o2}</option>
 								</select>
@@ -45,6 +45,9 @@
 var var_enable_print = {enable_print};
 var var_reslice = {enable_reslice};
 var var_need_refresh_preview = false;
+var var_need_print_right = {needprint_right};
+var var_need_print_left = {needprint_left};
+var var_bicolor_model = {bicolor_model};
 
 $("input[type=submit]").on('click', function()
 {
@@ -61,11 +64,6 @@ $('<div>').appendTo('#right_cartridge')
 // .attr({'id': 'print_slice', 'onclick': 'javascript: window.location.href="/printdetail/printslice";'}).html('{print_button}')
 // .button().button('refresh');
 
-if ($("#slider_left").attr('value') == "---")
-	$("#temper_l").css('display', 'none');
-if ($("#slider_right").attr('value') == "---")
-	$("#temper_r").css('display', 'none');
-
 var tmp = $("#slider_right").val();
 var min_tmp = tmp - 10;
 
@@ -79,6 +77,13 @@ $("#slider_left").attr('min', (min_tmp < 165) ? 165 : min_tmp);
 $("#slider_left").attr('max', parseInt(tmp) + 10);
 
 $('#detail_zone').trigger("create");
+
+if (var_need_print_right == false) {
+	$('input#slider_right').slider({disabled: true});
+}
+if (var_need_print_left == false) {
+	$('input#slider_left').slider({disabled: true});
+}
 	
 if (var_enable_print == false) {
 	$("#print_slice").button("disable");
@@ -103,5 +108,48 @@ $("#preview_zone").show();
 if (var_need_refresh_preview) {
 	getPreview(false);
 }
+
+// assign trigger for exchange extruder
+$("select#exchange_extruder").change(function() {
+	// switch print on and exchange off in some special cases
+	if (var_enable_print == false) {
+		$("select#exchange_extruder").slider({disabled: true});
+		$("select#exchange_extruder").slider('refresh');
+		$("#print_slice").button("enable");
+	}
+	
+	// switch temperature slider and state message if it's mono-color model
+	if (var_bicolor_model == false) {
+		if (var_need_print_right) {
+			$('input#slider_right').slider({disabled: true});
+			$('input#slider_left').slider({disabled: false});
+			$("p#state_f_l").html('{filament_ok}');
+			$("p#state_f_r").html('{filament_not_need}');
+			var_need_print_right = false;
+			var_need_print_left = true;
+		}
+		else { // var_need_print_left
+			$('input#slider_right').slider({disabled: false});
+			$('input#slider_left').slider({disabled: true});
+			$("p#state_f_r").html('{filament_ok}');
+			$("p#state_f_l").html('{filament_not_need}');
+			var_need_print_left = false;
+			var_need_print_right = true;
+		}
+	}
+	else {
+		$("p#state_f_r").html('{filament_ok}');
+		$("p#state_f_l").html('{filament_ok}');
+	}
+	
+	// inverse color and get new preview image if necessary
+	if (var_color_right != var_color_left) {
+		var temp_color = var_color_right;
+		
+		var_color_right = var_color_left;
+		var_color_left = temp_color;
+		getPreview(false);
+	}
+});
 
 </script>

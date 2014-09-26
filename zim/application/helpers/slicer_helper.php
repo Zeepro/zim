@@ -55,7 +55,7 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 	define('SLICER_TIMEOUT_NOLIMIT',	300);
 	
 	define('SLICER_VALUE_DEFAULT_TEMPER',		230);
-	define('SLICER_VALUE_DEFAULT_FIRST_TEMPER',	230);
+	define('SLICER_VALUE_DEFAULT_FIRST_TEMPER',	235);
 	
 	define('SLICER_CMD_SLICER_PS_STATUS',	'ps -A | grep slic3r.bin');
 	define('SLICER_CMD_RESTART_SLICER',		'/etc/init.d/zeepro-slic3r restart &');
@@ -533,7 +533,7 @@ function Slicer_changeParameter($array_setting) {
 
 function Slicer_changeTemperByCartridge($array_cartridge) {
 	$json_cartridge = array();
-	$array_danger_return = array(ERROR_INTERNAL);
+	$array_danger_return = array(ERROR_INTERNAL, ERROR_WRONG_PRM, ERROR_BUSY_PRINTER);
 	$temperature = $first_temperature = NULL;
 	
 	$CI = &get_instance();
@@ -560,9 +560,14 @@ function Slicer_changeTemperByCartridge($array_cartridge) {
 	foreach (array('r', 'l') as $abb_cartridge) {
 		$ret_val = PrinterState_getCartridgeAsArray($json_cartridge, $abb_cartridge);
 		//TODO think about if we need to set default temperature when cartridge is absent or not
-		if ($ret_val != ERROR_OK && !in_array($ret_val, $array_danger_return)) {
+		if (in_array($ret_val, $array_danger_return)) {
+			//TODO notice the printerstate helper that slicer use default temperature instead of cartridge info (user can put cartridge during slicing)
 			$json_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER] = SLICER_VALUE_DEFAULT_TEMPER;
 			$json_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1] = SLICER_VALUE_DEFAULT_FIRST_TEMPER;
+			
+			$CI->load->helper('printerlog');
+			PrinterLog_logMessage('dangerous return detected: ' . $ret_val
+					 . ', slicer default temperature assigned for cartridge ' . $abb_cartridge, __FILE__, __LINE__);
 		}
 		
 		if (is_null($temperature)) {

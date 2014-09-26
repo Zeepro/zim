@@ -26,3 +26,13 @@ $lang['print_button']
 	= 'Imprimer';
 $lang['reslice_button']
 	= 'Slicer à nouveau';
+$lang['exchange_extruder']
+	= 'Inversion de la cartouche';
+$lang['exchange_straight']
+	= 'Droit';
+$lang['exchange_crossover']
+	= 'Croisé';
+$lang['exchange_right']
+	= 'Droite';
+$lang['exchange_left']
+	= 'Gauche';

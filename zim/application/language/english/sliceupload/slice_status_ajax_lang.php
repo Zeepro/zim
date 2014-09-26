@@ -26,3 +26,13 @@ $lang['print_button']
 	= 'Print';
 $lang['reslice_button']
 	= 'Reslice';
+$lang['exchange_extruder']
+	= 'Cartridge inversion';
+$lang['exchange_straight']
+	= 'Straight';
+$lang['exchange_crossover']
+	= 'Crossover';
+$lang['exchange_right']
+	= 'Right';
+$lang['exchange_left']
+	= 'Left';

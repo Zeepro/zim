@@ -43,5 +43,16 @@ $lang['Description']
 $lang['error']
 	= 'erreur';
 $lang['Home']
-= 'Home';
-?>
+	= 'Home';
+$lang['filament_not_need']
+	= 'non nécessaire';
+$lang['exchange_extruder']
+	= 'Inversion de la cartouche';
+$lang['exchange_straight']
+	= 'Droit';
+$lang['exchange_crossover']
+	= 'Croisé';
+$lang['exchange_right']
+	= 'Droite';
+$lang['exchange_left']
+	= 'Gauche';

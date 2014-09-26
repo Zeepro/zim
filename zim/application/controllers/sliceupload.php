@@ -398,14 +398,77 @@ class Sliceupload extends MY_Controller {
 	}
 	
 	function slice_status_ajax() {
+		$ret_val = 0;
+		$cr = 0;
+		$array_data = array();
+		$status_current = NULL;
+		$display = NULL;
+		
+		$this->load->helper(array('printerstate', 'slicer'));
+		$this->load->library('parser');
+		
+		CoreStatus_checkInIdle($status_current);
+		$ret_val = PrinterState_checkBusyStatus($status_current, $array_data);
+		if ($ret_val == TRUE && $status_current == CORESTATUS_VALUE_IDLE) {
+			if (isset($array_data[PRINTERSTATE_TITLE_LASTERROR])) {
+				$cr = $array_data[PRINTERSTATE_TITLE_LASTERROR];
+			}
+			else {
+				$cr = ERROR_OK;
+			}
+		}
+		else if ($ret_val == FALSE && $status_current == CORESTATUS_VALUE_SLICE) {
+			if (!isset($array_data[PRINTERSTATE_TITLE_PERCENT])) {
+				$this->load->helper('printerlog');
+				PrinterLog_logError('can not find percentage in slicing', __FILE__, __LINE__);
+				$cr = ERROR_INTERNAL;
+			}
+			else {
+				$cr = ERROR_OK;
+				$this->output->set_status_header($cr);
+				$this->output->set_content_type('txt_u');
+				$this->parser->parse('template/plaintxt', array('display' => $array_data[PRINTERSTATE_TITLE_PERCENT]));
+				
+				return;
+			}
+		}
+		else {
+			$this->load->helper('printerlog');
+			PrinterLog_logError('unknown status in slicing', __FILE__, __LINE__);
+			$cr = ERROR_INTERNAL;
+			CoreStatus_setInIdle();
+		}
+		
+		if (!in_array($cr, array(
+				ERROR_OK, ERROR_INTERNAL,
+				ERROR_LOW_RIGT_FILA, ERROR_LOW_LEFT_FILA,
+				ERROR_MISS_RIGT_FILA, ERROR_MISS_LEFT_FILA,
+				ERROR_MISS_RIGT_CART, ERROR_MISS_LEFT_CART,
+		))) {
+			$this->load->helper('printerlog');
+			PrinterLog_logError('unknown return after slicing: ' . $cr, __FILE__, __LINE__);
+			$cr = ERROR_INTERNAL;
+		}
+		
+		if ($cr == ERROR_INTERNAL) {
+			$this->output->set_status_header($cr);
+		}
+		else {
+			$this->output->set_status_header(202);
+		}
+		$display = $cr . " " . t(MyERRMSG($cr));
+		$this->output->set_content_type('txt_u');
+		$this->parser->parse('template/plaintxt', array('display' => $display)); //optional
+		
+		return;
+	}
+	
+	function slice_result_ajax() {
 		//FIXME need to rewrite this function to read always two cartridges and treat with temporary sliced model information
 		$template_data = array();
 		$ret_val = 0;
 		$array_data = array();
-		$status_current = NULL;
-		$cr = 0;
-		$need_filament_l = 0;
-		$need_filament_r = 0;
+		$cr = ERROR_OK;
 		$state_f_l = NULL;
 		$state_f_r = NULL;
 		$change_left = '';
@@ -414,211 +477,188 @@ class Sliceupload extends MY_Controller {
 // 		$array_key_real_temper = 'real_temperature'; //TODO think about if we need to declare this key name in helper or not
 		$error = NULL;
 		$option_selected = 'selected="selected"';
+		$select_disable = 'disabled="disabled"';
+		$array_need = array('r' => 'false', 'l' => 'false');
 		
-		$callback_return = $this->input->get('callback');
 		$this->load->helper(array('printerstate', 'slicer'));
 		$file_temp_data = $this->config->item('temp') . SLICER_FILE_TEMP_DATA;
 		$this->load->library('parser');
 		$this->lang->load('sliceupload/slice_status_ajax', $this->config->item('language'));
 		
-		if ($callback_return) {
-			if (!file_exists($file_temp_data)) {
-				$this->load->helper('printerlog');
-				PrinterLog_logError('callback return to slice page without temp data file', __FILE__, __LINE__);
-				$cr = ERROR_INTERNAL;
-			}
-			else {
-				$data_json = array();
-				$temp_json = array();
-				
-				$this->load->helper('json');
-				$temp_json = json_read($file_temp_data, TRUE);
-				if (isset($temp_json['error'])) {
-					$this->load->helper('printerlog');
-					PrinterLog_logError('read temp data file error', __FILE__, __LINE__);
-					$cr = ERROR_INTERNAL;
-				}
-				else {
-					$material = NULL;
-					
-					$data_json = $temp_json['json'];
-					$cr = ERROR_OK;
-					foreach ($data_json as $abb_filament => $array_temp) {
-						$data_cartridge = array();
-						$tmp_ret = 0;
-						$volume_need = $array_temp[PRINTERSTATE_TITLE_NEED_L];
-						
-						$tmp_ret = PrinterState_checkFilament($abb_filament, $volume_need, $data_cartridge);
-						if (in_array($tmp_ret, array(
-								ERROR_OK, ERROR_MISS_LEFT_FILA, ERROR_MISS_RIGT_FILA,
-								ERROR_LOW_LEFT_FILA, ERROR_LOW_RIGT_FILA,
-						))) {
-							$array_data[$abb_filament] = array(
-									PRINTERSTATE_TITLE_COLOR		=> $data_cartridge[PRINTERSTATE_TITLE_COLOR],
-									PRINTERSTATE_TITLE_EXT_TEMPER	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER],
-									PRINTERSTATE_TITLE_EXT_TEMP_1	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1],
-									PRINTERSTATE_TITLE_NEED_L		=> $volume_need,
-							);
-						}
-						// only assign return code when success to make a tour of used cartridges
-						if ($cr == ERROR_OK) {
-							$cr = $tmp_ret; //FIXME if we have several error code, it only returns one of it
-						}
-						// check material difference for all used cartridges
-						if (!in_array($tmp_ret, array(
-								ERROR_INTERNAL, ERROR_MISS_LEFT_CART, ERROR_MISS_RIGT_CART,
-						))) {
-							if ($material == NULL) {
-								$material = $data_cartridge[PRINTERSTATE_TITLE_MATERIAL];
-							}
-							else if ($material != $data_cartridge[PRINTERSTATE_TITLE_MATERIAL]) {
-								$error .= t('cartridge_material_diff_msg') . '<br>';
-							}
-							if ($array_temp[PRINTERSTATE_TITLE_EXT_TEMPER] != $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER]) {
-								$error .= t('temper_diff_msg',
-										array(
-												$array_temp[PRINTERSTATE_TITLE_EXT_TEMPER],
-												$data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER],
-										)
-								) . '<br>';
-							}
-							if ($array_temp[PRINTERSTATE_TITLE_EXT_TEMP_1] != $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1]) {
-								$error .= t('first_temper_diff_msg',
-										array(
-												$array_temp[PRINTERSTATE_TITLE_EXT_TEMP_1],
-												$data_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1],
-										)
-								) . '<br>';
-							}
-						}
-					}
-					if (!is_null($error)) {
-						$error .= t('suggest_reslice');
-					}
-				}
-			}
+		if (!file_exists($file_temp_data)) {
+			$this->load->helper('printerlog');
+			PrinterLog_logError('callback return to slice page without temp data file', __FILE__, __LINE__);
+			$cr = ERROR_INTERNAL;
 		}
 		else {
-			CoreStatus_checkInIdle($status_current);
-			$ret_val = PrinterState_checkBusyStatus($status_current, $array_data, FALSE);
-			if ($ret_val == TRUE && $status_current == CORESTATUS_VALUE_IDLE) {
-				if (isset($array_data[PRINTERSTATE_TITLE_LASTERROR])) {
-					$cr = $array_data[PRINTERSTATE_TITLE_LASTERROR];
-				}
-				else {
-					$cr = ERROR_OK;
-				}
-			}
-			else if ($ret_val == FALSE && $status_current == CORESTATUS_VALUE_SLICE) {
-				if (!isset($array_data[PRINTERSTATE_TITLE_PERCENT])) {
-					$this->load->helper('printerlog');
-					PrinterLog_logError('can not find percentage in slicing', __FILE__, __LINE__);
-					$cr = ERROR_INTERNAL;
-				}
-				else {
-					$cr = ERROR_OK;
-					$this->output->set_status_header($cr);
-					$this->output->set_content_type('txt_u');
-					$this->parser->parse('template/plaintxt', array('display' => $array_data[PRINTERSTATE_TITLE_PERCENT]));
-					
-					return;
-				}
-			}
-			else {
+			$data_json = array();
+			$temp_json = array();
+			
+			$this->load->helper('json');
+			$temp_json = json_read($file_temp_data, TRUE);
+			if (isset($temp_json['error'])) {
 				$this->load->helper('printerlog');
-				PrinterLog_logError('unknown status in slicing', __FILE__, __LINE__);
+				PrinterLog_logError('read temp data file error', __FILE__, __LINE__);
 				$cr = ERROR_INTERNAL;
 			}
-			
-// 			// save data info into temp json file
-// 			if ($cr != ERROR_INTERNAL) {
-// 				try {
-// 					$fp = fopen($file_temp_data, 'w');
-// 					if ($fp) {
-// 						fwrite($fp, json_encode($array_data));
-// 						fclose($fp);
-// 					}
-// 					else {
-// 						throw new Exception('can not open file');
-// 					}
-// 				} catch (Exception $e) {
-// 					$this->load->helper('printerlog');
-// 					PrinterLog_logError('can not save temp json file', __FILE__, __LINE__);
-// 					$cr = ERROR_INTERNAL;
-// 				}
-// 			}
-			
-// 			// assign the same value for real temperature
-// 			foreach(array_keys($array_data) as $abb_filament) {
-// 				$array_data[$abb_filament][$array_key_real_temper] = $array_data[$abb_filament][PRINTERSTATE_TITLE_EXT_TEMPER];
-// 			}
 		}
 		
-		
-		//TODO treat mono color and mono extruder case
-		
-		$state_f_l = $state_f_r = t('filament_ok');
-		if (!isset($array_data['l'])) {
-			$state_f_l = t('filament_not_need');
-		}
-		$change_left = $change_right = t('change_filament');
-		switch ($cr) {
-			case ERROR_OK:
-				// do nothing if no error
-				break;
+		if ($cr != ERROR_OK) {
+			$display = $cr . " " . t(MyERRMSG($cr));
+			$this->output->set_status_header($cr);
+			$this->output->set_content_type('txt_u');
+			$this->parser->parse('template/plaintxt', array('display' => $display)); //optional
 			
-			case ERROR_INTERNAL:
-				$display = $cr . " " . t(MyERRMSG($cr));
-				$this->output->set_status_header($cr);
-				$this->output->set_content_type('txt_u');
-				$this->parser->parse('template/plaintxt', array('display' => $display)); //optional
-				return;
-				break; // never reach here
-				
-			case ERROR_LOW_RIGT_FILA:
-				$state_f_r = t('filament_not_enough');
-				break;
-				
-			case ERROR_MISS_RIGT_FILA:
-				$state_f_r = t('filament_unloaded');
-				$change_right = t('load_filament');
-				break;
-				
-			case ERROR_MISS_RIGT_CART:
-				$state_f_r = t('filament_empty');
-				$change_right = t('load_filament');
-				break;
-				
-			case ERROR_LOW_LEFT_FILA:
-				$state_f_l = t('filament_not_enough');
-				break;
-				
-			case ERROR_MISS_LEFT_FILA:
-				$state_f_l = t('filament_unloaded');
-				$change_left = t('load_filament');
-				break;
-				
-			case ERROR_MISS_LEFT_CART:
-				$state_f_l = t('filament_empty');
-				$change_left = t('load_filament');
-				break;
-				
-			default:
-				$this->load->helper('printerlog');
-				PrinterLog_logError('unknown return after slicing: ' . $cr, __FILE__, __LINE__);
-				break;
+			return;
 		}
-		
+		else {
+			$material = NULL;
+			
+			//TODO treat mono color and mono extruder case
+			$state_f_l = $state_f_r = t('filament_ok');
+			$change_left = $change_right = t('change_filament');
+			
+			$data_json = $temp_json['json'];
+			foreach (array('r', 'l') as $abb_filament) {
+				$data_cartridge = array();
+				$data_slice = array();
+				$tmp_ret = 0;
+				$volume_need = 0;
+				
+				if (isset($data_json[$abb_filament])) {
+					$data_slice = $data_json[$abb_filament];
+					if (isset($data_slice[PRINTERSTATE_TITLE_NEED_L])) {
+						$volume_need = $data_slice[PRINTERSTATE_TITLE_NEED_L];
+						if ($volume_need > 0) {
+							$array_need[$abb_filament] = 'true';
+						}
+					}
+				}
+				else if ($abb_filament == 'l') {
+					$state_f_l = t('filament_not_need');
+				}
+				else { // $abb_filament == 'r'
+					$state_f_r = t('filament_not_need');
+				}
+				
+				$tmp_ret = PrinterState_checkFilament($abb_filament, $volume_need, $data_cartridge);
+				if (in_array($tmp_ret, array(
+						ERROR_OK, ERROR_MISS_LEFT_FILA, ERROR_MISS_RIGT_FILA,
+						ERROR_LOW_LEFT_FILA, ERROR_LOW_RIGT_FILA,
+				))) {
+					$array_data[$abb_filament] = array(
+							PRINTERSTATE_TITLE_COLOR		=> $data_cartridge[PRINTERSTATE_TITLE_COLOR],
+							PRINTERSTATE_TITLE_EXT_TEMPER	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER],
+							PRINTERSTATE_TITLE_EXT_TEMP_1	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1],
+							PRINTERSTATE_TITLE_NEED_L		=> $volume_need,
+					);
+				}
+				else {
+					$array_data[$abb_filament] = array(
+							PRINTERSTATE_TITLE_COLOR		=> PRINTERSTATE_VALUE_DEFAULT_COLOR,
+							PRINTERSTATE_TITLE_EXT_TEMPER	=> SLICER_VALUE_DEFAULT_TEMPER,
+							PRINTERSTATE_TITLE_EXT_TEMP_1	=> SLICER_VALUE_DEFAULT_FIRST_TEMPER,
+							PRINTERSTATE_TITLE_NEED_L		=> $volume_need,
+					);
+				}
+				
+				// treat error
+				switch ($tmp_ret) {
+					case ERROR_OK:
+						// do nothing if no error
+						break;
+						
+					case ERROR_LOW_RIGT_FILA:
+						$state_f_r = t('filament_not_enough');
+						break;
+							
+					case ERROR_MISS_RIGT_FILA:
+						$state_f_r = t('filament_unloaded');
+						$change_right = t('load_filament');
+						break;
+							
+					case ERROR_MISS_RIGT_CART:
+						$state_f_r = t('filament_empty');
+						$change_right = t('load_filament');
+						break;
+							
+					case ERROR_LOW_LEFT_FILA:
+						$state_f_l = t('filament_not_enough');
+						break;
+							
+					case ERROR_MISS_LEFT_FILA:
+						$state_f_l = t('filament_unloaded');
+						$change_left = t('load_filament');
+						break;
+							
+					case ERROR_MISS_LEFT_CART:
+						$state_f_l = t('filament_empty');
+						$change_left = t('load_filament');
+						break;
+							
+					default:
+						$this->load->helper('printerlog');
+						PrinterLog_logError('unexpected return when generating slicing result: ' . $cr, __FILE__, __LINE__);
+						
+						// assign error message if necessary
+						if ($abb_filament == 'l') {
+							$state_f_l = t('filament_error');
+						}
+						else { // $abb_filament == 'r'
+							$state_f_r = t('filament_error');
+						}
+						break;
+				}
+				// assign $cr only when status is ok (acts like a flag of error)
+				if ($cr == ERROR_OK && $volume_need > 0) {
+					$cr = $tmp_ret;
+				}
+				
+				// check material difference for all used cartridges
+				if (!in_array($tmp_ret, array(
+						ERROR_INTERNAL, ERROR_MISS_LEFT_CART, ERROR_MISS_RIGT_CART,
+				))) {
+					if ($material == NULL) {
+						$material = $data_cartridge[PRINTERSTATE_TITLE_MATERIAL];
+					}
+					else if ($material != $data_cartridge[PRINTERSTATE_TITLE_MATERIAL]) {
+						$error .= t('cartridge_material_diff_msg') . '<br>';
+					}
+				}
+				
+				if ($volume_need > 0) { // act as count($data_slice), but with more verification
+					if ($data_slice[PRINTERSTATE_TITLE_EXT_TEMPER] != $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER]) {
+						$error .= t('temper_diff_msg',
+								array(
+										$data_slice[PRINTERSTATE_TITLE_EXT_TEMPER],
+										$data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER],
+								)
+						) . '<br>';
+					}
+					if ($data_slice[PRINTERSTATE_TITLE_EXT_TEMP_1] != $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1]) {
+						$error .= t('first_temper_diff_msg',
+								array(
+										$data_slice[PRINTERSTATE_TITLE_EXT_TEMP_1],
+										$data_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1],
+								)
+						) . '<br>';
+					}
+				}
+			}
+			if (!is_null($error)) {
+				$error .= t('suggest_reslice');
+			}
+		}
 		
 		$template_data = array(
-				'cartridge_c_l'		=> isset($array_data['l']) ? $array_data['l'][PRINTERSTATE_TITLE_COLOR] : PRINTERSTATE_VALUE_DEFAULT_COLOR,
-				'cartridge_c_r'		=> isset($array_data['r']) ? $array_data['r'][PRINTERSTATE_TITLE_COLOR] : PRINTERSTATE_VALUE_DEFAULT_COLOR,
+				'cartridge_c_l'		=> $array_data['l'][PRINTERSTATE_TITLE_COLOR],
+				'cartridge_c_r'		=> $array_data['r'][PRINTERSTATE_TITLE_COLOR],
 				'state_f_l'			=> $state_f_l,
 				'state_f_r'			=> $state_f_r,
-				'need_filament_l'	=> isset($array_data['l']) ? $array_data['l'][PRINTERSTATE_TITLE_NEED_L] : 0,
-				'need_filament_r'	=> isset($array_data['r']) ? $array_data['r'][PRINTERSTATE_TITLE_NEED_L] : 0,
-				'temper_l'			=> isset($array_data['l']) ? $array_data['l'][PRINTERSTATE_TITLE_EXT_TEMPER] : '---',
-				'temper_r'			=> isset($array_data['r']) ? $array_data['r'][PRINTERSTATE_TITLE_EXT_TEMPER] : '---',
+				'need_filament_l'	=> $array_data['l'][PRINTERSTATE_TITLE_NEED_L],
+				'need_filament_r'	=> $array_data['r'][PRINTERSTATE_TITLE_NEED_L],
+				'temper_l'			=> $array_data['l'][PRINTERSTATE_TITLE_EXT_TEMPER],
+				'temper_r'			=> $array_data['r'][PRINTERSTATE_TITLE_EXT_TEMPER],
 // 				'real_temper_l'		=> isset($array_data['l']) ? $array_data['l'][$array_key_real_temper] : 200,
 // 				'real_temper_r'		=> isset($array_data['r']) ? $array_data['r'][$array_key_real_temper] : 200,
 				'print_button'		=> t('print_button'),
@@ -635,16 +675,32 @@ class Sliceupload extends MY_Controller {
 				'exchange_o1'		=> t('exchange_straight'),
 				'exchange_o2'		=> t('exchange_crossover'),
 				'bicolor_model'		=> 'false',
+				'needprint_right'	=> $array_need['r'],
+				'needprint_left'	=> $array_need['l'],
+				'enable_exchange'	=> $select_disable,
+				'filament_not_need'	=> t('filament_not_need'),
+				'filament_ok'		=> t('filament_ok'),
 		);
 		
-		if (isset($array_data['r']) && isset($array_data['l'])) {
+		if (ERROR_OK == PrinterState_checkFilaments(array(
+				'l'	=> $array_data['r'][PRINTERSTATE_TITLE_NEED_L],
+				'r'	=> $array_data['l'][PRINTERSTATE_TITLE_NEED_L],
+		))) {
+			$template_data['enable_exchange'] = NULL; // enable exchange if verification is passed
+		}
+// 		if (ERROR_OK == PrinterState_checkFilament('l', $array_data['r'][PRINTERSTATE_TITLE_NEED_L])
+// 		&& ERROR_OK == PrinterState_checkFilament('r', $array_data['l'][PRINTERSTATE_TITLE_NEED_L])) {
+// 			$template_data['enable_exchange'] = NULL; // enable exchange if verification is passed
+// 		}
+		
+		if ($array_need['r'] == 'true' && $array_need['l'] == 'true') {
 			$template_data['bicolor_model'] = 'true';
 		}
 		else {
 			$template_data['exchange_o1']		= t('exchange_left');
 			$template_data['exchange_o2']		= t('exchange_right');
 			
-			if (isset($array_data['r'])) {
+			if ($array_need['r'] == 'true') {
 				$template_data['exchange_o1_val']	= 1;
 				$template_data['exchange_o2_val']	= 0;
 				$template_data['exchange_o2_sel']	= $option_selected;
@@ -654,7 +710,6 @@ class Sliceupload extends MY_Controller {
 		$this->output->set_status_header(202);
 		$this->parser->parse('template/sliceupload/slice_result_ajax', $template_data); //optional
 		
-		CoreStatus_setInIdle();
 		return;
 	}
 	

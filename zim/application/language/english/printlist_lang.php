@@ -44,4 +44,15 @@ $lang['error']
 	= 'error';
 $lang['Home']
 	= 'Home';
-?>
+$lang['filament_not_need']
+	= 'not in need';
+$lang['exchange_extruder']
+	= 'Cartridge inversion';
+$lang['exchange_straight']
+	= 'Straight';
+$lang['exchange_crossover']
+	= 'Crossover';
+$lang['exchange_right']
+	= 'Right';
+$lang['exchange_left']
+	= 'Left';

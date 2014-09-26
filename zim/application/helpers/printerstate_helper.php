@@ -1226,19 +1226,25 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array(), 
 					$this->load->helper('printerlog');
 					PrinterLog_logError('can not save temp json file', __FILE__, __LINE__);
 // 					$cr = ERROR_INTERNAL;
+// 					$ret_val = ERROR_INTERNAL;
 				}
 				
 				if ($ret_val != ERROR_OK) {
 					$CI->load->helper('printerlog');
-					
+					PrinterLog_logError('check filament error after slicing, cr: ' . $ret_val, __FILE__, __LINE__);
 					$array_data[PRINTERSTATE_TITLE_LASTERROR] = $ret_val;
-					PrinterLog_logError('check filament error after slicing - usually because of no enough filament', __FILE__, __LINE__);
 				}
 				
 // 				// try to start printing after slicing if necessary
 // 				if ($printafterslice == FALSE) {
 				
-				CoreStatus_setInIdle($ret_val);
+// 				CoreStatus_setInIdle($ret_val);
+				if ($ret_val == ERROR_INTERNAL) {
+					CoreStatus_setInIdle(ERROR_INTERNAL);
+				}
+				else {
+					CoreStatus_setInIdle();
+				}
 					
 				return TRUE;
 			}
