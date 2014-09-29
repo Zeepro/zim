@@ -45,7 +45,7 @@ $lang['error']
 $lang['Home']
 	= 'Home';
 $lang['filament_not_need']
-	= 'not used';
+	= 'N/A';
 $lang['exchange_extruder']
 	= 'Color inversion';
 $lang['exchange_straight']
