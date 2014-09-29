@@ -369,7 +369,6 @@ sub change_extruder {
 	foreach my $line (@lines) {
 		my $pos_extruder = -1;
 		my $pos_comment = -1;
-		my $change_extruder = FALSE;
 		
 		# do not count comment and empty line
 		$line =~ s/\R//g;
@@ -382,20 +381,27 @@ sub change_extruder {
 		foreach my $extruder_test ("T0", "T1") {
 			$pos_extruder = index($line, $extruder_test);
 			
-			if ($pos_extruder != -1 && $pos_extruder == 0) {
-				$extruder_current = $extruder_test;
-				$change_extruder = TRUE;
-				if ($extruder_test eq "T0") { # T0
-					print "T1\n";
+			if ($pos_extruder != -1) {
+				if ($pos_extruder == 0) {
+					$extruder_current = $extruder_test;
+					if ($extruder_test eq "T0") { # T0
+						$line = "T1";
+					}
+					else { # T1
+						$line = "T0";
+					}
+					last;
 				}
-				else { # T1
-					print "T0\n";
+				else { # special gcode, such like M104, M109, etc.
+					my $extruder_set = ($extruder_test eq "T0") ? "T1" : "T0";
+					
+					while ($pos_extruder > -1) {
+						substr($line, $pos_extruder, length($extruder_test), $extruder_set);
+						$pos_extruder = index($line, $extruder_test, $pos_extruder + length($extruder_set));
+					}
+					last; # normally, there is only one extruder in one line (except in comment)
 				}
-				last;
 			}
-		}
-		if ($change_extruder == TRUE) {
-			next;
 		}
 		
 		print $line . "\n";
