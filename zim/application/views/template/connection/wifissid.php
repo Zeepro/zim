@@ -30,14 +30,14 @@
 // Detect Android
 */
 
-var ua = navigator.userAgent;
-var isAndroid = ua.indexOf("android") > -1;
+// var ua = navigator.userAgent;
+// var isAndroid = ua.indexOf("android") > -1;
 
-if (isAndroid)
-{
-	var match = ua.match(/Android\s([0-9\.]*)/);
-	if (match[1][0] < '4' || (match[1][0] == '4' && match[1][2] < '4'))
-		window.location.href = "/connection/android_oldversions";
-}
+// if (isAndroid)
+// {
+// 	var match = ua.match(/Android\s([0-9\.]*)/);
+// 	if (match[1][0] < '4' || (match[1][0] == '4' && match[1][2] < '4'))
+// 		window.location.href = "/connection/android_oldversions";
+// }
 	</script>
 </div>
