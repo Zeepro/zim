@@ -4,6 +4,9 @@
 	<div data-role="content">
 		<div id="container" style="text-align:center;">
 			<p id="hint_box">{config_printer}</p>
+			<div id="error_box">
+				{connect_error_msg}
+			</div>
 		</div>
 	</div>
 
@@ -14,26 +17,9 @@ $(document).ready(function()
 	$(".ui-loader").css("display", "block");
 });
 
-var ua = navigator.userAgent;
-var isAndroid = ua.indexOf("android") > -1;
-var version = "N/A";
-
-var suffix = '.local';
-
-if (isAndroid)
-{
-	var match = ua.match(/Android\s([0-9\.]*)/);
-	if (match[1][0] < '4' || (match[1][0] == '4' && match[1][2] < '4'))
-		window.location.href = "/connection/android_oldversions";
-	else
-		suffix = '';
-}
-
-if (ua.search('Windows') != -1)
-{
-	suffix = '';
-}
-
+/*
+// Start magicDatabase=zsso;User ID=zssologin;Password=V8lu7hb1
+*/
 
 setTimeout(function()
 {
@@ -43,30 +29,37 @@ setTimeout(function()
 	interval = setInterval(function()
 	{
 		var image = new Image();
-		
-		if (counter >= 90) {
+		var image2 = new Image();
+
+		if (counter >= 90)
+		{
 			clearInterval(interval);
-			$("p#hint_box").html('{connect_error_msg}');
+			$("p#hint_box").css('display', 'none');
+			$("div#error_box").css('display', 'block');
 			$(".ui-loader").css("display", "none");
 		}
-		else {
+		else
+		{
 			counter += 1;
 		}
 		
-		image.src = "http://{hostname}" + "/assets/images/pixel.png?_=" + (new Date()).getTime();
+		image.src = "http://{hostname}/assets/images/pixel.png?_=" + (new Date()).getTime();
+		image2.src = "http://{hostname}.local/assets/images/pixel.png?_=" + (new Date()).getTime();
 		setTimeout(function()
 		{
 			if (image.height != 0)
 			{
 				clearInterval(interval);
-				window.location.href = "http://{hostname}" + "/account/first_signup/";
+				window.location.href = "http://{hostname}/account/first_signup/";
+			}
+			if (image2.height != 0)
+			{
+				clearInterval(interval);
+				window.location.href = "http://{hostname}.local/account/first_signup/";
 			}
 		}, 1000);
 	}, 2000);
 }, 30000);
-
-
-
 </script>
 
 </div>

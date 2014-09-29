@@ -5,16 +5,39 @@
 	</header>
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
-		<div id="container">
+		<noscript>
+			<p>Your navigator has disabled Javascript support, please enable it to start configuring zim.</p>
+		</noscript>
+		<div id="container" style="display:none">
 			<h2>{title}</h2>
-			<ul data-role="listview" data-inset="true" id="listview"
-				class="shadowBox">
+			<ul data-role="listview" data-inset="true" id="listview" class="shadowBox">
 				{list_ssid}
-				<li><a href="/connection/wifipswd?ssid={link}&{wizard}">{name}</a></li>
+				<li><a href="/connection/wifipswd?ssid={link}&{wizard}" class="needSpin">{name}</a></li>
 				{/list_ssid}
-				<li><a href="/connection/wifinotvisiblessid?{wizard}" data-prefetch>{no_visable}</a></li>
+				<li><a href="/connection/wifinotvisiblessid?{wizard}" class="needSpin" data-prefetch>{no_visable}</a></li>
 			</ul>
 			<img src="/assets/images/shadow2.png" class="shadow" alt="shadow">
 		</div>
 	</div>
+	<script>
+		$("div#container").css('display', 'block');
+		$("a.needSpin").on("click", function()
+		{
+			$(".ui-loader").css("display", "none");
+		})
+
+/*
+// Detect Android
+*/
+
+var ua = navigator.userAgent;
+var isAndroid = ua.indexOf("android") > -1;
+
+if (isAndroid)
+{
+	var match = ua.match(/Android\s([0-9\.]*)/);
+	if (match[1][0] < '4' || (match[1][0] == '4' && match[1][2] < '4'))
+		window.location.href = "/connection/android_oldversions";
+}
+	</script>
 </div>

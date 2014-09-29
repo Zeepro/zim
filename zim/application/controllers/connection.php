@@ -466,7 +466,25 @@ class Connection extends MY_Controller {
 		$this->_generate_framePage($body_page);
 		return;
 	}
-
+	
+	public function android_oldversions()
+	{
+		$template_data = array();
+		$body_page = NULL;
+		
+		$this->load->library('parser');
+		$this->lang->load('connection/deprecated_android', $this->config->item('language'));
+		
+		$template_data = array(
+				'inf_kit_kat' => t('inf_kit_kat'),
+		);
+		
+		$body_page = $this->parser->parse('template/connection/android_oldversions', $template_data, TRUE);
+		$this->_generate_framePage($body_page);
+		
+		return;
+	}
+	
 	public function in_progress()
 	{
 		$template_data = array();
