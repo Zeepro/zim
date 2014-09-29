@@ -23,14 +23,14 @@ $lang['header_multi']
 
 // upload_wait
 $lang['wait_message']
-	= 'Loading model into slicer...';
+	= 'Loading model...';
 $lang['return_button']
 	= 'Ok';
 $lang['fail_message']
-	= 'Load error, please check your model and try again.';
+	= 'Loading error, please check your model and try again.';
 $lang['fin_message']
-	= 'Succeeded adding model into slicer, the page will redirect into slicer after 3 seconds';
+	= 'Succeeded adding model into slicer, you will be redirected after 3 seconds';
 
 // restart
 $lang['wait_in_restart']
-	= 'Slicer not responding detected, try to relaunch slicer...';
+	= 'Slicer not responding, try to relaunch the slicer...';

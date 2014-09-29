@@ -11,7 +11,7 @@ $lang['suggest_reslice']
 $lang['filament_ok']
 	= 'ok';
 $lang['filament_not_need']
-	= 'not used';
+	= 'N/A';
 $lang['filament_not_enough']
 	= 'not enough';
 $lang['filament_unloaded']
