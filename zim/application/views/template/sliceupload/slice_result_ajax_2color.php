@@ -1,42 +1,46 @@
 
-				<div class="ui-grid-a">
-					<div class="ui-block-a"><div id="left_cartridge" class="ui-bar ui-bar-f">
-						<div style="width: 75px; height: 75px; background-color: {cartridge_c_l}; margin: 0 auto;">
-							<img src="/images/cartridge.png" style="width: 100%">
-						</div>
-						<p id="state_f_l">{state_f_l}</p>
-						<p>{temper_l} °C</p>
-					</div></div>
-					<div class="ui-block-b"><div id="right_cartridge" class="ui-bar ui-bar-f">
-						<div style="width: 75px; height: 75px; background-color: {cartridge_c_r}; margin: 0 auto;">
-							<img src="/images/cartridge.png" style="width: 100%">
-						</div>
-						<p id="state_f_r">{state_f_r}</p>
-						<p>{temper_r} °C</p>
-					</div></div>
-				</div>
-				<p style="text-align: left;">{error_msg}</p>
 				<form action="/printdetail/printslice_temp" method="POST" data-ajax="false">
+					<div id="exchange_container" class="ui-bar ui-bar-f" style="height:3em;">
+						<label>
+							<input type="checkbox" name="exchange_interface" id="exchange_extruder" value="1" {enable_exchange}>{exchange_extruder}
+						</label>
+					</div>
 					<div class="ui-grid-a">
-						<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;">
-							<label for="exchange_extruder"><h2>{exchange_extruder}</h2></label>
-						</div></div>
-						<div class="ui-block-b">
-							<div class="ui-bar ui-bar-f" style="height:3em;">
-								<select name="exchange" id="exchange_extruder" data-role="slider" data-track-theme="a" data-theme="a" {enable_exchange}>
-									<option value="{exchange_o1_val}">{exchange_o1}</option>
-									<option value="{exchange_o2_val}" {exchange_o2_sel}>{exchange_o2}</option>
-								</select>
+						<div class="ui-block-a"><div id="left_cartridge" class="ui-bar ui-bar-f">
+							<div style="width: 75px; height: 75px; background-color: {cartridge_c_l}; margin: 0 auto;">
+								<img src="/images/cartridge.png" style="width: 100%">
 							</div>
-						</div>
-						<div id="temper_l">
-							<label>Left temperature</label>
-							<input type="range" id="slider_left" name="l" value="{temper_l}" min="160" max="260" />
-						</div>
-						<div id="temper_r">
-							<label>Right temperature</label>
-							<input type="range" id="slider_right" name="r" value="{temper_r}" min="160" max="260" />
-						</div>
+							<p id="state_f_l">{state_f_l}</p>
+							<p>{temper_l} °C</p>
+						</div></div>
+						<div class="ui-block-b"><div id="right_cartridge" class="ui-bar ui-bar-f">
+							<div style="width: 75px; height: 75px; background-color: {cartridge_c_r}; margin: 0 auto;">
+								<img src="/images/cartridge.png" style="width: 100%">
+							</div>
+							<p id="state_f_r">{state_f_r}</p>
+							<p>{temper_r} °C</p>
+						</div></div>
+					</div>
+					<p style="text-align: left;">{error_msg}</p>
+					<div class="ui-grid-a">
+						<div class="ui-block-a"><div id="left_cartridge" class="ui-bar ui-bar-f">
+							<div id="temper_l">
+								<label>Left temperature</label>
+								<input type="range" id="slider_left" name="l" value="{temper_l}" min="160" max="260" />
+							</div>
+						</div></div>
+						<div class="ui-block-b"><div id="right_cartridge" class="ui-bar ui-bar-f">
+							<div id="temper_r">
+								<label>Right temperature</label>
+								<input type="range" id="slider_right" name="r" value="{temper_r}" min="160" max="260" />
+							</div>
+						</div></div>
+<!-- 						<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;"> -->
+<!-- 							<label for="exchange_extruder"><h2>{exchange_extruder}</h2></label> -->
+<!-- 						</div></div> -->
+<!-- 						<div class="ui-block-b"> -->
+<!-- 						</div> -->
+						<input type="hidden" name="exchange" id="exchange_extruder_hidden" value="0">
 						<input type="submit" id="print_slice" value="{print_button}">
 					</div>
 				</form>
@@ -94,27 +98,34 @@ if (var_reslice == true) {
 	.button().button('refresh');
 }
 
+if (var_bicolor_model == false) {
+	$('#exchange_container').addClass("switch-larger");
+}
+
 // assign new preview color
-if (var_color_right != '{cartridge_c_r}') {
-	var_color_right = '{cartridge_c_r}';
-	var_need_refresh_preview = true;
-}
-if (var_color_left != '{cartridge_c_l}') {
-	var_color_left = '{cartridge_c_l}';
-	var_need_refresh_preview = true;
-}
+var_color_right = '{cartridge_c_r}';
+var_color_left = '{cartridge_c_l}';
+
+// if (var_color_right != '{cartridge_c_r}') {
+// 	var_color_right = '{cartridge_c_r}';
+// 	var_need_refresh_preview = true;
+// }
+// if (var_color_left != '{cartridge_c_l}') {
+// 	var_color_left = '{cartridge_c_l}';
+// 	var_need_refresh_preview = true;
+// }
 
 $("#preview_zone").show();
-if (var_need_refresh_preview) {
+// if (var_need_refresh_preview) {
 	getPreview(false);
-}
+// }
 
 // assign trigger for exchange extruder
-$("select#exchange_extruder").change(function() {
+$("input#exchange_extruder").change(function() {
 	// switch print on and exchange off in some special cases
 	if (var_enable_print == false) {
-		$("select#exchange_extruder").slider({disabled: true});
-		$("select#exchange_extruder").slider('refresh');
+		$("input#exchange_extruder").slider({disabled: true});
+		$("input#exchange_extruder").slider('refresh');
 		$("#print_slice").button("enable");
 	}
 	
@@ -149,6 +160,13 @@ $("select#exchange_extruder").change(function() {
 		var_color_right = var_color_left;
 		var_color_left = temp_color;
 		getPreview(false);
+	}
+	
+	if ($("input#exchange_extruder").is(":checked")) {
+		$("input#exchange_extruder_hidden").val("1");
+	}
+	else {
+		$("input#exchange_extruder_hidden").val("0");
 	}
 });
 

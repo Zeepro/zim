@@ -58,7 +58,7 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 	define('SLICER_VALUE_DEFAULT_FIRST_TEMPER',	235);
 	
 	define('SLICER_CMD_SLICER_PS_STATUS',	'ps -A | grep slic3r.bin');
-	define('SLICER_CMD_RESTART_SLICER',		'/etc/init.d/zeepro-slic3r restart &');
+	define('SLICER_CMD_RESTART_SLICER',		'sudo /etc/init.d/zeepro-slic3r restart &');
 	
 // 	define('SLICER_FILENAME_ZIPMODEL',	'_model_slicer.zip');
 }
@@ -533,29 +533,35 @@ function Slicer_changeParameter($array_setting) {
 
 function Slicer_changeTemperByCartridge($array_cartridge) {
 	$json_cartridge = array();
-	$array_danger_return = array(ERROR_INTERNAL, ERROR_WRONG_PRM, ERROR_BUSY_PRINTER);
 	$temperature = $first_temperature = NULL;
+	$array_danger_return = array(
+			ERROR_INTERNAL,
+			ERROR_WRONG_PRM,
+			ERROR_BUSY_PRINTER,
+			ERROR_MISS_RIGT_CART,
+			ERROR_MISS_LEFT_CART
+	);
 	
 	$CI = &get_instance();
 	$CI->load->helper('printerstate');
 	
-	foreach ($array_cartridge as $abb_cartridge) {
-		switch ($abb_cartridge) {
-			case 'r':
-				$array_danger_return[] = ERROR_MISS_RIGT_CART;
-				break;
+// 	foreach ($array_cartridge as $abb_cartridge) {
+// 		switch ($abb_cartridge) {
+// 			case 'r':
+// 				$array_danger_return[] = ERROR_MISS_RIGT_CART;
+// 				break;
 				
-			case 'l':
-				$array_danger_return[] = ERROR_MISS_LEFT_CART;
-				break;
+// 			case 'l':
+// 				$array_danger_return[] = ERROR_MISS_LEFT_CART;
+// 				break;
 				
-			default:
-				$CI->load->helper('printerlog');
-				PrinterLog_logError('unknown cartridge abb value', __FILE__, __LINE__);
-				return ERROR_INTERNAL;
-				break; // never reach here
-		}
-	}
+// 			default:
+// 				$CI->load->helper('printerlog');
+// 				PrinterLog_logError('unknown cartridge abb value', __FILE__, __LINE__);
+// 				return ERROR_INTERNAL;
+// 				break; // never reach here
+// 		}
+// 	}
 	
 	foreach (array('r', 'l') as $abb_cartridge) {
 		$ret_val = PrinterState_getCartridgeAsArray($json_cartridge, $abb_cartridge);

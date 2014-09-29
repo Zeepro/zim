@@ -36,7 +36,7 @@
 					</div></div>
 					<div class="ui-block-b">
 						<div class="ui-bar ui-bar-f" style="height:3em;">
-							<select name="exchange" id="exchange_extruder" data-role="slider" data-track-theme="a" data-theme="a" {enable_exchange}>
+							<select name="exchange_interface" id="exchange_extruder" data-role="slider" data-track-theme="a" data-theme="a" {enable_exchange}>
 								<option value="1">{exchange_on}</option>
 								<option value="0" selected="selected">{exchange_off}</option>
 							</select>
@@ -81,6 +81,7 @@
 <!-- 				<a href="/print?id={model_id}" class="ui-btn ui-btn-inline ui-icon-action ui-btn-icon-left">{print_model}</a> -->
 			</div>
 			<div style="clear: both;">
+				<input type="hidden" name="exchange" id="exchange_extruder_hidden" value="0">
 				<!-- <button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh" onclick="window.location.href='/printdetail/printmodel?id={model_id}'">{print_model}</button>-->
 				<input type="submit" value="{print_model}" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh" />
 			</div>
@@ -151,6 +152,8 @@ $("select#exchange_extruder").change(function() {
 		var_need_print_left = false;
 		var_need_print_right = true;
 	}
+	
+	$("input#exchange_extruder_hidden").val($("select#exchange_extruder").val());
 });
 </script>
 </div>

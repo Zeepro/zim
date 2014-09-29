@@ -20,6 +20,8 @@ $lang['wait_slice']
 	= 'Slicing du modèle commencé...';
 $lang['wait_in_slice']
 	= 'Slicing en cours, pourcentage: ';
+$lang['slice_suffix']
+	= '%%<br/>Attendez SVP...';
 $lang['near_button']
 	= 'Zoom avant';
 $lang['far_button']

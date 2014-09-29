@@ -17,7 +17,9 @@ $lang['wait_preview']
 $lang['wait_slice']
 	= '正在开始分层分析';
 $lang['wait_in_slice']
-	= '等待分析完成，进度百分比：';
+	= '分析中：';
+$lang['slice_suffix']
+	= '%%<br/>请等待…';
 $lang['near_button']
 	= '镜头拉进';
 $lang['far_button']

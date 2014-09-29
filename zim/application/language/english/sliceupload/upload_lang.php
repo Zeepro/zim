@@ -23,11 +23,11 @@ $lang['header_multi']
 
 // upload_wait
 $lang['wait_message']
-	= 'Adding model into slicer, please wait...';
+	= 'Loading model into slicer...';
 $lang['return_button']
-	= 'Try again';
+	= 'Ok';
 $lang['fail_message']
-	= 'Error for adding model into slicer';
+	= 'Load error, please check your model and try again.';
 $lang['fin_message']
 	= 'Succeeded adding model into slicer, the page will redirect into slicer after 3 seconds';
 

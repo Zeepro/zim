@@ -11,7 +11,7 @@ $lang['suggest_reslice']
 $lang['filament_ok']
 	= 'ok';
 $lang['filament_not_need']
-	= 'not in need';
+	= 'not used';
 $lang['filament_not_enough']
 	= 'not enough';
 $lang['filament_unloaded']
@@ -27,12 +27,12 @@ $lang['print_button']
 $lang['reslice_button']
 	= 'Reslice';
 $lang['exchange_extruder']
-	= 'Cartridge inversion';
+	= 'Color inversion';
 $lang['exchange_straight']
 	= 'Straight';
 $lang['exchange_crossover']
 	= 'Crossover';
 $lang['exchange_right']
-	= 'Right';
+	= 'Right cartridge';
 $lang['exchange_left']
-	= 'Left';
+	= 'Left cartridge';

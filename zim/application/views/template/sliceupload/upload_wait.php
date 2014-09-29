@@ -25,10 +25,11 @@ function add_model() {
 		timeout: 1000*60*10,
 	})
 	.done(function(html) {
-		$('#wait_message').html("{fin_message}");
-		setTimeout(function(){
-			window.location.href="/sliceupload/slice";
-			}, 3000);
+// 		$('#wait_message').html("{fin_message}");
+// 		setTimeout(function(){
+// 			window.location.href="/sliceupload/slice";
+// 			}, 3000);
+		window.location.href="/sliceupload/slice";
 	})
 	.fail(function() { // not in printing
 		$('#wait_message').html("{fail_message}");

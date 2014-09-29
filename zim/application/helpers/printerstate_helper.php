@@ -1197,13 +1197,34 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array(), 
 					$tmp_ret = 0;
 					
 					$tmp_ret = PrinterState_checkFilament($abb_filament, $volume_need, $data_cartridge);
-					$array_data[$abb_filament] = array(
-							PRINTERSTATE_TITLE_COLOR		=> $data_cartridge[PRINTERSTATE_TITLE_COLOR],
-							PRINTERSTATE_TITLE_EXT_TEMPER	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER],
-							PRINTERSTATE_TITLE_EXT_TEMP_1	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1],
-							PRINTERSTATE_TITLE_NEED_L		=> $volume_need,
-							PRINTERSTATE_TITLE_MATERIAL		=> $data_cartridge[PRINTERSTATE_TITLE_MATERIAL], // for different material check
-					);
+// 					$array_data[$abb_filament] = array(
+// 							PRINTERSTATE_TITLE_COLOR		=> $data_cartridge[PRINTERSTATE_TITLE_COLOR],
+// 							PRINTERSTATE_TITLE_EXT_TEMPER	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER],
+// 							PRINTERSTATE_TITLE_EXT_TEMP_1	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1],
+// 							PRINTERSTATE_TITLE_NEED_L		=> $volume_need,
+// 							PRINTERSTATE_TITLE_MATERIAL		=> $data_cartridge[PRINTERSTATE_TITLE_MATERIAL], // for different material check
+// 					);
+					if (in_array($tmp_ret, array(
+							ERROR_OK, ERROR_MISS_LEFT_FILA, ERROR_MISS_RIGT_FILA,
+							ERROR_LOW_LEFT_FILA, ERROR_LOW_RIGT_FILA,
+					))) {
+						$array_data[$abb_filament] = array(
+								PRINTERSTATE_TITLE_COLOR		=> $data_cartridge[PRINTERSTATE_TITLE_COLOR],
+								PRINTERSTATE_TITLE_EXT_TEMPER	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER],
+								PRINTERSTATE_TITLE_EXT_TEMP_1	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1],
+								PRINTERSTATE_TITLE_NEED_L		=> $volume_need,
+								PRINTERSTATE_TITLE_MATERIAL		=> $data_cartridge[PRINTERSTATE_TITLE_MATERIAL], // for different material check
+						);
+					}
+					else {
+						$array_data[$abb_filament] = array(
+								PRINTERSTATE_TITLE_COLOR		=> PRINTERSTATE_VALUE_DEFAULT_COLOR,
+								PRINTERSTATE_TITLE_EXT_TEMPER	=> SLICER_VALUE_DEFAULT_TEMPER,
+								PRINTERSTATE_TITLE_EXT_TEMP_1	=> SLICER_VALUE_DEFAULT_FIRST_TEMPER,
+								PRINTERSTATE_TITLE_NEED_L		=> $volume_need,
+								PRINTERSTATE_TITLE_MATERIAL		=> PRINTERSTATE_DESP_MATERIAL_PLA, // for different material check
+						);
+					}
 					
 					// only assign return value when no error, so we can grap all data we need in checking loop
 					if ($ret_val == ERROR_OK) {

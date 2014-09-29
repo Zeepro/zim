@@ -15,11 +15,13 @@ $lang['goto_preset']
 $lang['goto_hint']
 	= 'Are you sure to go to the settings presets page?';
 $lang['wait_preview']
-	= 'Wait for loading preview image';
+	= 'Loading preview...';
 $lang['wait_slice']
-	= 'Starting slicing';
+	= 'Start slicing...';
 $lang['wait_in_slice']
-	= 'Waiting for slicing, percentage: ';
+	= 'Slicing: ';
+$lang['slice_suffix']
+	= '%%<br/>Please wait...';
 $lang['near_button']
 	= 'Zoom in';
 $lang['far_button']

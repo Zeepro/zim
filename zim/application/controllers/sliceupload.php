@@ -224,6 +224,7 @@ class Sliceupload extends MY_Controller {
 		// parse the main body
 		$template_data = array(
 				'wait_in_slice'	=> t('wait_in_slice'),
+				'slice_suffix'	=> t('slice_suffix'),
 		);
 		$body_page = $this->parser->parse('template/sliceupload/slicestatus', $template_data, TRUE);
 		
@@ -407,7 +408,13 @@ class Sliceupload extends MY_Controller {
 		$this->load->helper(array('printerstate', 'slicer'));
 		$this->load->library('parser');
 		
-		CoreStatus_checkInIdle($status_current);
+		$ret_val = CoreStatus_checkInIdle($status_current);
+		if ($ret_val == TRUE) {
+			$cr = 403;
+			$this->output->set_status_header($cr);
+			
+			return;
+		}
 		$ret_val = PrinterState_checkBusyStatus($status_current, $array_data);
 		if ($ret_val == TRUE && $status_current == CORESTATUS_VALUE_IDLE) {
 			if (isset($array_data[PRINTERSTATE_TITLE_LASTERROR])) {
@@ -624,25 +631,25 @@ class Sliceupload extends MY_Controller {
 					else if ($material != $data_cartridge[PRINTERSTATE_TITLE_MATERIAL]) {
 						$error .= t('cartridge_material_diff_msg') . '<br>';
 					}
-				}
-				
-				if ($volume_need > 0) { // act as count($data_slice), but with more verification
-					if ($data_slice[PRINTERSTATE_TITLE_EXT_TEMPER] != $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER]) {
-						$error .= t('temper_diff_msg',
-								array(
-										$data_slice[PRINTERSTATE_TITLE_EXT_TEMPER],
-										$data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER],
-								)
-						) . '<br>';
-					}
-					if ($data_slice[PRINTERSTATE_TITLE_EXT_TEMP_1] != $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1]) {
-						$error .= t('first_temper_diff_msg',
-								array(
-										$data_slice[PRINTERSTATE_TITLE_EXT_TEMP_1],
-										$data_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1],
-								)
-						) . '<br>';
-					}
+					
+// 					if ($volume_need > 0) { // act as count($data_slice), but with more verification
+// 						if ($data_slice[PRINTERSTATE_TITLE_EXT_TEMPER] != $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER]) {
+// 							$error .= t('temper_diff_msg',
+// 									array(
+// 											$data_slice[PRINTERSTATE_TITLE_EXT_TEMPER],
+// 											$data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER],
+// 									)
+// 							) . '<br>';
+// 						}
+// 						if ($data_slice[PRINTERSTATE_TITLE_EXT_TEMP_1] != $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1]) {
+// 							$error .= t('first_temper_diff_msg',
+// 									array(
+// 											$data_slice[PRINTERSTATE_TITLE_EXT_TEMP_1],
+// 											$data_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1],
+// 									)
+// 							) . '<br>';
+// 						}
+// 					}
 				}
 			}
 			if (!is_null($error)) {
@@ -695,6 +702,7 @@ class Sliceupload extends MY_Controller {
 		
 		if ($array_need['r'] == 'true' && $array_need['l'] == 'true') {
 			$template_data['bicolor_model'] = 'true';
+			$this->parser->parse('template/sliceupload/slice_result_ajax_2color', $template_data);
 		}
 		else {
 			$template_data['exchange_o1']		= t('exchange_left');
@@ -705,10 +713,10 @@ class Sliceupload extends MY_Controller {
 				$template_data['exchange_o2_val']	= 0;
 				$template_data['exchange_o2_sel']	= $option_selected;
 			}
+			$this->parser->parse('template/sliceupload/slice_result_ajax_1color', $template_data);
 		}
 		
 		$this->output->set_status_header(202);
-		$this->parser->parse('template/sliceupload/slice_result_ajax', $template_data); //optional
 		
 		return;
 	}

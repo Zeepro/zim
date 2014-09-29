@@ -32,16 +32,10 @@
 			<div data-role="collapsible" data-collapsed="false" style="text-align: center;">
 				<h4>{title_current}</h4>
 				<div class="ui-grid-a">
-					<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;">
-						<label for="exchange_extruder"><h2>{exchange_extruder}</h2></label>
-					</div></div>
-					<div class="ui-block-b">
-						<div class="ui-bar ui-bar-f" style="height:3em;">
-							<select name="exchange" id="exchange_extruder" data-role="slider" data-track-theme="a" data-theme="a" {enable_exchange}>
-								<option value="0">{exchange_off}</option>
-								<option value="1">{exchange_on}</option>
-							</select>
-						</div>
+					<div id="exchange_container" class="ui-bar ui-bar-f" style="height:3em;">
+						<label>
+							<input type="checkbox" name="exchange_interface" id="exchange_extruder" value="1" {enable_exchange}>{exchange_extruder}
+						</label>
 					</div>
 				</div>
 				<div style="height:265px">
@@ -81,6 +75,7 @@
 				</div>
 			</div>
 			<div style="clear: both;">
+				<input type="hidden" name="exchange" id="exchange_extruder_hidden" value="0">
 				<input type="submit" value="{print_model}" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh" />
 			</div>
 			</form>
@@ -124,17 +119,24 @@ $(document).on("pagecreate",function() {
 });
 
 //assign trigger for exchange extruder
-$("select#exchange_extruder").change(function() {
+$("input#exchange_extruder").change(function() {
 	// switch print on and exchange off in some special cases
 	if (var_enable_print == false) {
-		$("select#exchange_extruder").slider({disabled: true});
-		$("select#exchange_extruder").slider("refresh");
+		$("input#exchange_extruder").slider({disabled: true});
+		$("input#exchange_extruder").slider("refresh");
 		$("input[type=submit]").button("refresh");
 		$("input[type=submit]").button("enable");
 	}
 	
 	$("p#state_f_r").html('{filament_ok}');
 	$("p#state_f_l").html('{filament_ok}');
+	
+	if ($("input#exchange_extruder").is(":checked")) {
+		$("input#exchange_extruder_hidden").val("1");
+	}
+	else {
+		$("input#exchange_extruder_hidden").val("0");
+	}
 });
 
 </script>

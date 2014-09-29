@@ -45,7 +45,7 @@ function checkSlice() {
 		}
 		else if (var_slice_status.status == 200) { // in checking
 			// html => percentage
-			$("#detail_zone").html("{wait_in_slice} " + html);
+			$("#detail_zone").html("{wait_in_slice} " + html + "{slice_suffix}");
 		}
 	})
 	.fail(function() { // not allowed

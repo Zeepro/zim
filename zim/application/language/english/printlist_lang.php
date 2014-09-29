@@ -45,14 +45,14 @@ $lang['error']
 $lang['Home']
 	= 'Home';
 $lang['filament_not_need']
-	= 'not in need';
+	= 'not used';
 $lang['exchange_extruder']
-	= 'Cartridge inversion';
+	= 'Color inversion';
 $lang['exchange_straight']
 	= 'Straight';
 $lang['exchange_crossover']
 	= 'Crossover';
 $lang['exchange_right']
-	= 'Right';
+	= 'Right cartridge';
 $lang['exchange_left']
-	= 'Left';
+	= 'Left cartridge';
