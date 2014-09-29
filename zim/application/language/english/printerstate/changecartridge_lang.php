@@ -13,7 +13,7 @@ $lang['Right cartridge change']
 $lang['Unload the filament']
 	= 'Unload the filament';
 $lang['Waiting for getting information...']
-	= 'Waiting for information...';
+	= 'Reading cartridge information...';
 $lang['Wait for unloading...']
 	= 'Unloading...';
 $lang['Not enough filament']
@@ -62,7 +62,5 @@ $lang['cancel_button']
 	= 'Cancel';
 $lang['hint_unload_temper']
 	= 'Heating...';
-$lang['cancel_button']
-	= 'Cancel';
 $lang['cancel_info']
 	= 'Cancelling...';

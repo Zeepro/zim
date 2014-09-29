@@ -13,4 +13,4 @@ $lang['wizard_fail_hint']
 $lang['wizard_skip_hint']
 	= 'You can connect to your printer using <a href="http://%s/">http://%s/</a>.';
 $lang['button_ok']
-	= 'Ok';
+	= 'Go to my zim';
