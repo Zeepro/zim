@@ -246,6 +246,7 @@ function load_jwplayer_video() {
 setTimeout(load_jwplayer_video, 10000);
 var var_ajax;
 var var_ajax_lock = false;
+var var_home_before_level = false;
 
 $("#head_led").change(function()
 {
@@ -303,6 +304,12 @@ $("#strip_led").change(function()
 
 function home(var_axis) {
 	var var_url;
+	if (var_ajax_lock == true) {
+		return;
+	}
+	else {
+		var_ajax_lock = true;
+	}
 
 	var_axis = typeof var_axis !== 'undefined' ? var_axis : 'all';
 	if (var_axis == 'all') {
@@ -324,11 +331,8 @@ function home(var_axis) {
 			$(".ui-loader").css("display", "none");
 		},
 	})
-	.done(function(html) {
-		$("#gcode_detail_info").html('OK');
-	})
-	.fail(function() {
-		$("#gcode_detail_info").html('ERROR');
+	.always(function() {
+		var_ajax_lock = false;
 	});
 
 	return false;
@@ -337,10 +341,15 @@ function home(var_axis) {
 function move(var_axis, var_value) {
 	var var_url;
 	var var_speed;
+	if (var_ajax_lock == true) {
+		return;
+	}
+	else {
+		var_ajax_lock = true;
+	}
 
 	var_axis = typeof var_axis !== 'undefined' ? var_axis : 'error';
 	if (var_axis == 'error') {
-		$("#gcode_detail_info").html('ERROR');
 		return false;
 	}
 	else {
@@ -365,11 +374,8 @@ function move(var_axis, var_value) {
 			$(".ui-loader").css("display", "none");
 		},
 	})
-	.done(function(html) {
-		$("#gcode_detail_info").html('OK');
-	})
-	.fail(function() {
-		$("#gcode_detail_info").html('ERROR');
+	.always(function() {
+		var_ajax_lock = false;
 	});
 
 	return false;
@@ -377,12 +383,14 @@ function move(var_axis, var_value) {
 
 function level(var_point) {
 	var var_url;
-	if (var_ajax_lock == true)
-	{
+	if (var_home_before_level == false) {
+		home_before_level(var_point);
 		return;
 	}
-	else
-	{
+	if (var_ajax_lock == true) {
+		return;
+	}
+	else {
 		var_ajax_lock = true;
 	}
 
@@ -408,11 +416,37 @@ function level(var_point) {
 			$(".ui-loader").css("display", "none");
 		},
 	})
-	.done(function(html) {
-	
+	.always(function() {
+		var_ajax_lock = false;
+	});
+
+	return false;
+}
+
+function home_before_level(var_point) {
+	if (var_ajax_lock == true) {
+		return;
+	}
+	else {
+		var_ajax_lock = true;
+	}
+	var_ajax = $.ajax({
+		url: "/manage/home",
+		type: "GET",
+		cache: false,
+		beforeSend: function() {
+			$("#overlay").addClass("gray-overlay");
+			$(".ui-loader").css("display", "block");
+		},
+		complete: function() {
+			$("#overlay").removeClass("gray-overlay");
+			$(".ui-loader").css("display", "none");
+		},
 	})
-	.fail(function() {
-		
+	.done(function() {
+		var_ajax_lock = false;
+		var_home_before_level = true;
+		level(var_point);
 	})
 	.always(function() {
 		var_ajax_lock = false;
