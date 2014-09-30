@@ -30,18 +30,11 @@
 <!-- 			</div> -->
 			<div data-role="collapsible" data-collapsed="false" style="text-align: center;">
 				<h4>{title_current}</h4>
-				<div class="ui-grid-a">
-					<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;">
-						<label for="exchange_extruder"><h2>{exchange_extruder}</h2></label>
-					</div></div>
-					<div class="ui-block-b">
-						<div class="ui-bar ui-bar-f" style="height:3em;">
-							<select name="exchange_interface" id="exchange_extruder" data-role="slider" data-track-theme="a" data-theme="a" {enable_exchange}>
-								<option value="1">{exchange_on}</option>
-								<option value="0" selected="selected">{exchange_off}</option>
-							</select>
-						</div>
-					</div>
+				<div id="exchange_container" class="ui-bar ui-bar-f switch-larger" style="height:3em;">
+					<select name="exchange_interface" id="exchange_extruder" data-role="slider" data-track-theme="a" data-theme="a" {enable_exchange}>
+						<option value="1">{exchange_on}</option>
+						<option value="0" selected="selected">{exchange_off}</option>
+					</select>
 				</div>
 				<div style="height:265px">
 					<div class="ui-grid-a">
