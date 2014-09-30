@@ -3,7 +3,7 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
-			<div id="wait_message">{wait_message}</div>
+			<div id="wait_message" style="text-align: center;">{wait_message}</div>
 		</div>
 	</div>
 </div>
