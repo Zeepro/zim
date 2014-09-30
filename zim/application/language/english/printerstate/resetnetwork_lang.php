@@ -12,4 +12,4 @@ $lang['Reset the printer\'s network']
 $lang['Reset error']
 	= 'Reset error';
 $lang['Connect to the new printer\'s network, then press OK']
-	= 'Please restart your zim, then connect to this wifi network: Zim_initialization_XXXX ; and open a browser on http://10.0.0.1 to configure your zim.';
+	= 'Please restart your zim, then connect to this wifi network: Zim_initialization_XXXX ; and open a browser on <a href="http://10.0.0.1">http://10.0.0.1</a> to configure your zim.';

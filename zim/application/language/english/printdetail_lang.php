@@ -29,7 +29,7 @@ $lang['Temperature of the left extruder: %d °C']
 $lang['Temperature of the right extruder: %d °C']
 	= 'Temperature of the right extruder: <span id="print_detail_info_temper_r_value">%d</span> °C';
 $lang['Waiting for starting...']
-	= 'Waiting for starting...';
+	= 'Starting the print...';
 $lang['Printing details']
 	= 'Printing details';
 $lang['Congratulation, your printing is complete!']
@@ -51,9 +51,9 @@ $lang['in_finish']
 $lang['printdetail_cancel_pagetitle']
 	= 'Zim - Cancelling details';
 $lang['wait_hint_cancel']
-	= 'Waiting for cancelling...';
+	= 'Cancelling...';
 $lang['finish_hint_cancel']
-	= 'Your printing is canceled!';
+	= 'Your printing is canceled.';
 
 //printdetail recovery()
 $lang['printdetail_recovery_pagetitle']
