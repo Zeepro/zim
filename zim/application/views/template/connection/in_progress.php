@@ -4,7 +4,7 @@
 	<div data-role="content">
 		<div id="container" style="text-align:center;">
 			<p id="hint_box">{config_printer}</p>
-			<div id="error_box">
+			<div id="error_box" style="display:none;">
 				{connect_error_msg}
 			</div>
 		</div>
