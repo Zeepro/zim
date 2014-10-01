@@ -134,7 +134,8 @@ class MY_Lang extends CI_Lang {
              }
 
              /* Check the browser's language */
-             $lang_browser = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
+             // use default language if we do not receive language setting
+             $lang_browser = (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) ? substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2) : $default_abbr;
              if (isset($lang_uri_abbr[$lang_browser])) {
              	$lang_abbr = $lang_browser;
              } else {
