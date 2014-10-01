@@ -503,6 +503,7 @@ class Connection extends MY_Controller {
 		
 		$template_data = array(
 				'hostname'			=> $hostname,
+				'printersn'			=> ZimAPI_getSerial(),
 				'config_printer'	=> t('config_printer'),
 				'connect_error_msg'	=> t('connect_error_msg'),
 		);

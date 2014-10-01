@@ -25,11 +25,32 @@ setTimeout(function()
 {
 	var interval;
 	var counter = 0;
+	var localip = "";
 	
 	interval = setInterval(function()
 	{
 		var image = new Image();
 		var image2 = new Image();
+		var image3 = new Image();
+
+		if (localip.length == 0)
+		{
+			$.ajax({
+			cache: false,
+			type: "POST",
+			url: "https://sso.zeepro.com/getlocalip.ashx",
+			data: { "printersn": "{printersn}"},
+			dataType: "json",
+			success: function (data) {
+				if (data.state == "ok")
+				{
+					localip = data.localIP;
+				}
+			},
+//			error:function (xhr, ajaxOptions, thrownError){
+//			}
+		});
+		}
 
 		if (counter >= 90)
 		{
@@ -43,10 +64,19 @@ setTimeout(function()
 			counter += 1;
 		}
 		
+		if (localip.length > 0)
+		{
+			image3.src = "http://" + localip + "/assets/images/pixel.png?_=" + (new Date()).getTime();
+		}
 		image.src = "http://{hostname}/assets/images/pixel.png?_=" + (new Date()).getTime();
 		image2.src = "http://{hostname}.local/assets/images/pixel.png?_=" + (new Date()).getTime();
 		setTimeout(function()
 		{
+			if (image3.height != 0)
+			{
+				clearInterval(interval);
+				window.location.href = "http://" + localip + "/account/first_signup/";
+			}
 			if (image.height != 0)
 			{
 				clearInterval(interval);
