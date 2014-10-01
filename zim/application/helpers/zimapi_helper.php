@@ -1120,6 +1120,11 @@ function ZimAPI_getVersion($next_boot = FALSE) {
 		$version = trim(shell_exec(ZIMAPI_CMD_VERSION));
 	}
 	
+	//FIXME remove me as soon as possible
+	if ($version == 'dev_release_1.2') { // error version after flash SD or recovery
+		$version = trim(@file_get_contents($CI->config->item('version_file')));
+	}
+	
 	return $version;
 }
 
