@@ -5,7 +5,7 @@
 		<div id="container">
 			<div id="detail_zone" style="clear: both; text-align: center;">
 			</div>
-			<a href="#" class="ui-btn" onclick="javascript: stopSlice();">{cancel_button}</a>
+			<div id="cancel_div"><a href="#" class="ui-btn" onclick="javascript: stopSlice();">{cancel_button}</a></div>
 		</div>
 	</div>
 </div>
@@ -81,7 +81,9 @@ function stopSlice() {
 // 		alert("End");
 	})
 	.always(function() {
-		window.location.replace("/");
+		$("#cancel_div").hide();
+		$("#detail_zone").html("{wait_cancel}");
+		setTimeout(function() { window.location.replace("/"); }, 10000);
 	});
 
 	return;

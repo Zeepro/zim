@@ -41,6 +41,7 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 	define('SLICER_FILE_MODEL',		'_sliced_model.gcode');
 // 	define('SLICER_FILE_RENDERING',	'preview.png');
 	define('SLICER_FILE_TEMP_DATA',	'_sliced_info.json');
+	define('SLICER_FILE_HTTP_PORT',	'Slic3rPort.txt');
 	
 	define('SLICER_FILE_SLICELOG',	'/var/log/slic3r');
 	
@@ -198,6 +199,7 @@ function Slicer_sliceHalt() {
 		CoreStatus_setInIdle();
 		
 		$cr = ERROR_OK;
+		Slicer_restart(); //FIXME remove me as soon as possible
 	}
 	else {
 		$cr = ERROR_NO_SLICING;
@@ -683,6 +685,8 @@ function Slicer__getHTTPCode($http_response_header) {
 
 function Slicer__requestSlicer($suffix_url, $time_limit = TRUE, &$response = NULL) {
 	global $CFG;
+	Slicer__changeURLPort();
+	
 	$context = stream_context_create(
 			array('http' => array(
 					'ignore_errors' => TRUE,
@@ -698,6 +702,29 @@ function Slicer__requestSlicer($suffix_url, $time_limit = TRUE, &$response = NUL
 	}
 	
 	return Slicer__getHTTPCode($http_response_header);
+}
+
+function Slicer__changeURLPort() {
+	$CI = &get_instance();
+	$slicer_url = $CI->config->item('slicer_url');
+	$port_filepath = $CI->config->item('temp') . SLICER_FILE_HTTP_PORT;
+	
+	if (FALSE === strpos($slicer_url, '8080/')) {
+		return;
+	}
+	if (file_exists($port_filepath)) {
+		$slicer_url = str_replace('8080/', '', $slicer_url);
+		$slicer_url .= @file_get_contents($port_filepath) . '/';
+		$CI->config->set_item('slicer_url', $slicer_url);
+// 		$CI->load->helper('printerlog');
+// 		PrinterLog_logDebug('found slic3r port file, url: ' . $slicer_url, __FILE__, __LINE__);
+	}
+	else {
+		$CI->load->helper('printerlog');
+		PrinterLog_logMessage('can not find port file of slic3r, try to use original one, 8080', __FILE__, __LINE__);
+	}
+	
+	return;
 }
 
 function Slicer__getColorString($color, &$color_string) {

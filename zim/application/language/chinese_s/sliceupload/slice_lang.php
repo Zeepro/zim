@@ -30,3 +30,5 @@ $lang['big_button']
 	= '尺寸 +';
 $lang['cancel_button']
 	= '取消';
+$lang['wait_cancel']
+	= '取消中…';

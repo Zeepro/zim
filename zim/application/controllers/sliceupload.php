@@ -226,6 +226,7 @@ class Sliceupload extends MY_Controller {
 				'wait_in_slice'	=> t('wait_in_slice'),
 				'slice_suffix'	=> t('slice_suffix'),
 				'cancel_button'	=> t('cancel_button'),
+				'wait_cancel'	=> t('wait_cancel'),
 		);
 		$body_page = $this->parser->parse('template/sliceupload/slicestatus', $template_data, TRUE);
 		
@@ -901,7 +902,7 @@ class Sliceupload extends MY_Controller {
 		$action = $this->input->get('action');
 		
 		$this->load->helper('slicer');
-		if (Slicer_checkOnline()) {
+		if (Slicer_checkOnline(FALSE)) {
 			$this->output->set_status_header(202, 'Opened');
 			
 			return;
@@ -910,7 +911,7 @@ class Sliceupload extends MY_Controller {
 			$this->load->helper('printerlog');
 			PrinterLog_logDebug('restarting slicer', __FILE__, __LINE__);
 			
-// 			Slicer_restart();
+			Slicer_restart();
 		}
 		
 		$display = 200 . " " . t(MyERRMSG(200));
