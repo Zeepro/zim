@@ -6,7 +6,15 @@
 	<div data-role="content">
 		<div id="container"></div>
 	</div>
-	
+
 <script>
+<!--
+var var_xsize = {xsize};
+var var_ysize = {ysize};
+var var_zsize = {zsize};
+var var_max_percent = {max_percent};
+
+-->
 </script>
+
 </div>

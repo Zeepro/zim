@@ -275,7 +275,12 @@ class Sliceupload extends MY_Controller {
 		
 		// parse the main body
 		$template_data = array(
-				'home'				=> t('home'),
+				'home'			=> t('home'),
+				'cancel_button'	=> t('cancel'),
+				'max_percent'	=> 0.8,
+				'xsize'			=> 150,
+				'ysize'			=> 175,
+				'zsize'			=> 100,
 		);
 		$body_page = $this->parser->parse('template/sliceupload/reducesize', $template_data, TRUE);
 		
