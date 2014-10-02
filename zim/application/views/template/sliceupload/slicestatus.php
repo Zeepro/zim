@@ -5,6 +5,7 @@
 		<div id="container">
 			<div id="detail_zone" style="clear: both; text-align: center;">
 			</div>
+			<a href="#" class="ui-btn" onclick="javascript: stopSlice();">{cancel_button}</a>
 		</div>
 	</div>
 </div>
@@ -14,6 +15,7 @@
 var var_slice_status;
 var var_slice_status_lock = false;
 var var_slice_interval;
+var var_slice_cancel = null;
 
 
 $(document).ready(prepareDisplay());
@@ -49,7 +51,9 @@ function checkSlice() {
 		}
 	})
 	.fail(function() { // not allowed
-		window.location.replace("/");
+		if (var_slice_cancel == null) {
+			window.location.replace("/");
+		}
 //			clearInterval(var_refreshChangeStatus);
 //			$("#print_detail_info").html('<p>{finish_info}</p>');
 //			$('button#print_action').click(function(){window.location.href='/'; return false;});
@@ -61,6 +65,25 @@ function checkSlice() {
 		var_slice_status_lock = false;
 	});
 	
+	return;
+}
+
+function stopSlice() {
+	var_slice_status_lock = true;
+	clearInterval(var_slice_interval);
+	
+	var_slice_cancel = $.ajax({
+		url: "/rest/cancelslicing",
+		type: "GET",
+		cache: false,
+	})
+	.done(function(html) {
+// 		alert("End");
+	})
+	.always(function() {
+		window.location.replace("/");
+	});
+
 	return;
 }
 

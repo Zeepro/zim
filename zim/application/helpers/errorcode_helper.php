@@ -31,6 +31,7 @@ if (!defined('ERROR_OK')) {
 	define('ERROR_TOOBIG_MODEL',	451);
 	define('ERROR_NO_SLICED',		452);
 	define('ERROR_REMOTE_REFUSE',	453);
+	define('ERROR_NO_SLICING',		454);
 	
 	define('ERROR_INTERNAL',		500);
 	
@@ -63,6 +64,7 @@ if (!defined('ERROR_OK')) {
 			ERROR_TOOBIG_MODEL		=> 'Model too big',
 			ERROR_NO_SLICED			=> 'No sliced model',
 			ERROR_REMOTE_REFUSE		=> 'Remote control not allowed',
+			ERROR_NO_SLICING		=> 'No current slicing',
 			
 			ERROR_INTERNAL			=> 'Internal API error',
 			404						=> 'Not found',

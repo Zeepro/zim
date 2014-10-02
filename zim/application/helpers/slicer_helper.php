@@ -42,6 +42,8 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 // 	define('SLICER_FILE_RENDERING',	'preview.png');
 	define('SLICER_FILE_TEMP_DATA',	'_sliced_info.json');
 	
+	define('SLICER_FILE_SLICELOG',	'/var/log/slic3r');
+	
 	define('SLICER_OFFSET_VALUE_COLOR2EXTRUDER',	-1);
 	
 	define('SLICER_RESPONSE_OK',		200);
@@ -190,10 +192,15 @@ function Slicer_sliceHalt() {
 	$ret_val = Slicer__requestSlicer(SLICER_URL_SLICE_HALT);
 	
 	if ($ret_val == SLICER_RESPONSE_OK) {
+		$CI = &get_instance();
+		$CI->load->helper('corestatus');
+		
+		CoreStatus_setInIdle();
+		
 		$cr = ERROR_OK;
 	}
 	else {
-		$cr = ERROR_NO_PRINT;
+		$cr = ERROR_NO_SLICING;
 	}
 	
 	return $cr;
@@ -205,7 +212,7 @@ function Slicer_checkSlice(&$progress, &$array_extruder = array()) {
 	
 	if ($ret_val == SLICER_RESPONSE_OK) {
 		if ((int)$response < 0) {
-			$cr = ERROR_NO_PRINT;
+			$cr = ERROR_NO_SLICING;
 			$progress = -1;
 		}
 		else {
@@ -260,7 +267,7 @@ function Slicer_checkAdd(&$progress) {
 
 	if ($ret_val == SLICER_RESPONSE_OK) {
 		if ((int)$response < 0) {
-			$cr = ERROR_NO_PRINT;
+			$cr = ERROR_NO_SLICING;
 			$progress = -1;
 		}
 		else {

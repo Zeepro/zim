@@ -30,3 +30,5 @@ $lang['small_button']
 	= 'Size -';
 $lang['big_button']
 	= 'Size +';
+$lang['cancel_button']
+	= 'Cancel';

@@ -28,3 +28,5 @@ $lang['small_button']
 	= '尺寸 -';
 $lang['big_button']
 	= '尺寸 +';
+$lang['cancel_button']
+	= '取消';

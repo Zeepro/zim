@@ -225,6 +225,7 @@ class Sliceupload extends MY_Controller {
 		$template_data = array(
 				'wait_in_slice'	=> t('wait_in_slice'),
 				'slice_suffix'	=> t('slice_suffix'),
+				'cancel_button'	=> t('cancel_button'),
 		);
 		$body_page = $this->parser->parse('template/sliceupload/slicestatus', $template_data, TRUE);
 		

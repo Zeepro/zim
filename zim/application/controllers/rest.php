@@ -491,6 +491,33 @@ class Rest extends MY_Controller {
 		if (CoreStatus_checkInIdle($status_current)) {
 			$this->_return_cr(ERROR_NO_PRINT);
 			return;
+		}if ($status_current == CORESTATUS_VALUE_PRINT) {
+			$this->load->helper('printer');
+			
+			$ret_val = Printer_stopPrint();
+			if ($ret_val == TRUE) {
+				$this->_return_cr(ERROR_OK);
+			}
+			else {
+				$this->load->helper('printerlog');
+				PrinterLog_logError('can not stop printing by REST', __FILE__, __LINE__);
+				$this->_return_cr(ERROR_NO_PRINT);
+			}
+		}
+		else {
+			$this->_return_cr(ERROR_NO_PRINT);
+		}
+		
+		return;
+	}
+	
+	public function cancelslicing() {
+		$ret_val = 0;
+		$status_current = '';
+		
+		if (CoreStatus_checkInIdle($status_current)) {
+			$this->_return_cr(ERROR_NO_SLICING);
+			return;
 		}
 		
 		if ($status_current == CORESTATUS_VALUE_SLICE) {
@@ -506,21 +533,8 @@ class Rest extends MY_Controller {
 				$this->_return_cr($ret_val);
 			}
 		}
-		else if ($status_current == CORESTATUS_VALUE_PRINT) {
-			$this->load->helper('printer');
-			
-			$ret_val = Printer_stopPrint();
-			if ($ret_val == TRUE) {
-				$this->_return_cr(ERROR_OK);
-			}
-			else {
-				$this->load->helper('printerlog');
-				PrinterLog_logError('can not stop printing by REST', __FILE__, __LINE__);
-				$this->_return_cr(ERROR_NO_PRINT);
-			}
-		}
 		else {
-			$this->_return_cr(ERROR_NO_PRINT);
+			$this->_return_cr(ERROR_NO_SLICING);
 		}
 		
 		return;

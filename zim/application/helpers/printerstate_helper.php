@@ -132,6 +132,9 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_TITLE_EXT_LENG_R',	'r_length');
 	define('PRINTERSTATE_TITLE_SLICE_ERR',	'slicing_error');
 	define('PRINTERSTATE_TITLE_DETAILMSG',	'Message');
+	define('PRINTERSTATE_TITLE_PRINT_XMAX',	'xmax');
+	define('PRINTERSTATE_TITLE_PRINT_YMAX',	'ymax');
+	define('PRINTERSTATE_TITLE_PRINT_ZMAX',	'zmax');
 	
 	define('PRINTERSTATE_JSON_PRINTER', 		'Printer.json');
 	define('PRINTERSTATE_TITLE_JSON_NB_EXTRUD', 'ExtrudersNumber');
@@ -1163,7 +1166,7 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array(), 
 				$status_current = CORESTATUS_VALUE_IDLE;
 				switch ($ret_val) {
 					//TODO treat the error with api and ui
-					case ERROR_NO_PRINT:
+					case ERROR_NO_SLICING:
 						$error_message = 'not in slicing';
 						PrinterLog_logMessage($error_message, __FILE__, __LINE__);
 						break;
@@ -2183,7 +2186,6 @@ function PrinterState_filterOutput(&$output, $command = '', $trim_ok = TRUE) {
 
 function PrinterState_getNbExtruder() {
 	global $CFG;
-	$nb_extruder = 0;
 	$tmp_array = array();
 	$printerinfo_fullpath = $CFG->config['hardconf'] . PRINTERSTATE_JSON_PRINTER;
 	
@@ -2203,6 +2205,36 @@ function PrinterState_getNbExtruder() {
 	}
 	
 	return $tmp_array['json'][PRINTERSTATE_TITLE_JSON_NB_EXTRUD];
+}
+
+function PrinterState_getPrintSize(&$size_array) {
+	global $CFG;
+	$tmp_array = array();
+	$printerinfo_fullpath = $CFG->config['hardconf'] . PRINTERSTATE_JSON_PRINTER;
+	
+	$CI= &get_instance();
+	$CI->load->helper('json');
+	
+	$size_array = array();
+	try {
+		$tmp_array = json_read($printerinfo_fullpath, TRUE);
+		if ($tmp_array['error']) {
+			throw new Exception('read json error');
+		}
+	} catch (Exception $e) {
+		$CI = &get_instance();
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('read printer json error', __FILE__, __LINE__);
+		return 0;
+	}
+	
+	foreach (array(PRINTERSTATE_TITLE_PRINT_XMAX, PRINTERSTATE_TITLE_PRINT_YMAX, PRINTERSTATE_TITLE_PRINT_ZMAX) as $key) {
+		if (isset($tmp_array['json'][$key])) {
+			$size_array[$key] = $tmp_array['json'][$key];
+		}
+	}
+	
+	return;
 }
 
 function PrinterState_getMarlinVersion(&$version_marlin) {
@@ -2236,6 +2268,7 @@ function PrinterState_getInfoAsArray() {
 	$name_sso = NULL;
 	$hostname = NULL;
 	$network_data = array();
+	$platform_size = array();
 	$array_return= array();
 	$cr = 0;
 	
@@ -2247,6 +2280,7 @@ function PrinterState_getInfoAsArray() {
 	if ($cr != ERROR_OK) {
 		$hostname = 'N/A';
 	}
+	PrinterState_getPrintSize($platform_size);
 	
 	$cr = ZimAPI_getNetworkInfoAsArray($network_data);
 	$array_return = array(
@@ -2260,6 +2294,10 @@ function PrinterState_getInfoAsArray() {
 			ZIMAPI_TITLE_IP					=> ($cr == ERROR_OK && !is_null($network_data[ZIMAPI_TITLE_IP]))
 					 ? $network_data[ZIMAPI_TITLE_IP] : 'N/A',
 	);
+	
+	foreach ($platform_size as $key => $value) {
+		$array_return[$key] = $value;
+	}
 
 	$cr = ZimAPI_getPrinterSSOName($name_sso);
 	if ($cr == ERROR_OK && $name_sso != NULL) {

@@ -461,8 +461,8 @@ function CoreStatus_checkCallNoBlockRESTInPrint() {
 
 function CoreStatus_checkCallNoBlockRESTInSlice() {
 	return CoreStatus__checkCallURI(array(
-			'/rest/status'		=> NULL,
-			'/rest/cancel'		=> NULL,
+			'/rest/status'			=> NULL,
+			'/rest/cancelslicing'	=> NULL,
 	));
 }
 

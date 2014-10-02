@@ -82,6 +82,12 @@ class Test_log extends CI_Controller {
 		return;
 	}
 	
+	public function slicelog() {
+		$this->file('slicelog');
+		
+		return;
+	}
+	
 	private function file($type = 'debug') {
 		$path_file = '';
 		
@@ -97,6 +103,11 @@ class Test_log extends CI_Controller {
 			case 'printlog':
 				$this->load->helper('printerstate');
 				$path_file = PRINTERSTATE_FILE_PRINTLOG;
+				break;
+				
+			case 'slicelog':
+				$this->load->helper('slicer');
+				$path_file = SLICER_FILE_SLICELOG;
 				break;
 				
 			default:
