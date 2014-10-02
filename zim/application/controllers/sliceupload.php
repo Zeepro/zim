@@ -243,8 +243,6 @@ class Sliceupload extends MY_Controller {
 	function restart() {
 		$template_data = array();
 		$body_page = NULL;
-		$ret_val = 0;
-		$status_current = NULL;
 		
 		$this->load->library('parser');
 		$this->lang->load('sliceupload/upload', $this->config->item('language'));
@@ -255,6 +253,31 @@ class Sliceupload extends MY_Controller {
 				'wait_in_restart'	=> t('wait_in_restart'),
 		);
 		$body_page = $this->parser->parse('template/sliceupload/restart', $template_data, TRUE);
+		
+		// parse all page
+		$template_data = array(
+				'lang'			=> $this->config->item('language_abbr'),
+				'headers'		=> '<title>' . t('sliceupload_slice_pagetitle') . '</title>',
+				'contents'		=> $body_page,
+		);
+		
+		$this->parser->parse('template/basetemplate', $template_data);
+		
+		return;
+	}
+	
+	function reducesize() {
+		$template_data = array();
+		$body_page = NULL;
+		
+		$this->load->library('parser');
+		$this->lang->load('sliceupload/upload', $this->config->item('language'));
+		
+		// parse the main body
+		$template_data = array(
+				'home'				=> t('home'),
+		);
+		$body_page = $this->parser->parse('template/sliceupload/reducesize', $template_data, TRUE);
 		
 		// parse all page
 		$template_data = array(
