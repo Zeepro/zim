@@ -287,7 +287,8 @@ class Sliceupload extends MY_Controller {
 		// parse all page
 		$template_data = array(
 				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('sliceupload_slice_pagetitle') . '</title>',
+				'headers'		=> '<title>' . t('sliceupload_slice_pagetitle') . '</title>' . "\n"
+						. '<link rel="stylesheet" href="/assets/jquery-mobile-fluid960.min.css">',
 				'contents'		=> $body_page,
 		);
 		
