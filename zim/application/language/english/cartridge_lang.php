@@ -46,4 +46,13 @@ $lang['checksum_label']
 	= 'Checksum';
 $lang['write_button']
 	= 'Write';
-
+$lang['magic_number_error']
+	= 'Magic number error';
+$lang['crc_error']
+	= 'CRC error';
+$lang['cartridge_type_error']
+	= 'Cartridge type error';
+$lang['filament_type_error']
+	= 'Filament type error';
+$lang['internal_error']
+	= 'Internal system error';
