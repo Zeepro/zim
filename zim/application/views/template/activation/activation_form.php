@@ -13,7 +13,7 @@
 				<input type="hidden" name="email" value='{email}' />
 				<input type="hidden" name="password" value='{password}' />
 				<label for="printer_name"></label>
-				<input type="text" name="printer_name" value="" />
+				<input type="text" name="printer_name" value="" pattern="^[a-zA-Z0-9][a-zA-Z0-9\-]{0,7}[a-zA-Z0-9]$|^[a-zA-Z0-9]$" required />
 				<input type="submit" name="submit" value="Ok" />
 			</form>
 		</div>
