@@ -23,13 +23,17 @@ $lang['cartridge_type']
 $lang['material_type']
 	= '打印丝种类';
 $lang['temperature']
-	= '温度';
+	= '温度 （°C）';
 $lang['temperature_first']
-	= '首层温度';
+	= '首层温度 （°C）';
 $lang['initial_length']
-	= '初始长度';
+	= '初始长度 （m）';
 $lang['used_length']
-	= '已使用长度';
+	= '已使用长度 （m）';
+$lang['initial_length_mm']
+	= '初始长度 （mm）';
+$lang['used_length_mm']
+	= '已使用长度 （mm）';
 $lang['cartridge_code_hint']
 	= '墨盒数据';
 $lang['magic_number']

@@ -22,8 +22,8 @@
 					<td>{red_label}</td>
 					<td>{green_label}</td>
 					<td>{blue_label}</td>
-					<td>{initial_length}</td>
-					<td>{used_length}</td>
+					<td>{initial_length_mm}</td>
+					<td>{used_length_mm}</td>
 					<td>{temperature}</td>
 					<td>{temperature_first}</td>
 					<td>{pack_label}</td>
@@ -184,10 +184,10 @@ function inputUserChoice(flag) {
 				$("#overlay").addClass("gray-overlay");
 				$(".ui-loader").css("display", "block");
 			},
-			complete: function() {	
-				$("#overlay").removeClass("gray-overlay");
-				$(".ui-loader").css("display", "none");
-			},
+// 			complete: function() {
+// 				$("#overlay").removeClass("gray-overlay");
+// 				$(".ui-loader").css("display", "none");
+// 			},
 		});
 	}
 	else {
@@ -200,6 +200,8 @@ function inputUserChoice(flag) {
 			location.reload();
 		}).fail(function() {
 			$("#hint_message").html("{error_writing}");
+			$("#overlay").removeClass("gray-overlay");
+			$(".ui-loader").css("display", "none");
 		});
 	}
 
