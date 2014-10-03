@@ -46,4 +46,20 @@ $lang['checksum_label']
 	= '验证编号';
 $lang['write_button']
 	= '写入';
+$lang['magic_number_error']
+	= '识别编号错误';
+$lang['crc_error']
+	= '验证编号错误';
+$lang['cartridge_type_error']
+	= '墨盒种类错误';
+$lang['filament_type_error']
+	= '打印丝种类错误';
+$lang['internal_error']
+	= '内部系统错误';
+$lang['information_not_changed']
+	= '数据没有变化';
+$lang['writing_successed']
+	= '写入成功';
+$lang['error_writing']
+	= '写入失败';
 

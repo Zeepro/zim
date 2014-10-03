@@ -13,6 +13,48 @@
 		<div id="container">
 			<h2 style="text-align: center;">{side_cartridge}</h2>
 			
+			<p>{cartridge_code_hint} <span id="code">{cartridge_code}</span></p>
+			<table border="1">
+				<tr>
+					<td>{magic_number}</td>
+					<td>{cartridge_type}</td>
+					<td>{material_type}</td>
+					<td>{red_label}</td>
+					<td>{green_label}</td>
+					<td>{blue_label}</td>
+					<td>{initial_length}</td>
+					<td>{used_length}</td>
+					<td>{temperature}</td>
+					<td>{temperature_first}</td>
+					<td>{pack_label}</td>
+					<td>{checksum_label}</td>
+				</tr>
+				<tr>
+					<td id="case_1">XXXX</td>
+					<td id="case_2">X</td>
+					<td id="case_21">X</td>
+					<td id="case_3">XX</td>
+					<td id="case_4">XX</td>
+					<td id="case_5">XX</td>
+					<td id="case_6">XXXXX</td>
+					<td id="case_7">XXXXX</td>
+					<td id="case_8">XX</td>
+					<td id="case_9">XX</td>
+					<td id="case_10">XXXX</td>
+					<td id="case_11">XX</td>
+				</tr>
+				<tr>
+					<td colspan="6"></td>
+					<td id="t_case_6">XXXXX</td>
+					<td id="t_case_7">XXXXX</td>
+					<td id="t_case_8">XX</td>
+					<td id="t_case_9">XX</td>
+					<td id="t_case_10">XXXX</td>
+					<td></td>
+				</tr>
+			</table>
+			<br><br>
+			
 			<div class="container_16">
 				<div class="grid_5"><div class="ui-bar ui-bar-d" style="height: 2em;">
 					<label for="showPaletteOnly">{color}</label>
@@ -68,38 +110,6 @@
 			
 			<button onclick="javascript: inputUserChoice(flag);">{write_button}</button>
 			<div id="hint_message" class="zim-error">{error}</div>
-			
-			<p>{cartridge_code_hint} <span id="code">{cartridge_code}</span></p>
-			<table border="1">
-				<tr>
-					<td>{magic_number}</td>
-					<td>{cartridge_type}</td>
-					<td>{material_type}</td>
-					<td>{red_label}</td>
-					<td>{green_label}</td>
-					<td>{blue_label}</td>
-					<td>{initial_length}</td>
-					<td>{used_length}</td>
-					<td>{temperature}</td>
-					<td>{temperature_first}</td>
-					<td>{pack_label}</td>
-					<td>{checksum_label}</td>
-				</tr>
-				<tr>
-					<td id="case_1">XXXX</td>
-					<td id="case_2">X</td>
-					<td id="case_21">X</td>
-					<td id="case_3">XX</td>
-					<td id="case_4">XX</td>
-					<td id="case_5">XX</td>
-					<td id="case_6">XXXXX</td>
-					<td id="case_7">XXXXX</td>
-					<td id="case_8">XX</td>
-					<td id="case_9">XX</td>
-					<td id="case_10">XXXX</td>
-					<td id="case_11">XX</td>
-				</tr>
-			</table>
 		</div>
 	</div>
 
@@ -110,6 +120,7 @@ var flag = false;
 var code = $("#code").html();
 
 if (code.length == 32) {
+	var var_date = '{pack_date_val}';
 	$("#case_1").html(code.substr(0, 4));
 	$("#case_2").html(code[4]);
 	$("#case_21").html(code[5]);
@@ -122,6 +133,12 @@ if (code.length == 32) {
 	$("#case_9").html(code.substr(24, 2));
 	$("#case_10").html(code.substr(26, 4));
 	$("#case_11").html(code.substr(30, 2));
+	
+	$("#t_case_6").html({initial_length_value} * 1000);
+	$("#t_case_7").html({used_length_value} * 1000);
+	$("#t_case_8").html({temper_value});
+	$("#t_case_9").html({temper_f_value});
+	$("#t_case_10").html(var_date);
 }
 
 $("#showPaletteOnly").spectrum(
@@ -142,7 +159,9 @@ $("input#showPaletteOnly").on('change', function() { flag = true; });
 $("input#temper_input").on('change', function() { flag = true; });
 $("input#temper_first_input").on('change', function() { flag = true; });
 $("input#length_input").on('change', function() { flag = true; });
+$("input#length_used_input").on('change', function() { flag = true; });
 $("select#material_input").on('change', function() { flag = true; });
+$("select#cartridge_input").on('change', function() { flag = true; });
 
 function inputUserChoice(flag) {
 	if (flag == true) {
@@ -172,14 +191,15 @@ function inputUserChoice(flag) {
 		});
 	}
 	else {
-		$("#hint_message").html('Information is not changed');
+		$("#hint_message").html("{info_not_changed}");
 	}
 	
 	if (var_action) {
 		var_action.done(function() {
-			$("#hint_message").html('Writing successed');
+			$("#hint_message").html("{writing_successed}");
+			location.reload();
 		}).fail(function() {
-			$("#hint_message").html('Error in writing');
+			$("#hint_message").html("{error_writing}");
 		});
 	}
 

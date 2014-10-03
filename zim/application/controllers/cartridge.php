@@ -28,7 +28,7 @@ class Cartridge extends MY_Controller {
 	
 	public function readnwrite($side = 'r') {
 		$cr = 0;
-		$cartridge_code = 'Cartridge code';
+		$cartridge_code = NULL;
 		$err_code = NULL;
 		$error = NULL;
 		$cartridge_data = array();
@@ -41,6 +41,7 @@ class Cartridge extends MY_Controller {
 		$cartridge_value = 0;
 		$color_value = '#ffffff';
 		$option_selected = 'selected="selected"';
+		$packdate_val = 'N/A';
 		
 		// right as default
 		if (in_array($side, array('l', 'left')))
@@ -65,23 +66,23 @@ class Cartridge extends MY_Controller {
 			if ($cr == ERROR_INTERNAL) {
 				switch ($err_code) {
 					case PRINTERSTATE_CARTRIDGE_ERR_MAGIC:
-						$error = t('Magic number error');
+						$error = t('magic_number_error');
 						break;
 						
 					case PRINTERSTATE_CARTRIDGE_ERR_CRC:
-						$error = t('CRC error');
+						$error = t('crc_error');
 						break;
 						
 					case PRINTERSTATE_CARTRIDGE_ERR_CART:
-						$error = t('Cartridge type error');
+						$error = t('cartridge_type_error');
 						break;
 						
 					case PRINTERSTATE_CARTRIDGE_ERR_FILA:
-						$error = t('Filament type error');
+						$error = t('filament_type_error');
 						break;
 						
 					default:
-						$error = t('Internal error');
+						$error = t('internal_error');
 						break;
 				}
 			}
@@ -101,6 +102,7 @@ class Cartridge extends MY_Controller {
 			if ($temper_value < 165) {
 				$temper_value = 165;
 			}
+			$packdate_val = $cartridge_data[PRINTERSTATE_TITLE_SETUP_DATE];
 		}
 		
 		$template_data = array (
@@ -137,6 +139,10 @@ class Cartridge extends MY_Controller {
 				'pack_label'			=> t('pack_label'),
 				'checksum_label'		=> t('checksum_label'),
 				'write_button'			=> t('write_button'),
+				'pack_date_val'			=> $packdate_val,
+				'info_not_changed'		=> t('information_not_changed'),
+				'writing_successed'		=> t('writing_successed'),
+				'error_writing'			=> t('error_writing'),
 		);
 	
 		if ($cr == ERROR_OK) {
@@ -158,6 +164,7 @@ class Cartridge extends MY_Controller {
 					$material_value = PRINTERSTATE_VALUE_MATERIAL_PLA;
 					break;
 			}
+			$template_data['material_array'][$material_value]['on'] = $option_selected;
 			switch ($cartridge_data[PRINTERSTATE_TITLE_CARTRIDGE]) {
 				case PRINTERSTATE_DESP_CARTRIDGE_NORMAL:
 					$cartridge_value = PRINTERSTATE_VALUE_CARTRIDGE_NORMAL;

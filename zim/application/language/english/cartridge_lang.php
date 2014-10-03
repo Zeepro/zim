@@ -56,3 +56,9 @@ $lang['filament_type_error']
 	= 'Filament type error';
 $lang['internal_error']
 	= 'Internal system error';
+$lang['information_not_changed']
+	= 'Information is not changed';
+$lang['writing_successed']
+	= 'Writing successed';
+$lang['error_writing']
+	= 'Error in writing';

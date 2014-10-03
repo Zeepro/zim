@@ -61,4 +61,4 @@ $lang['information_not_changed']
 $lang['writing_successed']
 	= 'Ecriture réussie';
 $lang['error_writing']
-	= 'Erreur d\'écriture'';
+	= 'Erreur d\'écriture';
