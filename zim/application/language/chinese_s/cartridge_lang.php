@@ -1,11 +1,11 @@
 <?php
 
 $lang['left']
-	= 'Left cartridge';
+	= '左墨盒';
 $lang['right']
-	= 'Right cartridge';
+	= '右墨盒';
 $lang['readnwrite_pagetitle']
-	= 'Zim - Write your cartridge';
+	= 'Zim - 写入墨盒数据';
 $lang['PLA']
 	= 'PLA';
 $lang['ABS']
@@ -13,37 +13,37 @@ $lang['ABS']
 $lang['PVA']
 	= 'PVA';
 $lang['Normal']
-	= 'Normal';
+	= '普通';
 $lang['Refill']
-	= 'Refill';
+	= '可再充';
 $lang['color']
-	= 'Color';
+	= '颜色';
 $lang['cartridge_type']
-	= 'Cartridge type';
+	= '墨盒种类';
 $lang['material_type']
-	= 'Material type';
+	= '打印丝种类';
 $lang['temperature']
-	= 'Temperature';
+	= '温度';
 $lang['temperature_first']
-	= 'Temperature (first layer)';
+	= '首层温度';
 $lang['initial_length']
-	= 'Initial length';
+	= '初始长度';
 $lang['used_length']
-	= 'Used length';
+	= '已使用长度';
 $lang['cartridge_code_hint']
-	= 'Cartridge code';
+	= '墨盒数据';
 $lang['magic_number']
-	= 'Magic number';
+	= '识别编号';
 $lang['red_label']
-	= 'Red HEX';
+	= '红色HEX';
 $lang['green_label']
-	= 'Green HEX';
+	= '绿色HEX';
 $lang['blue_label']
-	= 'Blue HEX';
+	= '蓝色HEX';
 $lang['pack_label']
-	= 'Package date';
+	= '包装日期';
 $lang['checksum_label']
-	= 'Checksum';
+	= '验证编号';
 $lang['write_button']
-	= 'Write';
+	= '写入';
 
