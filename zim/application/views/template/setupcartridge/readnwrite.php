@@ -11,8 +11,38 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
-			<h2 style="text-align: center;">Read 'n' Write - {side_cartridge} Cartridge</h2>
-			
+			<h2 style="text-align: center;">{side_cartridge}</h2>
+			Initial code : <span id="code">{cartridge_code}</span>
+			<table border="1">
+				<tr>
+					<td id="case_1"></td>
+					<td id="case_2"></td>
+					<td id="case_21"></td>
+					<td id="case_3"></td>
+					<td id="case_4"></td>
+					<td id="case_5"></td>
+					<td id="case_6"></td>
+					<td id="case_7"></td>
+					<td id="case_8"></td>
+					<td id="case_9"></td>
+					<td id="case_10"></td>
+					<td id="case_11"></td>
+					</tr>
+				<tr>
+					<td>Magic number</td>
+					<td>Cartridge type</td>
+					<td>Material</td>
+					<td>Red</td>
+					<td>Green</td>
+					<td>Blue</td>
+					<td>Initial length</td>
+					<td>Used length</td>
+					<td>Temp</td>
+					<td>1st layer temp</td>
+					<td>Packing date</td>
+					<td>Checksum</td>
+				</tr>
+			</table>
 			<div class="container_16">
 				<div class="grid_5"><div class="ui-bar ui-bar-d" style="height: 2em;">
 					<label for="showPaletteOnly">Color</label>
@@ -43,10 +73,16 @@
 					<input type='range' name="tf" id="temper_first_input" value="{temper_f_value}" min="160" max="260" />
 				</div></div>
 				<div class="grid_5"><div class="ui-bar ui-bar-d" style="height: 3em;">
-					<label for="length_input">Length</label>
+					<label for="length_input">Initial length</label>
 				</div></div>
 				<div class="grid_11"><div class="ui-bar ui-bar-c" style="height: 3em;">
-					<input type='range' name="l" id="length_input" value="{length_value}" min="10" max="200" />
+					<input type='range' name="l" id="length_input" value="{initial_length_value}" min="10" max="200" />
+				</div></div>
+				<div class="grid_5"><div class="ui-bar ui-bar-d" style="height: 3em;">
+					<label for="length_input">Used length</label>
+				</div></div>
+				<div class="grid_11"><div class="ui-bar ui-bar-c" style="height: 3em;">
+					<input type='range' name="l" id="length_input" value="{used_length_value}" min="0" max="200" />
 				</div></div>
 			</div>
 			
@@ -58,6 +94,21 @@
 <script type="text/javascript">
 var_next_phase = '{next_phase}';
 var flag = false;
+
+var code = $("#code").html();
+
+$("#case_1").html(code.substr(0, 4));
+$("#case_2").html(code[4]);
+$("#case_21").html(code[5]);
+$("#case_3").html(code.substr(6, 2));
+$("#case_4").html(code.substr(8, 2));
+$("#case_5").html(code.substr(10, 2));
+$("#case_6").html(code.substr(12, 5));
+$("#case_7").html(code.substr(17, 5));
+$("#case_8").html(code.substr(22, 2));
+$("#case_9").html(code.substr(24, 2));
+$("#case_10").html(code.substr(26, 4));
+$("#case_11").html(code.substr(30, 2));
 
 $("#showPaletteOnly").spectrum(
 {
@@ -116,7 +167,7 @@ function inputUserChoice(flag) {
 		});
 	}
 
-	return false;
+	return (false);
 }
 
 </script>
