@@ -1,11 +1,11 @@
 <?php
 
 $lang['left']
-	= 'Left cartridge';
+	= 'Cartouche de gauche';
 $lang['right']
-	= 'Right cartridge';
+	= 'Cartouche de droite';
 $lang['readnwrite_pagetitle']
-	= 'Zim - Write your cartridge';
+	= 'Zim - Mise à jour de l\'étiquette RFID';
 $lang['PLA']
 	= 'PLA';
 $lang['ABS']
@@ -13,37 +13,37 @@ $lang['ABS']
 $lang['PVA']
 	= 'PVA';
 $lang['Normal']
-	= 'Normal';
+	= 'Normale';
 $lang['Refill']
-	= 'Refill';
+	= 'Rechargeable';
 $lang['color']
-	= 'Color';
+	= 'Couleur';
 $lang['cartridge_type']
-	= 'Cartridge type';
+	= 'Type de cartouche';
 $lang['material_type']
-	= 'Material type';
+	= 'Type de matériel';
 $lang['temperature']
-	= 'Temperature';
+	= 'Température';
 $lang['temperature_first']
-	= 'Temperature (first layer)';
+	= 'Température (première couche)';
 $lang['initial_length']
-	= 'Initial length';
+	= 'Quantité initiale';
 $lang['used_length']
-	= 'Used length';
+	= 'Quanité utilisée';
 $lang['cartridge_code_hint']
-	= 'Cartridge code';
+	= 'Code de la cartouche';
 $lang['magic_number']
 	= 'Magic number';
 $lang['red_label']
-	= 'Red HEX';
+	= 'Rouge';
 $lang['green_label']
-	= 'Green HEX';
+	= 'Vert';
 $lang['blue_label']
-	= 'Blue HEX';
+	= 'Blue';
 $lang['pack_label']
-	= 'Package date';
+	= 'Date d\'emballage';
 $lang['checksum_label']
-	= 'Checksum';
+	= 'CRC';
 $lang['write_button']
-	= 'Write';
+	= 'Ecrire';
 
