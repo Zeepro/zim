@@ -174,7 +174,7 @@ class Cartridge extends MY_Controller {
 			$template_data['cartridge_array'][$cartridge_value]['on'] = $option_selected;
 		}
 	
-		$body_page = $this->parser->parse('template/setupcartridge/readnwrite', $template_data, TRUE);
+		$body_page = $this->parser->parse('template/cartridge', $template_data, TRUE);
 	
 		// parse all page
 		$template_data = array(
