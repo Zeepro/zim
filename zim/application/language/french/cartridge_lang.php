@@ -56,3 +56,9 @@ $lang['filament_type_error']
 	= 'Type de filament incorrect';
 $lang['internal_error']
 	= 'Erreur interne';
+$lang['information_not_changed']
+	= 'Pas de changement';
+$lang['writing_successed']
+	= 'Ecriture réussie';
+$lang['error_writing']
+	= 'Erreur d\'écriture'';
