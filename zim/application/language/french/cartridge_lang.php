@@ -46,4 +46,13 @@ $lang['checksum_label']
 	= 'CRC';
 $lang['write_button']
 	= 'Ecrire';
-
+$lang['magic_number_error']
+	= 'Magic number incorrect';
+$lang['crc_error']
+	= 'Erreur de CRC';
+$lang['cartridge_type_error']
+	= 'Type de cartouche incorrect';
+$lang['filament_type_error']
+	= 'Type de filament incorrect';
+$lang['internal_error']
+	= 'Erreur interne';
