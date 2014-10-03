@@ -23,13 +23,17 @@ $lang['cartridge_type']
 $lang['material_type']
 	= 'Material type';
 $lang['temperature']
-	= 'Temperature';
+	= 'Temperature (°C)';
 $lang['temperature_first']
-	= 'Temperature (first layer)';
+	= 'Temperature - first layer (°C)';
 $lang['initial_length']
-	= 'Initial length';
+	= 'Initial length (m)';
+$lang['initial_length_mm']
+	= 'Initial length (mm)';
 $lang['used_length']
-	= 'Used length';
+	= 'Used length (m)';
+$lang['used_length_mm']
+	= 'Used length (mm)';
 $lang['cartridge_code_hint']
 	= 'Cartridge code';
 $lang['magic_number']

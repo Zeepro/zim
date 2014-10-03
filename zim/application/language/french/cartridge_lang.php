@@ -23,13 +23,17 @@ $lang['cartridge_type']
 $lang['material_type']
 	= 'Type de matériel';
 $lang['temperature']
-	= 'Température';
+	= 'Température (°C)';
 $lang['temperature_first']
-	= 'Température (première couche)';
+	= 'Température - première couche (°C)';
 $lang['initial_length']
-	= 'Quantité initiale';
+	= 'Quantité initiale (m)';
+$lang['initial_length_mm']
+	= 'Quantité initiale (mm)';
 $lang['used_length']
-	= 'Quantité utilisée';
+	= 'Quantité utilisée (m)';
+$lang['used_length_mm']
+	= 'Quantité utilisée (mm)';
 $lang['cartridge_code_hint']
 	= 'Code de la cartouche';
 $lang['magic_number']
