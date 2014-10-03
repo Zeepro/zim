@@ -29,7 +29,7 @@ $lang['temperature_first']
 $lang['initial_length']
 	= 'Quantité initiale';
 $lang['used_length']
-	= 'Quanité utilisée';
+	= 'Quantité utilisée';
 $lang['cartridge_code_hint']
 	= 'Code de la cartouche';
 $lang['magic_number']
