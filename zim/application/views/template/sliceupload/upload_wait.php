@@ -29,7 +29,21 @@ function add_model() {
 // 		setTimeout(function(){
 // 			window.location.href="/sliceupload/slice";
 // 			}, 3000);
-		window.location.href="/sliceupload/slice";
+		
+		if (var_ajax.status == 200) {
+			window.location.href="/sliceupload/slice";
+		}
+		else if (var_ajax.status == 202) {
+			var response = JSON.parse(html);
+			var mid = response.id;
+			var xsize = response.xsize;
+			var ysize = response.ysize;
+			var zsize = response.zsize;
+			var scalemax = response.scalemax;
+			
+			window.location.href="/sliceupload/reducesize?id=" + mid + "&x="
+					+ xsize + "&y=" + ysize + "&z=" + zsize + "&ms=" + scalemax;
+		}
 	})
 	.fail(function() { // not in printing
 		$('#wait_message').html("{fail_message}");

@@ -7,6 +7,7 @@ $CI->load->helper(array('detectos', 'errorcode'));
 
 if (!defined('SLICER_URL_ADD_MODEL')) {
 	define('SLICER_URL_ADD_MODEL',		'add?file=');
+	define('SLICER_URL_ADD_MODEL_ADV',	'add?noresize&file=');
 	define('SLICER_URL_GET_MODELFILE',	'getmodel?id=');
 	define('SLICER_URL_RELOAD_PRESET',	'reload');
 	define('SLICER_URL_LISTMODEL',		'listmodel');
@@ -38,6 +39,12 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 	define('SLICER_PRM_PRM',	'slicerparameter');
 	
 	define('SLICER_TITLE_COLOR',	'color');
+	define('SLICER_TITLE_MAXSCALE',	'scalemax');
+	define('SLICER_TITLE_MODELID',	'id');
+	define('SLICER_TITLE_XSIZE',	'xsize');
+	define('SLICER_TITLE_YSIZE',	'ysize');
+	define('SLICER_TITLE_ZSIZE',	'zsize');
+	
 	define('SLICER_FILE_MODEL',		'_sliced_model.gcode');
 // 	define('SLICER_FILE_RENDERING',	'preview.png');
 	define('SLICER_FILE_TEMP_DATA',	'_sliced_info.json');
@@ -66,7 +73,7 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 // 	define('SLICER_FILENAME_ZIPMODEL',	'_model_slicer.zip');
 }
 
-function Slicer_addModel($models_path) {
+function Slicer_addModel($models_path, $auto_resize = TRUE, &$array_return = array()) {
 	$cr = 0;
 	$CI = &get_instance();
 	$ret_val = 0;
@@ -77,7 +84,24 @@ function Slicer_addModel($models_path) {
 		return ERROR_INTERNAL;
 	}
 	
-	$ret_val = Slicer__requestSlicer(SLICER_URL_ADD_MODEL . json_encode($models_path), FALSE);
+	if ($auto_resize == TRUE) {
+		$ret_val = Slicer__requestSlicer(SLICER_URL_ADD_MODEL . json_encode($models_path), FALSE);
+	}
+	else {
+		$response = NULL;
+		$tmp_array = array();
+		
+		$ret_val = Slicer__requestSlicer(SLICER_URL_ADD_MODEL_ADV . json_encode($models_path), FALSE, $response);
+		$tmp_array = json_decode($response, TRUE);
+		if ($tmp_array != NULL && is_array($tmp_array)) {
+			$array_return = $tmp_array;
+		}
+		else {
+			$ret_val = ERROR_INTERNAL;
+			$CI->load->helper('printerlog');
+			PrinterLog_logError("add slicer model api error", __FILE__, __LINE__);
+		}
+	}
 	
 	switch ($ret_val) {
 		case SLICER_RESPONSE_OK:

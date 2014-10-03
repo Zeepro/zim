@@ -10,12 +10,17 @@
 			<label>{reduce_size_text}</label>
 			<br />
 			<div>{reduce_size_graduation}</div>
-			<form action="" method="post">
+				<form action="" method="post">
+					<input type="hidden" name="id" value="{id}">
+					<input type="hidden" name="x" value="{xsize}">
+					<input type="hidden" name="y" value="{ysize}">
+					<input type="hidden" name="z" value="{zsize}">
+					<input type="hidden" name="ms" value="{max_percent}">
 					<input type="range" name="sizepercentage" id="sizepercentage" value="" min="1" max="100">
 					<div id="dimension"><center>{reduced_size}: <span id="x_size"></span>mm x <span id="y_size"></span>mm x <span id="z_size"></span>mm</center></div>
 					<div id="submit_container"><input type="submit" value="{submit_button}" data-ajax="false"></div>
 					<div id="submit_container"><input type="button" value="{cancel_button}" data-ajax="false"></div>
-			</form>
+				</form>
 		</div>
 	</div>
 

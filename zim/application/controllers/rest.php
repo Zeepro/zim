@@ -354,6 +354,7 @@ class Rest extends MY_Controller {
 				}
 			}
 		} else {
+			//TODO change load view into parser?
 			$this->load->view('template/rest/printlist_form');
 			return;
 		}
@@ -1401,11 +1402,16 @@ class Rest extends MY_Controller {
 		return;
 	}
 	
-	public function upload() {
-		$cr = 0;
+	public function upload($resize = NULL) {
+		$cr = ERROR_OK;
 		$model = NULL;
 		
+		if (FALSE !== $this->input->get('noresize')) {
+			$resize = 'noresize';
+		}
+		
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+			$array_model = array();
 			$upload_config = array (
 					'upload_path'	=> $this->config->item('temp'),
 					'allowed_types'	=> '*',
@@ -1420,16 +1426,13 @@ class Rest extends MY_Controller {
 				$model = $this->upload->data();
 				$model_path = $model['full_path'];
 				
-				$this->load->helper('slicer');
-				$cr = Slicer_addModel(array($model_path));
+				$array_model[] = $model_path;
 			}
 			else if ($this->upload->do_upload('s1')) {
-				$array_model = array();
 				$first_combine = TRUE;
 				$model = $this->upload->data();
 				$array_model[] = $model['full_path'];
 				
-				$cr = ERROR_OK;
 				foreach (array('s2') as $file_key) {
 					if ($this->upload->do_upload($file_key)) {
 						$first_combine = FALSE;
@@ -1441,21 +1444,45 @@ class Rest extends MY_Controller {
 						break;
 					}
 				}
-				if ($cr == ERROR_OK) {
-					$this->load->helper('slicer');
-					$cr = Slicer_addModel($array_model);
-				}
 			}
 			else {
 				// treat error - missing gcode file
 				$cr = ERROR_MISS_PRM;
 			}
 			
+			if ($cr == ERROR_OK) {
+				$this->load->helper('slicer');
+				if ($resize != 'noresize') {
+					$cr = Slicer_addModel($array_model);
+				}
+				else {
+					$array_return = array();
+					
+					$cr = Slicer_addModel($array_model, FALSE, $array_return);
+					if ($cr == ERROR_OK) {
+						$display = json_encode($array_return);
+						
+						$this->output->set_content_type(RETURN_CONTENT_TYPE_JSON);
+						$this->load->library('parser');
+						$this->parser->parse('template/plaintxt', array('display' => $display));
+						
+						return;
+					}
+				}
+			}
+			
 			$this->_return_cr($cr);
 		}
 		else {
+			//TODO change load view into parser?
 			$this->load->view('template/rest/model_form');
 		}
+		
+		return;
+	}
+	
+	public function uploadnoresize() {
+		$this->upload('noresize');
 		
 		return;
 	}
@@ -1609,6 +1636,7 @@ class Rest extends MY_Controller {
 			$this->_return_cr($cr);
 		}
 		else {
+			//TODO change load view into parser?
 			$this->load->view('template/rest/gcodefile_form');
 		}
 		

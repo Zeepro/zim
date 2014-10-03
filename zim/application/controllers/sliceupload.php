@@ -271,6 +271,38 @@ class Sliceupload extends MY_Controller {
 	function reducesize() {
 		$template_data = array();
 		$body_page = NULL;
+		$id = 0;
+		$xsize = 0;
+		$ysize = 0;
+		$zsize = 0;
+		$scalemax = 0;
+		
+		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+			$scale_set = (int) $this->input->post('sizepercentage');
+			
+			$id = (int) $this->input->post('id');
+			$xsize = (float) $this->input->post('x');
+			$ysize = (float) $this->input->post('y');
+			$zsize = (float) $this->input->post('z');
+			$scalemax = (float) $this->input->post('ms');
+			
+			
+		}
+		else {
+			$id = (int) $this->input->get('id');
+			$xsize = (float) $this->input->get('x');
+			$ysize = (float) $this->input->get('y');
+			$zsize = (float) $this->input->get('z');
+			$scalemax = (float) $this->input->get('ms');
+		}
+
+		$scalemax = floor($scalemax);
+		// simple check of passing value
+		if ($xsize * $ysize * $zsize * $scalemax == 0) {
+			$this->output->set_header('Location: /sliceupload/upload');
+			return;
+		}
+		
 		
 		$this->load->library('parser');
 		$this->lang->load('sliceupload/upload', $this->config->item('language'));
@@ -300,7 +332,7 @@ class Sliceupload extends MY_Controller {
 	}
 	
 	function add_model_ajax() {
-		$cr = 0;
+		$cr = ERROR_OK;
 		$display = NULL;
 		
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -310,7 +342,7 @@ class Sliceupload extends MY_Controller {
 				$number_model = count($array_model);
 				if ($number_model) {
 					$tmp_i = 0;
-					$cr = ERROR_OK;
+					
 					for ($tmp_i = 0; $tmp_i < $number_model; $tmp_i++) {
 						$array_model[$tmp_i] = $this->config->item('temp') . $array_model[$tmp_i];
 						if (!file_exists($array_model[$tmp_i])) {
@@ -320,8 +352,26 @@ class Sliceupload extends MY_Controller {
 					}
 					
 					if ($cr == ERROR_OK) {
+						$array_return = array();
+						
 						$this->load->helper('slicer');
 						$cr = Slicer_addModel($array_model);
+// 						$cr = Slicer_addModel($array_model, FALSE, $array_return);
+// 						if ($cr == ERROR_OK) {
+// 							try {
+// 								if ($array_return[SLICER_TITLE_MAXSCALE] < 100) {
+// 									$display = json_encode($array_return);
+// 									$this->output->set_status_header(202);
+// 									$this->output->set_content_type('txt_u');
+// 									$this->load->library('parser');
+// 									$this->parser->parse('template/plaintxt', array('display' => $display)); //optional
+									
+// 									return;
+// 								}
+// 							} catch (Exception $e) {
+// 								$cr = ERROR_INTERNAL;
+// 							}
+// 						}
 					}
 				}
 			}

@@ -941,7 +941,13 @@ function PrinterState_setCartridgeAsArray($abb_cartridge, $data_json = array(), 
 	}
 	$code_write .= $temp_hex;
 	// first layer extrusion temperature
-	$temp_hex = dechex($data_json[PRINTERSTATE_TITLE_EXT_TEMPER] - PRINTERSTATE_OFFSET_TEMPER + 10);
+	$temp_hex = NULL;
+	if (array_key_exists(PRINTERSTATE_TITLE_EXT_TEMP_1, $data_json)) {
+		$temp_hex = dechex($data_json[PRINTERSTATE_TITLE_EXT_TEMP_1] - PRINTERSTATE_OFFSET_TEMPER);
+	}
+	else {
+		$temp_hex = dechex($data_json[PRINTERSTATE_TITLE_EXT_TEMPER] - PRINTERSTATE_OFFSET_TEMPER + 10);
+	}
 	if (strlen($temp_hex) == 1) {
 		$temp_hex = '0' . $temp_hex;
 	}

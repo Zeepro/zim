@@ -500,7 +500,7 @@ function ZimAPI_setHostname($hostname, $restart = TRUE) {
 	if (strlen($hostname) > 9 || strlen($hostname) == 0) {
 		return ERROR_MISS_PRM;
 	}
-	else if (preg_match('/^[A-Za-z0-9]+$/', $hostname)) {
+	else if (preg_match('/^[A-Za-z0-9][A-Za-z0-9\-]{0,7}[A-Za-z0-9]$|^[A-Za-z0-9]$/', $hostname)) {
 		$ret_val = 0;
 		$output = array();
 		$command = ZIMAPI_CMD_SETHOSTNAME . $hostname;
