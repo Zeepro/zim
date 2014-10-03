@@ -9,7 +9,7 @@
 <!-- 			<h2>{title}</h2> -->
 			<ul data-role="listview" id="listview" class="shadowBox" data-inset="true" data-filter="true" data-filter-placeholder="{search_hint}" data-filter-theme="d">
 				{model_lists}
-				<li><a href="{baseurl_detail}?id={id}" data-ajax="false" onclick="javascript: load_wait();">
+				<li><a href="{baseurl_detail}?id={id}" onclick="javascript: load_wait();">
 					<img src="{image}">
 					<h2>{name}</h2></a>
 				</li>
@@ -25,6 +25,11 @@ function load_wait() {
 	$("#overlay").addClass("gray-overlay");
 	$(".ui-loader").css("display", "block");
 }
+
+$(document).on("pagebeforehide", function() {
+	$(".ui-loader").css("display", "none");
+	$("#overlay").removeClass("gray-overlay");
+});
 -->
 </script>
 
