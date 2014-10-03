@@ -5,7 +5,7 @@ $lang['left']
 $lang['right']
 	= 'Right cartridge';
 $lang['readnwrite_pagetitle']
-	= 'Zim - Write your cartridge';
+	= 'Zim - RFID label update';
 $lang['PLA']
 	= 'PLA';
 $lang['ABS']
@@ -15,7 +15,7 @@ $lang['PVA']
 $lang['Normal']
 	= 'Normal';
 $lang['Refill']
-	= 'Refill';
+	= 'Refillable';
 $lang['color']
 	= 'Color';
 $lang['cartridge_type']
