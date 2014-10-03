@@ -160,6 +160,10 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_OFFSET_YEAR_SETUP_DATE',	2014);
 	define('PRINTERSTATE_VALUE_DEFAULT_COLOR',		'transparent');
 	define('PRINTERSTATE_VALUE_OFFSET_TO_CAL_TIME',	10);
+	define('PRINTERSTATE_CARTRIDGE_ERR_MAGIC',		1);
+	define('PRINTERSTATE_CARTRIDGE_ERR_CRC',		2);
+	define('PRINTERSTATE_CARTRIDGE_ERR_CART',		3);
+	define('PRINTERSTATE_CARTRIDGE_ERR_FILA',		4);
 	
 	define('PRINTERSTATE_VALUE_DEFAULT_EXTRUD',				5);
 	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD',		90);
@@ -635,7 +639,7 @@ function PrinterState_getCartridgeCode(&$code_cartridge, $abb_cartridge, $power_
 	return ERROR_OK;
 }
 
-function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge, $power_off = TRUE) {
+function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge, $power_off = TRUE, $error_type = NULL) {
 	$last_output = NULL;
 	$ret_val = 0;
 	
@@ -664,6 +668,7 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge, $pow
 		$hex_checksum = hexdec(substr($last_output, 30, 2));
 		if ($hex_cal != $hex_checksum) {
 			PrinterLog_logError('checksum error, $hex_cal: ' . $hex_cal . ', $hex_data: ' . $hex_checksum, __FILE__, __LINE__);
+			$error_type = PRINTERSTATE_CARTRIDGE_ERR_CRC;
 			return ERROR_INTERNAL; // checksum failed
 		}
 		
@@ -688,6 +693,7 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge, $pow
 				
 			default:
 				PrinterLog_logError('magic number error', __FILE__, __LINE__);
+				$error_type = PRINTERSTATE_CARTRIDGE_ERR_MAGIC;
 				return ERROR_INTERNAL;
 				break;
 		}
@@ -761,6 +767,7 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge, $pow
 				
 			default:
 				PrinterLog_logError('cartridge type error', __FILE__, __LINE__);
+				$error_type = PRINTERSTATE_CARTRIDGE_ERR_CART;
 				return ERROR_INTERNAL;
 		}
 		
@@ -782,6 +789,7 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge, $pow
 				
 			default:
 				PrinterLog_logError('filament type error', __FILE__, __LINE__);
+				$error_type = PRINTERSTATE_CARTRIDGE_ERR_FILA;
 				return ERROR_INTERNAL;
 		}
 		
@@ -895,7 +903,7 @@ function PrinterState_setCartridgeAsArray($abb_cartridge, $data_json = array(), 
 	else {
 		$code_write .= dechex(PRINTERSTATE_VALUE_CARTRIDGE_NORMAL); // normal as default
 	}
-	// type of  material
+	// type of material
 	if (array_key_exists(PRINTERSTATE_TITLE_MATERIAL, $data_json)) {
 		$code_write .= dechex($data_json[PRINTERSTATE_TITLE_MATERIAL]);
 	}
@@ -917,7 +925,11 @@ function PrinterState_setCartridgeAsArray($abb_cartridge, $data_json = array(), 
 	$code_write .= $temp_hex;
 	// used quantity
 	if (array_key_exists(PRINTERSTATE_TITLE_USED, $data_json)) {
-		$code_write .= dechex($data_json[PRINTERSTATE_TITLE_USED]);
+		$temp_hex = dechex($data_json[PRINTERSTATE_TITLE_USED]);
+		while (strlen($temp_hex) < 5) {
+			$temp_hex = '0' . $temp_hex;
+		}
+		$code_write .= $temp_hex;
 	}
 	else {
 		$code_write .= '00000'; // 0 as default
