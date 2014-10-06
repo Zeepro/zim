@@ -59,14 +59,14 @@ class Sliceupload extends MY_Controller {
 						$array_model[] = $model['file_name'];
 					}
 					else if ($first_combine == TRUE) {
-						$error = t('upload_miss_fail');
+						$error = t('fail_message');
 						break;
 					}
 				}
 			}
 			else {
 				// treat error - missing gcode file
-				$error = t('upload_miss_fail');
+				$error = t('fail_message');
 			}
 			
 			if (is_null($error) && count($array_model)) {
