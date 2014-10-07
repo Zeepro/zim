@@ -737,11 +737,15 @@ function Slicer__changeURLPort() {
 		return;
 	}
 	if (file_exists($port_filepath)) {
-		$slicer_url = str_replace('8080/', '', $slicer_url);
-		$slicer_url .= @file_get_contents($port_filepath) . '/';
+		$port_slicer = @file_get_contents($port_filepath);
+		
+		if (strlen($port_slicer)) {
+			$slicer_url = str_replace('8080/', '', $slicer_url);
+			$slicer_url .= $port_slicer . '/';
+		}
 		$CI->config->set_item('slicer_url', $slicer_url);
-// 		$CI->load->helper('printerlog');
-// 		PrinterLog_logDebug('found slic3r port file, url: ' . $slicer_url, __FILE__, __LINE__);
+		$CI->load->helper('printerlog');
+		PrinterLog_logDebug('found slic3r port file, url: ' . $slicer_url, __FILE__, __LINE__);
 	}
 	else {
 		$CI->load->helper('printerlog');
