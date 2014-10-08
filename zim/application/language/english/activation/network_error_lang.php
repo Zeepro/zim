@@ -1,4 +1,4 @@
 <?php
 
-$lang['networ_error_msg'] = "You must be connected to the Internet to activate your printer.";
+$lang['networ_error_msg'] = "The printer has no access to Internet, please connect your printer to a network that with Internet access to activate your printer.";
 $lang['back'] = 'Back';

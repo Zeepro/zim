@@ -617,7 +617,7 @@
 			</div> <!-- advanced -->
 			<div id="save_as_container" style="{hide_save_as}">
 				<h3><label for="save_as">{save_as_title}</label></h3>
-				<input type="text" data-clear-btn="true" name="save_as" id="save_as">
+				<input type="text" data-clear-btn="true" name="save_as" id="save_as" required>
 			</div>
 			<div id="submit_container" style="{hide_submit}"><input type="submit" value="{submit_button}" data-ajax="false"></div>
 			</form>

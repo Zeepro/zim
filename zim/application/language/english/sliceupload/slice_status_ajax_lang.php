@@ -4,10 +4,9 @@ $lang['temper_diff_msg']
 $lang['first_temper_diff_msg']
 	= 'Detect difference between slice data and cartridge, first layer extrusion temperature: %d vs %d';
 $lang['cartridge_material_diff_msg']
-	= 'Detect difference between the materials of used cartridges, perhaps that will impact the quality of printing';
+	= 'You\'re trying to use different materials for the same print, this may have an impact on print quality';
 $lang['suggest_reslice']
-	= 'If you are not sure what you are doing, we suggest you to re-slice the model with the same material';
-
+	= 'If you\'re unsure, we suggest you to re-slice the model with the same material';
 $lang['filament_ok']
 	= 'ok';
 $lang['filament_not_need']

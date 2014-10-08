@@ -314,14 +314,13 @@ function stopPrint()
 		if (var_finish == true)
 			return;
 		finishLoop();
-		setTimeout(redirect_cancel, 1000);
-
 		function redirect_cancel()
 		{
  			//window.location.href="/printdetail/cancel?_=" + Math.round(+new Date / 1e3);
 			window.location.href="/printdetail/cancel";
 			return;
 		}
+		setTimeout(redirect_cancel, 1000);
 	}
 	return;
 }
