@@ -2721,7 +2721,7 @@ function PrinterState_getEndstop($abb_endstop, &$status) {
 		}
 		
 		// treat return of arduino
-		if (count($output)) {
+		if (count($output) > 1) {
 			$status = NULL;
 			foreach ($output as $line) {
 				if (strpos($line, ':') === FALSE) {
@@ -2735,6 +2735,54 @@ function PrinterState_getEndstop($abb_endstop, &$status) {
 					break;
 				}
 			}
+		}
+		else {
+			// no usful return
+			PrinterLog_logError('no arduino return', __FILE__, __LINE__);
+		}
+	} else {
+		PrinterLog_logMessage('call getting end stop in printing', __FILE__, __LINE__);
+		return ERROR_BUSY_PRINTER;
+	}
+	
+	return ERROR_INTERNAL;
+}
+
+function PrinterState_getEndstopList(&$array_status = array()) {
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$output = array();
+	$command = '';
+	$ret_val = 0;
+	
+	// check if we are in printing
+	$ret_val = FALSE; //PrinterState_checkInPrint();
+	if ($ret_val == FALSE) {
+		$command = $arcontrol_fullpath . PRINTERSTATE_GET_ENDSTOPS;
+		exec($command, $output, $ret_val);
+		if (!PrinterState_filterOutput($output, $command)) {
+			PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
+			return ERROR_INTERNAL;
+		}
+		PrinterLog_logArduino($command, $output);
+		if ($ret_val != ERROR_NORMAL_RC_OK) {
+			return ERROR_INTERNAL;
+		}
+		
+		// treat return of arduino
+		if (count($output) > 1) {
+			$status = NULL;
+			foreach ($output as $line) {
+				if (strpos($line, ':') === FALSE) {
+					continue;
+				}
+				$tmp_array = explode(':', $line);
+				$endstop_line = str_replace('_', '', trim($tmp_array[0]));
+				$array_status[$endstop_line] = (strtolower(trim($tmp_array[1])) == PRINTERSTATE_VALUE_ENDSTOP_OPEN)
+						? FALSE : TRUE;
+			}
+			
+			return ERROR_OK;
 		}
 		else {
 			// no usful return
