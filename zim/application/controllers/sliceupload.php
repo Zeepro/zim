@@ -93,7 +93,12 @@ class Sliceupload extends MY_Controller {
 		}
 		
 		$this->load->helper('slicer');
-		if (!Slicer_checkOnline(FALSE)) {
+		if (0 == strlen(@file_get_contents($this->config->item('temp') . SLICER_FILE_HTTP_PORT))) {
+			$this->output->set_header('Location: /sliceupload/restart?inboot=1');
+			
+			return;
+		}
+		else if (!Slicer_checkOnline(FALSE)) {
 			$this->output->set_header('Location: /sliceupload/restart');
 			
 			return;
@@ -245,14 +250,16 @@ class Sliceupload extends MY_Controller {
 	function restart() {
 		$template_data = array();
 		$body_page = NULL;
+		$in_boot = $this->input->get('inboot');
 		
 		$this->load->library('parser');
 		$this->lang->load('sliceupload/upload', $this->config->item('language'));
 		
 		// parse the main body
 		$template_data = array(
-				'home'				=> t('home'),
-				'wait_in_restart'	=> t('wait_in_restart'),
+				'home'			=> t('home'),
+				'check_in_boot'	=> $in_boot ? 'true' : 'false',
+				'wait_msg'		=> $in_boot ? t('wait_in_boot') : t('wait_in_restart'),
 		);
 		$body_page = $this->parser->parse('template/sliceupload/restart', $template_data, TRUE);
 		

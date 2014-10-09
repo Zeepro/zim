@@ -7,7 +7,7 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
-			<h3>{wait_in_restart}</h3>
+			<h3>{wait_msg}</h3>
 		</div>
 	</div>
 
@@ -15,12 +15,15 @@
 <!--
 var var_ajax;
 var var_ajax_lock = false;
+var var_check_in_boot = {check_in_boot};
 var var_refreshChecking;
 
 $(document).ready(loopChecking());
 
 function loopChecking() {
-	checkOnline(true);
+	if (var_check_in_boot == false) {
+		checkOnline(true);
+	}
 	var_refreshChecking = setInterval(checkOnline, 3000);
 }
 

@@ -28,3 +28,5 @@ $lang['fin_message']
 // restart
 $lang['wait_in_restart']
 	= '检测到分层分析软件无响应，正在重新启动软件中……';
+$lang['wait_in_boot']
+	= '分层分析软件正在启动中……';

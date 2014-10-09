@@ -34,3 +34,5 @@ $lang['fin_message']
 // restart
 $lang['wait_in_restart']
 	= 'Slicer not responding, try to relaunch the slicer...';
+$lang['wait_in_boot']
+	= 'Starting slicer...';
