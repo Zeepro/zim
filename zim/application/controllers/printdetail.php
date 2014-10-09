@@ -164,7 +164,7 @@ class Printdetail extends MY_Controller {
 // 		else {
 //  			$this->output->set_header('Location: /printdetail/status');
 // 		}
-		if ($model_clibration) {
+		if ($model_calibration) {
 			$this->output->set_header('Location: /printdetail/status?id=calibration');
 		}
 		else {
