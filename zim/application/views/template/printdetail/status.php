@@ -51,7 +51,8 @@
 </div>
 
 <script>
-function load_jwplayer_video() {
+function load_jwplayer_video()
+{
 	var player = jwplayer("myVideo").setup({
 							file: "{video_url}",
 							width: "100%",
@@ -65,9 +66,7 @@ function load_jwplayer_video() {
 									"<p>{video_error}</p>");
 	});
 }
-
 setTimeout(load_jwplayer_video, 10000);
-
 </script>
 
 <script type="text/javascript">
@@ -83,77 +82,6 @@ var var_finish = false;
 var var_temper_holder;
 var var_temper_l = null;
 var var_temper_r = null;
-// var timeout_head;
-// var timeout_strip;
-
-// timeout_strip = setInterval(function()
-// {
-// 	if (var_ajax_lock == false)
-// 	{
-// 		var_ajax_lock = true;
-// 		var var_state = $("#head_led").val().toString();
-// 		var_ajax = $.ajax(
-// 		{
-// 			url: "/rest/get",
-// 			cache: false,
-// 			data:
-// 			{
-// 				p: "headlight",
-// 			},
-// 			type: "GET",
-// 		})
-// 		.done(function(led_status)
-// 		{
-// 			if (led_status == "on")
-// 			{
-// 				$("#strip_led option:nth-child(2)").attr("selected", "selected");
-// 				$("#strip_led").refresh();
-// 			}
-// 			clearInterval(timeout_strip);
-// 		})
-// 		.always(function()
-// 		{
-// 			console.log("realease");
-// 			var_ajax_lock = false;
-// 		});
-// 	}
-// }, 1000);
-
-// function get_head_led()
-// {
-// 	if (var_ajax_lock == false)
-// 	{
-// 		var_ajax_lock = true;
-// 		var var_state = $("#head_led").val().toString();
-// 		var_ajax = $.ajax(
-// 		{
-// 			url: "/rest/get",
-// 			cache: false,
-// 			data:
-// 			{
-// 				p: "headlight",
-// 			},
-// 			type: "GET",
-// 		})
-// 		.done(function(msg)
-// 		{
-// 			$("#head_led option:nth-child(2)").attr("selected", "selected");
-// 			$("#head_led").refresh();
-// 			console.log('head_done : ' + timeout_head);
-// 			clearInterval(timeout_head);
-// 		})
-// 		.always(function()
-// 		{
-// 			var_ajax_lock = false;
-// 		});
-// 	}
-// 	else
-// 	{
-// 		console.log("locked");
-// 	}
-// }
-
-// timeout_head = setInterval(get_head_led, 1000);
 
 $(document).ready(checkPrintStatus());
 

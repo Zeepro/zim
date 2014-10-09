@@ -60,6 +60,11 @@
 		width: 12em;
 		max-width: 100%;
 	}
+	.ui-grid-a .ui-block-a .ui-slider-switch,
+	.switch-larger .ui-slider-switch {
+		width: 12em;
+		max-width: 100%;
+	}
 </style>
 <script type="text/javascript">
 	$(document).on("pageinit", function() {
