@@ -64,8 +64,13 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_VALUE_MODE_OFF',		'off');
 	define('ZIMAPI_VALUE_MODE_HLS',		'hls');
 	define('ZIMAPI_TITLE_PRESET',		'preset');
-	define('ZIMAPI_TITLE_PRESET_ID',	'id');
-	define('ZIMAPI_TITLE_PRESET_NAME',	'name');
+	
+	define('ZIMAPI_TITLE_PRESET_ID',		'id');
+	define('ZIMAPI_TITLE_PRESET_NAME',		'name');
+	define('ZIMAPI_TITLE_PRESET_INFILL',	'fill_density');
+	define('ZIMAPI_TITLE_PRESET_SKIRT',		'skirts');
+	define('ZIMAPI_TITLE_PRESET_RAFT',		'raft_layers');
+	define('ZIMAPI_TITLE_PRESET_SUPPORT',	'support_material');
 	
 	define('ZIMAPI_VALUE_DEFAULT_RHO',		600);
 	define('ZIMAPI_VALUE_DEFAULT_DELTA',	45);
@@ -1545,6 +1550,10 @@ function ZimAPI_setPresetSetting($id_preset, $array_input, $name_preset = NULL) 
 		$json_data = array(
 				ZIMAPI_TITLE_PRESET_ID		=> ZimAPI__codePresetHash($name_preset),
 				ZIMAPI_TITLE_PRESET_NAME	=> $name_preset,
+				ZIMAPI_TITLE_PRESET_INFILL	=> (float) $array_setting[ZIMAPI_TITLE_PRESET_INFILL],
+				ZIMAPI_TITLE_PRESET_SKIRT	=> (int) $array_setting[ZIMAPI_TITLE_PRESET_SKIRT],
+				ZIMAPI_TITLE_PRESET_RAFT	=> (int) $array_setting[ZIMAPI_TITLE_PRESET_RAFT],
+				ZIMAPI_TITLE_PRESET_SUPPORT	=> (int) $array_setting[ZIMAPI_TITLE_PRESET_SUPPORT],
 		);
 		
 		$CI->load->helper('json');

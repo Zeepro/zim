@@ -93,7 +93,8 @@ class Sliceupload extends MY_Controller {
 		}
 		
 		$this->load->helper('slicer');
-		if (0 == strlen(@file_get_contents($this->config->item('temp') . SLICER_FILE_HTTP_PORT))) {
+		if (0 == strlen(@file_get_contents($this->config->item('temp') . SLICER_FILE_HTTP_PORT))
+				&& FALSE == $this->config->item('simulator')) {
 			$this->output->set_header('Location: /sliceupload/restart?inboot=1');
 			
 			return;
