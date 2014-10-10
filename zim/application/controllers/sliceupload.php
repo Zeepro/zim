@@ -140,10 +140,11 @@ class Sliceupload extends MY_Controller {
 	}
 	
 	function slice() {
-		$template_data = array();
+		$ret_val = 0;
+		$status_current = NULL;
 		$body_page = NULL;
-		$list_preset = array();
 		$list_display = array();
+		$template_data = array();
 		$current_stage = 'wait_slice';
 		
 		// redirect the client when in slicing
@@ -165,10 +166,11 @@ class Sliceupload extends MY_Controller {
 			
 			foreach ($list_preset as $preset) {
 				$list_display[] = array(
-						'id'	=> $preset[ZIMAPI_TITLE_PRESET_ID],
 						'name'	=> $preset[ZIMAPI_TITLE_PRESET_NAME],
+						'id'	=> $preset[ZIMAPI_TITLE_PRESET_ID],
 				);
 			}
+			sort($list_display);
 		}
 		
 		$this->load->library('parser');
