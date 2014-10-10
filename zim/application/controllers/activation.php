@@ -69,7 +69,6 @@ class Activation extends MY_Controller
 				$context  = stream_context_create($options);
 				@file_get_contents($url, false, $context);
 				$result = substr($http_response_header[0], 9, 3);
-// 				echo "<script>console.log(".$result.");</script>";
 				if ($result == 200)
 				{
 					ZimAPI_setPrinterSSOName($printer_name);
@@ -87,7 +86,7 @@ class Activation extends MY_Controller
 		// parse all page
 		$template_data = array(
 				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Home') . '</title>',
+				'headers'		=> '<title>Zim - Activation</title>',
 				'contents'		=> $body_page,
 				'back'			=> t('back'),
 				'congrats'		=> t('congrats'),

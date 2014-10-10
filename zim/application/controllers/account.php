@@ -105,7 +105,8 @@ class Account extends MY_Controller {
 				'back'			=> t('back'),
 				'give_name'		=> t('give_name'),
 				'activate'		=> t('activate'),
-				'name_printer'	=> t('name_printer'),
+				'format'		=> t('hostname_format'),
+				'name_printer'	=> t('name_printer')
 		);
 		$this->parser->parse('template/basetemplate', $template_data);
 		return;

@@ -15,14 +15,16 @@ class Test_endstop extends CI_Controller
 
 		$view_data = array(
 			'error'		=> $error,
-			'yback'		=> $endstop['ymax'] ? 'selected="selected"' : "",
-			'yfront'	=> $endstop['ymin'] ? 'selected="selected"' : "",
-			'xleft'		=> $endstop['xmin'] ? 'selected="selected"' : "",
-			'xright'	=> $endstop['xmax'] ? 'selected="selected"' : "",
-			'ztop'		=> $endstop['zmin'] ? 'selected="selected"' : "",
-			'zbottom'	=> $endstop['zmax'] ? 'selected="selected"' : ""
+			'yback'		=> $endstop['ymax'] ? 'Pressed' : "Not pressed",
+			'yfront'	=> $endstop['ymin'] ? 'Pressed' : "Not pressed",
+			'xleft'		=> $endstop['xmin'] ? 'Pressed' : "Not pressed",
+			'xright'	=> $endstop['xmax'] ? 'Pressed' : "Not pressed",
+			'ztop'		=> $endstop['zmin'] ? 'Pressed' : "Not pressed",
+			'zbottom'	=> $endstop['zmax'] ? 'Pressed' : "Not pressed",
+			'leftcart'	=> $endstop['E1'] ? 'Pressed' : "Not pressed",
+			'rightcart'	=> $endstop['E0'] ? 'Pressed' : "Not pressed",
+			'home'		=> t('Home')
 		);
-
 		$body_page = $this->parser->parse('/template/test_endstop', $view_data, TRUE);
 		$template_data = array(
 				'headers'		=> '<title>Zim</title>',
