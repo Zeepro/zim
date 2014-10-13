@@ -21,8 +21,8 @@ class Test_endstop extends CI_Controller
 			'xright'	=> $endstop['xmax'] ? 'Pressed' : "Not pressed",
 			'ztop'		=> $endstop['zmin'] ? 'Pressed' : "Not pressed",
 			'zbottom'	=> $endstop['zmax'] ? 'Pressed' : "Not pressed",
-			'leftcart'	=> $endstop['E1'] ? 'Pressed' : "Not pressed",
-			'rightcart'	=> $endstop['E0'] ? 'Pressed' : "Not pressed",
+			'leftcart'	=> $endstop['E1'] ? 'Filament' : "No filament",
+			'rightcart'	=> $endstop['E0'] ? 'Filament' : "No filament",
 			'home'		=> t('Home')
 		);
 		$body_page = $this->parser->parse('/template/test_endstop', $view_data, TRUE);
