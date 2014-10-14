@@ -5,7 +5,7 @@
 	</div>
 	<div data-role="content">
 		<div id="container">
-			<p>{networ_error_msg}</p>
+			<p>{network_error_msg}</p>
 			<a href="/">{back}</a>
 		</div>
 	</div>

@@ -15,8 +15,12 @@ $lang['no_input']
 	= 'No user input found';
 $lang['set_error']
 	= 'Set hostname error';
+$lang['network_array_error']
+	= 'Error while trying to get network information';
 $lang['bad_char']
 	= 'Please use only letters, numbers, and hyphens.';
+$lang['p2p']
+	= "Your zim will now start broadcasting a Wi-Fi network named %s. For better results, please restart zim using the power button.<br />Connect your device on the network mentioned above with the password you specified at the previous step, and you will be able to manage your printer with an internet browser by clicking <a href='http://10.0.0.1'>here</a> or typing http://10.0.0.1 in the address bar.";
 $lang['finish_hint']
 	= 'Your zim will restart to apply its new parameters.</br>
 		</br>

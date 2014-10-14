@@ -23,7 +23,7 @@
 		$("div#container").css('display', 'block');
 		$("a.needSpin").on("click", function()
 		{
-			$(".ui-loader").css("display", "none");
+			$(".ui-loader").css("display", "block");
 		})
 
 /*

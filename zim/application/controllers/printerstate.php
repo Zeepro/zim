@@ -1184,31 +1184,43 @@ class Printerstate extends MY_Controller {
 				if ($code == ERROR_OK)
 				{
 					$hint_message = NULL;
-					if ($restart == TRUE)
+					$network_info = array();
+					$err = ZimAPI_getNetworkInfoAsArray($network_info);
+					if ($err != ERROR_OK)
 					{
-						$hint_message = t('finish_hint', array($hostname, $hostname, $hostname, $hostname));
+						$this->load->helper('printerlog');
+						PrinterLog_logError('can not retrieve connection info array', __FILE__, __LINE__);
+						$error = t("network_array_error");
 					}
 					else
 					{
-						$hint_message = t('finish_hint_norestart', array($hostname, $hostname));
+						if ($network_info[ZIMAPI_TITLE_TOPOLOGY] == ZIMAPI_VALUE_P2P)//peertopeer
+						{
+							$hint_message = t('p2p', $network_info[ZIMAPI_TITLE_SSID]);
+						}
+						else if ($restart == TRUE)
+						{
+							$hint_message = t('finish_hint', array($hostname, $hostname, $hostname, $hostname));
+						}
+						else
+						{
+							$hint_message = t('finish_hint_norestart', array($hostname, $hostname));
+						}
+						//parse the main body
+						$template_data = array(
+								'hint'			=> $hint_message,
+// 								'home_button'	=> t('home_button'),
+						);	
+						$body_page = $this->parser->parse('template/printerstate/sethostname_finish', $template_data, TRUE);
+						// parse all page
+						$template_data = array(
+								'lang'			=> $this->config->item('language_abbr'),
+								'headers'		=> '<title>' . t('page_title') . '</title>',
+								'contents'		=> $body_page,
+						);
+						$this->parser->parse('template/basetemplate', $template_data);
+						return;
 					}
-					// parse the main body
-					$template_data = array(
-							'hint'			=> $hint_message,
-// 							'home_button'	=> t('home_button'),
-					);
-					
-					$body_page = $this->parser->parse('template/printerstate/sethostname_finish', $template_data, TRUE);
-
-					// parse all page
-					$template_data = array(
-							'lang'			=> $this->config->item('language_abbr'),
-							'headers'		=> '<title>' . t('page_title') . '</title>',
-							'contents'		=> $body_page,
-					);
-					
-					$this->parser->parse('template/basetemplate', $template_data);
-					return;
 				}
 				else if ($code == ERROR_WRONG_PRM)
 				{

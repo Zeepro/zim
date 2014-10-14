@@ -70,7 +70,7 @@ class Connection extends MY_Controller {
 		);
 		
 		$body_page = $this->parser->parse('template/connection/index', $template_data, TRUE);
-		
+	
 		// parse all page
 		$this->_generate_framePage($body_page);
 		
@@ -161,65 +161,69 @@ class Connection extends MY_Controller {
 		return;
 	}
 	
-	public function wifipswd() {
+	public function wifipswd()
+	{
 		$template_data = array();
 		$body_page = NULL;
-		
+		$valid = TRUE;
+
 		$this->load->library(array('parser', 'form_validation'));
 		$this->load->helper(array('zimapi', 'corestatus'));
-		
-		$this->form_validation->set_rules('password_confirm', 'Password confirmation', '');
-		$this->form_validation->set_rules('password', 'Password', 'matches[password_confirm]');
-		
 		$this->lang->load('connection/master', $this->config->item('language'));
 		$this->lang->load('connection/wifipswd', $this->config->item('language'));
+			
 		
-		if ($this->form_validation->run() == FALSE) {
-			if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-				$ssid = $this->input->post('ssid');
-				$mode = $this->input->post('mode');
-			}
-			else {
-				$ssid = $this->input->get('ssid');
-				$mode = $this->input->get('mode');
-			}
-		} else {
+		if ($_SERVER['REQUEST_METHOD'] == 'POST')
+		{
+			$this->form_validation->set_rules('password_confirm', 'Password confirmation', 'matches[password]');
+			$valid = $this->form_validation->run();
 			$ssid = $this->input->post('ssid');
-			$passwd = $this->input->post('password');
 			$mode = $this->input->post('mode');
 			
-			$ret_val = ZimAPI_setcWifi($ssid, $passwd);
-			if ($ret_val != ERROR_OK) {
-// 				$error = t('invalid data');
-				$this->output->set_header("Location:/connection/wifissid" . ($mode == 'wizard') ? '/wizard' : NULL);
-				
-				return;
-			}
-			else
+			if ($valid != FALSE)
 			{
-				//$this->confirmation();
-				if ($mode == 'wizard') {
-// 					$this->confirmation_wizard();
-// 					$this->in_progress();
-					if (!CoreStatus_wantActivation()) {
-						$this->load->helper('printerlog');
-						PrinterLog_logError('can not set need activation status', __FILE__, __LINE__);
-					}
-					ZimAPI_restartNetwork();
-					$this->output->set_header("Location:/connection/in_progress");
+				$passwd = $this->input->post('password');
 					
+				$ret_val = ZimAPI_setcWifi($ssid, $passwd);
+				if ($ret_val != ERROR_OK)
+				{
+					// 				$error = t('invalid data');
+					$this->output->set_header("Location:/connection/wifissid" . ($mode == 'wizard') ? '/wizard' : NULL);
 					return;
 				}
-				else {
-					if (!CoreStatus_wantHostname()) {
-						$this->load->helper('printerlog');
-						PrinterLog_logError('can not set need hostname status', __FILE__, __LINE__);
+				else
+				{
+					//$this->confirmation();
+					if ($mode == 'wizard')
+					{
+						// 					$this->confirmation_wizard();
+						// 					$this->in_progress();
+						if (!CoreStatus_wantActivation())
+						{
+							$this->load->helper('printerlog');
+							PrinterLog_logError('can not set need activation status', __FILE__, __LINE__);
+						}
+						ZimAPI_restartNetwork();
+						$this->output->set_header("Location:/connection/in_progress");
+							
+						return;
 					}
-					$this->output->set_header("Location:/printerstate/sethostname");
-					
-					return;
+					else {
+						if (!CoreStatus_wantHostname())
+						{
+							$this->load->helper('printerlog');
+							PrinterLog_logError('can not set need hostname status', __FILE__, __LINE__);
+						}
+						$this->output->set_header("Location:/printerstate/sethostname");
+						return;
+					}
 				}
 			}
+		}
+		else
+		{
+			$ssid = $this->input->get('ssid');
+			$mode = $this->input->get('mode');
 		}
 		
 		$template_data = array(
@@ -230,6 +234,7 @@ class Connection extends MY_Controller {
 				'submit'			=> htmlspecialchars(t("OK")),
 				'mode'				=> ($mode == 'wizard') ? 'wizard' : 'normal',
 				'confirm_password'	=> t('confirm_password'),
+				'err_msg'			=> $valid == FALSE ? t('err_msg') : ""
 		);
 		$body_page = $this->parser->parse('template/connection/wifipswd', $template_data, TRUE);
 			

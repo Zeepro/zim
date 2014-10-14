@@ -7,7 +7,7 @@
 	<div data-role="content">
 		<div id="container">
 			<h2>{title}</h2>
-
+			<div class="zim-error">{err_msg}</div>
 			<form action="/connection/wifipswd" method="post" data-ajax="false"
 				accept-charset="utf-8">
 				<label for="password">{label}</label>
@@ -16,14 +16,13 @@
 				<input type="password" name="password" id="password" value="" />
 				<label for="password_confirm">{confirm_password}</label>
 				<input type="password" name="password_confirm" />
-				<div>
-					<input type="submit" value="{submit}" />
-				</div>
-
+				<br />
+				<input type="submit" value="{submit}" />
 			</form>
 		</div>
 	</div>
 	<script>
+		$(".ui-loader").css('display', 'none');
 		$("input[type=submit]").on('click', function()
 		{
 			$(".ui-loader").css('display', 'block');
