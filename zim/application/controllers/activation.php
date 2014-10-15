@@ -41,6 +41,8 @@ class Activation extends MY_Controller
 					'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Home') . '</title>',
 					'contents'		=> $body_page,
 					'back'			=> t('back'),
+					'try_again'		=> t('try_again'),
+					'try_again_hint'=> t('try_again_hint'),
 					'network_err_msg'=> t('network_err_msg')
 			);
 		}

@@ -5,8 +5,13 @@
 	</div>
 	<div data-role="content">
 		<div id="container">
-			<p>{network_error_msg}</p>
-			<a href="/">{back}</a>
+			<p>{network_err_msg}</p>
+			<br />
+			<a href="/" data-role="button">{back}</a>
+			<br />
+			<p>{try_again_hint}</p>
+			<br />
+			<a href="/activation/index" data-role="button">{try_again}</a>
 		</div>
 	</div>
 </div>

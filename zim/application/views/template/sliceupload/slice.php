@@ -117,15 +117,18 @@ function getPreview(var_control) {
 	})
 	.done(function(html) {
 		// html => link to image
-		var var_html = '<div id="control_general_group">'
-			+ '<button id="preview_near_button" data-inline="true" data-icon="plus" data-iconpos="left"'
-			+ ' onclick="javascript: getPreviewNear(' + var_control + ');" class="ui-btn-hidden" data-disabled="false">{near_button}</button>'
-			+ '<button id="preview_far_button" data-inline="true" data-icon="minus" data-iconpos="left"'
-			+ ' onclick="javascript: getPreviewFar(' + var_control + ');" class="ui-btn-hidden" data-disabled="false">{far_button}</button>'
+		var var_html = '<div id="control_general_group" class="ui-grid-b">'
+			+ '<p>{preview_zoom}</p>'
+			+ '<div class="ui-block-a"><button id="preview_near_button" data-inline="true" data-icon="plus" data-iconpos="left"'
+			+ ' onclick="javascript: getPreviewNear(' + var_control + ');" class="ui-btn-hidden" data-disabled="false">{near_button}</button></div>'
+			+ '<div class="ui-block-b"><input type="text" value="21" readonly /></div>'
+			+ '<div class="ui-block-c"><button id="preview_far_button" data-inline="true" data-icon="minus" data-iconpos="left"'
+			+ ' onclick="javascript: getPreviewFar(' + var_control + ');" class="ui-btn-hidden" data-disabled="false">{far_button}</button></div>'
 			+ '</div>';
 		var_html = var_html + '<img src="' + html + '"><br>';
 		if (var_control == true) {
 			var_html = var_html + '<div>'
+				+ '<p>{change_size}</p>'
 				+ '<button id="model_big_button" data-inline="true" data-icon="plus" data-iconpos="left"'
 				+ ' onclick="javascript: changeModel(\'s+\');" class="ui-btn-hidden" data-disabled="false">{big_button}</button>'
 				+ '<button id="model_small_button" data-inline="true" data-icon="minus" data-iconpos="left"'
@@ -133,6 +136,7 @@ function getPreview(var_control) {
 				
 			+ '</div>'
 			+ '<div class="ui-grid-b" id="control_grid">'
+			+ '<p>{rotations}</p>'
 			+ '<div class="ui-block-a"><div class="ui-bar ui-bar-f" id="xrot_grid">'
 				+ '<button id="model_xrotminus_button" data-inline="true" data-icon="minus" data-iconpos="notext"'
 				+ ' onclick="javascript: changeModel(\'xrot-\');" class="ui-btn-hidden" data-disabled="false">xrot add</button>'
