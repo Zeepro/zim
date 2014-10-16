@@ -40,10 +40,10 @@ var var_current_theta = {value_theta};
 var var_color_right = '{color_default}';
 var var_color_left = '{color_default}';
 
-var var_model_scale = 100;
-var var_model_zrot = 0;
-var var_model_xrot = 0;
-var var_model_yrot = 0;
+var var_model_scale = {model_scale};
+var var_model_zrot = {model_xrot};
+var var_model_xrot = {model_yrot};
+var var_model_yrot = {model_zrot};
 var var_factor_scale = 2;
 var var_interval_zrot = 30;
 var var_interval_xrot = 30;

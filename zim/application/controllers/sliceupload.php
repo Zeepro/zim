@@ -146,6 +146,10 @@ class Sliceupload extends MY_Controller {
 		$list_display = array();
 		$template_data = array();
 		$current_stage = 'wait_slice';
+		$current_scale = 100;
+		$current_xrot = 0;
+		$current_yrot = 0;
+		$current_zrot = 0;
 		
 		// redirect the client when in slicing
 		$this->load->helper('corestatus');
@@ -171,6 +175,25 @@ class Sliceupload extends MY_Controller {
 				);
 			}
 			sort($list_display);
+			
+			try {
+				$tmp_string = NULL;
+				$tmp_array = NULL;
+				
+				$this->load->helper('slicer');
+				$ret_val = Slicer_listModel($tmp_string);
+				$tmp_array = json_decode($tmp_string, TRUE);
+				
+				if ($ret_val == ERROR_OK && count($tmp_array)) {
+					$current_scale = $tmp_array[0][SLICER_PRM_SCALE];
+					$current_xrot = $tmp_array[0][SLICER_PRM_XROT];
+					$current_yrot = $tmp_array[0][SLICER_PRM_YROT];
+					$current_zrot = $tmp_array[0][SLICER_PRM_ZROT];
+				}
+			} catch (Exeception $e) {
+				$this->load->helper('printerlog');
+				PrinterLog_logError('synchronize slicer model info error', __FILE__, __LINE__);
+			}
 		}
 		
 		$this->load->library('parser');
@@ -197,6 +220,10 @@ class Sliceupload extends MY_Controller {
 				'small_button'	=> t('small_button'),
 				'big_button'	=> t('big_button'),
 				'color_default'	=> PRINTERSTATE_VALUE_DEFAULT_COLOR,
+				'model_scale'	=> $current_scale,
+				'model_xrot'	=> $current_xrot,
+				'model_yrot'	=> $current_yrot,
+				'model_zrot'	=> $current_zrot,
 		);
 		$body_page = $this->parser->parse('template/sliceupload/slice', $template_data, TRUE);
 		
