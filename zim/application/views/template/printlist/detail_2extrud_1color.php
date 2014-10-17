@@ -87,16 +87,16 @@ var var_enable_print = {enable_print};
 var var_need_print_right = ({need_filament_r} > 0) ? true : false;
 var var_need_print_left = ({need_filament_l} > 0) ? true : false;
 var tmp = $("#slider-2").val();
-var min_tmp = tmp - 10;
+var min_tmp = tmp - 15;
 
 $("#slider-2").attr('min', (min_tmp < 165) ? 165 : min_tmp); 
-$("#slider-2").attr('max', parseInt(tmp) + 10);
+$("#slider-2").attr('max', parseInt(tmp) + 15);
 
 tmp = $("#slider-1").val();
-min_tmp = tmp - 10;
+min_tmp = tmp - 15;
 
 $("#slider-1").attr('min', (min_tmp < 165) ? 165 : min_tmp); 
-$("#slider-1").attr('max', parseInt(tmp) + 10);
+$("#slider-1").attr('max', parseInt(tmp) + 15);
 
 $("input[type=submit]").on('click', function()
 {
