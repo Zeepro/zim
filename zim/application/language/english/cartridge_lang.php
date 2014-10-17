@@ -63,6 +63,6 @@ $lang['internal_error']
 $lang['information_not_changed']
 	= 'Information is not changed';
 $lang['writing_successed']
-	= 'Writing successed';
+	= 'writing succeeded';
 $lang['error_writing']
 	= 'Error in writing';
