@@ -50,6 +50,8 @@ var var_interval_xrot = 30;
 var var_interval_yrot = 30;
 var var_interval_rho = 100;
 
+var var_wait_preview = false;
+
 
 $(document).ready(prepareDisplay());
 
@@ -112,6 +114,7 @@ function getPreview(var_control) {
 		{	
 			$("#overlay").removeClass("gray-overlay");
 			$(".ui-loader").css("display", "none");
+			var_wait_preview = false;
 		},
 		timeout: 1000*60*10,
 	})
@@ -288,12 +291,15 @@ function changeModel(var_action) {
 		},
 		complete: function()
 		{	
-			$("#overlay").removeClass("gray-overlay");
-			$(".ui-loader").css("display", "none");
+			if (var_wait_preview == false) {
+				$("#overlay").removeClass("gray-overlay");
+				$(".ui-loader").css("display", "none");
+			}
 		},
 	})
 	.done(function(html) {
 		var_slice_status_lock = false;
+		var_wait_preview = true;
 		getPreview();
 	})
 	.fail(function() { // not allowed
