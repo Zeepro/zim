@@ -22,4 +22,14 @@
 		<h2>{create_account}</h2>
 		<a href="/account/signup/{returnUrl}" data-role="button" data-ajax="false">{sign_up}</a>
 	</div>
+	<script>
+	$(document).ready(function()
+	{
+		$(".ui-loader").css('display', 'none');
+	});
+	$("input[type=submit]").on('click', function()
+	{
+		$(".ui-loader").css('display', 'block');
+	});
+	</script>
 </div>

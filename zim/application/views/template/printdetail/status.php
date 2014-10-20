@@ -66,7 +66,20 @@ function load_jwplayer_video()
 									"<p>{video_error}</p>");
 	});
 }
-setTimeout(load_jwplayer_video, 10000);
+
+var video_check = setInterval(function()
+{
+	var req = $.ajax(
+	{
+		url: "{video_url}",
+		type: "HEAD",
+		success: function()
+		{
+			load_jwplayer_video();
+			clearInterval(video_check);
+		}
+	});
+}, 1000);
 </script>
 
 <script type="text/javascript">

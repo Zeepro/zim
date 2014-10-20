@@ -188,6 +188,10 @@
 
 <script type="text/javascript">
 
+//**************
+//	CARTRIDGE JS
+//**************
+
 $.ajax(
 {
 	url: "/manage/filament_ajax/l",
@@ -228,6 +232,10 @@ $(document).ready(function()
 	$("#bed_container").css("height", $("table").css("width")+1);
 });
 
+//**********
+//	VIDEO JS
+//**********
+
 function load_jwplayer_video() {
 	var player = jwplayer("myVideo").setup({
 							file: "{video_url}",
@@ -242,8 +250,24 @@ function load_jwplayer_video() {
 									"<p>{video_error}</p>");
 	});
 }
+var video_check = setInterval(function()
+{
+	var req = $.ajax(
+	{
+		url: "{video_url}",
+		type: "HEAD",
+		success: function()
+		{
+			load_jwplayer_video();
+			clearInterval(video_check);
+		}
+	});
+}, 1000);
 
-setTimeout(load_jwplayer_video, 10000);
+//********
+//	LED JS
+//********
+
 var var_ajax;
 var var_ajax_lock = false;
 var var_home_before_level = false;
@@ -301,6 +325,10 @@ $("#strip_led").change(function()
 		}
 	}, 1000);
 });
+
+//********
+//	HOMING
+//********
 
 function home(var_axis) {
 	var var_url;

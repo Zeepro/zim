@@ -269,7 +269,7 @@ class Account extends MY_Controller {
 		{
 			$data['back_or_already'] = t('back');
 			$data['has_skip'] = "none";
-			$data['btn_url'] ='javascript:history.back()';
+			$data['btn_url'] ='/activation/';
 		}
 		$data['confcode_hint'] = t('confcode_hint');
 		$data['signup_title'] = t('signup_title');

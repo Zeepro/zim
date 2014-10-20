@@ -5,10 +5,7 @@
 	</header>
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
-		<noscript>
-			<p>Your navigator has disabled Javascript support, please enable it to start configuring zim.</p>
-		</noscript>
-		<div id="container" style="display:none">
+		<div id="container">
 			<h2>{title}</h2>
 			<ul data-role="listview" data-inset="true" id="listview" class="shadowBox">
 				{list_ssid}
@@ -20,7 +17,6 @@
 		</div>
 	</div>
 	<script>
-		$("div#container").css('display', 'block');
 		$("a.needSpin").on("click", function()
 		{
 			$(".ui-loader").css("display", "block");
