@@ -14,9 +14,9 @@ $lang['change_right']
 $lang['set_hostname']
 	= "Changer le lien d'accès (nom d'hôte)";
 $lang['strip_led']
-	= 'Éclairage du plateau';
+	= 'Plateau';
 $lang['head_led']
-	= 'LED';
+	= 'Tête d\'impression';
 $lang['led_on']
 	= 'Allumé';
 $lang['led_off']
@@ -34,6 +34,6 @@ $lang['remote_control']
 $lang['lighting']
 	= 'Éclairage du plateau';
 $lang['set_preset']
-	= 'Présélections du slicer';
+	= 'Présélections d\'impression';
 $lang['nozzles_adjustments']
 	= 'Ajustement du décalage des buses';

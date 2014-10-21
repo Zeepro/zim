@@ -4,7 +4,7 @@ $lang['Home']
 $lang['Quick print']
 	= 'Modèles de Zeepro';
 $lang['Configuration']
-	= 'Configuration';
+	= 'Configuration et support';
 $lang['ZeePro Personal Printer 21 - Home']
 	= 'Zim - Accueil';
 $lang['manage']
@@ -12,4 +12,4 @@ $lang['manage']
 $lang['upload']
 	= 'Importer un modèle';
 $lang['about']
-= 'Informations';
+	= 'Informations sur ma zim';

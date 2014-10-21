@@ -14,11 +14,11 @@ $lang['change_right']
 $lang['set_hostname']
 	= 'Change access link (hostname)';
 $lang['strip_led']
-	= 'Platform lighting';
+	= 'Platform';
 $lang['lighting']
 	= 'Lighting';
 $lang['head_led']
-	= 'LED';
+	= 'Printer head';
 $lang['led_on']
 	= 'On';
 $lang['led_off']
@@ -34,6 +34,6 @@ $lang['tromboning']
 $lang['remote_control']
 	= 'Allow remote support';
 $lang['set_preset']
-	= 'Slicer presets';
+	= 'Printing presets';
 $lang['nozzles_adjustments']
 	= 'Nozzles offset adjustments';
