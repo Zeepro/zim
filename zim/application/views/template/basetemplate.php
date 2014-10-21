@@ -22,13 +22,14 @@
 			div.logo {
 				width:100%; 
 				height:110px; 
-				background:url("/assets/images/logo-1.png") top center no-repeat;
-				background-size: 119px 96px;
+				/*background:url("/assets/images/logo-1.png") top center no-repeat;*/
+				background:url("/assets/images/logo-white.png") top center no-repeat;
+				background-size: 212px 59px;
 			}
 			div#link_logo {
 				margin: 0 auto;
-				width: 97px;
-				height: 100px;
+				width: 248px;
+				height: 72px;
 				cursor: pointer;
 			}
 			.ui-page-theme-a{
