@@ -1602,8 +1602,10 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 				'bottom_solid_layers',
 				'extra_perimeters',
 				'avoid_crossing_perimeters',
-				'start_perimeters_at_concave_points',
-				'start_perimeters_at_non_overhang',
+				// old for 1.0
+// 				'start_perimeters_at_concave_points',
+// 				'start_perimeters_at_non_overhang',
+				// end of old for 1.0
 				'thin_walls',
 				'overhangs',
 				'randomize_start',
@@ -1627,6 +1629,7 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 				'support_material_speed',
 				'bridge_speed',
 				'gap_fill_speed',
+				'support_material_interface_speed', // new for 1.1.7
 				'travel_speed',
 				'first_layer_speed',
 				'skirts',
@@ -1643,12 +1646,25 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 				'support_material_angle',
 				'support_material_interface_layers',
 				'support_material_interface_spacing',
+				'dont_support_bridges', // new for 1.1.7
 				'perimeter_extruder',
 				'infill_extruder',
 				'support_material_extruder',
 				'support_material_interface_extruder',
 				'ooze_prevention',
 				'standby_temperature_delta',
+				// new for 1.1.7
+				'interface_shells',
+				'fan_always_on',
+				'cooling',
+				'min_fan_speed',
+				'max_fan_speed',
+				'bridge_fan_speed',
+				'disable_fan_first_layers',
+				'fan_below_layer_time',
+				'slowdown_below_layer_time',
+				'min_print_speed',
+				// end of new for 1.1.7
 				'extrusion_width',
 				'first_layer_extrusion_width',
 				'perimeter_extrusion_width',
@@ -1694,12 +1710,14 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 	if (!array_key_exists('avoid_crossing_perimeters', $array_setting)) {
 		$array_setting['avoid_crossing_perimeters'] = 0;
 	}
-	if (!array_key_exists('start_perimeters_at_concave_points', $array_setting)) {
-		$array_setting['start_perimeters_at_concave_points'] = 0;
-	}
-	if (!array_key_exists('start_perimeters_at_non_overhang', $array_setting)) {
-		$array_setting['start_perimeters_at_non_overhang'] = 0;
-	}
+	// old for 1.0
+// 	if (!array_key_exists('start_perimeters_at_concave_points', $array_setting)) {
+// 		$array_setting['start_perimeters_at_concave_points'] = 0;
+// 	}
+// 	if (!array_key_exists('start_perimeters_at_non_overhang', $array_setting)) {
+// 		$array_setting['start_perimeters_at_non_overhang'] = 0;
+// 	}
+	// end of old for 1.0
 	if (!array_key_exists('thin_walls', $array_setting)) {
 		$array_setting['thin_walls'] = 1;
 	}
@@ -1814,12 +1832,25 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 	if (!array_key_exists('travel_speed', $array_setting)) {
 		$array_setting['travel_speed'] = 130;
 	}
-	if (!array_key_exists('first_layer_speed', $array_setting)) {
+	if (!array_key_exists('first_layer_speed', $array_setting)) { // new for 1.1.7
 		$array_setting['first_layer_speed'] = '30%';
 	}
 	else
 	{
 		$tmp = $array_setting['first_layer_speed'];
+		$pos = strpos($tmp, "%");
+		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 20 || substr($tmp, 0, $pos) > 100))
+				|| ($pos === FALSE && ($tmp < 10 || $tmp > 200)))
+		{
+			return (FALSE);
+		}
+	}
+	if (!array_key_exists('support_material_interface_speed', $array_setting)) {
+		$array_setting['support_material_interface_speed'] = '100%';
+	}
+	else
+	{
+		$tmp = $array_setting['support_material_interface_speed'];
 		$pos = strpos($tmp, "%");
 		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 20 || substr($tmp, 0, $pos) > 100))
 				|| ($pos === FALSE && ($tmp < 10 || $tmp > 200)))
@@ -1871,6 +1902,9 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 	if (!array_key_exists('support_material_interface_spacing', $array_setting)) {
 		$array_setting['support_material_interface_spacing'] = 0;
 	}
+	if (!array_key_exists('dont_support_bridges', $array_setting)) { // new for 1.1.7
+		$array_setting['dont_support_bridges'] = 1;
+	}
 	// multiple extruders
 	if (!array_key_exists('perimeter_extruder', $array_setting)) {
 		$array_setting['perimeter_extruder'] = 1;
@@ -1889,6 +1923,37 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 	}
 	if (!array_key_exists('standby_temperature_delta', $array_setting)) {
 		$array_setting['standby_temperature_delta'] = -5;
+	}
+	if (!array_key_exists('interface_shells', $array_setting)) { // new for 1.1.7
+		$array_setting['interface_shells'] = 0;
+	}
+	// cooling fan (all new for 1.1.7)
+	if (!array_key_exists('fan_always_on', $search)) {
+		$array_setting['fan_always_on'] = 0;
+	}
+	if (!array_key_exists('cooling', $search)) {
+		$array_setting['cooling'] = 1;
+	}
+	if (!array_key_exists('min_fan_speed', $search)) {
+		$array_setting['min_fan_speed'] = 35;
+	}
+	if (!array_key_exists('max_fan_speed', $search)) {
+		$array_setting['max_fan_speed'] = 100;
+	}
+	if (!array_key_exists('bridge_fan_speed', $search)) {
+		$array_setting['bridge_fan_speed'] = 100;
+	}
+	if (!array_key_exists('disable_fan_first_layers', $search)) {
+		$array_setting['disable_fan_first_layers'] = 1;
+	}
+	if (!array_key_exists('fan_below_layer_time', $search)) {
+		$array_setting['fan_below_layer_time'] = 60;
+	}
+	if (!array_key_exists('slowdown_below_layer_time', $search)) {
+		$array_setting['slowdown_below_layer_time'] = 30;
+	}
+	if (!array_key_exists('min_print_speed', $search)) {
+		$array_setting['min_print_speed'] = 10;
 	}
 	// advanced
 	if (!array_key_exists('extrusion_width', $array_setting)) {

@@ -125,8 +125,10 @@ class Preset extends MY_Controller {
 			$this->form_validation->set_rules('bottom_solid_layers', 'bottom_solid_layers', 'required');
 			$this->form_validation->set_rules('extra_perimeters', 'extra_perimeters', 'required');
 			$this->form_validation->set_rules('avoid_crossing_perimeters', 'avoid_crossing_perimeters', 'required');
-			$this->form_validation->set_rules('start_perimeters_at_concave_points', 'start_perimeters_at_concave_points', 'required');
-			$this->form_validation->set_rules('start_perimeters_at_non_overhang', 'start_perimeters_at_non_overhang', 'required');
+			// old for 1.0
+// 			$this->form_validation->set_rules('start_perimeters_at_concave_points', 'start_perimeters_at_concave_points', 'required');
+// 			$this->form_validation->set_rules('start_perimeters_at_non_overhang', 'start_perimeters_at_non_overhang', 'required');
+			// end of old for 1.0
 			$this->form_validation->set_rules('thin_walls', 'thin_walls', 'required');
 			$this->form_validation->set_rules('overhangs', 'overhangs', 'required');
 			$this->form_validation->set_rules('randomize_start', 'randomize_start', 'required');
@@ -150,6 +152,7 @@ class Preset extends MY_Controller {
 			$this->form_validation->set_rules('support_material_speed', 'support_material_speed', 'required');
 			$this->form_validation->set_rules('bridge_speed', 'bridge_speed', 'required');
 			$this->form_validation->set_rules('gap_fill_speed', 'gap_fill_speed', 'required');
+			$this->form_validation->set_rules('support_material_interface_speed', 'support_material_interface_speed', 'required'); // new for 1.1.7
 			$this->form_validation->set_rules('travel_speed', 'travel_speed', 'required');
 			$this->form_validation->set_rules('first_layer_speed', 'first_layer_speed', 'required');
 			$this->form_validation->set_rules('skirts', 'skirts', 'required');
@@ -166,12 +169,25 @@ class Preset extends MY_Controller {
 			$this->form_validation->set_rules('support_material_angle', 'support_material_angle', 'required');
 			$this->form_validation->set_rules('support_material_interface_layers', 'support_material_interface_layers', 'required');
 			$this->form_validation->set_rules('support_material_interface_spacing', 'support_material_interface_spacing', 'required');
+			$this->form_validation->set_rules('dont_support_bridges', 'dont_support_bridges', 'required'); // new for 1.1.7
 			$this->form_validation->set_rules('perimeter_extruder', 'perimeter_extruder', 'required');
 			$this->form_validation->set_rules('infill_extruder', 'infill_extruder', 'required');
 			$this->form_validation->set_rules('support_material_extruder', 'support_material_extruder', 'required');
 			$this->form_validation->set_rules('support_material_interface_extruder', 'support_material_interface_extruder', 'required');
 			$this->form_validation->set_rules('ooze_prevention', 'ooze_prevention', 'required');
 			$this->form_validation->set_rules('standby_temperature_delta', 'standby_temperature_delta', 'required');
+			// new for 1.1.7
+			$this->form_validation->set_rules('interface_shells', 'interface_shells', 'required');
+			$this->form_validation->set_rules('fan_always_on', 'fan_always_on', 'required');
+			$this->form_validation->set_rules('cooling', 'cooling', 'required');
+			$this->form_validation->set_rules('min_fan_speed', 'min_fan_speed', 'required');
+			$this->form_validation->set_rules('max_fan_speed', 'max_fan_speed', 'required');
+			$this->form_validation->set_rules('bridge_fan_speed', 'bridge_fan_speed', 'required');
+			$this->form_validation->set_rules('disable_fan_first_layers', 'disable_fan_first_layers', 'required');
+			$this->form_validation->set_rules('fan_below_layer_time', 'fan_below_layer_time', 'required');
+			$this->form_validation->set_rules('slowdown_below_layer_time', 'slowdown_below_layer_time', 'required');
+			$this->form_validation->set_rules('min_print_speed', 'min_print_speed', 'required');
+			// end of new for 1.1.7
 			$this->form_validation->set_rules('extrusion_width', 'extrusion_width', 'required');
 			$this->form_validation->set_rules('first_layer_extrusion_width', 'first_layer_extrusion_width', 'required');
 			$this->form_validation->set_rules('perimeter_extrusion_width', 'perimeter_extrusion_width', 'required');
@@ -196,8 +212,10 @@ class Preset extends MY_Controller {
 						'bottom_solid_layers'					=> $this->input->post('bottom_solid_layers'),
 						'extra_perimeters'						=> $this->input->post('extra_perimeters'),
 						'avoid_crossing_perimeters'				=> $this->input->post('avoid_crossing_perimeters'),
-						'start_perimeters_at_concave_points'	=> $this->input->post('start_perimeters_at_concave_points'),
-						'start_perimeters_at_non_overhang'		=> $this->input->post('start_perimeters_at_non_overhang'),
+						// old for 1.0
+// 						'start_perimeters_at_concave_points'	=> $this->input->post('start_perimeters_at_concave_points'),
+// 						'start_perimeters_at_non_overhang'		=> $this->input->post('start_perimeters_at_non_overhang'),
+						// end of old for 1.0
 						'thin_walls'							=> $this->input->post('thin_walls'),
 						'overhangs'								=> $this->input->post('overhangs'),
 						'randomize_start'						=> $this->input->post('randomize_start'),
@@ -221,6 +239,7 @@ class Preset extends MY_Controller {
 						'support_material_speed'				=> $this->input->post('support_material_speed'),
 						'bridge_speed'							=> $this->input->post('bridge_speed'),
 						'gap_fill_speed'						=> $this->input->post('gap_fill_speed'),
+						'support_material_interface_speed'		=> $this->input->post('support_material_interface_speed'), // new for 1.1.7
 						'travel_speed'							=> $this->input->post('travel_speed'),
 						'first_layer_speed'						=> $this->input->post('first_layer_speed'),
 						'skirts'								=> $this->input->post('skirts'),
@@ -237,12 +256,25 @@ class Preset extends MY_Controller {
 						'support_material_angle'				=> $this->input->post('support_material_angle'),
 						'support_material_interface_layers'		=> $this->input->post('support_material_interface_layers'),
 						'support_material_interface_spacing'	=> $this->input->post('support_material_interface_spacing'),
+						'dont_support_bridges'					=> $this->input->post('dont_support_bridges'), // new for 1.1.7
 						'perimeter_extruder'					=> $this->input->post('perimeter_extruder'),
 						'infill_extruder'						=> $this->input->post('infill_extruder'),
 						'support_material_extruder'				=> $this->input->post('support_material_extruder'),
 						'support_material_interface_extruder'	=> $this->input->post('support_material_interface_extruder'),
 						'ooze_prevention'						=> $this->input->post('ooze_prevention'),
 						'standby_temperature_delta'				=> $this->input->post('standby_temperature_delta'),
+						// new for 1.1.7
+						'interface_shells'						=> $this->input->post('interface_shells'),
+						'fan_always_on'							=> $this->input->post('fan_always_on'),
+						'cooling'								=> $this->input->post('cooling'),
+						'min_fan_speed'							=> $this->input->post('min_fan_speed'),
+						'max_fan_speed'							=> $this->input->post('max_fan_speed'),
+						'bridge_fan_speed'						=> $this->input->post('bridge_fan_speed'),
+						'disable_fan_first_layers'				=> $this->input->post('disable_fan_first_layers'),
+						'fan_below_layer_time'					=> $this->input->post('fan_below_layer_time'),
+						'slowdown_below_layer_time'				=> $this->input->post('slowdown_below_layer_time'),
+						'min_print_speed'						=> $this->input->post('min_print_speed'),
+						// end of new for 1.1.7
 						'extrusion_width'						=> $this->input->post('extrusion_width'),
 						'first_layer_extrusion_width'			=> $this->input->post('first_layer_extrusion_width'),
 						'perimeter_extrusion_width'				=> $this->input->post('perimeter_extrusion_width'),
@@ -293,8 +325,10 @@ class Preset extends MY_Controller {
 				'bottom_solid_layers'					=> t('bottom_solid_layers'),
 				'extra_perimeters'						=> t('extra_perimeters'),
 				'avoid_crossing_perimeters'				=> t('avoid_crossing_perimeters'),
-				'start_perimeters_at_concave_points'	=> t('start_perimeters_at_concave_points'),
-				'start_perimeters_at_non_overhang'		=> t('start_perimeters_at_non_overhang'),
+				// old for 1.0
+// 				'start_perimeters_at_concave_points'	=> t('start_perimeters_at_concave_points'),
+// 				'start_perimeters_at_non_overhang'		=> t('start_perimeters_at_non_overhang'),
+				// end of old for 1.0
 				'thin_walls'							=> t('thin_walls'),
 				'overhangs'								=> t('overhangs'),
 				'randomize_start'						=> t('randomize_start'),
@@ -318,6 +352,7 @@ class Preset extends MY_Controller {
 				'support_material_speed'				=> t('support_material_speed'),
 				'bridge_speed'							=> t('bridge_speed'),
 				'gap_fill_speed'						=> t('gap_fill_speed'),
+				'support_material_interface_speed'		=> t('support_material_interface_speed'), // new for 1.1.7
 				'travel_speed'							=> t('travel_speed'),
 				'first_layer_speed'						=> t('first_layer_speed'),
 				'skirts'								=> t('skirts'),
@@ -334,12 +369,25 @@ class Preset extends MY_Controller {
 				'support_material_angle'				=> t('support_material_angle'),
 				'support_material_interface_layers'		=> t('support_material_interface_layers'),
 				'support_material_interface_spacing'	=> t('support_material_interface_spacing'),
+				'dont_support_bridges'					=> t('dont_support_bridges'), // new for 1.1.7
 				'perimeter_extruder'					=> t('perimeter_extruder'),
 				'infill_extruder'						=> t('infill_extruder'),
 				'support_material_extruder'				=> t('support_material_extruder'),
 				'support_material_interface_extruder'	=> t('support_material_interface_extruder'),
 				'ooze_prevention'						=> t('ooze_prevention'),
 				'standby_temperature_delta'				=> t('standby_temperature_delta'),
+				// new for 1.1.7
+				'interface_shells'						=> t('interface_shells'),
+				'fan_always_on'							=> t('fan_always_on'),
+				'cooling'								=> t('cooling'),
+				'min_fan_speed'							=> t('min_fan_speed'),
+				'max_fan_speed'							=> t('max_fan_speed'),
+				'bridge_fan_speed'						=> t('bridge_fan_speed'),
+				'disable_fan_first_layers'				=> t('disable_fan_first_layers'),
+				'fan_below_layer_time'					=> t('fan_below_layer_time'),
+				'slowdown_below_layer_time'				=> t('slowdown_below_layer_time'),
+				'min_print_speed'						=> t('min_print_speed'),
+				// end of new for 1.1.7
 				'extrusion_width'						=> t('extrusion_width'),
 				'first_layer_extrusion_width'			=> t('first_layer_extrusion_width'),
 				'perimeter_extrusion_width'				=> t('perimeter_extrusion_width'),
@@ -356,6 +404,7 @@ class Preset extends MY_Controller {
 				'layer_perimeter_subtitle3'		=> t('layer_perimeter_subtitle3'),
 				'layer_perimeter_subtitle4'		=> t('layer_perimeter_subtitle4'),
 				'layer_perimeter_subtitle5'		=> t('layer_perimeter_subtitle5'),
+				'layer_perimeter_subtitle3.1'	=> t('layer_perimeter_subtitle3.1'),
 				'infill_title'					=> t('infill_title'),
 				'infill_subtitle1'				=> t('infill_subtitle1'),
 				'infill_subtitle2'				=> t('infill_subtitle2'),
@@ -374,6 +423,12 @@ class Preset extends MY_Controller {
 				'mutiple_extruder_title'		=> t('mutiple_extruder_title'),
 				'mutiple_extruder_subtitle1'	=> t('mutiple_extruder_subtitle1'),
 				'mutiple_extruder_subtitle2'	=> t('mutiple_extruder_subtitle2'),
+				'mutiple_extruder_subtitle3'	=> t('mutiple_extruder_subtitle3'),
+				'fan_title'						=> t('fan_title'),
+				'fan_subtitle1'					=> t('fan_subtitle1'),
+				'fan_subtitle2'					=> t('fan_subtitle2'),
+				'fan_subtitle3'					=> t('fan_subtitle3'),
+				'fan_subtitle2.1'				=> t('fan_subtitle2.1'),
 				'advanced_title'				=> t('advanced_title'),
 				'advanced_subtitle1'			=> t('advanced_subtitle1'),
 				'advanced_subtitle2'			=> t('advanced_subtitle2'),
@@ -403,8 +458,10 @@ class Preset extends MY_Controller {
 				'bottom_solid_layers_value'						=> $array_setting['bottom_solid_layers'],
 				'extra_perimeters_value'						=> ($array_setting['extra_perimeters'] == TRUE) ? $option_selected : NULL,
 				'avoid_crossing_perimeters_value'				=> ($array_setting['avoid_crossing_perimeters'] == TRUE) ? $option_selected : NULL,
-				'start_perimeters_at_concave_points_value'		=> ($array_setting['start_perimeters_at_concave_points'] == TRUE) ? $option_selected : NULL,
-				'start_perimeters_at_non_overhang_value'		=> ($array_setting['start_perimeters_at_non_overhang'] == TRUE) ? $option_selected : NULL,
+				// old for 1.0
+// 				'start_perimeters_at_concave_points_value'		=> ($array_setting['start_perimeters_at_concave_points'] == TRUE) ? $option_selected : NULL,
+// 				'start_perimeters_at_non_overhang_value'		=> ($array_setting['start_perimeters_at_non_overhang'] == TRUE) ? $option_selected : NULL,
+				// end of old for 1.0
 				'thin_walls_value'								=> ($array_setting['thin_walls'] == TRUE) ? $option_selected : NULL,
 				'overhangs_value'								=> ($array_setting['overhangs'] == TRUE) ? $option_selected : NULL,
 				'randomize_start_value'							=> ($array_setting['randomize_start'] == TRUE) ? $option_selected : NULL,
@@ -440,6 +497,7 @@ class Preset extends MY_Controller {
 				'support_material_speed_value'					=> $array_setting['support_material_speed'],
 				'bridge_speed_value'							=> $array_setting['bridge_speed'],
 				'gap_fill_speed_value'							=> $array_setting['gap_fill_speed'],
+				'support_material_interface_speed_value'		=> $array_setting['support_material_interface_speed'], // new for 1.1.7
 				'travel_speed_value'							=> $array_setting['travel_speed'],
 				'first_layer_speed_value'						=> $array_setting['first_layer_speed'],
 				'skirts_value'									=> $array_setting['skirts'],
@@ -459,6 +517,7 @@ class Preset extends MY_Controller {
 				'support_material_angle_value'					=> $array_setting['support_material_angle'],
 				'support_material_interface_layers_value'		=> $array_setting['support_material_interface_layers'],
 				'support_material_interface_spacing_value'		=> $array_setting['support_material_interface_spacing'],
+				'dont_support_bridges_value'					=> ($array_setting['dont_support_bridges'] == TRUE) ? $option_selected : NULL, // new for 1.1.7
 // 				'perimeter_extruder_value'						=> $array_setting['perimeter_extruder'],
 				'perimeter_extruder_value_left'					=> NULL,
 				'perimeter_extruder_value_right'				=> NULL,
@@ -473,6 +532,18 @@ class Preset extends MY_Controller {
 				'support_material_interface_extruder_value_right'	=> NULL,
 				'ooze_prevention_value'							=> ($array_setting['ooze_prevention'] == TRUE) ? $option_selected : NULL,
 				'standby_temperature_delta_value'				=> $array_setting['standby_temperature_delta'],
+				// new for 1.1.7
+				'interface_shells_value'						=> ($array_setting['interface_shells'] == TRUE) ? $option_selected : NULL,
+				'fan_always_on_value'							=> ($array_setting['fan_always_on_value'] == TRUE) ? $option_selected : NULL,
+				'cooling_value'									=> ($array_setting['cooling'] == TRUE) ? $option_selected : NULL,
+				'min_fan_speed_value'							=> $array_setting['min_fan_speed'],
+				'max_fan_speed_value'							=> $array_setting['max_fan_speed'],
+				'bridge_fan_speed_value'						=> $array_setting['bridge_fan_speed'],
+				'disable_fan_first_layers_value'				=> $array_setting['disable_fan_first_layers'],
+				'fan_below_layer_time_value'					=> $array_setting['fan_below_layer_time'],
+				'slowdown_below_layer_time_value'				=> $array_setting['slowdown_below_layer_time'],
+				'min_print_speed_value'							=> $array_setting['min_print_speed'],
+				// end of new for 1.1.7
 				'extrusion_width_value'							=> $array_setting['extrusion_width'],
 				'first_layer_extrusion_width_value'				=> $array_setting['first_layer_extrusion_width'],
 				'perimeter_extrusion_width_value'				=> $array_setting['perimeter_extrusion_width'],
