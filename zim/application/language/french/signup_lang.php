@@ -8,3 +8,4 @@ $lang['confcode_hint'] = 'Un email de confirmation vous sera envoyé à cette ad
 $lang['Password'] = 'Mot de passe';
 $lang['Confirm Password'] = 'Confirmez votre mot de passe';
 $lang['button_skip'] = 'Omettre';
+$lang['show_password'] = 'Afficher les mots de passe';

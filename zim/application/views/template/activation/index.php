@@ -15,6 +15,9 @@
 				echo form_input('email') . '<br />' . '<br />';
 				echo form_label('{password}', 'password') . '<br />';
 				echo form_password('password') . '<br />' . '<br />';
+				echo '<div>';
+				echo '<label><input type="checkbox" name="show_pass" data-mini=true> {show_password} </label>';
+				echo "</div><br />";
 				echo form_submit('submit', '{sign_in}');
 				echo form_close();
 			?>
@@ -30,6 +33,13 @@
 	$("input[type=submit]").on('click', function()
 	{
 		$(".ui-loader").css('display', 'block');
+	});
+	$("input[name=show_pass]").on("click", function()
+	{
+		if ($("input[name=show_pass]").is(':checked'))
+			$("input[name=password]").attr("type", "text");
+		else
+			$("input[name=password]").attr("type", "password");
 	});
 	</script>
 </div>

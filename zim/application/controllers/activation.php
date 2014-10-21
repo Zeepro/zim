@@ -6,6 +6,7 @@ if (!defined('BASEPATH'))
 class Activation extends MY_Controller
 {
 	//FIXME rewrite totally this controller and pass core function to helper
+
 	public function index()
 	{
 		$network_ok = false;
@@ -29,6 +30,7 @@ class Activation extends MY_Controller
 					'sign_up'		=> t('sign_up'),
 					'back'			=> t('back'),
 					'create_account'=> t('create_account'),
+					'show_password'	=> t('show_password'),
 					'returnUrl'		=> isset($_GET['returnUrl']) ? ("?returnUrl=".$_GET['returnUrl']) : ""
 			);
 		}

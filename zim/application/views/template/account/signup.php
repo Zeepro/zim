@@ -18,8 +18,10 @@
 			echo form_label(t('Password'), 'password');
 			echo form_password('password').'<br />';
 			echo form_label(t('Confirm Password'), 'confirm');
-			echo form_password('confirm').'<br />';
-			echo '<br />';
+			echo form_password('confirm') . '<br />';
+			echo '<br /><div>';
+			echo '<label><input type="checkbox" name="show_pass" data-mini=true>{show_password}</label>';
+			echo "</div><br />";
 			echo form_submit('submit', t('signup_title'));
 			echo form_close();
 		?>
@@ -30,4 +32,21 @@
 		<a href="/activation/wizard_confirm/skip" data-role="button" style="display:{has_skip}">{skip_title}</a>
 		</div>
 	</div>
+	<script>
+		$("form").on("submit", function()
+		{
+			$("#overlay").addClass("gray-overlay");
+			$(".ui-loader").css("display", "block");
+		});
+		$("input[name=show_pass]").on("click", function()
+		{
+			if ($("input[name=show_pass]").is(':checked'))
+				$("input[type=password]").attr("type", "text");
+			else
+			{
+				$("input[name=password]").attr("type", "password");
+				$("input[name=confirm]").attr("type", "password");
+			}
+		});
+	</script>
 </div>
