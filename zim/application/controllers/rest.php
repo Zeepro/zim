@@ -1509,7 +1509,7 @@ class Rest extends MY_Controller {
 		$array_cartridge = array();
 		$this->load->helper('slicer');
 		
-		$cr = Slicer_reloadPreset();
+// 		$cr = Slicer_reloadPreset();
 		
 		// check platform and filament present (do not check filament quantity)
 		if ($cr == ERROR_OK) {

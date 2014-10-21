@@ -6,21 +6,21 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
-			<h2>{reduce_size_title}</h2>
-			<label>{reduce_size_text}</label>
+			<h2>{reducesize_title}</h2>
+			<label>{reducesize_text}</label>
 			<br />
-			<div>{reduce_size_graduation}</div>
-				<form action="" method="post">
-					<input type="hidden" name="id" value="{id}">
-					<input type="hidden" name="x" value="{xsize}">
-					<input type="hidden" name="y" value="{ysize}">
-					<input type="hidden" name="z" value="{zsize}">
-					<input type="hidden" name="ms" value="{max_percent}">
-					<input type="range" name="sizepercentage" id="sizepercentage" value="" min="1" max="100">
-					<div id="dimension"><center>{reduced_size}: <span id="x_size"></span>mm x <span id="y_size"></span>mm x <span id="z_size"></span>mm</center></div>
-					<div id="submit_container"><input type="submit" value="{submit_button}" data-ajax="false"></div>
-					<div id="submit_container"><input type="button" value="{cancel_button}" data-ajax="false"></div>
-				</form>
+			<form action="" method="post">
+				<input type="hidden" name="id" value="{id}">
+				<input type="hidden" name="x" value="{xsize}">
+				<input type="hidden" name="y" value="{ysize}">
+				<input type="hidden" name="z" value="{zsize}">
+				<input type="hidden" name="ms" value="{max_percent}">
+				<label for="sizepercentage">{reducesize_scale}</label>
+				<input type="range" name="sizepercentage" id="sizepercentage" value="{max_percent}" min="1" max="100">
+				<div id="dimension"><center>{reduced_size}: <span id="x_size"></span>mm x <span id="y_size"></span>mm x <span id="z_size"></span>mm</center></div>
+				<input id="resize_button" type="button" value="{resize_button}">
+				<input type="button" value="{cancel_button}" onclick="javascript:history.back();">
+			</form>
 		</div>
 	</div>
 
@@ -29,27 +29,55 @@ var var_xsize = {xsize};
 var var_ysize = {ysize};
 var var_zsize = {zsize};
 var var_max_percent = {max_percent};
+var var_model_id = {id};
+var var_ajax;
 
 $(document).ready(function () {
-
 	$(".ui-slider-handle").attr('style', "left: 100%;");
-	$("#sizepercentage").attr('max', var_max_percent * 100);
-	$('#sizepercentage').val(var_max_percent * 100);
- 	$("#x_size").text(var_xsize * var_max_percent);
- 	$("#y_size").text(var_ysize * var_max_percent);
- 	$("#z_size").text(var_zsize * var_max_percent);
-
-   $('#sizepercentage').on('change', function () { 
-   	$("#x_size").text(var_xsize * $('#sizepercentage').val() / 100);
-   	$("#y_size").text(var_ysize * $('#sizepercentage').val() / 100);
-   	$("#z_size").text(var_zsize * $('#sizepercentage').val() / 100);
-   });
+	$("#sizepercentage").attr('max', var_max_percent);
+// 	$('#sizepercentage').val(var_max_percent);
+	$("#x_size").text((var_xsize * var_max_percent / 100).toFixed(2));
+	$("#y_size").text((var_ysize * var_max_percent / 100).toFixed(2));
+	$("#z_size").text((var_zsize * var_max_percent / 100).toFixed(2));
+	
+	$('#sizepercentage').on('change', function () {
+		$("#x_size").text((var_xsize * $('#sizepercentage').val() / 100).toFixed(2));
+		$("#y_size").text((var_ysize * $('#sizepercentage').val() / 100).toFixed(2));
+		$("#z_size").text((var_zsize * $('#sizepercentage').val() / 100).toFixed(2));
+	});
 });
 
-$("input[type=submit]").on('click', function()
-{
-	$("#overlay").addClass("gray-overlay");
-	$(".ui-loader").css("display", "block");
+// $("input[type=submit]").on('click', function() {
+// 	$("#overlay").addClass("gray-overlay");
+// 	$(".ui-loader").css("display", "block");
+// });
+
+$('#resize_button').on('click', function() {
+	var_ajax = $.ajax({
+		url: "/sliceupload/preview_change_ajax",
+		type: "GET",
+		cache: false,
+		data: {
+			id:	var_model_id,
+			s:	$('#sizepercentage').val(),
+		},
+		beforeSend: function() {
+			$("#overlay").addClass("gray-overlay");
+			$(".ui-loader").css("display", "block");
+		},
+		complete: function() {
+			$("#overlay").removeClass("gray-overlay");
+			$(".ui-loader").css("display", "none");
+		},
+	})
+	.done(function(html) {
+		window.location.replace("/sliceupload/slice");
+	})
+	.fail(function() { // not allowed
+		alert('failed');
+	});
+	
+	return;
 });
 </script>
 

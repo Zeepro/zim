@@ -10,7 +10,34 @@ class Sliceupload extends MY_Controller {
 				'errorcode',
 		) );
 	}
-
+	
+	private function _clean_upload_folder() {
+		$upload_dir = array();
+		$current_time = time();
+		$upload_path = $this->config->item('temp');
+		
+		$this->load->helper('file');
+		
+		$upload_dir = @get_dir_file_info($upload_path);
+		
+		foreach($upload_dir as $file) {
+			$fileinfo = pathinfo($file['server_path']);
+			if (is_array($fileinfo) && array_key_exists('extension', $fileinfo)
+					&& in_array($fileinfo['extension'], array('stl', 'amf', 'obj'))) {
+				$alive_time = $file['date'] + 172800; // 48 hours alive duration (3600*48)
+				
+				if ($alive_time <= $current_time) {
+					@unlink($file['server_path']);
+					
+					$this->load->helper('printerlog');
+					PrinterLog_logDebug('deleted old model file: ' . $file['server_path']);
+				}
+			}
+		}
+		
+		return;
+	}
+	
 	public function index() {
 		$this->output->set_header('Location: /sliceupload/upload');
 		return;
@@ -104,6 +131,9 @@ class Sliceupload extends MY_Controller {
 			
 			return;
 		}
+		
+		// cleanup old upload temporary files
+		$this->_clean_upload_folder();
 		
 		if (ERROR_OK == Slicer_listModel($response) && $response != "[]") {
 			$template_data = array(
@@ -346,12 +376,19 @@ class Sliceupload extends MY_Controller {
 		
 		// parse the main body
 		$template_data = array(
-				'home'			=> t('home'),
-				'cancel_button'	=> t('cancel'),
-				'max_percent'	=> 0.8,
-				'xsize'			=> 150,
-				'ysize'			=> 175,
-				'zsize'			=> 100,
+				'home'				=> t('home'),
+				'back'				=> t('back'),
+				'cancel_button'		=> t('cancel'),
+				'max_percent'		=> $scalemax,
+				'xsize'				=> $xsize,
+				'ysize'				=> $ysize,
+				'zsize'				=> $zsize,
+				'id'				=> $id,
+				'reducesize_title'	=> t('reducesize_title'),
+				'reducesize_text'	=> t('reducesize_text'),
+				'reducesize_scale'	=> t('reducesize_scale'),
+				'reduced_size'		=> t('reduced_size'),
+				'resize_button'		=> t('resize_button'),
 		);
 		$body_page = $this->parser->parse('template/sliceupload/reducesize', $template_data, TRUE);
 		
@@ -392,23 +429,23 @@ class Sliceupload extends MY_Controller {
 						$array_return = array();
 						
 						$this->load->helper('slicer');
-						$cr = Slicer_addModel($array_model);
-// 						$cr = Slicer_addModel($array_model, FALSE, $array_return);
-// 						if ($cr == ERROR_OK) {
-// 							try {
-// 								if ($array_return[SLICER_TITLE_MAXSCALE] < 100) {
-// 									$display = json_encode($array_return);
-// 									$this->output->set_status_header(202);
-// 									$this->output->set_content_type('txt_u');
-// 									$this->load->library('parser');
-// 									$this->parser->parse('template/plaintxt', array('display' => $display)); //optional
+// 						$cr = Slicer_addModel($array_model);
+						$cr = Slicer_addModel($array_model, FALSE, $array_return);
+						if ($cr == ERROR_OK) {
+							try {
+								if ($array_return[SLICER_TITLE_MAXSCALE] < 100) {
+									$display = json_encode($array_return);
+									$this->output->set_status_header(202);
+									$this->output->set_content_type('txt_u');
+									$this->load->library('parser');
+									$this->parser->parse('template/plaintxt', array('display' => $display)); //optional
 									
-// 									return;
-// 								}
-// 							} catch (Exception $e) {
-// 								$cr = ERROR_INTERNAL;
-// 							}
-// 						}
+									return;
+								}
+							} catch (Exception $e) {
+								$cr = ERROR_INTERNAL;
+							}
+						}
 					}
 				}
 			}
