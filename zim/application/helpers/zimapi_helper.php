@@ -1928,31 +1928,31 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 		$array_setting['interface_shells'] = 0;
 	}
 	// cooling fan (all new for 1.1.7)
-	if (!array_key_exists('fan_always_on', $search)) {
+	if (!array_key_exists('fan_always_on', $array_setting)) {
 		$array_setting['fan_always_on'] = 0;
 	}
-	if (!array_key_exists('cooling', $search)) {
+	if (!array_key_exists('cooling', $array_setting)) {
 		$array_setting['cooling'] = 1;
 	}
-	if (!array_key_exists('min_fan_speed', $search)) {
+	if (!array_key_exists('min_fan_speed', $array_setting)) {
 		$array_setting['min_fan_speed'] = 35;
 	}
-	if (!array_key_exists('max_fan_speed', $search)) {
+	if (!array_key_exists('max_fan_speed', $array_setting)) {
 		$array_setting['max_fan_speed'] = 100;
 	}
-	if (!array_key_exists('bridge_fan_speed', $search)) {
+	if (!array_key_exists('bridge_fan_speed', $array_setting)) {
 		$array_setting['bridge_fan_speed'] = 100;
 	}
-	if (!array_key_exists('disable_fan_first_layers', $search)) {
+	if (!array_key_exists('disable_fan_first_layers', $array_setting)) {
 		$array_setting['disable_fan_first_layers'] = 1;
 	}
-	if (!array_key_exists('fan_below_layer_time', $search)) {
+	if (!array_key_exists('fan_below_layer_time', $array_setting)) {
 		$array_setting['fan_below_layer_time'] = 60;
 	}
-	if (!array_key_exists('slowdown_below_layer_time', $search)) {
+	if (!array_key_exists('slowdown_below_layer_time', $array_setting)) {
 		$array_setting['slowdown_below_layer_time'] = 30;
 	}
-	if (!array_key_exists('min_print_speed', $search)) {
+	if (!array_key_exists('min_print_speed', $array_setting)) {
 		$array_setting['min_print_speed'] = 10;
 	}
 	// advanced

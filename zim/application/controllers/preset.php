@@ -534,7 +534,7 @@ class Preset extends MY_Controller {
 				'standby_temperature_delta_value'				=> $array_setting['standby_temperature_delta'],
 				// new for 1.1.7
 				'interface_shells_value'						=> ($array_setting['interface_shells'] == TRUE) ? $option_selected : NULL,
-				'fan_always_on_value'							=> ($array_setting['fan_always_on_value'] == TRUE) ? $option_selected : NULL,
+				'fan_always_on_value'							=> ($array_setting['fan_always_on'] == TRUE) ? $option_selected : NULL,
 				'cooling_value'									=> ($array_setting['cooling'] == TRUE) ? $option_selected : NULL,
 				'min_fan_speed_value'							=> $array_setting['min_fan_speed'],
 				'max_fan_speed_value'							=> $array_setting['max_fan_speed'],
