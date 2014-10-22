@@ -69,16 +69,16 @@ $('<div>').appendTo('#right_cartridge')
 // .button().button('refresh');
 
 var tmp = $("#slider_right").val();
-var min_tmp = tmp - 10;
+var min_tmp = tmp - 15;
 
 $("#slider_right").attr('min', (min_tmp < 165) ? 165 : min_tmp); 
-$("#slider_right").attr('max', parseInt(tmp) + 10);
+$("#slider_right").attr('max', parseInt(tmp) + 15);
 
 tmp = $("#slider_left").val();
-min_tmp = tmp - 10;
+min_tmp = tmp - 15;
 
 $("#slider_left").attr('min', (min_tmp < 165) ? 165 : min_tmp); 
-$("#slider_left").attr('max', parseInt(tmp) + 10);
+$("#slider_left").attr('max', parseInt(tmp) + 15);
 
 $('#detail_zone').trigger("create");
 
