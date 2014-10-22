@@ -8,7 +8,7 @@
 		<div id="container">
 			<h2>{title}</h2>
 			<div class="zim-error">{err_msg}</div>
-			<form action="/connection/wifipswd" method="post" data-ajax="false"
+			<form method="post"
 				accept-charset="utf-8">
 				<label for="password">{label}</label>
 				<input type="hidden" name="ssid" id="ssid" value="{ssid}">
@@ -22,7 +22,10 @@
 		</div>
 	</div>
 	<script>
-		$(".ui-loader").css('display', 'none');
+	$(document).on("pagebeforehide", function() {
+		$(".ui-loader").css("display", "none");
+		$("#overlay").removeClass("gray-overlay");
+	});
 		$("input[type=submit]").on('click', function()
 		{
 			$(".ui-loader").css('display', 'block');

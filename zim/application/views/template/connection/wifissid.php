@@ -17,6 +17,7 @@
 		</div>
 	</div>
 	<script>
+		$(".ui-loader").css('display', 'none');
 		$("a.needSpin").on("click", function()
 		{
 			$(".ui-loader").css("display", "block");
