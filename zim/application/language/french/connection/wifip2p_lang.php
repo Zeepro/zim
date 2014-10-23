@@ -14,6 +14,7 @@ $lang['Write your password']
 	= 'Choisissez un mot de passe';
 $lang['OK']
 	= 'Valider';
-
+$lang['show_password']
+	= 'Afficher le mot de passe';
 
 ?>

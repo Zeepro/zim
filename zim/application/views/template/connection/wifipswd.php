@@ -10,12 +10,17 @@
 			<div class="zim-error">{err_msg}</div>
 			<form method="post"
 				accept-charset="utf-8">
-				<label for="password">{label}</label>
 				<input type="hidden" name="ssid" id="ssid" value="{ssid}">
 				<input type="hidden" name="mode" id="mode" value="{mode}">
+				<label for="password">{label}</label>
 				<input type="password" name="password" id="password" value="" />
 				<label for="password_confirm">{confirm_password}</label>
 				<input type="password" name="password_confirm" />
+				<br />
+				<br />
+				<div>
+					<label><input type="checkbox" name="show_pass" data-mini=true>{show_password}</label>
+				</div>
 				<br />
 				<input type="submit" value="{submit}" />
 			</form>
@@ -29,6 +34,16 @@
 		$("input[type=submit]").on('click', function()
 		{
 			$(".ui-loader").css('display', 'block');
+		});
+		$("input[name=show_pass]").on("click", function()
+		{
+			if ($("input[name=show_pass]").is(':checked'))
+				$("input[type=password]").attr("type", "text");
+			else
+			{
+				$("input[name=password]").attr("type", "password");
+				$("input[name=password_confirm]").attr("type", "password");
+			}
 		});
 	</script>
 </div>

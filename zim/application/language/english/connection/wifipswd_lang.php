@@ -5,6 +5,8 @@ $lang['network password'] =
 	"Enter password";
 $lang['confirm_password'] =
 	"Confirm password";
+$lang['show_password'] =
+	"Show password";
 $lang['OK'] =
 	"OK";
 $lang['err_msg'] =

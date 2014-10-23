@@ -234,6 +234,7 @@ class Connection extends MY_Controller {
 				'submit'			=> htmlspecialchars(t("OK")),
 				'mode'				=> ($mode == 'wizard') ? 'wizard' : 'normal',
 				'confirm_password'	=> t('confirm_password'),
+				'show_password'		=> t('show_password'),
 				'err_msg'			=> $valid == FALSE ? t('err_msg') : ""
 		);
 		$body_page = $this->parser->parse('template/connection/wifipswd', $template_data, TRUE);
@@ -433,6 +434,7 @@ class Connection extends MY_Controller {
 				'pwd_title'		=> t('Write your password'),
 				'error'			=> $error,
 				'ok'			=> t('OK'),
+				'show_password'	=> t('show_password'),
 				'back'			=> t('back'),
 		);
 		

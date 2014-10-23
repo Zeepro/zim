@@ -14,6 +14,6 @@ $lang['Write your password']
 	= 'Choose a password';
 $lang['OK']
 	= 'OK';
-
-
+$lang['show_password']
+	= 'Show password';
 ?>
