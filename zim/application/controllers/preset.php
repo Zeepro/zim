@@ -560,6 +560,7 @@ class Preset extends MY_Controller {
 				'hide_delete'	=> ($system_preset || $new_preset) ? $display_hide : NULL,
 				'error'			=> $error,
 				'disable_all'	=> ($system_preset && $new_preset == NULL) ? 'true' : 'false',
+				'save_as_value'	=> $new_preset ? NULL : $array_info['name'],
 				// hint for select option of extruder
 				'extruder_left'			=> t('extruder_left'),
 				'extruder_right'		=> t('extruder_right'),
