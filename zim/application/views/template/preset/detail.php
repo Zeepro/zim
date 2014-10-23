@@ -569,7 +569,7 @@
 							<label for="cooling">{cooling}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<select name="fan_always_on" id="fan_always_on" data-role="slider" data-track-theme="a" data-theme="a">
+							<select name="cooling" id="cooling" data-role="slider" data-track-theme="a" data-theme="a">
 								<option value="0">{switch_off}</option>
 								<option value="1" {cooling_value}>{switch_on}</option>
 							</select>
@@ -583,25 +583,25 @@
 							<label for="min_fan_speed">{min_fan_speed}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="text" style="text-align:right;" data-clear-btn="false" name="min_fan_speed" id="min_fan_speed" value="{min_fan_speed_value}">
+							<input type="number" style="text-align:right;" data-clear-btn="false" name="min_fan_speed" id="min_fan_speed" value="{min_fan_speed_value}">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="bridge_fan_speed">{max_fan_speed}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="text" style="text-align:right;" data-clear-btn="false" name="max_fan_speed" id="max_fan_speed" value="{max_fan_speed_value}">
+							<input type="number" style="text-align:right;" data-clear-btn="false" name="max_fan_speed" id="max_fan_speed" value="{max_fan_speed_value}">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="bridge_fan_speed">{bridge_fan_speed}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="text" style="text-align:right;" data-clear-btn="false" name="bridge_fan_speed" id="bridge_fan_speed" value="{bridge_fan_speed_value}">
+							<input type="number" style="text-align:right;" data-clear-btn="false" name="bridge_fan_speed" id="bridge_fan_speed" value="{bridge_fan_speed_value}">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="disable_fan_first_layers">{disable_fan_first_layers}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="text" style="text-align:right;" data-clear-btn="false" name="disable_fan_first_layers" id="disable_fan_first_layers" value="{disable_fan_first_layers_value}" />
+							<input type="number" style="text-align:right;" data-clear-btn="false" name="disable_fan_first_layers" id="disable_fan_first_layers" value="{disable_fan_first_layers_value}" />
 						</div></div>
 					</div>
 				</div>
@@ -612,19 +612,19 @@
 							<label for="fan_below_layer_time">{fan_below_layer_time}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="text" style="text-align:right;" data-clear-btn="false" name="fan_below_layer_time" id="fan_below_layer_time" value="{fan_below_layer_time_value}">
+							<input type="number" style="text-align:right;" data-clear-btn="false" name="fan_below_layer_time" id="fan_below_layer_time" value="{fan_below_layer_time_value}">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="slowdown_below_layer_time">{slowdown_below_layer_time}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="text" style="text-align:right;" data-clear-btn="false" name="slowdown_below_layer_time" id="slowdown_below_layer_time" value="{slowdown_below_layer_time_value}" />
+							<input type="number" style="text-align:right;" data-clear-btn="false" name="slowdown_below_layer_time" id="slowdown_below_layer_time" value="{slowdown_below_layer_time_value}" />
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="min_print_speed">{min_print_speed}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="text" style="text-align:right;" data-clear-btn="false" name="min_print_speed" id="min_print_speed" value="{min_print_speed_value}" />
+							<input type="number" style="text-align:right;" data-clear-btn="false" name="min_print_speed" id="min_print_speed" value="{min_print_speed_value}" />
 						</div></div>
 					</div>
 				</div>
