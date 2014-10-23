@@ -19,7 +19,7 @@ $lang['Wait for unloading...']
 $lang['Not enough filament']
 	= 'Filament insuffisant';
 $lang['Load the filament']
-	= 'Charger le filament';
+	= 'Charger et amorcer le filament';
 $lang['Your cartridge is loaded']
 	= 'Votre cartouche est chargée';
 $lang['Change the cartridge']

@@ -9,7 +9,7 @@
 				<li><a href="/printmodel/listmodel">
 					<h2>{menu_printlist}</h2></a>
 				</li>
-				<li><a href="/sliceupload/upload">
+				<li id="upload_li"><a href="/sliceupload/upload">
 					<h2>{upload}</h2></a>
 				</li>
 			</ul>
@@ -29,4 +29,10 @@
 			<img src="/assets/images/shadow2.png" class="shadow" alt="shadow">
 		</div>
 	</div>
+	<script>
+		var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
+
+		if (iOS)
+			$("#upload_li").remove();
+	</script>
 </div>
