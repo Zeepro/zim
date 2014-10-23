@@ -173,8 +173,8 @@ setInterval(function()
 		$("#ymax").val(endstop["ymax"] ? "Pressed" : "Not pressed");
 		$("#zmin").val(endstop["zmin"] ? "Pressed" : "Not pressed");
 		$("#zmax").val(endstop["zmax"] ? "Pressed" : "Not pressed");
-		$("#E0").val(endstop["E0"] ? "Pressed" : "Not pressed");
-		$("#E1").val(endstop["E1"] ? "Pressed" : "Not pressed");
+		$("#E0").val(endstop["E0"] ? "Filament" : "No filament");
+		$("#E1").val(endstop["E1"] ? "Filament" : "No filament");
 
 		//$("#E1").val(endstop["E1"] ? "on" : "off");
 
