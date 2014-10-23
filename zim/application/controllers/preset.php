@@ -321,14 +321,12 @@ class Preset extends MY_Controller {
 				'first_layer_height'					=> t('first_layer_height'),
 				'perimeters'							=> t('perimeters'),
 				'spiral_vase'							=> t('spiral_vase'),
+				'solid_layers'							=> t('solid_layers'),
 				'top_solid_layers'						=> t('top_solid_layers'),
 				'bottom_solid_layers'					=> t('bottom_solid_layers'),
 				'extra_perimeters'						=> t('extra_perimeters'),
 				'avoid_crossing_perimeters'				=> t('avoid_crossing_perimeters'),
-				// old for 1.0
-// 				'start_perimeters_at_concave_points'	=> t('start_perimeters_at_concave_points'),
-// 				'start_perimeters_at_non_overhang'		=> t('start_perimeters_at_non_overhang'),
-				// end of old for 1.0
+
 				'thin_walls'							=> t('thin_walls'),
 				'overhangs'								=> t('overhangs'),
 				'randomize_start'						=> t('randomize_start'),

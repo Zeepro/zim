@@ -15,6 +15,41 @@ $lang['new_preset_title']
 $lang['submit_button']
 	= 'Enregistrer';
 
+$lang['support_material_interface_speed']
+	= 'Interface des matériaux de support (mm/s or %%)';
+$lang['dont_support_bridges']
+	= 'Désactiver le support de ponts';
+$lang['interface_shells']
+	= 'Parois d\'interfaçage';
+$lang['mutiple_extruder_subtitle3']
+	= 'Avancé';
+$lang['fan_title']
+	= 'Ventilation';
+$lang['fan_subtitle1']
+	= 'Activer';
+$lang['fan_subtitle2']
+	= 'Réglage des ventilateurs';
+$lang['fan_subtitle3']
+	= 'Seuil de refroidissement';
+$lang['min_fan_speed']
+	= 'Vitesse minimum des ventilateurs';
+$lang['max_fan_speed']
+	= 'Vitesse maximum des ventilateurs';
+$lang['fan_always_on']
+	= 'Garder les ventilateurs actifs';
+$lang['cooling']
+	= 'Refroidissement automatique';
+$lang['bridge_fan_speed']
+	= 'Vitesse du ventilateur sur ponts (%%)';
+$lang['disable_fan_first_layers']
+	= 'Désactiver le ventilateur pour les X premières couches';
+$lang['fan_below_layer_time']
+	= 'Activer le ventilateur si le temps d\'impression de la couche est inférieur à';
+$lang['slowdown_below_layer_time']
+	= 'Ralentir le ventilateur si le temps d\'impression de la couche est inférieur à';
+$lang['min_print_speed']
+	= 'Vitesse d\'impression minimale';
+
 $lang['fill_pattern1']
 = 'croisé';
 $lang['fill_pattern2']
@@ -113,10 +148,12 @@ $lang['perimeters']
 	= 'Périmètres (minimum)';
 $lang['spiral_vase']
 	= 'Élévation en spirale';
+$lang['solid_layers']
+	= 'Couches de renfort:';
 $lang['top_solid_layers']
-	= 'Couches de renfort supérieures';
+	= 'Supérieures';
 $lang['bottom_solid_layers']
-	= 'Couches de renfort inférieures';
+	= 'Inférieures';
 $lang['extra_perimeters']
 	= 'Périmètres supplémentaires en cas de besoin';
 $lang['avoid_crossing_perimeters']

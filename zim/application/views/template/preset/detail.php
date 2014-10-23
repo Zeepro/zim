@@ -60,19 +60,19 @@
 					<h4>{layer_perimeter_subtitle3}</h4>
 					<div class="ui-grid-a">
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
-							<label for="slider">Solid layers:</label>
+							<label for="slider">{solid_layers}</label>
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="top_solid_layers" style="padding-left: 2em;">{top_solid_layers}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" style="text-align:right;" data-clear-btn="false" name="top_solid_layers" id="top_solid_layers" value="{top_solid_layers_value}" min="1" max="20">
+							<input type="number" style="text-align:right;" data-clear-btn="false" name="top_solid_layers" id="top_solid_layers" value="{top_solid_layers_value}" min="0" max="20">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="bottom_solid_layers" style="padding-left: 2em;">{bottom_solid_layers}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" style="text-align:right;" data-clear-btn="false" name="bottom_solid_layers" id="bottom_solid_layers" value="{bottom_solid_layers_value}" min="1" max="20">
+							<input type="number" style="text-align:right;" data-clear-btn="false" name="bottom_solid_layers" id="bottom_solid_layers" value="{bottom_solid_layers_value}" min="0" max="20">
 						</div></div>
 					</div>
 				</div>
@@ -95,27 +95,6 @@
 							<select name="avoid_crossing_perimeters" id="avoid_crossing_perimeters" data-role="slider" data-track-theme="a" data-theme="a">
 								<option value="0">{switch_off}</option>
 								<option value="1" {avoid_crossing_perimeters_value}>{switch_on}</option>
-							</select>
-						</div></div>
-						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
-							<label for="slider">Start perimeters at:</label>
-						</div></div>
-						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
-							<label for="start_perimeters_at_concave_points" style="padding-left: 2em;">{start_perimeters_at_concave_points}</label>
-						</div></div>
-						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<select name="start_perimeters_at_concave_points" id="start_perimeters_at_concave_points" data-role="slider" data-track-theme="a" data-theme="a">
-								<option value="0">{switch_off}</option>
-								<option value="1" {start_perimeters_at_concave_points_value}>{switch_on}</option>
-							</select>
-						</div></div>
-						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
-							<label for="start_perimeters_at_non_overhang" style="padding-left: 2em;">{start_perimeters_at_non_overhang}</label>
-						</div></div>
-						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<select name="start_perimeters_at_non_overhang" id="start_perimeters_at_non_overhang" data-role="slider" data-track-theme="a" data-theme="a">
-								<option value="0">{switch_off}</option>
-								<option value="1" {start_perimeters_at_non_overhang_value}>{switch_on}</option>
 							</select>
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
@@ -171,7 +150,7 @@
 							<label for="fill_density">{fill_density}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" style="text-align:right;" data-clear-btn="false" name="fill_density" id="fill_density" value="{fill_density_value}" min="0" max="100" step="0.01">
+							<input type="text" style="text-align:right;" data-clear-btn="false" name="fill_density" id="fill_density" value="{fill_density_value}">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="fill_pattern">{fill_pattern}</label>
@@ -315,6 +294,12 @@
 							<input type="number" style="text-align:right;" data-clear-btn="false" name="support_material_speed" id="support_material_speed" value="{support_material_speed_value}" min="10" max="200">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
+							<label for="support_material_interface_speed">{support_material_interface_speed}</label>
+						</div></div>
+						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
+							<input type="text" style="text-align:right;" data-clear-btn="false" name="support_material_interface_speed" id="support_material_interface_speed" value="{support_material_interface_speed_value}" min="10" max="200">
+						</div></div>
+						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="bridge_speed">{bridge_speed}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
@@ -372,7 +357,7 @@
 							<label for="skirt_height">{skirt_height}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" style="text-align:right;" data-clear-btn="false" name="skirt_height" id="skirt_height" value="{skirt_height_value}" min="0" max="1000">
+							<input type="number" style="text-align:right;" data-clear-btn="false" name="skirt_height" id="skirt_height" value="{skirt_height_value}" min="0" max="6000">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="min_skirt_length">{min_skirt_length}</label>
@@ -472,6 +457,15 @@
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
 							<input type="number" style="text-align:right;" data-clear-btn="false" name="support_material_interface_spacing" id="support_material_interface_spacing" value="{support_material_interface_spacing_value}" min="0" max="10">
 						</div></div>
+						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
+							<label for="dont_support_bridges">{dont_support_bridges}</label>
+						</div></div>
+						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
+							<select name="dont_support_bridges" id="dont_support_bridges" data-role="slider" data-track-theme="a" data-theme="a">
+								<option value="0">{switch_off}</option>
+								<option value="1" {dont_support_bridges_value}>{switch_on}</option>
+							</select>
+						</div></div>
 					</div>
 				</div>
 			</div> <!-- support material -->
@@ -542,7 +536,99 @@
 						</div></div>
 					</div>
 				</div>
+				<div data-role="collapsible" data-collapsed="false" data-theme="d">
+					<h4>{mutiple_extruder_subtitle3}</h4>
+					<div class="ui-grid-a">
+						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
+							<label for="interface_shells">{interface_shells}</label>
+						</div></div>
+						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
+							<select name="interface_shells" id="interface_shells" data-role="slider" data-track-theme="a" data-theme="a">
+								<option value="0">{switch_off}</option>
+								<option value="1" {interface_shells_value}>{switch_on}</option>
+							</select>
+						</div></div>
+					</div>
+				</div>
 			</div> <!-- multiple extruder -->
+			<div data-role="collapsible">
+				<h4>{fan_title}</h4>
+				<div data-role="collapsible" data-collapsed="false" data-theme="d">
+					<h4>{fan_subtitle1}</h4>
+					<div class="ui-grid-a">
+						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
+							<label for="fan_always_on">{fan_always_on}</label>
+						</div></div>
+						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
+							<select name="fan_always_on" id="fan_always_on" data-role="slider" data-track-theme="a" data-theme="a">
+								<option value="0">{switch_off}</option>
+								<option value="1" {fan_always_on_value}>{switch_on}</option>
+							</select>
+						</div></div>
+						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
+							<label for="cooling">{cooling}</label>
+						</div></div>
+						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
+							<select name="fan_always_on" id="fan_always_on" data-role="slider" data-track-theme="a" data-theme="a">
+								<option value="0">{switch_off}</option>
+								<option value="1" {cooling_value}>{switch_on}</option>
+							</select>
+						</div></div>
+					</div>
+				</div>
+				<div data-role="collapsible" data-collapsed="false" data-theme="d">
+					<h4>{fan_subtitle2}</h4>
+					<div class="ui-grid-a">
+						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
+							<label for="min_fan_speed">{min_fan_speed}</label>
+						</div></div>
+						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
+							<input type="text" style="text-align:right;" data-clear-btn="false" name="min_fan_speed" id="min_fan_speed" value="{min_fan_speed_value}">
+						</div></div>
+						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
+							<label for="bridge_fan_speed">{max_fan_speed}</label>
+						</div></div>
+						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
+							<input type="text" style="text-align:right;" data-clear-btn="false" name="max_fan_speed" id="max_fan_speed" value="{max_fan_speed_value}">
+						</div></div>
+						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
+							<label for="bridge_fan_speed">{bridge_fan_speed}</label>
+						</div></div>
+						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
+							<input type="text" style="text-align:right;" data-clear-btn="false" name="bridge_fan_speed" id="bridge_fan_speed" value="{bridge_fan_speed_value}">
+						</div></div>
+						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
+							<label for="disable_fan_first_layers">{disable_fan_first_layers}</label>
+						</div></div>
+						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
+							<input type="text" style="text-align:right;" data-clear-btn="false" name="disable_fan_first_layers" id="disable_fan_first_layers" value="{disable_fan_first_layers_value}" />
+						</div></div>
+					</div>
+				</div>
+				<div data-role="collapsible" data-collapsed="false" data-theme="d">
+					<h4>{fan_subtitle3}</h4>
+					<div class="ui-grid-a">
+						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
+							<label for="fan_below_layer_time">{fan_below_layer_time}</label>
+						</div></div>
+						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
+							<input type="text" style="text-align:right;" data-clear-btn="false" name="fan_below_layer_time" id="fan_below_layer_time" value="{fan_below_layer_time_value}">
+						</div></div>
+						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
+							<label for="slowdown_below_layer_time">{slowdown_below_layer_time}</label>
+						</div></div>
+						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
+							<input type="text" style="text-align:right;" data-clear-btn="false" name="slowdown_below_layer_time" id="slowdown_below_layer_time" value="{slowdown_below_layer_time_value}" />
+						</div></div>
+						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
+							<label for="min_print_speed">{min_print_speed}</label>
+						</div></div>
+						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
+							<input type="text" style="text-align:right;" data-clear-btn="false" name="min_print_speed" id="min_print_speed" value="{min_print_speed_value}" />
+						</div></div>
+					</div>
+				</div>
+			</div> <!-- Fan -->
 			<div data-role="collapsible">
 				<h4>{advanced_title}</h4>
 				<div data-role="collapsible" data-collapsed="false" data-theme="d">

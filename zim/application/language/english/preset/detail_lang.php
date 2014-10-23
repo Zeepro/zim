@@ -105,6 +105,41 @@ $lang['advanced_subtitle3']
 $lang['save_as_title']
 	= 'Save as';
 
+$lang['support_material_interface_speed']
+	= 'Support material interface (mm/s or %%)';
+$lang['dont_support_bridges']
+	= 'Don\'t support bridges';
+$lang['interface_shells']
+	= 'Interface shells';
+$lang['mutiple_extruder_subtitle3']
+	= 'Advanced';
+$lang['fan_title']
+	= 'Fan';
+$lang['fan_subtitle1']
+	= 'Enable';
+$lang['fan_subtitle2']
+	= 'Fan settings';
+$lang['fan_subtitle3']
+	= 'Cooling thresholds';
+$lang['min_fan_speed']
+	= 'Minimum fan speed';
+$lang['max_fan_speed']
+	= 'Maximum fan speed';
+$lang['fan_always_on']
+	= 'Keep fan always on';
+$lang['cooling']
+	= 'Enable auto cooling';
+$lang['bridge_fan_speed']
+	= 'Bridges fan speed (%%)';
+$lang['disable_fan_first_layers']
+	= 'disable fan for the first X layers';
+$lang['fan_below_layer_time']
+	= 'Enable fan if layer print time is below';
+$lang['slowdown_below_layer_time']
+	= 'Slow down if layer print time is below';
+$lang['min_print_speed']
+	= 'Min print speed';
+
 $lang['layer_height']
 	= 'Layer height';
 $lang['first_layer_height']
@@ -113,6 +148,8 @@ $lang['perimeters']
 	= 'Perimeters (minimum)';
 $lang['spiral_vase']
 	= 'Spiral vase';
+$lang['solid_layers']
+	= 'Solid layers:';
 $lang['top_solid_layers']
 	= 'Top';
 $lang['bottom_solid_layers']
