@@ -91,7 +91,6 @@ class Preset extends MY_Controller {
 		$body_page = NULL;
 		$option_selected = 'selected="selected"';
 		$display_hide = 'display: none;';
-		$change_disable = 'disabled="disabled"';
 		$system_preset = FALSE;
 		$error = NULL;
 		
@@ -560,7 +559,7 @@ class Preset extends MY_Controller {
 				'hide_submit'	=> ($system_preset && $new_preset == NULL) ? $display_hide : NULL,
 				'hide_delete'	=> ($system_preset || $new_preset) ? $display_hide : NULL,
 				'error'			=> $error,
-				'disable_all'	=> $system_preset ? $change_disable : NULL,
+				'disable_all'	=> ($system_preset && $new_preset == NULL) ? 'true' : 'false',
 				// hint for select option of extruder
 				'extruder_left'			=> t('extruder_left'),
 				'extruder_right'		=> t('extruder_right'),

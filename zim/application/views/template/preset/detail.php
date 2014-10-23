@@ -710,4 +710,12 @@
 			<div class="zim-error">{error}</div>
 		</div>
 	</div>
+	<script>
+	console.log('{disable_all}');
+		if ({disable_all} == true)
+		{
+			$("input").attr('disabled', 'disabled');
+			$("select").attr('disabled', 'disabled');
+		}
+	</script>
 </div>
