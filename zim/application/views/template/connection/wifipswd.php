@@ -1,4 +1,4 @@
-<div data-role="page">
+<div id="wifipswd_id" data-role="page">
 	<header data-role="header" class="page-header">
 		<a data-icon="arrow-l" data-role="button" data-direction="reverse"
 			data-rel="back">{back}</a>
@@ -27,23 +27,23 @@
 		</div>
 	</div>
 	<script>
-	$(document).on("pagebeforehide", function() {
-		$(".ui-loader").css("display", "none");
-		$("#overlay").removeClass("gray-overlay");
+	$("div#wifipswd_id").on('pageshow', function()
+	{
+		setTimeout(function(){$(".ui-loader").css("display", "none")}, 1);
 	});
-		$("input[type=submit]").on('click', function()
+	$("input[type=submit]").on('click', function()
+	{
+		$(".ui-loader").css('display', 'block');
+	});
+	$("input[name=show_pass]").on("click", function()
+	{
+		if ($("input[name=show_pass]").is(':checked'))
+			$("input[type=password]").attr("type", "text");
+		else
 		{
-			$(".ui-loader").css('display', 'block');
-		});
-		$("input[name=show_pass]").on("click", function()
-		{
-			if ($("input[name=show_pass]").is(':checked'))
-				$("input[type=password]").attr("type", "text");
-			else
-			{
-				$("input[name=password]").attr("type", "password");
-				$("input[name=password_confirm]").attr("type", "password");
-			}
-		});
+			$("input[name=password]").attr("type", "password");
+			$("input[name=password_confirm]").attr("type", "password");
+		}
+	});
 	</script>
 </div>

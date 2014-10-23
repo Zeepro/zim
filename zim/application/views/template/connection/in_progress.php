@@ -12,13 +12,13 @@
 
 <script>
 
-$(document).ready(function()
+$(document).on('pageshow', function()
 {
 	$(".ui-loader").css("display", "block");
 });
 
 /*
-// Start magicDatabase=zsso;User ID=zssologin;Password=V8lu7hb1
+// Start magic
 */
 
 setTimeout(function()
