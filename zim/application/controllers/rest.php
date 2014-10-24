@@ -1663,14 +1663,14 @@ class Rest extends MY_Controller {
 					'encrypt_name'	=> TRUE,
 			);
 			$this->load->library('upload', $upload_config);
-				
-			if ($this->upload->do_upload('f1') and ($name = $this->input->get('name'))) {
+			
+			if ($this->upload->do_upload('f1') and ($name = $this->input->post('name'))) {
 				$f1 = $this->upload->data();
 				if ($this->upload->do_upload('f2')) {
 					$f2 = $this->upload->data();
 				}
 	
-				if ($f1['file_size'] < 100000 && (f2 === NULL || ($f2 && $f2['file_size'] < 100000))) {
+				if ($f1['file_size'] < 100000 && ($f2 === NULL || ($f2 && $f2['file_size'] < 100000))) {
 					$cr = PrinterStoring_storeStl($name, $f1, $f2);
 				}
 				else {
@@ -1795,7 +1795,8 @@ class Rest extends MY_Controller {
 		$this->load->helper('printerstoring');
 	
 		$display = PrinterStoring_listStl();
-		$this->parser->parse('template/plaintxt', array('display' => $display));
+		$this->output->set_content_type(RETURN_CONTENT_TYPE_JSON);
+		echo $display;
 	
 		return;
 	}
@@ -1806,7 +1807,8 @@ class Rest extends MY_Controller {
 		$this->load->helper('printerstoring');
 	
 		$display = PrinterStoring_listGcode();
-		$this->parser->parse('template/plaintxt', array('display' => $display));
+		$this->output->set_content_type(RETURN_CONTENT_TYPE_JSON);
+		echo $display;
 	
 		return;
 	}
