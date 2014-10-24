@@ -85,6 +85,7 @@ class MY_Controller extends CI_Controller {
 		else {
 			$status_current = '';
 			$url_redirect = '';
+			$array_status = array();
 			
 			// check initialization issue
 			if (CoreStatus_checkInInitialization()) {
@@ -122,7 +123,7 @@ class MY_Controller extends CI_Controller {
 				return;
 			}
 			// check working issue
-			else if (!CoreStatus_checkInIdle($status_current)) {
+			else if (!CoreStatus_checkInIdle($status_current, $array_status)) {
 				switch($status_current) {
 					case CORESTATUS_VALUE_RECOVERY: //TODO finish and test me
 						if (CoreStatus_checkCallRecovery($url_redirect)) {
@@ -131,7 +132,7 @@ class MY_Controller extends CI_Controller {
 						break;
 						
 					case CORESTATUS_VALUE_PRINT:
-						if (CoreStatus_checkCallPrinting($url_redirect)) {
+						if (CoreStatus_checkCallPrinting($array_status, $url_redirect)) {
 							return; // we are calling the right page
 						}
 						break;

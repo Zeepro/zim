@@ -961,6 +961,7 @@ function PrinterState_setCartridgeAsArray($abb_cartridge, $data_json = array(), 
 	}
 	$time_offset = gmmktime(0, 0, 0, 1, 1, PRINTERSTATE_OFFSET_YEAR_SETUP_DATE);
 	$time_rfid = ($time_code - $time_offset) / 60 / 60 / 24;
+	if ($time_rfid < 0) $time_rfid = 0; // start at offset if we have a wrong time
 	$temp_hex = strtoupper(dechex($time_rfid));
 	while (strlen($temp_hex) < 4) {
 		$temp_hex = '0' . $temp_hex;

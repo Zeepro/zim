@@ -18,6 +18,18 @@ $lang['video_error']
 	= 'Nous sommes désolés, mais votre terminal ne supporte pas le streaming vidéo HLS.';
 $lang['loading_player']
 	= 'Chargement du lecteur...';
+$lang['Waiting for starting...']
+	= 'En attente de démarrage...';
+$lang['pagetitle_prime']
+	= 'Zim - Détails de l\'amorçage';
+$lang['title_prime']
+	= 'Contrôler votre amorçage';
+$lang['print_detail_prime']
+	= 'Détail de l\'amorçage';
+$lang['cancel_confirm_prime']
+	= "Voulez-vous vraiment arrêter l'amorçage ?";
+$lang['wait_info_prime']
+	= 'En attente de démarrage...';
 
 //printdetail status_ajax()
 $lang['Percentage: %d%%']
@@ -28,8 +40,6 @@ $lang['Temperature of the left extruder: %d °C']
 	= 'Température de l\'extrudeur gauche : <span id="print_detail_info_temper_l_value">%d</span> °C';
 $lang['Temperature of the right extruder: %d °C']
 	= 'Température de l\'extrudeur droit : <span id="print_detail_info_temper_r_value">%d</span> °C';
-$lang['Waiting for starting...']
-	= 'En attente de démarrage...';
 $lang['Printing details']
 	= 'Details de l\'impression';
 $lang['Congratulation, your printing is complete!']
@@ -46,6 +56,8 @@ $lang['button_set_offset']
 	= 'Corriger le décalage';
 $lang['in_finish']
 	= 'En attente de finalisation de l\'impression...';
+$lang['in_finish_prime']
+	= 'En attente de finalisation de l\'amorçage...';
 
 //printdetail cancel()
 $lang['printdetail_cancel_pagetitle']

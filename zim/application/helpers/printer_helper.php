@@ -74,15 +74,17 @@ function Printer_preparePrint($need_prime = TRUE) {
 function Printer_printFromPrime($abb_extruder, $first_run = TRUE) {
 	$name_prime = '';
 	$gcode_path = NULL;
+	$model_id = NULL;
 	$ret_val = 0;
 	$id_model = '';
 	$array_info = array();
 	
 	$CI = &get_instance();
-	$CI->load->helper('printlist');
+	$CI->load->helper(array('printlist', 'corestatus'));
 	
 	switch ($abb_extruder) {
 		case 'l':
+			$model_id = CORESTATUS_VALUE_MID_PRIME_L;
 			if ($first_run == TRUE)
 				$name_prime = PRINTLIST_MODEL_PRIME_L;
 			else
@@ -90,6 +92,7 @@ function Printer_printFromPrime($abb_extruder, $first_run = TRUE) {
 			break;
 			
 		case 'r':
+			$model_id = CORESTATUS_VALUE_MID_PRIME_R;
 			if ($first_run == TRUE)
 				$name_prime = PRINTLIST_MODEL_PRIME_R;
 			else
@@ -116,7 +119,7 @@ function Printer_printFromPrime($abb_extruder, $first_run = TRUE) {
 		}
 		
 		if (Printer__getLengthFromJson($array_info, $array_filament)) {
-			$ret_val = Printer_printFromFile($gcode_path, FALSE, $array_filament);
+			$ret_val = Printer_printFromFile($gcode_path, $model_id, FALSE, $array_filament);
 		}
 		else {
 			$ret_val = ERROR_INTERNAL;
@@ -134,7 +137,7 @@ function Printer_printFromPrime($abb_extruder, $first_run = TRUE) {
 // }
 
 // function Printer_printFromModel($id_model, $stop_printing = FALSE) {
-function Printer_printFromModel($id_model, $exchange_extruder = FALSE, $array_temper = array()) {
+function Printer_printFromModel($id_model, $model_calibration, $exchange_extruder = FALSE, $array_temper = array()) {
 	$gcode_path = NULL;
 	$ret_val = 0;
 	$array_info = array();
@@ -160,7 +163,13 @@ function Printer_printFromModel($id_model, $exchange_extruder = FALSE, $array_te
 			if ($exchange_extruder) {
 				Printer__inverseFilament($array_filament);
 			}
-			$ret_val = Printer_printFromFile($gcode_path, TRUE, $array_filament);
+			if ($model_calibration == TRUE) {
+				$CI = &get_instance();
+				$CI->load->helper('corestatus');
+				
+				$id_model = CORESTATUS_VALUE_MID_CALIBRATION;
+			}
+			$ret_val = Printer_printFromFile($gcode_path, $id_model, TRUE, $array_filament);
 		}
 		else {
 			$ret_val = ERROR_INTERNAL;
@@ -186,7 +195,7 @@ function Printer_printFromSlice($exchange_extruder = FALSE, $array_temper = arra
 	
 	// check filaments
 	//TODO test me
-	$CI->load->helper(array('printerstate', 'json'));
+	$CI->load->helper(array('printerstate', 'json', 'corestatus'));
 	
 	$file_temp_data = $CI->config->item('temp') . SLICER_FILE_TEMP_DATA;
 	$temp_json = json_read($file_temp_data, TRUE);
@@ -217,13 +226,13 @@ function Printer_printFromSlice($exchange_extruder = FALSE, $array_temper = arra
 	}
 	// temporary change end
 	
-	$ret_val = Printer_printFromFile($gcode_path, TRUE, $array_filament);
+	$ret_val = Printer_printFromFile($gcode_path, CORESTATUS_VALUE_MID_SLICE, TRUE, $array_filament);
 	
 	return $ret_val;
 }
 
 // function Printer_printFromFile($gcode_path, $need_prime = TRUE, $stop_printing = FALSE) {
-function Printer_printFromFile($gcode_path, $need_prime = TRUE, $array_filament = array()) {
+function Printer_printFromFile($gcode_path, $model_id, $need_prime = TRUE, $array_filament = array()) {
 	global $CFG;
 	$command = '';
 	$output = array();
@@ -288,7 +297,7 @@ function Printer_printFromFile($gcode_path, $need_prime = TRUE, $array_filament 
 		}
 	
 		// change status json file
-		$ret_val = CoreStatus_setInPrinting();
+		$ret_val = CoreStatus_setInPrinting($model_id);
 // 	}
 // 	else {
 // 		$ret_val = CoreStatus_setInCanceling();

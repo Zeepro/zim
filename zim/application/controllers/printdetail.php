@@ -8,7 +8,8 @@ class Printdetail extends MY_Controller {
 		$this->load->helper( array(
 // 				'printerstate',
 				'url',
-				'json'
+				'json',
+				'corestatus',
 		) );
 	}
 	
@@ -141,7 +142,7 @@ class Printdetail extends MY_Controller {
 				$model_calibration = TRUE;
 			}
 			$this->set_led();
-			$cr = Printer_printFromModel($mid, $exchange_extruder);
+			$cr = Printer_printFromModel($mid, $model_calibration, $exchange_extruder);
 // 			$cr = Printer_startPrintingStatusFromModel($mid);
 			if ($cr != ERROR_OK) {
 				if ($model_calibration) {
@@ -165,7 +166,8 @@ class Printdetail extends MY_Controller {
 //  			$this->output->set_header('Location: /printdetail/status');
 // 		}
 		if ($model_calibration) {
-			$this->output->set_header('Location: /printdetail/status?id=calibration');
+// 			$this->output->set_header('Location: /printdetail/status?id=calibration');
+			$this->output->set_header('Location: /printdetail/status?id=' . CORESTATUS_VALUE_MID_CALIBRATION);
 		}
 		else {
 			$this->output->set_header('Location: /printdetail/status?id=' . $mid);
@@ -197,7 +199,7 @@ class Printdetail extends MY_Controller {
 				$model_calibration = TRUE;
 			}
 			$this->set_led();
-			$cr = Printer_printFromModel($mid, $exchange_extruder, $array_temper);
+			$cr = Printer_printFromModel($mid, $model_calibration, $exchange_extruder, $array_temper);
 			if ($cr != ERROR_OK) {
 				if ($model_calibration) {
 					$this->output->set_header('Location: /printmodel/detail?id=calibration');
@@ -214,7 +216,8 @@ class Printdetail extends MY_Controller {
 		}
 		
 		if ($model_calibration) {
-			$this->output->set_header('Location: /printdetail/status?id=calibration');
+// 			$this->output->set_header('Location: /printdetail/status?id=calibration');
+			$this->output->set_header('Location: /printdetail/status?id=' . CORESTATUS_VALUE_MID_CALIBRATION);
 		}
 		else {
 			$this->output->set_header('Location: /printdetail/status?id=' . $mid);
@@ -237,7 +240,8 @@ class Printdetail extends MY_Controller {
 			return;
 		}
 		else {
-			$this->output->set_header('Location: /printdetail/status?id=slice');
+// 			$this->output->set_header('Location: /printdetail/status?id=slice');
+			$this->output->set_header('Location: /printdetail/status?id=' . CORESTATUS_VALUE_MID_SLICE);
 		}
 		
 		return;
@@ -263,7 +267,8 @@ class Printdetail extends MY_Controller {
 			return;
 		}
 		else {
-			$this->output->set_header('Location: /printdetail/status?id=slice');
+// 			$this->output->set_header('Location: /printdetail/status?id=slice');
+			$this->output->set_header('Location: /printdetail/status?id=' . CORESTATUS_VALUE_MID_SLICE);
 		}
 		
 		return;
@@ -271,11 +276,12 @@ class Printdetail extends MY_Controller {
 	
 	public function end_print() {
 		//TODO need option for changing return page
-		$this->load->helper('printerstate');
+		//TODO finish me
+// 		$this->load->helper('printerstate');
 		
-		foreach(array('l', 'r') as $abb_filament) {
-			PrinterState_setTemperature($array_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1], 'e', $abb_filament);
-		}
+// 		foreach(array('l', 'r') as $abb_filament) {
+// 			PrinterState_setTemperature($array_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1], 'e', $abb_filament);
+// 		}
 		
 		$this->output->set_header('Location: /');
 		
@@ -285,6 +291,7 @@ class Printdetail extends MY_Controller {
 	public function status() {
 		$time_remain = NULL;
 		$body_page = NULL;
+		$pagetitle = NULL;
 		$template_data = array();
 		$data_status = array();
 		$temper_status = array();
@@ -312,12 +319,13 @@ class Printdetail extends MY_Controller {
 		$abb_cartridge = $this->input->get('v');
 		$id = $this->input->get('id');
 		
-		if ($id == 'slice') {
+		if ($id == CORESTATUS_VALUE_MID_SLICE) {
 			$print_slice = TRUE;
+// 			$callback = CORESTATUS_VALUE_MID_SLICE;
 		}
-		else if ($id == 'calibration') {
+		else if ($id == CORESTATUS_VALUE_MID_CALIBRATION) {
 			$print_calibration = TRUE;
-			$callback = 'calibration';
+// 			$callback = CORESTATUS_VALUE_MID_CALIBRATION;
 		}
 		
 		// parse the main body
@@ -348,10 +356,13 @@ class Printdetail extends MY_Controller {
 		
 		if ($print_slice == TRUE) {
 			$template_data['restart_url'] = '/printdetail/printslice';
+			$template_data['return_url']	= '/sliceupload/slice?callback';
 		}
 		else if ($print_calibration == TRUE) {
 // 			$template_data['restart_url'] = '/printdetail/printcalibration';
 			$template_data['restart_url'] = '/printmodel/detail?id=calibration';
+			$template_data['return_url']	= '/printerstate/offset_setting';
+			$template_data['return_button']	= t('button_set_offset');
 		} else if ($abb_cartridge) {
 			$template_data['finish_info']	= t('Restart?');
 // 			$template_data['return_url']	= '/printmodel/detail?id=' . $callback;
@@ -359,26 +370,36 @@ class Printdetail extends MY_Controller {
 			$template_data['return_button']	= t('No');
 			$template_data['var_prime']		= 'true';
 			$template_data['again_button']	= t('Yes');
+			
+			// change wording
+			$template_data['title'] = t('title_prime');
+			$template_data['print_detail'] = t('print_detail_prime');
+			$template_data['cancel_confirm'] = t('cancel_confirm_prime');
+			$template_data['finish_info'] = t('finish_info_prime');
+			$template_data['wait_info'] = t('wait_info_prime');
 		}
-		if ($callback) {
-			if ($callback == 'slice') {
-				$template_data['return_url']	= '/sliceupload/slice?callback';
-			}
-			else if ($callback == 'calibration') {
-				$template_data['return_url']	= '/printerstate/offset_setting';
-				$template_data['return_button']	= t('button_set_offset');
-			}
-			else {
+		
+// 		if ($callback)
+		if ($callback && !in_array($callback, array(CORESTATUS_VALUE_MID_CALIBRATION, CORESTATUS_VALUE_MID_SLICE))) {
+// 			if ($callback == 'slice') {
+// 				$template_data['return_url']	= '/sliceupload/slice?callback';
+// 			}
+// 			else if ($callback == 'calibration') {
+// 				$template_data['return_url']	= '/printerstate/offset_setting';
+// 				$template_data['return_button']	= t('button_set_offset');
+// 			}
+// 			else {
 				$template_data['return_url']	= '/printmodel/detail?id=' . $callback;
-			}
+// 			}
 		}
 		
 		$body_page = $this->parser->parse('template/printdetail/status', $template_data, TRUE);
 		
 		// parse all page
+		$pagetitle = ($abb_cartridge) ? t('pagetitle_prime') : t('ZeePro Personal Printer 21 - Printing details');
 		$template_data = array(
 				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Printing details') . '</title>',
+				'headers'		=> '<title>' . $pagetitle . '</title>',
 				'contents'		=> $body_page,
 		);
 		
@@ -437,8 +458,21 @@ class Printdetail extends MY_Controller {
 		}
 		
 		if ($data_status['print_percent'] == 100) {
+			$current_status = NULL;
+			$array_status = array();
+			
+			CoreStatus_checkInIdle($status_current, $array_status);
+			if (is_array($array_status) && array_key_exists(CORESTATUS_TITLE_PRINTMODEL, $array_status)
+					&& in_array($array_status[CORESTATUS_TITLE_PRINTMODEL],
+							array(CORESTATUS_VALUE_MID_PRIME_L, CORESTATUS_VALUE_MID_PRIME_R)
+					)) {
+				$finish_hint = t('in_finish_prime');
+			}
+			else {
+				$finish_hint = t('in_finish');
+			}
+			
 			$hold_temper = 'true';
-			$finish_hint = t('in_finish');
 		}
 		else {
 			$hold_temper = 'false';

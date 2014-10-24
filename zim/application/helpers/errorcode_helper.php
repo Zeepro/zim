@@ -32,6 +32,9 @@ if (!defined('ERROR_OK')) {
 	define('ERROR_NO_SLICED',		452);
 	define('ERROR_REMOTE_REFUSE',	453);
 	define('ERROR_NO_SLICING',		454);
+	define('ERROR_DISK_FULL',		456);
+	define('ERROR_GCODE_NOTFOUND',	457);
+	define('ERROR_IMG_NOTFOUND',	458);
 	
 	define('ERROR_INTERNAL',		500);
 	
@@ -65,6 +68,9 @@ if (!defined('ERROR_OK')) {
 			ERROR_NO_SLICED			=> 'No sliced model',
 			ERROR_REMOTE_REFUSE		=> 'Remote control not allowed',
 			ERROR_NO_SLICING		=> 'No current slicing',
+			ERROR_DISK_FULL			=> 'Disk Full',
+			ERROR_GCODE_NOTFOUND	=> 'G-code file not found',
+			ERROR_IMG_NOTFOUND		=> 'Image file not found',
 			
 			ERROR_INTERNAL			=> 'Internal API error',
 			404						=> 'Not found',

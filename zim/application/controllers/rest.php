@@ -442,8 +442,8 @@ class Rest extends MY_Controller {
 		
 		$mid = $this->input->get('id'); //return false if missing
 		
-		if ($mid) {
-			$cr = Printer_printFromModel($mid, $exchange_extruder);
+		if ($mid) { //TODO need well defined whether it is a calibration or not
+			$cr = Printer_printFromModel($mid, FALSE, $exchange_extruder);
 		}
 		else {
 			$cr = ERROR_MISS_PRM;
@@ -641,6 +641,7 @@ class Rest extends MY_Controller {
 					break;
 					
 				case PRINTERSTATE_PRM_INFO:
+					//TODO need add SSO account
 					$cr = ERROR_OK;
 					$display = PrinterState_getInfo();
 					break;
@@ -1640,6 +1641,173 @@ class Rest extends MY_Controller {
 			$this->load->view('template/rest/gcodefile_form');
 		}
 		
+		return;
+	}
+	
+
+	public function libstorestl() {
+		$cr = ERROR_OK;
+		$f1 = NULL;
+		$f2 = NULL;
+		$name = NULL;
+	
+		$this->load->helper('printerstoring');
+	
+		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+			$upload_config = array (
+					'upload_path'	=> $this->config->item('temp'),
+					'allowed_types'	=> '*',
+					// 					'allowed_types'	=> 'gcode',
+					'overwrite'		=> TRUE,
+					'remove_spaces'	=> TRUE,
+					'encrypt_name'	=> TRUE,
+			);
+			$this->load->library('upload', $upload_config);
+				
+			if ($this->upload->do_upload('f1') and ($name = $this->input->get('name'))) {
+				$f1 = $this->upload->data();
+				if ($this->upload->do_upload('f2')) {
+					$f2 = $this->upload->data();
+				}
+	
+				if ($f1['file_size'] < 100000 && (f2 === NULL || ($f2 && $f2['file_size'] < 100000))) {
+					$cr = PrinterStoring_storeStl($name, $f1, $f2);
+				}
+				else {
+					$cr = ERROR_TOOBIG_FILE;
+				}
+			}
+			else {
+				// treat error - missing file or name
+				$cr = ERROR_MISS_PRM;
+			}
+	
+			$this->_return_cr($cr);
+		}
+		else {
+			$this->load->view('template/rest/libstorestl_form');
+		}
+	
+		return;
+	}
+	
+	public function librenamestl() {
+		$cr = ERROR_OK;
+		$id = NULL;
+		$name = NULL;
+	
+		$this->load->helper('printerstoring');
+	
+		if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+				
+			if (($id = $this->input->get('id') || ($name = $this->input->get('name')))) {
+				if ((int)$id < 0) {
+					$cr = ERROR_WRONG_PRM;
+				}
+				else {
+					$cr = PrinterStoring_renameStl((int)$id, $name);
+				}
+			}
+			else {
+				$cr = ERROR_MISS_PRM;
+			}
+			$this->_return_cr($cr);
+		}
+		return;
+	}
+	
+	public function libdeletestl() {
+		$cr = ERROR_OK;
+		$id = NULL;
+	
+		$this->load->helper('printerstoring');
+	
+		if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+				
+			if (($id = $this->input->get('id'))) {
+				if ((int)$id < 0) {
+					$cr = ERROR_WRONG_PRM;
+				}
+				else {
+					$cr = PrinterStoring_deleteStl((int)$id);
+				}
+			}
+			else {
+				$cr = ERROR_MISS_PRM;
+			}
+			$this->_return_cr($cr);
+		}
+		return;
+	}
+	
+	public function librenamegcode() {
+		$cr = ERROR_OK;
+		$id = NULL;
+		$name = NULL;
+	
+		$this->load->helper('printerstoring');
+	
+		if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+				
+			if (($id = $this->input->get('id') || ($name = $this->input->get('name')))) {
+				if ((int)$id < 0) {
+					$cr = ERROR_WRONG_PRM;
+				}
+				else {
+					$cr = PrinterStoring_renameGcode((int)$id, $name);
+				}
+			}
+			else {
+				$cr = ERROR_MISS_PRM;
+			}
+			$this->_return_cr($cr);
+		}
+		return;
+	}
+	
+	public function libdeletegcode() {
+		$cr = ERROR_OK;
+		$id = NULL;
+	
+		$this->load->helper('printerstoring');
+	
+		if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+				
+			if (($id = $this->input->get('id'))) {
+				if ((int)$id < 0) {
+					$cr = ERROR_WRONG_PRM;
+				}
+				else {
+					$cr = PrinterStoring_deleteGcode((int)$id);
+				}
+			}
+			else {
+				$cr = ERROR_MISS_PRM;
+			}
+			$this->_return_cr($cr);
+		}
+		return;
+	}
+	
+	public function libliststl() {
+		$display = '';
+	
+		$this->load->helper('printerstoring');
+	
+		$display = PrinterStoring_listStl();
+		$this->parser->parse('template/plaintxt', array('display' => $display));
+	
+		return;
+	}
+	
+	public function liblistgcode() {
+		$display = '';
+	
+		$this->load->helper('printerstoring');
+	
+		$display = PrinterStoring_listGcode();
+		$this->parser->parse('template/plaintxt', array('display' => $display));
+	
 		return;
 	}
 }

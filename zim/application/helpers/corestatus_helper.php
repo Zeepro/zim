@@ -24,6 +24,7 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_TITLE_LASTERROR',	'LastError');
 // 	define('CORESTATUS_TITLE_LASTSTATUS',	'LastState');
 	define('CORESTATUS_TITLE_SUBSTATUS',	'Substate');
+	define('CORESTATUS_TITLE_PRINTMODEL',	'PrintMID');
 	
 	define('CORESTATUS_VALUE_IDLE',				'idle');
 	define('CORESTATUS_VALUE_PRINT',			'printing');
@@ -38,6 +39,13 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 // 	define('CORESTATUS_VALUE_UPGRADE',			'upgrading');
 	define('CORESTATUS_VALUE_RECOVERY',			'recovery');
 	define('CORESTATUS_VALUE_USB',				'usb_connected');
+	define('CORESTATUS_VALUE_MID_SLICE',		'slice');
+	define('CORESTATUS_VALUE_MID_PRIME_R',		'prime_right');
+	define('CORESTATUS_VALUE_MID_PRIME_L',		'prime_left');
+// 	define('CORESTATUS_VALUE_MID_REPRIME_R',	'remprime_right');
+// 	define('CORESTATUS_VALUE_MID_REPRIME_L',	'remprime_left');
+// 	define('CORESTATUS_VALUE_MID_CANCEL',		'cancel');
+	define('CORESTATUS_VALUE_MID_CALIBRATION',	'calibration');
 	
 	define('CORESTATUS_CMD_CHECK_SD',		'echo writable > ');
 	define('CORESTATUS_SUFFIX_CONF',		'conf/');
@@ -302,8 +310,33 @@ function CoreStatus_checkCallUSB(&$url_redirect = '') {
 	return CoreStatus__checkCallController('usb');
 }
 
-function CoreStatus_checkCallPrinting(&$url_redirect = '') {
+function CoreStatus_checkCallPrinting($array_status = array(), &$url_redirect = '') {
 	$url_redirect = '/printdetail/status';
+	
+	if (is_array($array_status) && array_key_exists(CORESTATUS_TITLE_PRINTMODEL, $array_status)) {
+		switch ($array_status[CORESTATUS_TITLE_PRINTMODEL]) {
+			case CORESTATUS_VALUE_MID_PRIME_R:
+				$url_redirect .= '?v=r';
+				break;
+				
+			case CORESTATUS_VALUE_MID_PRIME_L:
+				$url_redirect .= '?v=l';
+				break;
+				
+			case CORESTATUS_VALUE_MID_SLICE:
+			case CORESTATUS_VALUE_MID_CALIBRATION:
+			default:
+				if (is_null($array_status[CORESTATUS_TITLE_PRINTMODEL])) {
+					$CI = &get_instance();
+					$CI->load->helper('printerlog');
+					PrinterLog_logMessage('null printing model id stored in status file', __FILE__, __LINE__);
+				}
+				else {
+					$url_redirect .= '?id=' . $array_status[CORESTATUS_TITLE_PRINTMODEL];
+				}
+				break;
+		}
+	}
 	
 	return CoreStatus__checkCallURI(array(
 			'/printdetail/status'		=> NULL,
@@ -474,6 +507,7 @@ function CoreStatus_checkCallNoBlockPageInConnection() {
 
 function CoreStatus_setInIdle($last_error = FALSE, $error_message = FALSE) {
 	$status_previous = '';
+	$array_status = array(CORESTATUS_TITLE_STARTTIME => NULL);
 	$ret_val = CoreStatus_checkInIdle($status_previous);
 	if ($ret_val == TRUE) {
 		return TRUE; // we are already in idle
@@ -491,6 +525,7 @@ function CoreStatus_setInIdle($last_error = FALSE, $error_message = FALSE) {
 // 		}
 		
 		CoreStatus_setInPause(FALSE); // not necessary in any case, just a safty
+		$array_status[CORESTATUS_TITLE_PRINTMODEL] = NULL;
 	}
 // 	else if ($status_previous == CORESTATUS_VALUE_UNLOAD_FILA_L
 // 			|| $status_previous == CORESTATUS_VALUE_UNLOAD_FILA_R) {
@@ -504,18 +539,11 @@ function CoreStatus_setInIdle($last_error = FALSE, $error_message = FALSE) {
 	if ($last_error !== FALSE) {
 		// add last_error for slicing
 		//TODO perhaps also check $status_previous == CORESTATUS_VALUE_SLICE ?
-		return CoreStatus__setInStatus(CORESTATUS_VALUE_IDLE,
-				array(
-						CORESTATUS_TITLE_STARTTIME	=> NULL,
-						CORESTATUS_TITLE_LASTERROR	=> $last_error,
-						CORESTATUS_TITLE_MESSAGE	=> $error_message ? $error_message : NULL,
-				)
-		);
+		$array_status[CORESTATUS_TITLE_LASTERROR] = $last_error;
+		$array_status[CORESTATUS_TITLE_MESSAGE] = $error_message ? $error_message : NULL;
 	}
 	
-	return CoreStatus__setInStatus(CORESTATUS_VALUE_IDLE,
-			array(CORESTATUS_TITLE_STARTTIME => NULL)
-	);
+	return CoreStatus__setInStatus(CORESTATUS_VALUE_IDLE, $array_status);
 }
 
 function CoreStatus_cleanSliced() {
@@ -555,8 +583,9 @@ function CoreStatus_cleanSliced() {
 // 	);
 // }
 
-function CoreStatus_setInPrinting($stop_printing = FALSE) {
-	if ($stop_printing == FALSE) {
+// function CoreStatus_setInPrinting($model_id, $stop_printing = FALSE) {
+function CoreStatus_setInPrinting($model_id) {
+// 	if ($stop_printing == FALSE) {
 		// start camera http live streaming
 		$ret_val = 0;
 		
@@ -568,20 +597,23 @@ function CoreStatus_setInPrinting($stop_printing = FALSE) {
 // 		}
 		
 		return CoreStatus__setInStatus(CORESTATUS_VALUE_PRINT,
-				array(CORESTATUS_TITLE_STARTTIME => time())
+				array(
+						CORESTATUS_TITLE_STARTTIME	=> time(),
+						CORESTATUS_TITLE_PRINTMODEL	=> $model_id,
+				)
 		);
-	}
-	else {
-		//TODO check if we need remaining time for canceling or not?
-		return CoreStatus__setInStatus(CORESTATUS_VALUE_CANCEL);
-// 		return CoreStatus__setInStatus(CORESTATUS_VALUE_CANCEL,
-// 				array(CORESTATUS_TITLE_STARTTIME => time())
-// 		);
-	}
+// 	}
+// 	else {
+// 	}
 }
 
 function CoreStatus_setInCanceling() {
-	return CoreStatus_setInPrinting(TRUE);
+// 	return CoreStatus_setInPrinting(CORESTATUS_VALUE_MID_CANCEL, TRUE);
+	//TODO check if we need remaining time for canceling or not?
+// 	return CoreStatus__setInStatus(CORESTATUS_VALUE_CANCEL,
+// 			array(CORESTATUS_TITLE_STARTTIME => time())
+// 	);
+	return CoreStatus__setInStatus(CORESTATUS_VALUE_CANCEL);
 }
 
 function CoreStatus_setInPause($value = TRUE) {

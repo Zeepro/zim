@@ -429,23 +429,23 @@ class Sliceupload extends MY_Controller {
 						$array_return = array();
 						
 						$this->load->helper('slicer');
-// 						$cr = Slicer_addModel($array_model);
-						$cr = Slicer_addModel($array_model, FALSE, $array_return);
-						if ($cr == ERROR_OK) {
-							try {
-								if ($array_return[SLICER_TITLE_MAXSCALE] < 100) {
-									$display = json_encode($array_return);
-									$this->output->set_status_header(202);
-									$this->output->set_content_type('txt_u');
-									$this->load->library('parser');
-									$this->parser->parse('template/plaintxt', array('display' => $display)); //optional
+						$cr = Slicer_addModel($array_model);
+// 						$cr = Slicer_addModel($array_model, FALSE, $array_return);
+// 						if ($cr == ERROR_OK) {
+// 							try {
+// 								if ($array_return[SLICER_TITLE_MAXSCALE] < 100) {
+// 									$display = json_encode($array_return);
+// 									$this->output->set_status_header(202);
+// 									$this->output->set_content_type('txt_u');
+// 									$this->load->library('parser');
+// 									$this->parser->parse('template/plaintxt', array('display' => $display)); //optional
 									
-									return;
-								}
-							} catch (Exception $e) {
-								$cr = ERROR_INTERNAL;
-							}
-						}
+// 									return;
+// 								}
+// 							} catch (Exception $e) {
+// 								$cr = ERROR_INTERNAL;
+// 							}
+// 						}
 					}
 				}
 			}
