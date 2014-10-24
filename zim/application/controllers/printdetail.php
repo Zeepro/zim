@@ -511,6 +511,8 @@ class Printdetail extends MY_Controller {
 		if ($ret_val == TRUE) {
 			$template_data = array();
 			$body_page = '';
+			$status_current = NULL;
+			$array_status = array();
 			
 			$this->load->library('parser');
 			$this->lang->load('printdetail', $this->config->item('language'));
@@ -530,6 +532,14 @@ class Printdetail extends MY_Controller {
 					'return_url'	=> '/',
 					'video_url'		=> $this->config->item('video_url'),
 			);
+			
+			CoreStatus_checkInIdle($status_current, $array_status);
+			if (is_array($array_status) && array_key_exists(CORESTATUS_TITLE_PRINTMODEL, $array_status)
+					&& in_array($array_status[CORESTATUS_TITLE_PRINTMODEL],
+							array(CORESTATUS_VALUE_MID_PRIME_L, CORESTATUS_VALUE_MID_PRIME_R)
+					)) {
+				$template_data['title'] = t('title_prime');
+			}
 			
 			$body_page = $this->parser->parse('template/printdetail/cancel', $template_data, TRUE);
 			
