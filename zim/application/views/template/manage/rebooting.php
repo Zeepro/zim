@@ -18,7 +18,7 @@
 	<script>
 		var ping = new Image();
 
-		ping.src = "/assets/images/pixel.png";
+		ping.src = "/assets/images/pixel.png?_=" + (new Date()).getTime();
 		setTimeout(function()
 		{
 			var interval = setInterval(function()
