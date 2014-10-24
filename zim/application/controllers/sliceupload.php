@@ -254,6 +254,7 @@ class Sliceupload extends MY_Controller {
 				'model_xrot'	=> $current_xrot,
 				'model_yrot'	=> $current_yrot,
 				'model_zrot'	=> $current_zrot,
+				'preview_fail'	=> t('preview_fail'),
 		);
 		$body_page = $this->parser->parse('template/sliceupload/slice', $template_data, TRUE);
 		
@@ -982,6 +983,11 @@ class Sliceupload extends MY_Controller {
 		
 		if ($cr != ERROR_OK) {
 			$display = $cr . " " . t(MyERRMSG($cr));
+		}
+		else if (!file_exists(realpath($path_image))) {
+			// in the case: $cr == ERROR_OK 
+			$cr = 202;
+			$display = 'preview image unavailable';
 		}
 		$this->output->set_status_header($cr, ($cr != ERROR_OK) ? $display : 'ok');
 		$this->output->set_content_type('txt_u');

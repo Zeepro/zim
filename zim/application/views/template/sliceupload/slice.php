@@ -119,6 +119,14 @@ function getPreview(var_control) {
 		timeout: 1000*60*10,
 	})
 	.done(function(html) {
+		if (var_preview.status == 202) {
+			alert("{preview_fail}");
+			$("#preview_zone").html("{preview_fail}");
+			$("a#slice_button").removeClass("ui-disabled");
+			
+			return;
+		}
+		
 		// html => link to image
 		var var_html = '<div id="control_general_group">'
 			+ '<button id="preview_near_button" data-inline="true" data-icon="plus" data-iconpos="left"'
