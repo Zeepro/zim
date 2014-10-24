@@ -64,6 +64,7 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_VALUE_MODE_OFF',		'off');
 	define('ZIMAPI_VALUE_MODE_HLS',		'hls');
 	define('ZIMAPI_TITLE_PRESET',		'preset');
+	define('ZIMAPI_PRM_UTIL_REBOOT',	' reboot');
 	
 	define('ZIMAPI_TITLE_PRESET_ID',		'id');
 	define('ZIMAPI_TITLE_PRESET_NAME',		'name');
@@ -1427,6 +1428,21 @@ function ZimAPI_setSSH($mode) {
 	}
 	
 	return ERROR_OK;
+}
+
+function ZimAPI_reboot() {
+	$output = array();
+	$ret_val = 0;
+	$CI = &get_instance();
+	$command = 'sudo ' . $CI->config->item('siteutil') . ZIMAPI_PRM_UTIL_REBOOT;
+	
+	exec($command, $output, $ret_val);
+	
+	if ($ret_val == ERROR_NORMAL_RC_OK) {
+		return ERROR_OK;
+	}
+	
+	return ERROR_INTERNAL;
 }
 
 function ZimAPI_getPresetInfoAsArray($preset_id, &$array_info, &$system_preset = NULL, $set_localization = TRUE) {
