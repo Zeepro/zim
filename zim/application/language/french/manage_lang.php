@@ -31,6 +31,8 @@ $lang['left']
 	= "Gauche";
 $lang['right']
 	= "Droite";
+$lang['reboot']
+	= "Redémarrer zim";
 $lang['video_error']
 	= 'Nous sommes désolés, mais votre terminal ne supporte pas le streaming vidéo HLS.';
 $lang['bed_hint']

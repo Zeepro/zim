@@ -47,8 +47,7 @@ setTimeout(function()
 					localip = data.localIP;
 				}
 			},
-//			error:function (xhr, ajaxOptions, thrownError){
-//			}
+//			error:function (xhr, ajaxOptions, thrownError){}
 		});
 		}
 

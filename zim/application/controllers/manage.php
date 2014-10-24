@@ -51,6 +51,7 @@ class Manage extends MY_Controller {
 				'bed_hint'		=> t('bed_hint'),
 				'video_error'	=> t('video_error'),
 				'video_url'		=> $this->config->item('video_url'),
+				'reboot'		=> t('reboot'),
 				'lighting_title'=> t('lighting_title'),
 				'strip_led'		=> t('strip_led'),
 				'head_led'		=> t('head_led'),
@@ -170,6 +171,55 @@ class Manage extends MY_Controller {
 			}
 		}	
 		$this->output->set_status_header(200);
+		return;
+	}
+	
+	public function rebooting()
+	{
+		$this->load->library('parser');
+		$this->load->helper('zimapi');
+		
+		$this->lang->load('manage/reboot', $this->config->item('language'));
+		$template_data = array(
+				'hint'	=> t('hint'),
+		);
+		$this->parser->parse('template/manage/rebooting', $template_data);
+		$body_page = $this->parser->parse('template/manage/index', $template_data, TRUE);
+		
+		if (ZimAPI_reboot() == ERROR_OK)
+		{
+			$template_data = array(
+				'lang'			=> $this->config->item('language_abbr'),
+				'headers'		=> '<title>' . t('title_reboot') . '</title>' . "\n"
+				. '<link rel="stylesheet" href="/assets/jquery-mobile-fluid960.min.css">',
+				'contents'		=> $body_page,
+			);
+			$this->parser->parse('template/basetemplate', $template_data);
+		}	
+		return;
+	}
+
+	public function reboot_confirm()
+	{
+		$this->load->library('parser');
+		$this->lang->load('manage/reboot', $this->config->item('language'));
+		$template_data = array(
+			'confirm_message'	=> t('confirm_message'),
+			'yes_reboot'		=> t('yes_reboot'),
+			'no_reboot'			=> t('no_reboot')
+		);
+		$this->parser->parse('template/manage/reboot_confirm', $template_data);
+		$body_page = $this->parser->parse('template/manage/index', $template_data, TRUE);
+		
+		// parse all page
+		$template_data = array(
+				'lang'			=> $this->config->item('language_abbr'),
+				'headers'		=> '<title>' . t('title_reboot') . '</title>' . "\n"
+				. '<link rel="stylesheet" href="/assets/jquery-mobile-fluid960.min.css">',
+				'contents'		=> $body_page,
+		);
+		
+		$this->parser->parse('template/basetemplate', $template_data);
 		return;
 	}
 

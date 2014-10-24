@@ -31,6 +31,8 @@ $lang['left']
 	= "Left";
 $lang['right']
 	= "Right";
+$lang['reboot']
+	= "Reboot zim";
 $lang['video_error']
 	= 'We\'re sorry, but your device is not compatible with HLS video streaming.';
 $lang['bed_hint']

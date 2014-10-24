@@ -183,6 +183,7 @@
 					</table>
 				</div>
 			</div>
+			<a href="/manage/reboot_confirm"data-role="button">{reboot}</a>
 		</div>
 	</div>
 
