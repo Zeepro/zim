@@ -18,17 +18,17 @@
 	<script>
 		var ping = new Image();
 
-		ping.src = "/assets/images/pixel.png?_=" + (new Date()).getTime();
 		setTimeout(function()
 		{
 			var interval = setInterval(function()
 			{
+				ping.src = "/assets/images/pixel.png?_=" + (new Date()).getTime();
 				if (ping.height > 0)
 				{
 					clearInterval(interval);
 					window.location.href = "/";
 				}
-			}, 500);
+			}, 5000);
 		}, 25000);
 	</script>
 </div>
