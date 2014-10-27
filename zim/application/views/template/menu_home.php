@@ -15,6 +15,14 @@
 				</li>
 			</ul>
 			<ul data-role="listview" id="listview" class="shadowBox" data-inset="true">
+				<li>
+					<a href="#"><h2>{my_library}</h2></a>
+				</li>
+				<li>
+					<a href="#"><h2>{my_zim_shop}</h2></a>
+				</li>
+			</ul>
+			<ul data-role="listview" id="listview" class="shadowBox" data-inset="true">
 				<li><a href="/manage" data-ajax="false">
 					<h2>{manage}</h2></a>
 				</li>

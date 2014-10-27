@@ -31,6 +31,8 @@ class Menu_home extends MY_Controller {
 		$template_data = array(
 // 				'title'				=> t('Home'),
 				'update_available'	=> $need_update ? t('update_available') : "",
+				'my_library'		=> t('my_library'),
+				'my_zim_shop'		=> t('my_zim_shop'),
 				'menu_printlist'	=> t('Quick print'),
 				'menu_printerstate'	=> t('Configuration'),
 				'manage'			=> t('manage'),

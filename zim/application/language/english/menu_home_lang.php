@@ -13,5 +13,9 @@ $lang['upload']
 	= 'Import a model';
 $lang['about']
 	= 'About my zim';
+$lang['my_library']
+	= 'My library';
+$lang['my_zim_shop']
+	= 'My zim shop';
 $lang['update_available']
 	= 'New software upgrade available – restart your zim to install it';
