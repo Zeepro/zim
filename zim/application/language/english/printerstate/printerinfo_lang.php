@@ -6,9 +6,9 @@ $lang['back']
 $lang['printerstate_printerinfo_pagetitle']
 	= 'Zim - Information';
 $lang['version_title']
-	= 'Software version';
+	= 'Current software version';
 $lang['next_version_title']
-	= 'Software version (after reboot)';
+	= 'Software version after restart';
 $lang['type_title']
 	= 'Type';
 $lang['serial_title']
