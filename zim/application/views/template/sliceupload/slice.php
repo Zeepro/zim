@@ -120,7 +120,7 @@ function getPreview(var_control) {
 	})
 	.done(function(html) {
 		if (var_preview.status == 202) {
-			alert("{preview_fail}");
+// 			alert("{preview_fail}");
 			$("#preview_zone").html("{preview_fail}");
 			$("a#slice_button").removeClass("ui-disabled");
 			
