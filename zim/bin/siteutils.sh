@@ -139,6 +139,9 @@ case "$1" in
 		unload_filament $2 $3
 		;;
 		
+	reboot)
+		/sbin/reboot -i
+		
 	*)
 		echo "Usage: $0 {force_reco|start_tomboning|stop_romboning|status_tomboning|restart_arcontrol|*}"
 		exit 1

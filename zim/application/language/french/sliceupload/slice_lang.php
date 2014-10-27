@@ -35,4 +35,4 @@ $lang['cancel_button']
 $lang['wait_cancel']
 	= 'Annulation en cours...';
 $lang['preview_fail']
-	= 'Image indisponible, merci de réessayer ultérieurement';
+	= 'Image indisponible';
