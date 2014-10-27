@@ -4,6 +4,7 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
+			<b>{update_available}<b>
 <!-- 			<h2>{title}</h2> -->
 			<ul data-role="listview" id="listview" class="shadowBox" data-inset="true">
 				<li><a href="/printmodel/listmodel">

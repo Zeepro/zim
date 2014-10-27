@@ -13,3 +13,5 @@ $lang['upload']
 	= 'Importer un modèle';
 $lang['about']
 	= 'Informations sur ma zim';
+$lang['update_available']
+	= 'Un mise à jour du logiciel est disponible – Veuillez redémarrer votre zim pour l\'installer';

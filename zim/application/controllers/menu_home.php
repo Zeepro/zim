@@ -11,11 +11,12 @@ class Menu_home extends MY_Controller {
 		) );
 	}
 	
-	public function index() {
+	public function index()
+	{
 		$template_data = array();
 		$body_page = NULL;
-		$sso_name = NULL;
-
+		$need_update = FALSE;
+	
 		$this->load->library('parser');
 		$this->lang->load('menu_home', $this->config->item('language'));
 		$this->load->helper('zimapi');
@@ -25,10 +26,11 @@ class Menu_home extends MY_Controller {
 			$this->load->helper('printerlog');
 			PrinterLog_logError('can not turn off camera', __FILE__, __LINE__);
 		}
-		
-		// parse the main body
+		$need_update = !(ZimAPI_getVersion(TRUE) == ZimAPI_getVersion(FALSE));
+		//parse the main body
 		$template_data = array(
 // 				'title'				=> t('Home'),
+				'update_available'	=> $need_update ? t('update_available') : "",
 				'menu_printlist'	=> t('Quick print'),
 				'menu_printerstate'	=> t('Configuration'),
 				'manage'			=> t('manage'),
