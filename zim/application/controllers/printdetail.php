@@ -375,7 +375,7 @@ class Printdetail extends MY_Controller {
 			$template_data['title'] = t('title_prime');
 			$template_data['print_detail'] = t('print_detail_prime');
 			$template_data['cancel_confirm'] = t('cancel_confirm_prime');
-			$template_data['finish_info'] = t('finish_info_prime');
+// 			$template_data['finish_info'] = t('finish_info_prime');
 			$template_data['wait_info'] = t('wait_info_prime');
 		}
 		
