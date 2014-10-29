@@ -3,9 +3,11 @@
 if (!defined('BASEPATH'))
 	exit('No direct script access allowed');
 
-class Account extends MY_Controller {
+class Account extends MY_Controller
+{
 	//FIXME rewrite totally this controller and pass core function to helper
-	private function _assign_wizard($email, $password) {
+	private function _assign_wizard($email, $password)
+	{
 		$context = NULL;
 		$printer_name = NULL;
 		$cr = 0;
@@ -62,7 +64,7 @@ class Account extends MY_Controller {
 				catch (Exception $e)
 				{
 					//TODO:error handling
-					die();
+					$this->output->set_header('Location: /activation');
 				}
 				
 				$result = substr($http_response_header[0], 9, 3);
@@ -72,17 +74,23 @@ class Account extends MY_Controller {
 					$this->load->helper('corestatus');
 					if (CoreStatus_checkInConnection()) {
 						$cr = $this->_assign_wizard($email, $password);
-						if ($cr == TRUE) {
+						if ($cr == TRUE)
+						{
+							//Save creds in session
+							$custom_data = array('email' => $email, 'password' => $password);
+							$this->session->set_userdata($custom_data);
+
 							$this->output->set_header('Location: /activation/wizard_confirm');
 						}
 						else {
 							$this->output->set_header('Location: /activation/wizard_confirm/fail');
 						}
-						
 						return;
 					}
 					
 					$file = 'template/activation/activation_form';
+					$custom_data = array('email' => $email, 'password' => $password);
+					$this->session->set_userdata($custom_data);
 					$data = array('email' =>$email, 'password' => $password, 'returnUrl' => isset($_GET['returnUrl']) ? ('?returnUrl='.$_GET['returnUrl']) : '');
 				}
 				else //error, for example bad password
@@ -133,7 +141,7 @@ class Account extends MY_Controller {
 			{
 				extract($_POST);
 				$url = 'https://sso.zeepro.com/confirmaccount.ashx';
-				$data = array('email' => $email, 'code' => $code);
+				$data = array('email' => $this->session->userdata('email'), 'code' => $code);
 			
 				$options = array('http' => array('header'  => "Content-type: application/x-www-form-urlencoded\r\n",
 						'method'  => 'POST',
@@ -251,8 +259,7 @@ class Account extends MY_Controller {
 				file_get_contents('https://sso.zeepro.com/createaccount.ashx', false, $context);
 				$result = substr($http_response_header[0], 9, 3);
 				if ($result == 200) {
-					$this->session->set_flashdata('email', $email);
-					$this->session->set_flashdata('password', $password);
+					$this->session->set_userdata($data);
 					redirect('/account/signup_confirmation');
 				}
 			}
