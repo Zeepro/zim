@@ -208,7 +208,8 @@ class Account extends MY_Controller
 		$body_page = NULL;
 		$template_data = array();
 		$data = array();
-		
+		$data['error'] = "";
+
 		$this->load->library('parser');
 		$this->lang->load('signup', $this->config->item('language'));
 		$this->load->helper(array('url','corestatus'));
@@ -256,13 +257,20 @@ class Account extends MY_Controller
 						)
 				);
 				$context = stream_context_create($options);
-				file_get_contents('https://sso.zeepro.com/createaccount.ashx', false, $context);
+				@file_get_contents('https://sso.zeepro.com/createaccount.ashx', false, $context);
 				$result = substr($http_response_header[0], 9, 3);
-				if ($result == 200) {
+				if ($result == 200)
+				{
 					$this->session->set_userdata($data);
 					redirect('/account/signup_confirmation');
 				}
+				else if ($result == 437)
+					$data['error'] = t('account_exists') . '<br />';
+				else if ($result == 432)
+					$data['error'] = t('missing_parameter') . '<br />';
 			}
+			else
+				$data['error'] = t('missing_parameter') . '<br />';
 		}
 		
 		// add skip button if in wizard

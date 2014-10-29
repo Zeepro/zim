@@ -9,3 +9,5 @@ $lang['show_password'] = 'Show passwords';
 $lang['Password'] = 'Password';
 $lang['Confirm Password'] = 'Confirm your password';
 $lang['button_skip'] = 'Skip';
+$lang['account_exists'] = 'This email address is already registered';
+$lang['missing_parameter'] = 'All fields are required';

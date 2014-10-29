@@ -8,7 +8,9 @@
 	<div data-role="content">
 		<div id="container">
 			<h1>{signup_title}</h1>
-				<h3>{signup_text}</h3>
+			<h3>{signup_text}</h3>
+			<div class="zim-error">{error}</div>
+			<br />	
 		<?php
 			$this->load->helper('form');
 			

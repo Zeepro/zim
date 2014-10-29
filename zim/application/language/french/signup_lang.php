@@ -9,3 +9,5 @@ $lang['Password'] = 'Mot de passe';
 $lang['Confirm Password'] = 'Confirmez votre mot de passe';
 $lang['button_skip'] = 'Omettre';
 $lang['show_password'] = 'Afficher les mots de passe';
+$lang['account_exists'] = 'Cette adresse email est déjà enregistrée';
+$lang['missing_parameter'] = 'Tous les champs sont obligatoires';
