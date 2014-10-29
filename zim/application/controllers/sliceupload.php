@@ -255,6 +255,7 @@ class Sliceupload extends MY_Controller {
 				'model_yrot'	=> $current_yrot,
 				'model_zrot'	=> $current_zrot,
 				'preview_fail'	=> t('preview_fail'),
+				'setmodel_fail'	=> t('setmodel_fail'),
 		);
 		$body_page = $this->parser->parse('template/sliceupload/slice', $template_data, TRUE);
 		
@@ -780,7 +781,7 @@ class Sliceupload extends MY_Controller {
 				// check material difference for all used cartridges
 				if (!in_array($tmp_ret, array(
 						ERROR_INTERNAL, ERROR_MISS_LEFT_CART, ERROR_MISS_RIGT_CART,
-				))) {
+				)) && $volume_need > 0) {
 					if ($material == NULL) {
 						$material = $data_cartridge[PRINTERSTATE_TITLE_MATERIAL];
 					}

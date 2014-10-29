@@ -36,3 +36,5 @@ $lang['wait_cancel']
 	= 'Annulation en cours...';
 $lang['preview_fail']
 	= 'Image indisponible';
+$lang['setmodel_fail']
+	= "Oops ! Le modèle dépasse la limite du plateau d'impression.";

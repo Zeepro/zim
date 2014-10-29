@@ -311,7 +311,7 @@ function changeModel(var_action) {
 		getPreview();
 	})
 	.fail(function() { // not allowed
-		alert('failed');
+		alert("{setmodel_fail}");
 		
 		// reverse the original state
 		switch (var_action) {

@@ -36,3 +36,5 @@ $lang['wait_cancel']
 	= 'Cancelling...';
 $lang['preview_fail']
 	= 'Image unavailable';
+$lang['setmodel_fail']
+	= 'Oops! The item exceeds the available printing surface.';
