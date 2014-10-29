@@ -126,6 +126,10 @@ class Activation extends MY_Controller
 			case NULL:
 				$hint_txt = t('wizard_success_hint', array($hostname, $hostname, $hostname));
 				$hint_title = t('hint_title_success');
+
+				// send email
+				$email = $this->session->userdata('email');
+				@file_get_contents('https://sso.zeepro.com/sendtipsmail.ashx?email='.$email);
 				break;
 				
 			case 'fail':
