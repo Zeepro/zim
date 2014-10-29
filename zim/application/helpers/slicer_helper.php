@@ -69,6 +69,7 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 	
 	define('SLICER_CMD_SLICER_PS_STATUS',	'ps -A | grep slic3r.bin');
 	define('SLICER_CMD_RESTART_SLICER',		'sudo /etc/init.d/zeepro-slic3r restart &');
+	define('SLICER_CMD_PRM_PREVIEW_FILE',	'preview.png');
 	
 // 	define('SLICER_FILENAME_ZIPMODEL',	'_model_slicer.zip');
 }
@@ -503,6 +504,23 @@ function Slicer_rendering($rho, $theta, $delta, &$path_image, $color1 = NULL, $c
 		$explode_array = explode("\n", $response);
 		if (isset($explode_array[1])) {
 			$path_image = $explode_array[1];
+			
+			if (file_exists($path_image)) {
+				$image_folder = dirname($path_image);
+				$output = array();
+				$ret_val = 0;
+				$command = "convert $path_image $image_folder/" . SLICER_CMD_PRM_PREVIEW_FILE;
+				
+				exec($command, $output, $ret_val);
+				$path_image = $image_folder . '/' . SLICER_CMD_PRM_PREVIEW_FILE;
+				
+				if ($ret_val != ERROR_NORMAL_RC_OK) {
+					$CI = &get_instance();
+					$CI->load->helper('printerlog');
+					PrinterLog_logDebug('convert command error, cmd: ' . $command . '; ret: ' . $ret_val, __FILE__, __LINE__);
+					return $cr; //TODO we do not change the return code of this error for this moment, but we will change it
+				}
+			}
 		}
 		else {
 			$cr = ERROR_INTERNAL;
