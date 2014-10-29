@@ -25,9 +25,6 @@
 			echo form_submit('submit', t('signup_title'));
 			echo form_close();
 		?>
-	<div>
-		<p>{confcode_hint}</p>
-	</div>
 		<a href="{btn_url}" data-role="button">{back_or_already}</a>
 		<a href="/activation/wizard_confirm/skip" data-role="button" style="display:{has_skip}">{skip_title}</a>
 		</div>

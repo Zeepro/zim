@@ -1,5 +1,11 @@
 <div id="overlay"></div>
 <div id="detailPage" data-role="page">
+	<style>
+    	input[type=number]
+    	{
+        	display : none !important;
+		}
+	</style>
 	<header data-role="header" class="page-header">
 		<a href="javascript:history.back();" data-icon="back" data-ajax="false">{back}</a>
 		<a href="/" data-icon="home" data-ajax="false">Home</a>
@@ -61,12 +67,17 @@
 							<a href="/printerstate/changecartridge?v=r&f={need_filament_r}&id={model_id}" data-role="button" data-ajax="false" data-iconpos="none" class="ui-shadow ui-corner-all">{change_filament_r}</a>
 						</div>
 					</div>
-					<div>{temp_adjustments}</div>
 					<div class="ui-grid-a">
 						<div class="ui-block-a">
-							<input type="range" name="l" id="slider-1" value="{temper_filament_l}" min="160" max="260">
+							{temp_adjustments_l} <span id="temperature_text_1">{temper_filament_l}°C</span>
 						</div>
 						<div class="ui-block-b">
+							{temp_adjustments_r} <span id="temperature_text_2">{temper_filament_r}°C</span>
+						</div>
+						<div class="ui-block-a" id="div-slider1">
+							<input type="range" name="l" id="slider-1" value="{temper_filament_l}" min="160" max="260">
+						</div>
+						<div class="ui-block-b" id="div-slider2">
 							<input type="range" name="r" id="slider-2" value="{temper_filament_r}" min="160" max="260">
 						</div>
 					</div>
@@ -147,6 +158,16 @@ $("select#exchange_extruder").change(function() {
 	}
 	
 	$("input#exchange_extruder_hidden").val($("select#exchange_extruder").val());
+});
+
+$("#div-slider1").on("change", function()
+{
+	$("#temperature_text_1").html($("#slider-1").val() + "°C");
+});
+
+$("#div-slider2").on("change", function()
+{
+	$("#temperature_text_2").html($("#slider-2").val() + "°C");
 });
 </script>
 </div>

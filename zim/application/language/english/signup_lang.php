@@ -1,6 +1,6 @@
 <?php
 
-$lang['already'] = "I already have a Zeepro account";
+$lang['already'] = "Already have a Zeepro account ?";
 $lang['back'] = 'Back';
 $lang['signup_title'] = "Create your zeepro account";
 $lang['signup_text'] = 'Your account will allow you to access your zim from anywhere, get additional free models, easier ZeeproCare Service and much more to come.';
