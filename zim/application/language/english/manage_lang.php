@@ -32,8 +32,18 @@ $lang['left']
 $lang['right']
 	= "Right";
 $lang['reboot']
-	= "Reboot zim";
+	= "Restart zim";
 $lang['video_error']
 	= 'We\'re sorry, but your device is not compatible with HLS video streaming.';
-$lang['bed_hint']
-	= "Click on the buttons to move the printer's head above each screw to adjust the platform's height.";
+$lang['what']
+	= "What is it ?";
+$lang['home_text']
+	= "Manually set zim's head and platform to their home positions on the X,Y, and Z axis.";
+$lang['head_text']
+	= "Manually move zim head to different positions on the X and Y axis.";
+$lang['platform_text']
+	= "Manually raise or lower zim platform.";
+$lang['filament_text']
+	= "Load, Prime and Unload filament… and check your filament levels.";
+$lang['bed_text']
+	= "Adjust the height between the nozzles and zim platform for the best print performance. Click on the buttons to move the printer's head over each platform’s screw. Then use a paper sheet and place it between the nozzles and the platform. Loosen or tighten the screw until you feel a small amount of resistance when moving the paper from side to side. The nozzles should barely touch the paper, not more.";
