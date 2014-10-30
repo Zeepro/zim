@@ -155,7 +155,7 @@ class Account extends MY_Controller
 					// if in wizard mode, we fix the printer name
 					$this->load->helper('corestatus');
 					if (CoreStatus_checkInConnection()) {
-						$cr = $this->_assign_wizard($email, $password);
+						$cr = $this->_assign_wizard($this->session->userdata('email'), $this->session->userdata('password'));
 						if ($cr == TRUE) {
 							$this->output->set_header('Location: /activation/wizard_confirm');
 						}
