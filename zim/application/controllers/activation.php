@@ -22,7 +22,7 @@ class Activation extends MY_Controller
 			$this->lang->load('activation/activation', $this->config->item('language'));
 			$template_data = array(
 					'lang'			=> $this->config->item('language_abbr'),
-					'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Home') . '</title>',
+					'headers'		=> '<title>' . "zim - Activation" . '</title>',
 					'contents'		=> $body_page,
 					'title'			=> t('title'),
 					'password'		=> t('password'),
@@ -92,6 +92,7 @@ class Activation extends MY_Controller
 				'lang'			=> $this->config->item('language_abbr'),
 				'headers'		=> '<title>Zim - Activation</title>',
 				'contents'		=> $body_page,
+				'name_printer'	=> t('name_printer'),
 				'back'			=> t('back'),
 				'congrats'		=> t('congrats'),
 				'confirmation_message'	=> t('confirmation_message'),
