@@ -97,17 +97,22 @@
 var var_enable_print = {enable_print};
 var var_need_print_right = ({need_filament_r} > 0) ? true : false;
 var var_need_print_left = ({need_filament_l} > 0) ? true : false;
+var limit_min_tmp = {temper_min};
+var limit_max_tmp = {temper_max};
+var delta_tmp = {temper_delta};
 var tmp = $("#slider-2").val();
-var min_tmp = tmp - 15;
+var min_tmp = tmp - delta_tmp;
+var max_tmp = parseInt(tmp) + delta_tmp;
 
-$("#slider-2").attr('min', (min_tmp < 165) ? 165 : min_tmp); 
-$("#slider-2").attr('max', parseInt(tmp) + 15);
+$("#slider-2").attr('min', (min_tmp < limit_min_tmp) ? limit_min_tmp : min_tmp); 
+$("#slider-2").attr('max', (max_tmp > limit_max_tmp) ? limit_max_tmp : max_tmp);
 
 tmp = $("#slider-1").val();
-min_tmp = tmp - 15;
+min_tmp = tmp - delta_tmp;
+max_tmp = parseInt(tmp) + delta_tmp;
 
-$("#slider-1").attr('min', (min_tmp < 165) ? 165 : min_tmp); 
-$("#slider-1").attr('max', parseInt(tmp) + 15);
+$("#slider-1").attr('min', (min_tmp < limit_min_tmp) ? limit_min_tmp : min_tmp); 
+$("#slider-1").attr('max', (max_tmp > limit_max_tmp) ? limit_max_tmp : max_tmp);
 
 $("input[type=submit]").on('click', function()
 {

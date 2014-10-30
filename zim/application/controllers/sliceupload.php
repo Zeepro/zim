@@ -844,6 +844,9 @@ class Sliceupload extends MY_Controller {
 				'enable_exchange'	=> $select_disable,
 				'filament_not_need'	=> t('filament_not_need'),
 				'filament_ok'		=> t('filament_ok'),
+				'temper_max'		=> PRINTERSTATE_TEMPER_CHANGE_MAX,
+				'temper_min'		=> PRINTERSTATE_TEMPER_CHANGE_MIN,
+				'temper_delta'		=> PRINTERSTATE_TEMPER_CHANGE_VAL,
 		);
 		
 		if (ERROR_OK == PrinterState_checkFilaments(array(

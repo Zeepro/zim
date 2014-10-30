@@ -68,17 +68,22 @@ $('<div>').appendTo('#right_cartridge')
 // .attr({'id': 'print_slice', 'onclick': 'javascript: window.location.href="/printdetail/printslice";'}).html('{print_button}')
 // .button().button('refresh');
 
+var limit_min_tmp = {temper_min};
+var limit_max_tmp = {temper_max};
+var delta_tmp = {temper_delta};
 var tmp = $("#slider_right").val();
-var min_tmp = tmp - 15;
+var min_tmp = tmp - delta_tmp;
+var max_tmp = parseInt(tmp) + delta_tmp;
 
-$("#slider_right").attr('min', (min_tmp < 165) ? 165 : min_tmp); 
-$("#slider_right").attr('max', parseInt(tmp) + 15);
+$("#slider_right").attr('min', (min_tmp < limit_min_tmp) ? limit_min_tmp : min_tmp); 
+$("#slider_right").attr('max', (max_tmp > limit_max_tmp) ? limit_max_tmp : max_tmp);
 
 tmp = $("#slider_left").val();
-min_tmp = tmp - 15;
+min_tmp = tmp - delta_tmp;
+max_tmp = parseInt(tmp) + delta_tmp;
 
-$("#slider_left").attr('min', (min_tmp < 165) ? 165 : min_tmp); 
-$("#slider_left").attr('max', parseInt(tmp) + 15);
+$("#slider_left").attr('min', (min_tmp < limit_min_tmp) ? limit_min_tmp : min_tmp); 
+$("#slider_left").attr('max', (max_tmp > limit_max_tmp) ? limit_max_tmp : max_tmp);
 
 $('#detail_zone').trigger("create");
 

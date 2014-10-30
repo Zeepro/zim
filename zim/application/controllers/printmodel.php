@@ -253,6 +253,9 @@ class Printmodel extends MY_Controller {
 				'enable_print'		=> $enable_print,
 				'filament_not_need'	=> t('filament_not_need'),
 				'filament_ok'		=> t('ok'),
+				'temper_max'		=> PRINTERSTATE_TEMPER_CHANGE_MAX,
+				'temper_min'		=> PRINTERSTATE_TEMPER_CHANGE_MIN,
+				'temper_delta'		=> PRINTERSTATE_TEMPER_CHANGE_VAL,
 		);
 		if ($nb_extruder >= 2) {
 			$template_data['state_c_l'] = $color_left_filament;
