@@ -65,8 +65,8 @@ class Activation extends MY_Controller
 				$this->load->helper('zimapi');
 				extract($_POST);
 				$url = 'https://sso.zeepro.com/addprinter.ashx';
-				$data = array('email' => $email, 'password' => $password, 'printersn' => ZimAPI_getSerial(), 'printername' => $printer_name);
-		
+				//$data = array('email' => $email, 'password' => $password, 'printersn' => ZimAPI_getSerial(), 'printername' => $printer_name);F40E11800016
+				$data = array('email' => $this->session->userdata('email'), 'password' => $this->session->userdata('password'), 'printersn' => "F40E11800016", 'printername' => $printer_name);
 				$options = array('http' => array('header'  => "Content-type: application/x-www-form-urlencoded\r\n",
 						'method'  => 'POST',
 						'content' => http_build_query($data)));
@@ -77,10 +77,10 @@ class Activation extends MY_Controller
 				{
 					ZimAPI_setPrinterSSOName($printer_name);
 					$file = 'template/activation/activation_confirm';
-					if (isset($_GET['returnUrl']))
+					/*if (isset($_GET['returnUrl']))
 						$this->output->set_header("Location:/" . $_GET['returnUrl']);
 					else
-						$this->output->set_header("Location:/");
+						$this->output->set_header("Location:/");*/
 				}
 				else
 					$this->output->set_header("Location:/activation/activation_form");
@@ -95,7 +95,7 @@ class Activation extends MY_Controller
 				'name_printer'	=> t('name_printer'),
 				'back'			=> t('back'),
 				'congrats'		=> t('congrats'),
-				'confirmation_message'	=> t('confirmation_message'),
+				'confirmation_message'	=> t('hint'),
 				'returnUrl'		=> isset($_GET['returnUrl']) ? "/" . $_GET['returnUrl'] : "/"
 		);
 		$this->parser->parse('template/basetemplate', $template_data);
