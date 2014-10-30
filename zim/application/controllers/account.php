@@ -167,7 +167,7 @@ class Account extends MY_Controller
 					}
 					
 					$file = 'template/activation/activation_form';
-					$data = array('email' =>$email, 'password' => $password, 'returnUrl' => '');
+					$data = array('email' => $this->session->userdata('email'), 'password' => $this->session->userdata('password'), 'returnUrl' => '');
 				}
 			}
 		}
