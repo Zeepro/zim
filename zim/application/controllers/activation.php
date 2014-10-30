@@ -65,7 +65,7 @@ class Activation extends MY_Controller
 				$this->load->helper('zimapi');
 				extract($_POST);
 				$url = 'https://sso.zeepro.com/addprinter.ashx';
-				$data = array('email' => $this->session->userdata('email'), 'password' => $this->session->userdata('password'), 'printersn' => "ZimAPI_getSerial()", 'printername' => $printer_name);
+				$data = array('email' => $this->session->userdata('email'), 'password' => $this->session->userdata('password'), 'printersn' => ZimAPI_getSerial(), 'printername' => $printer_name);
 				$options = array('http' => array('header'  => "Content-type: application/x-www-form-urlencoded\r\n",
 						'method'  => 'POST',
 						'content' => http_build_query($data)));
