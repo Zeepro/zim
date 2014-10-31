@@ -57,6 +57,7 @@ class Manage extends MY_Controller {
 				'video_error'	=> t('video_error'),
 				'video_url'		=> $this->config->item('video_url'),
 				'reboot'		=> t('reboot'),
+				'shutdown'		=> t('shutdown'),
 				'lighting_title'=> t('lighting_title'),
 				'strip_led'		=> t('strip_led'),
 				'head_led'		=> t('head_led'),
@@ -213,9 +214,7 @@ class Manage extends MY_Controller {
 			'yes_reboot'		=> t('yes_reboot'),
 			'no_reboot'			=> t('no_reboot')
 		);
-		$this->parser->parse('template/manage/reboot_confirm', $template_data);
-		$body_page = $this->parser->parse('template/manage/index', $template_data, TRUE);
-		
+		$body_page = $this->parser->parse('template/manage/reboot_confirm', $template_data, TRUE);
 		// parse all page
 		$template_data = array(
 				'lang'			=> $this->config->item('language_abbr'),
@@ -226,6 +225,36 @@ class Manage extends MY_Controller {
 		
 		$this->parser->parse('template/basetemplate', $template_data);
 		return;
+	}
+
+	public function shutdown_confirm()
+	{
+		$this->load->library('parser');
+		$this->lang->load('manage/shutdown', $this->config->item('language'));
+		$template_data = array(
+				'confirm_message'	=> t('confirm_message'),
+				'yes'		=> t('yes'),
+				'no'		=> t('no'),
+				'shutdown_confirm'	=> t('shutdown_confirm')
+		);
+		$body_page = $this->parser->parse('template/manage/shutdown_confirm', $template_data, TRUE);
+		
+		// parse all page
+		$template_data = array(
+				'lang'			=> $this->config->item('language_abbr'),
+				'headers'		=> '<title>' . t('title_shutdown') . '</title>' . "\n"
+				. '<link rel="stylesheet" href="/assets/jquery-mobile-fluid960.min.css">',
+				'contents'		=> $body_page,
+		);
+		
+		$this->parser->parse('template/basetemplate', $template_data);
+		return; 
+	}
+
+	public function shutdown_ajax()
+	{
+		$this->load->helper('printerstate');
+		PrinterState_powerOff();
 	}
 
 	public function filament_ajax($side)

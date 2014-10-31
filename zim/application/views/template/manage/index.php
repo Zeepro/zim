@@ -9,7 +9,7 @@
 	</style>
 	<div id="overlay"></div>
 	<header data-role="header" class="page-header">
-		<a href="javascript:history.back();" data-icon="back" data-ajax="false">{back}</a>
+		<a href="javascript:history.back();" data-icon="back" data-ajax="false" class="back-button">{back}</a>
 	</header>
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
@@ -218,7 +218,8 @@
 					</table>
 				</div>
 			</div>
-			<a href="/manage/reboot_confirm"data-role="button">{reboot}</a>
+			<a href="/manage/reboot_confirm" data-role="button">{reboot}</a>
+			<a href="/manage/shutdown_confirm" data-role="button">{shutdown}</a>
 		</div>
 	</div>
 
