@@ -435,7 +435,7 @@ function Slicer_setModel($array_data) {
 		}
 	}
 	
-	$ret_val = Slicer__requestSlicer($url_request);
+	$ret_val = Slicer__requestSlicer($url_request, FALSE);
 	
 	switch ($ret_val) {
 		case SLICER_RESPONSE_OK:
