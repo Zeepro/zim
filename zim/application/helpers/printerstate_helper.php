@@ -76,6 +76,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_SET_OFFSET',		' M1660');
 	define('PRINTERSTATE_OFFSET_X_LABEL',	'\ X');
 	define('PRINTERSTATE_OFFSET_Y_LABEL',	'\ Y');
+	define('PRINTERSTATE_POWER_OFF',		' M2002');
 	
 	global $CFG;
 	if ($CFG->config['simulator']) {
@@ -3145,6 +3146,27 @@ function PrinterState_setOffset($array_data = array()) {
 	else if (count($output) && FALSE !== strpos($output[0], 'Error')) {
 		PrinterLog_logError('set offset command message error', __FILE__, __LINE__);
 		return ERROR_WRONG_PRM;
+	}
+	
+	return ERROR_OK;
+}
+
+function PrinterState_powerOff() {
+	global $CFG;
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$output = array();
+	$command = $arcontrol_fullpath . PRINTERSTATE_POWER_OFF;
+	$ret_val = 0;
+	
+	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output, $command)) {
+		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	PrinterLog_logArduino($command, $output);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		PrinterLog_logError('power off error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
 	}
 	
 	return ERROR_OK;

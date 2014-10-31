@@ -1445,6 +1445,14 @@ function ZimAPI_reboot() {
 	return ERROR_INTERNAL;
 }
 
+function ZimAPI_shutdown() {
+	// we leave a possibility to shutdown in ZimAPI helper, but I recommand you to load PrinterState directly
+	$CI = &get_instance();
+	$CI->load->helper('printerstate');
+	
+	return PrinterState_powerOff();
+}
+
 function ZimAPI_getPresetInfoAsArray($preset_id, &$array_info, &$system_preset = NULL, $set_localization = TRUE) {
 	$presetlist_basepath = NULL;
 	$tmp_array = NULL;
