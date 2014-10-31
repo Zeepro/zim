@@ -38,63 +38,65 @@ class Account extends MY_Controller
 	{
 		$this->load->library('parser');
 		$data = array();
+		$errors = "";
 		$file = 'template/activation/index.php';
 		$this->lang->load('activation/activation_form', $this->config->item('language'));
 		
 		if ($this->input->server('REQUEST_METHOD') == 'POST')
 		{
-			$this->load->library('form_validation');
-			$this->form_validation->set_rules('email', 'Email', 'required|valid_email');
-			$this->form_validation->set_rules('password', 'Password', 'required');
-			
-			if ($this->form_validation->run())
+			extract($_POST);
+			$url = 'https://sso.zeepro.com/login.ashx';
+			$data = array('email' => $email, 'password' => $password);
+			$options = array('http' => array('header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+       										'method'  => 'POST',
+       										'content' => http_build_query($data)));
+			$context  = stream_context_create($options);
+			try
 			{
-				extract($_POST);
-				$url = 'https://sso.zeepro.com/login.ashx';
-				$data = array('email' => $email, 'password' => $password);
-
-				$options = array('http' => array('header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-        										'method'  => 'POST',
-        										'content' => http_build_query($data)));
-				$context  = stream_context_create($options);
-				try
+				@file_get_contents($url, false, $context);
+			}
+			catch (Exception $e)
+			{
+				//TODO:error handling
+				$this->output->set_header('Location: /activation');
+			}
+			$result = substr($http_response_header[0], 9, 3);
+			if ($result == 202)
+			{
+				// if in wizard mode, we fix the printer name
+				$this->load->helper('corestatus');
+				if (CoreStatus_checkInConnection())
 				{
-					@file_get_contents($url, false, $context);
-				}
-				catch (Exception $e)
-				{
-					//TODO:error handling
-					$this->output->set_header('Location: /activation');
-				}
-				
-				$result = substr($http_response_header[0], 9, 3);
-				if ($result == 202)
-				{
-					// if in wizard mode, we fix the printer name
-					$this->load->helper('corestatus');
-					if (CoreStatus_checkInConnection()) {
-						$cr = $this->_assign_wizard($email, $password);
-						if ($cr == TRUE)
-						{
-							//Save creds in session
-							$custom_data = array('email' => $email, 'password' => $password);
-							$this->session->set_userdata($custom_data);
-
-							$this->output->set_header('Location: /activation/wizard_confirm');
-						}
-						else {
-							$this->output->set_header('Location: /activation/wizard_confirm/fail');
-						}
-						return;
+					$cr = $this->_assign_wizard($email, $password);
+					if ($cr == TRUE)
+					{
+						//Save creds in session
+						$custom_data = array('email' => $email, 'password' => $password);
+						$this->session->set_userdata($custom_data);
+						$this->output->set_header('Location: /activation/wizard_confirm');
 					}
-					
-					$file = 'template/activation/activation_form';
-					$custom_data = array('email' => $email, 'password' => $password);
-					$this->session->set_userdata($custom_data);
-					$data = array('email' =>$email, 'password' => $password, 'returnUrl' => isset($_GET['returnUrl']) ? ('?returnUrl='.$_GET['returnUrl']) : '');
-				}
-				else //error, for example bad password
-					$this->output->set_header('Location: /activation');
+					else
+						$this->output->set_header('Location: /activation/wizard_confirm/fail');
+					return;
+				}	
+				$file = 'template/activation/activation_form';
+				$custom_data = array('email' => $email, 'password' => $password);
+				$this->session->set_userdata($custom_data);
+				$data = array('email' =>$email, 'password' => $password, 'returnUrl' => isset($_GET['returnUrl']) ? ('?returnUrl='.$_GET['returnUrl']) : '');
+			}
+			else //error, for example bad password
+				//$this->output->set_header('Location: /activation');
+			{
+				$this->lang->load('activation/activation', $this->config->item('language'));
+				if ($result == 432)
+					$errors = t('missing_param');
+				if ($result == 433)
+					$errors = t('bad_login');
+				else if ($result == 434)
+					$errors = t('bad_pass');
+				else if ($result == 439)
+					$errors = t('unknown_email');
+				$data = array('sign_in' => t('sign_in'), 'title' => t('title'), 'show_password' => t('show_password'), 'password' => t('password'), 'returnUrl' => isset($_GET['returnUrl']) ? ('?returnUrl='.$_GET['returnUrl']) : '');
 			}
 		}
 		else {
@@ -112,6 +114,7 @@ class Account extends MY_Controller
 				'contents'		=> $body_page,
 				'back'			=> t('back'),
 				'give_name'		=> t('give_name'),
+				'errors'		=> $errors,
 				'activate'		=> t('activate'),
 				'format'		=> t('hostname_format'),
 				'name_printer'	=> t('name_printer')

@@ -7,3 +7,7 @@ $lang['sign_in'] = "Sign in";
 $lang['sign_up'] = "Sign up";
 $lang['show_password'] = "Show password";
 $lang['back'] = "Back";
+$lang['bad_pass'] = "Incorrect password";
+$lang['bad_login'] = "Unknown email";
+$lang['unknown_email'] = "Unknown email";
+$lang['missing_param'] = "All the fields are required";

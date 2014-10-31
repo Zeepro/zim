@@ -8,14 +8,15 @@
 	<div data-role="content">
 		<div id="container">
 			<h2>{title}</h2>
+			<div class="zim-error">{errors}</div>
 			<br />
-			<div id="error"><?php $this->load->helper('form'); echo validation_errors(); ?></div>
 			<?php
+				$this->load->helper('form');
 				echo form_open('/account/signin/{returnUrl}', array('data-ajax' => "false"));
 				echo form_label('Email', 'email');
-				echo form_input('email') . '<br />' . '<br />';
+				echo form_input(array("name" => "email", "required" => "required")) . '<br />' . '<br />';
 				echo form_label('{password}', 'password');
-				echo form_password('password') . '<br />';
+				echo form_password(array("name" => "password", "required" => "required")) . '<br />';
 				echo '<div>';
 				echo '<label><input type="checkbox" name="show_pass" data-mini=true>{show_password}</label>';
 				echo "</div><br />";

@@ -25,6 +25,7 @@ class Activation extends MY_Controller
 					'headers'		=> '<title>' . "zim - Activation" . '</title>',
 					'contents'		=> $body_page,
 					'title'			=> t('title'),
+					'errors'		=> "",
 					'password'		=> t('password'),
 					'sign_in'		=> t('sign_in'),
 					'sign_up'		=> t('sign_up'),
