@@ -1700,12 +1700,12 @@ class Rest extends MY_Controller {
 	
 		if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 				
-			if (($id = $this->input->get('id') || ($name = $this->input->get('name')))) {
-				if ((int)$id < 0) {
+			if (($id = $this->input->get('id')) && ($name = $this->input->get('name'))) {
+				if (intval($id) < 1) {
 					$cr = ERROR_WRONG_PRM;
 				}
 				else {
-					$cr = PrinterStoring_renameStl((int)$id, $name);
+					$cr = PrinterStoring_renameStl(intval($id), $name);
 				}
 			}
 			else {
@@ -1725,11 +1725,11 @@ class Rest extends MY_Controller {
 		if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 				
 			if (($id = $this->input->get('id'))) {
-				if ((int)$id < 0) {
+				if (intval($id) < 1) {
 					$cr = ERROR_WRONG_PRM;
 				}
 				else {
-					$cr = PrinterStoring_deleteStl((int)$id);
+					$cr = PrinterStoring_deleteStl(intval($id));
 				}
 			}
 			else {
@@ -1749,12 +1749,12 @@ class Rest extends MY_Controller {
 	
 		if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 				
-			if (($id = $this->input->get('id') || ($name = $this->input->get('name')))) {
-				if ((int)$id < 0) {
+			if (($id = $this->input->get('id')) || ($name = $this->input->get('name'))) {
+				if (intval($id) < 1) {
 					$cr = ERROR_WRONG_PRM;
 				}
 				else {
-					$cr = PrinterStoring_renameGcode((int)$id, $name);
+					$cr = PrinterStoring_renameGcode(intval($id), $name);
 				}
 			}
 			else {
@@ -1774,11 +1774,11 @@ class Rest extends MY_Controller {
 		if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 				
 			if (($id = $this->input->get('id'))) {
-				if ((int)$id < 0) {
+				if (intval($id) < 1) {
 					$cr = ERROR_WRONG_PRM;
 				}
 				else {
-					$cr = PrinterStoring_deleteGcode((int)$id);
+					$cr = PrinterStoring_deleteGcode(intval($id));
 				}
 			}
 			else {
@@ -1810,6 +1810,86 @@ class Rest extends MY_Controller {
 		$this->output->set_content_type(RETURN_CONTENT_TYPE_JSON);
 		echo $display;
 	
+		return;
+	}
+
+	public function libprintstl() {
+		$cr = ERROR_OK;
+		$id = NULL;
+	
+		$this->load->helper('printerstoring');
+	
+		if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+				
+			if (($id = $this->input->get('id'))) {
+				if (intval($id) < 1) {
+					$cr = ERROR_WRONG_PRM;
+				}
+				else {
+					$cr = PrinterStoring_printStl(intval($id));
+				}
+			}
+			else {
+				$cr = ERROR_MISS_PRM;
+			}
+			$this->_return_cr($cr);
+		}
+		return;
+	}
+
+	public function libstoregcode() {
+		$cr = ERROR_OK;
+		$name = NULL;
+	
+		$this->load->helper('printerstoring');
+	
+		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+			// get filament length from sliced Extended Parameters
+			$this->load->helper('printerstate');
+			$info = json_decode(PrinterState_checkStatus(), true);
+
+			$length = 0;
+			if (array_key_exists('eXtended_parameters', $info)) {
+				$length += (array_key_exists('r_length', $info['eXtended_parameters']) ? $info['eXtended_parameters']['r_length'] : 0);
+				$length += (array_key_exists('l_length', $info['eXtended_parameters']) ? $info['eXtended_parameters']['l_length'] : 0);
+			}
+			if (($name = $this->input->post('name'))) {
+					$cr = PrinterStoring_storeGcode($name, $length);
+			}
+			else {
+				$cr = ERROR_MISS_PRM;
+			}
+	
+			$this->_return_cr($cr);
+		}
+		else {
+			$this->load->view('template/rest/libstoregcode_form');
+		}
+	
+		return;
+	}
+
+	public function libprintgcode() {
+		$cr = ERROR_OK;
+		$id = NULL;
+
+		$this->load->helper('printerstoring');
+	
+		if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+				
+			if (($id = $this->input->get('id'))) {
+				if (intval($id) < 1) {
+					$cr = ERROR_WRONG_PRM;
+				}
+				else {
+					$cr = PrinterStoring_printGcode(intval($id));
+				}
+			}
+			else {
+				$cr = ERROR_MISS_PRM;
+			}
+			$this->_return_cr($cr);
+		}
 		return;
 	}
 }
