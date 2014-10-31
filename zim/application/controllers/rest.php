@@ -1545,6 +1545,31 @@ class Rest extends MY_Controller {
 	}
 	
 	//==========================================================
+	//system part
+	//==========================================================
+	public function shutdown() {
+		$cr = 0;
+		
+		$this->load->helper('printerstate');
+		$cr = PrinterState_powerOff();
+		
+		$this->_return_cr($cr);
+		
+		return;
+	}
+	
+	public function reboot() {
+		$cr = 0;
+		
+		$this->load->helper('zimapi');
+		$cr = ZimAPI_reboot();
+		
+		$this->_return_cr($cr);
+		
+		return;
+	}
+	
+	//==========================================================
 	//debug part
 	//==========================================================
 	public function gcode() {
@@ -1644,7 +1669,9 @@ class Rest extends MY_Controller {
 		return;
 	}
 	
-
+	//==========================================================
+	//library part
+	//==========================================================
 	public function libstorestl() {
 		$cr = ERROR_OK;
 		$f1 = NULL;
