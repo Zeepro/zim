@@ -6,6 +6,7 @@
 			height: 42% !important;
 			border-radius: 50% !important;
 		}
+		
 	</style>
 	<div id="overlay"></div>
 	<header data-role="header" class="page-header">
@@ -53,13 +54,13 @@
 			<div data-role="collapsible" style="align: center;">
 				<h4>{reset}</h4>
 				<div class="container_16">
-					<div class="grid_6 prefix_5 suffix_5">
+					
 						<a href="#home_popup" data-rel="popup" class="ui-btn ui-icon-info ui-btn-icon-right ui-corner-all ui-shadow" data-transition="pop">{what}</a>
 						<div id="home_popup" data-role="popup" class="ui-content">
 							<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right"></a>
 							{home_text}
 						</div>
-					</div>
+					
 					<div class="grid_6 prefix_5 suffix_5">
 						<a href="#" data-role="button" data-icon="home" data-iconpos="left" onclick="home();">XYZ</a>
 					</div>
@@ -77,13 +78,13 @@
 			<div data-role="collapsible" style="align: center;">
 				<h4>{head}</h4>
 				<div class="container_16">
-					<div class="grid_6 prefix_5 suffix_5">
+					
 						<a href="#head_popup" data-rel="popup" class="ui-btn ui-icon-info ui-btn-icon-right ui-corner-all ui-shadow" data-transition="pop">{what}</a>
 						<div id="head_popup" data-role="popup" class="ui-content">
 							<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right"></a>
 							{head_text}
 						</div>
-					</div>
+					
 					<div class="grid_4 prefix_6 suffix_6">
 						<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" onclick="move('Y', 1);">1</a>
 					</div>
@@ -128,13 +129,13 @@
 			<div data-role="collapsible" style="align: center;">
 				<h4>{platform}</h4>
 				<div class="container_16">
-					<div class="grid_6 prefix_5 suffix_5">
+					
 						<a href="#platform_popup" data-rel="popup" class="ui-btn ui-icon-info ui-btn-icon-right ui-corner-all ui-shadow" data-transition="pop">{what}</a>
 						<div id="platform_popup" data-role="popup" class="ui-content">
 							<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right"></a>
 							{platform_text}
 						</div>
-					</div>
+					
 					<div class="grid_4 prefix_6 suffix_6">
 						<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" onclick="move('Z', -1);">1</a>
 					</div>
@@ -161,13 +162,13 @@
 			<div data-role="collapsible">
 				<h4>{filament}</h4>
 				<div class="container_16" style="text-align:center">
-					<div class="grid_6 prefix_5 suffix_5">
+					
 						<a href="#filament_popup" data-rel="popup" class="ui-btn ui-icon-info ui-btn-icon-right ui-corner-all ui-shadow" data-transition="pop">{what}</a>
 						<div id="filament_popup" data-role="popup" class="ui-content">
 							<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right"></a>
 							{filament_text}
 						</div>
-					</div>
+					
 					<div style="text-align:center;display:inline-block;width:45%;margin-left:2%">
 						{left}
 					</div>
@@ -188,13 +189,13 @@
 			<div data-role="collapsible">
 				<h4>{bed_title}</h4>
 				<div id="bed_container" class="container_16" style="height:480px; text-align: center">
-					<div class="grid_6 prefix_5 suffix_5">
+					
 						<a href="#bed_popup" data-rel="popup" class="ui-btn ui-icon-info ui-btn-icon-right ui-corner-all ui-shadow" data-transition="pop">{what}</a>
 						<div id="bed_popup" data-role="popup" class="ui-content">
 							<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right"></a>
 							{bed_text}
 						</div>
-					</div>
+					
 					<br />
 					<table style="border: 2px solid;width:100%;background-color:silver;margin:0 auto;max-width:400px;max-height:400px">
 						<tr>

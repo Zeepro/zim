@@ -1,7 +1,7 @@
 <?php
 
 $lang['confirm_message']
-	= 'Are you sure you want to reboot your zim ?';
+	= 'Are you sure you want to restart your zim ?';
 $lang['title_reboot']
 	= 'Reboot zim';
 $lang['yes_reboot']

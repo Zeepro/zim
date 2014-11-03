@@ -24,7 +24,8 @@
 		{
 			$.ajax(
 			{
-				url: '/manage/shutdown_ajax'
+				url: '/manage/shutdown_ajax',
+				timeout: 5000
 			})
 			.complete(function()
 			{
