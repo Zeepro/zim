@@ -1892,6 +1892,7 @@ function PrinterState_unloadFilament($abb_filament) {
 	$array_cartridge = array();
 	$command = '';
 	$ret_val = 0;
+	$temper_unload = PRINTERSTATE_TEMPER_MAX_E;
 	
 	// start alter temporary solution
 // 	switch ($abb_filament) {
@@ -1914,7 +1915,27 @@ function PrinterState_unloadFilament($abb_filament) {
 		return ERROR_INTERNAL;
 	}
 	
-	$command = $arcontrol_fullpath . PRINTERSTATE_UNLOAD_FILAMENT . $abb_filament . ' ' . $array_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1];
+	// fix temperature according to filament type
+	switch ($array_cartridge[PRINTERSTATE_TITLE_MATERIAL]) {
+		case PRINTERSTATE_DESP_MATERIAL_PLA:
+			$temper_unload = 240;
+			break;
+			
+		case PRINTERSTATE_DESP_MATERIAL_ABS:
+			$temper_unload = 260;
+			break;
+			
+		case PRINTERSTATE_DESP_MATERIAL_PVA:
+			$temper_unload = 200;
+			break;
+			
+		default:
+			PrinterLog_logError('unknown filament type in unloading', __FILE__, __LINE__);
+			return ERROR_INTERNAL;
+			break; // never reach here
+	}
+// 	$command = $arcontrol_fullpath . PRINTERSTATE_UNLOAD_FILAMENT . $abb_filament . ' ' . $array_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1];
+	$command = $arcontrol_fullpath . PRINTERSTATE_UNLOAD_FILAMENT . $abb_filament . ' ' . $temper_unload;
 	
 	$CI->load->helper('detectos');
 	if ($CI->config->item('simulator') == FALSE && !DectectOS_checkWindows()) {
@@ -3152,17 +3173,21 @@ function PrinterState_setOffset($array_data = array()) {
 }
 
 function PrinterState_powerOff() {
-	global $CFG;
-	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$CI = &get_instance();
+	$arcontrol_fullpath = $CI->config->item('arcontrol_c');
 	$output = array();
 	$command = $arcontrol_fullpath . PRINTERSTATE_POWER_OFF;
 	$ret_val = 0;
 	
-	exec($command, $output, $ret_val);
-	if (!PrinterState_filterOutput($output, $command)) {
-		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
-		return ERROR_INTERNAL;
+	$CI->load->helper('detectos');
+	if ($CI->config->item('simulator') == FALSE && !DectectOS_checkWindows()) {
+		$command .= ' &';
 	}
+	else {
+		$command = 'start /B ' . $command;
+	}
+	
+	exec($command, $output, $ret_val);
 	PrinterLog_logArduino($command, $output);
 	if ($ret_val != ERROR_NORMAL_RC_OK) {
 		PrinterLog_logError('power off error', __FILE__, __LINE__);

@@ -101,7 +101,7 @@ unload_filament() {
 	done
 	rm $STATUS_FILE_UNLOAD_HEAT
 	
-	arcontrol_cli G90 M83 $gcode_extruder $gcode_charge "G1 E20 F150";
+	arcontrol_cli G90 M83 $gcode_extruder $gcode_charge "G1 E40 F150";
 	sleep 10; # wait charging and extruding
 	arcontrol_cli $gcode_unload;
 	arcontrol_cli "M104 S0 $gcode_extruder";
