@@ -76,7 +76,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_SET_OFFSET',		' M1660');
 	define('PRINTERSTATE_OFFSET_X_LABEL',	'\ X');
 	define('PRINTERSTATE_OFFSET_Y_LABEL',	'\ Y');
-	define('PRINTERSTATE_POWER_OFF',		' M2002');
+	define('PRINTERSTATE_POWER_OFF',		' G4\ S2 M2002'); // 2s of delay before launching shutdown
 	
 	global $CFG;
 	if ($CFG->config['simulator']) {
