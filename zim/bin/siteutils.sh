@@ -141,6 +141,7 @@ case "$1" in
 		
 	reboot)
 		/sbin/reboot -i
+		;;
 		
 	*)
 		echo "Usage: $0 {force_reco|start_tomboning|stop_romboning|status_tomboning|restart_arcontrol|*}"
