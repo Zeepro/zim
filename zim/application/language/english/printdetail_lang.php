@@ -31,6 +31,23 @@ $lang['cancel_confirm_prime']
 $lang['wait_info_prime']
 	= 'Starting the priming...';
 
+$lang['storegcode_info']
+	= 'Save this print in <b>My Models Library</b>';
+$lang['storegcode_name']
+	= 'Print name HERE';
+
+$lang['timelapse_error']
+	= 'We were not able to give you the timelapse';
+$lang['timelapse_ok']
+	= 'You can now download your timelapse';
+$lang['timelapse_info']
+	= 'Please wait few seconds so we can give you the link to your timelapse';
+$lang['timelapse_button']
+	= 'Download';
+
+$lang['Print again']
+	= 'Print again';
+	
 //printdetail status_ajax()
 $lang['Percentage: %d%%']
 	= 'Percentage: %d%%';

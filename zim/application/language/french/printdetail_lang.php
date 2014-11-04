@@ -31,6 +31,22 @@ $lang['cancel_confirm_prime']
 $lang['wait_info_prime']
 	= 'En attente de démarrage...';
 
+$lang['storegcode_info']
+	= 'Sauvegarder ce mod&egrave;le dans Ma Biblioth&egrave;que';
+$lang['storegcode_name']
+	= 'Nom du mod&egrave;le';
+$lang['timelapse_error']
+	= 'Nous ne sommes pas en mesure de cr&eacute;er la vid&eacute;o de timelapse';
+$lang['timelapse_ok']
+	= 'Vous pouvez maintenant t&eacute;l&eacute;charger votre timelapse';
+$lang['timelapse_info']
+	= 'Patientez quelques secondes que nous cr&eacute;ons votre timelapse';
+$lang['timelapse_button']
+	= 'T&eacutel&eacutecharger';
+
+$lang['Print again']
+	= 'Recommencer';
+
 //printdetail status_ajax()
 $lang['Percentage: %d%%']
 	= 'Pourcentage : %d%%';

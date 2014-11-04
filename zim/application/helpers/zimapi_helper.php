@@ -52,13 +52,16 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	
 	define('ZIMAPI_FILENAME_CAMERA',	'Camera.json');
 	define('ZIMAPI_FILENAME_SOFTWARE',	'Software.json');
-	define('ZIMAPI_FILEPATH_CAPTURE',	'/var/www/tmp/capture.jpg');
+	define('ZIMAPI_FILEPATH_CAPTURE',	'/var/www/tmp/image.jpg');
 	define('ZIMAPI_FILEPATH_UPGRADE',	'/config/conf/profile.json');
+	define('ZIMAPI_PRM_CAMERA_TIMELAPSE', 'ffmpeg -v quiet -r 10 -f image2 -s 640x360 -i /var/www/tmp/img%03d.jpg -i /var/www/tmp/logo_calque_60.png -y -filter_complex "[0:v][1:v]overlay=380:5" -vcodec libx264 -crf 35 /var/www/tmp/timelapse.mp4');
+	define('ZIMAPI_FILENAME_TIMELAPSE', 'timelapse.mp4');
+	define('ZIMAPI_FILEPATH_TIMELAPSE', '/var/www/tmp/timelapse.mp4');
 	define('ZIMAPI_PRM_CAMERA_PRINTSTART',
-			' -v quiet -r 15 -s 640x480 -f video4linux2 -i /dev/video0 -vf "crop=640:360:0:60" -minrate 512k -maxrate 512k -bufsize 2512k -map 0 -force_key_frames "expr:gte(t,n_forced*2)" -c:v libx264 -r 15 -threads 2 -crf 35 -profile:v baseline -b:v 512k -pix_fmt yuv420p -flags -global_header -f hls -hls_time 5 -hls_wrap 20 -hls_list_size 10 /var/www/tmp/zim.m3u8');
+			' -v quiet -r 15 -s 640x480 -f video4linux2 -i /dev/video0 -vf "crop=640:360:0:60" -minrate 512k -maxrate 512k -bufsize 2512k -map 0 -force_key_frames "expr:gte(t,n_forced*2)" -c:v libx264 -r 15 -threads 2 -crf 35 -profile:v baseline -b:v 512k -pix_fmt yuv420p -flags -global_header -f hls -hls_time 5 -hls_wrap 20 -hls_list_size 10 /var/www/tmp/zim.m3u8 -f image2 -vf fps=fps={fps} -qscale:v 2 /var/www/tmp/img%03d.jpg');
 	define('ZIMAPI_PRM_CAMERA_STOP',	' stop ');
 	define('ZIMAPI_PRM_CAMERA_CAPTURE',
-			' -v quiet -f video4linux2 -i /dev/video0 -y -vframes 1 /var/www/tmp/capture.jpg');
+			' -v quiet -f video4linux2 -i /dev/video0 -y -vframes 1 /var/www/tmp/image.jpg');
 // 	define('ZIMAPI_TITLE_MODE',			'mode');
 	define('ZIMAPI_TITLE_COMMAND',		'command');
 	define('ZIMAPI_VALUE_MODE_OFF',		'off');
@@ -76,7 +79,10 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_VALUE_DEFAULT_RHO',		600);
 	define('ZIMAPI_VALUE_DEFAULT_DELTA',	45);
 	define('ZIMAPI_VALUE_DEFAULT_THETA',	30);
-	
+	define('ZIMAPI_VALUE_DEFAULT_LENGTH', 8000);
+	define('ZIMAPI_VALUE_DEFAULT_SPEED', 0.5);
+	define('ZIMAPI_VALUE_DEFAULT_TL_LENGTH', 30);
+
 	define('ZIMAPI_PRM_CAPTURE',	'picture');
 	define('ZIMAPI_PRM_VIDEO_MODE',	'video');
 	define('ZIMAPI_PRM_PRESET',		'slicerpreset');
@@ -782,7 +788,7 @@ function ZimAPI_cameraCapture(&$path_capture) {
 	}
 	
 	$command = $CFG->config['capture'] . ZIMAPI_PRM_CAMERA_CAPTURE;
-		
+	
 	exec($command, $output, $ret_val);
 	if ($ret_val != ERROR_NORMAL_RC_OK) {
 		$CI = &get_instance();
@@ -2155,4 +2161,41 @@ function ZimAPI__setPresetLocalization(&$array_json) {
 	
 	return;
 	
+}
+
+function ZimAPI_encodeTimelapse(&$path_timelapse) {
+		global $CFG;
+	$output = NULL;
+	$ret_val = 0;
+	$info_camera = '';
+	
+	// if (!ZimAPI_checkCamera($info_camera)) {
+	// 	return FALSE;
+	// }
+	// if ($info_camera != ZIMAPI_VALUE_MODE_OFF) {
+	// 	$CI = &get_instance();
+	// 	$CI->load->helper('printerlog');
+	// 	PrinterLog_logError('encode can not run when camera is on', __FILE__, __LINE__);
+	// 	return FALSE;
+	// }
+	
+	exec(ZIMAPI_PRM_CAMERA_TIMELAPSE, $output, $ret_val);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		$CI = &get_instance();
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('encode timelapse command error', __FILE__, __LINE__);
+		PrinterLog_logError(ZIMAPI_PRM_CAMERA_TIMELAPSE, __FILE__, __LINE__);
+		return FALSE;
+	}
+	
+	// $CI = &get_instance();
+	// $CI->load->helper('detectos');
+	// if (DectectOS_checkWindows()) {
+	// 	$path_timelapse = $CFG->config['bin'] . 'capture.jpg';
+	// }
+	// else {
+		$path_timelapse = ZIMAPI_FILEPATH_TIMELAPSE;
+	// }
+	
+	return TRUE;
 }

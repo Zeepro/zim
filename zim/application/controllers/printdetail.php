@@ -12,7 +12,7 @@ class Printdetail extends MY_Controller {
 				'corestatus',
 		) );
 	}
-	
+	 
 	private function set_led() {
 		$ret_val = 0;
 		$status_strip = 0;
@@ -307,8 +307,49 @@ class Printdetail extends MY_Controller {
 		$this->lang->load('printerstate/index', $this->config->item('language'));
 		
 		$this->load->helper(array('zimapi', 'printerstate'));
-		if (!ZimAPI_cameraOn(ZIMAPI_PRM_CAMERA_PRINTSTART)) {
-			$this->load->helper('printerlog');
+
+		$id = $this->input->get('id');
+
+		//get print length
+		$length = 0;
+		// if just sliced model, get value from status
+		if ($id == 'slice') {
+			$this->load->helper('printerstate');
+			$info = json_decode(PrinterState_checkStatus(), true);
+			//var_dump($info);
+			if (array_key_exists('eXtended_parameters', $info)) {
+				$length += (array_key_exists('r_length', $info['eXtended_parameters']) ? $info['eXtended_parameters']['r_length'] : 0);
+				$length += (array_key_exists('l_length', $info['eXtended_parameters']) ? $info['eXtended_parameters']['l_length'] : 0);
+			}
+		}
+		// if presliced model get from modellist
+		else if (strlen($id) == 32) {
+			$this->load->helper('printlist');
+			$info = json_decode(ModelList_list(), true);
+
+			if (array_key_exists('models', $info)) {
+				foreach ($info['models'] as $m) {
+					if (array_key_exists('mid', $m) && $m['mid'] == $id) {
+						$length += (array_key_exists('l1', $m) ? $m['l1'] : 0);
+						$length += (array_key_exists('l2', $m) ? $m['l2'] : 0);
+					}
+				}
+			}
+		}
+		// if from gcode library	
+		else {
+			$this->load->helper('printerstoring');
+			$info = PrinterStoring_getInfo("gcode", $id);
+
+			//$length += (array_key_exists('length', $info) ? $info['length'] : 0);
+		}
+		if ($length == 0) {
+			$length = ZIMAPI_VALUE_DEFAULT_LENGTH;
+		}
+
+		// 30s timelapse at 10 fps, so 300 / print time with 0.5mm/s average speed
+		if (!ZimAPI_cameraOn(str_replace('{fps}', (ZIMAPI_VALUE_DEFAULT_TL_LENGTH * 10 / ($length / ZIMAPI_VALUE_DEFAULT_SPEED)), ZIMAPI_PRM_CAMERA_PRINTSTART))) {
+			$this->load->helper('printerlog'); 
 			PrinterLog_logError('can not set camera', __FILE__, __LINE__);
 		}
 		
@@ -317,7 +358,6 @@ class Printdetail extends MY_Controller {
 		
 		$callback = $this->input->get('cb');
 		$abb_cartridge = $this->input->get('v');
-		$id = $this->input->get('id');
 		
 		if ($id == CORESTATUS_VALUE_MID_SLICE) {
 			$print_slice = TRUE;
@@ -352,6 +392,12 @@ class Printdetail extends MY_Controller {
 				'initial_head'		=> ($status_head == TRUE) ? $option_selected : NULL,
 				'video_error'		=> t('video_error'),
 				'loading_player'	=> t('loading_player'),
+				'storegcode_info' => t('storegcode_info'),
+				'storegcode_name'		=> t('storegcode_name'),
+				'timelapse_error' => t('timelapse_error'),
+				'timelapse_ok'		=> t('timelapse_ok'),
+				'timelapse_info' => t('timelapse_info'),
+				'timelapse_button'		=> t('timelapse_button')
 		);
 		
 		if ($print_slice == TRUE) {
@@ -698,5 +744,32 @@ class Printdetail extends MY_Controller {
 		$this->output->set_content_type('text/plain; charset=UTF-8');
 		
 		return;
+	}
+
+	public function camera_stop() {
+		$this->load->helper('zimapi');
+		if (!ZimAPI_cameraOff()) {
+			$this->load->helper('printerlog');
+			PrinterLog_logError('can not turn off camera', __FILE__, __LINE__);
+			return null;
+		}
+		sleep(2);
+		$capture_path = '';
+		if (!ZimAPI_cameraCapture($capture_path)) {
+			$this->load->helper('printerlog');
+			PrinterLog_logError('can not take capture camera', __FILE__, __LINE__);
+			return null;
+		}
+		sleep(2);
+		$timelapse_path = '';
+		if (!ZimAPI_encodeTimelapse($timelapse_path)) {
+			$this->load->helper('printerlog');
+			PrinterLog_logError('can not take encode timelapse', __FILE__, __LINE__);
+			return null;
+		}
+		echo '/tmp/' . ZIMAPI_FILENAME_TIMELAPSE;
+
+		return;
+//		return $timelapse_path;
 	}
 }
