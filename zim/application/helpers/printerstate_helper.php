@@ -1918,7 +1918,7 @@ function PrinterState_unloadFilament($abb_filament) {
 	// fix temperature according to filament type
 	switch ($array_cartridge[PRINTERSTATE_TITLE_MATERIAL]) {
 		case PRINTERSTATE_DESP_MATERIAL_PLA:
-			$temper_unload = 240;
+			$temper_unload = 220;
 			break;
 			
 		case PRINTERSTATE_DESP_MATERIAL_ABS:
