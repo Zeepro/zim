@@ -11,3 +11,5 @@ $lang['Confirm Password'] = 'Confirm your password';
 $lang['button_skip'] = 'Skip';
 $lang['account_exists'] = 'This email address is already registered';
 $lang['missing_parameter'] = 'All fields are required';
+$lang['confirm_skip_text'] = 'If you do not create a Zeepro account, you therefore acknowledge that you will not have access to your zim on the go, and you may not benefit from some premium ZeeproCare Service offers.<br /><br />You will only be able to access your zim via the following URLs: http://zim/ or http://zim.local/<br />Please make sure to bookmark the above URLs for future access to your zim.';
+$lang['still_skip'] = 'I still want to skip this step';

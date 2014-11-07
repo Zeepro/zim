@@ -7,6 +7,10 @@
 			<div id="error_box" style="display:none;">
 				{connect_error_msg}
 			</div>
+			<div id="err_popup" data-role="popup" data-dismissible="false">
+				<p>We had trouble connecting and registering your zim.<br />
+				Before trying again, make sure you're connected to the WiFi network you selected.</p>
+			</div>
 		</div>
 	</div>
 
@@ -21,6 +25,35 @@ $(document).on('pageshow', function()
 // Start magic
 */
 
+var count = -1;
+var error = false;
+
+check_internet_interval = setInterval(function()
+{
+	var pixel = new Image();
+	
+
+	pixel.src = "http://home.zeepro.com/assets/img/pixel.png?_=" + (new Date()).getTime();
+	count++;
+	if (count == 60)
+	{
+		clearInterval(check_internet_interval);
+		$(".ui-loader").css("display", "none");
+		$("div#err_popup").popup();
+		$("div#err_popup").popup("open");
+		error = true;
+	}
+	setTimeout(function()
+	{
+		if (pixel.height != 0)
+		{
+			clearInterval(check_internet_interval);
+			console.log("found_image");
+		}
+	}, 500);
+		console.log("count :" + count);
+}, 1000);
+
 setTimeout(function()
 {
 	var interval;
@@ -29,6 +62,12 @@ setTimeout(function()
 	
 	interval = setInterval(function()
 	{
+		if (error)
+		{
+			clearInterval(interval);
+			return;
+		}
+
 		var image = new Image();
 		var image2 = new Image();
 		var image3 = new Image();

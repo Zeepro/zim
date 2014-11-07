@@ -38,13 +38,13 @@ $lang['shutdown']
 $lang['video_error']
 	= 'We\'re sorry, but your device is not compatible with HLS video streaming.';
 $lang['what']
-	= "What is it ?";
+	= "What's this ?";
 $lang['home_text']
-	= "Manually set zim's head and platform to their home positions on the X,Y, and Z axis.";
+	= "Set zim's head and platform to their home positions on the X,Y, and Z axis.";
 $lang['head_text']
-	= "Manually move zim head to different positions on the X and Y axis.";
+	= "Move zim head to different positions on the X and Y axis.";
 $lang['platform_text']
-	= "Manually raise or lower zim platform.";
+	= "Raise or lower zim platform.";
 $lang['filament_text']
 	= "Load, Prime and Unload filament… and check your filament levels.";
 $lang['bed_text']

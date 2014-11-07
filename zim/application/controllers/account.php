@@ -293,6 +293,8 @@ class Account extends MY_Controller
 		$data['signup_title'] = t('signup_title');
 		$data['signup_text'] = t('signup_text');
 		$data['skip_title'] = t('button_skip');
+		$data['confirm_skip_text'] = t('confirm_skip_text');
+		$data['still_skip'] = t('still_skip');
 		$data['back'] = t('back');
 		$data['show_password'] = t('show_password');
 		$body_page = $this->parser->parse('template/account/signup', $data, TRUE);

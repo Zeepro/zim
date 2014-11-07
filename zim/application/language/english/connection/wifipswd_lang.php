@@ -1,6 +1,6 @@
 <?php
 $lang['network'] =
-	"%s wifi network";
+	"%s WiFi network";
 $lang['network password'] =
 	"Enter password";
 $lang['confirm_password'] =

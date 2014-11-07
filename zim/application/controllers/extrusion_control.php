@@ -6,7 +6,7 @@ if (!defined('PRONTERFACE_EMULATOR_LOG')) {
 	define('PRONTERFACE_EMULATOR_LOG', '_emulator.log');
 }
 
-class Pronterface extends MY_Controller {
+class Extrusion_control extends MY_Controller {
 	function __construct() {
 		parent::__construct ();
 		$this->load->helper( array(
@@ -23,12 +23,12 @@ class Pronterface extends MY_Controller {
 		$this->load->library('parser');
 
 		// parse the main body
-		$body_page = $this->parser->parse('template/pronterface', array(), TRUE);
+		$body_page = $this->parser->parse('template/extrusion_control', array(), TRUE);
 
 		// parse all page
 		$template_data = array(
 				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>Pronterface#</title>',
+				'headers'		=> '<title>Zeepronterface</title>',
 				'contents'		=> $body_page,
 		);
 
@@ -40,37 +40,8 @@ class Pronterface extends MY_Controller {
 	public function stop() {
 		$this->load->helper('printerstate');
 		PrinterState_stopPrinting();
-		$this->output->set_header('Location: /pronterface');
+		$this->output->set_header('Location: /extrusion_control');
 
-		return;
-	}
-	
-	public function move($axis = NULL, $value = NULL, $speed = NULL) {
-		if (is_null($axis) || is_null($value) || is_null($speed)
-				|| ((int)$value == 0) || ((int)$speed == 0)) {
-			$this->output->set_status_header(403);
-			return;
-		}
-		else {
-			$cr = 0;
-			
-			$this->load->helper(array('printerstate', 'errorcode'));
-			
-			$axis = strtoupper($axis);
-			$cr = PrinterState_relativePositioning(TRUE);
-			if ($cr == ERROR_OK) {
-				$cr = PrinterState_move($axis, (int)$value, (int)$speed);
-			}
-			if ($cr == ERROR_OK) {
-				$cr = PrinterState_relativePositioning(FALSE);
-			}
-			if ($cr == ERROR_OK) {
-				$this->output->set_status_header(200);
-				return;
-			}
-		}
-		
-		$this->output->set_status_header(403);
 		return;
 	}
 	
@@ -98,90 +69,6 @@ class Pronterface extends MY_Controller {
 		$this->output->set_status_header(403);
 		return;
 	}
-	
-	public function home($axis = 'ALL') {
-		$cr = 0;
-		
-		$this->load->helper(array('printerstate', 'errorcode'));
-		$axis = strtoupper($axis);
-		$cr = PrinterState_homing($axis);
-		if ($cr == ERROR_OK) {
-			$this->output->set_status_header(200);
-			return;
-		}
-		
-		$this->output->set_status_header(403);
-		return;
-	}
-	
-	public function level($point = NULL) {
-		$cr = 0;
-		$array_cmd = array();
-		
-		if (is_null($point)) {
-			$this->output->set_status_header(403);
-			return;
-		}
-		
-		$this->load->helper(array('printerstate', 'errorcode'));
-		$cr = PrinterState_relativePositioning(FALSE);
-		if ($cr != ERROR_OK) {
-			$point = 'error';
-		}
-		switch ($point) {
-			case 'center':
-				$array_cmd = array(
-						'X'	=> 75,
-						'Y'	=> 75,
-				);
-				break;
-				
-			case 'xmin_ymin':
-				$array_cmd = array(
-						'X'	=> 0,
-						'Y'	=> 0,
-				);
-				break;
-				
-			case 'xmin_ymax':
-				$array_cmd = array(
-						'X'	=> 0,
-						'Y'	=> 150,
-				);
-				break;
-				
-			case 'xmax_ymax':
-				$array_cmd = array(
-						'X'	=> 150,
-						'Y'	=> 150,
-				);
-				break;
-				
-			case 'xmax_ymin':
-				$array_cmd = array(
-						'X'	=> 150,
-						'Y'	=> 0,
-				);
-				break;
-				
-			default:
-				$this->output->set_status_header(403);
-				return;
-				break; // never reach here
-		}
-		
-		foreach ($array_cmd as $axis => $value) {
-			$cr = PrinterState_move($axis, $value, 2000);
-			if ($cr != ERROR_OK) {
-				$this->output->set_status_header(403);
-				return;
-			}
-		}
-		
-		$this->output->set_status_header(200);
-		return;
-	}
-	
 	public function heat($extruder = NULL, $temper = NULL) {
 		$cr = 0;
 		
