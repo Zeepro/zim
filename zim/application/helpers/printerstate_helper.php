@@ -1252,10 +1252,12 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array(), 
 						);
 					}
 					
-					// only assign return value when no error, so we can grap all data we need in checking loop
-					if ($ret_val == ERROR_OK) {
-						$ret_val = $tmp_ret;
-					}
+					// we will ignore the error of cartridge checking if slicing is well done (default value assigned even if not true)
+					//TODO use the exact fail code in parameter error_type of PrinterState_getCartridgeAsArray to decide whether we change ret_val or not
+// 					// only assign return value when no error, so we can grap all data we need in checking loop
+// 					if ($ret_val == ERROR_OK) {
+// 						$ret_val = $tmp_ret;
+// 					}
 				}
 				
 				// save the temp file for every service (attention: do not change $ret_val in this block!)
@@ -1272,8 +1274,7 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array(), 
 				} catch (Exception $e) {
 					$this->load->helper('printerlog');
 					PrinterLog_logError('can not save temp json file', __FILE__, __LINE__);
-// 					$cr = ERROR_INTERNAL;
-// 					$ret_val = ERROR_INTERNAL;
+					$ret_val = ERROR_INTERNAL;
 				}
 				
 				if ($ret_val != ERROR_OK) {

@@ -111,19 +111,18 @@ function Printer_printFromPrime($abb_extruder, $first_run = TRUE) {
 	if (($ret_val == ERROR_OK) && $gcode_path) {
 		$array_filament = array();
 		
+		if (!Printer__getLengthFromJson($array_info, $array_filament)) {
+			return ERROR_INTERNAL; // $ret_val = ERROR_INTERNAL;
+		}
+		
 		// modify the temperature of gcode file according to cartridge info
 		//TODO test me
-		$ret_val = Printer__changeGcode($gcode_path);
+		$ret_val = Printer__changeGcode($gcode_path, $array_filament);
 		if ($ret_val != ERROR_OK) {
 			return $ret_val;
 		}
 		
-		if (Printer__getLengthFromJson($array_info, $array_filament)) {
-			$ret_val = Printer_printFromFile($gcode_path, $model_id, FALSE, $array_filament);
-		}
-		else {
-			$ret_val = ERROR_INTERNAL;
-		}
+		$ret_val = Printer_printFromFile($gcode_path, $model_id, FALSE, $array_filament);
 	}
 	
 	return $ret_val;
@@ -146,10 +145,25 @@ function Printer_printFromModel($id_model, $model_calibration, $exchange_extrude
 	if (($ret_val == ERROR_OK) && $gcode_path) {
 		$array_filament = array();
 		
+		if (Printer__getLengthFromJson($array_info, $array_filament)) {
+			if ($exchange_extruder) {
+				Printer__inverseFilament($array_filament);
+			}
+			if ($model_calibration == TRUE) {
+				$CI = &get_instance();
+				$CI->load->helper('corestatus');
+		
+				$id_model = CORESTATUS_VALUE_MID_CALIBRATION;
+			}
+		}
+		else {
+			return ERROR_INTERNAL; // $ret_val = ERROR_INTERNAL;
+		}
+		
 		// temporary change - modify the temperature of gcode file according to cartridge info
 		//TODO test me and remove me if it is necessary
 // 		$ret_val = Printer__changeGcode($gcode_path);
-		$ret_val = Printer__changeGcode($gcode_path, $exchange_extruder, $array_temper);
+		$ret_val = Printer__changeGcode($gcode_path, $array_filament, $exchange_extruder, $array_temper);
 		if ($ret_val != ERROR_OK) {
 			return $ret_val;
 		}
@@ -159,21 +173,7 @@ function Printer_printFromModel($id_model, $model_calibration, $exchange_extrude
 		// temporary change end
 		
 // 		$ret_val = Printer_printFromFile($gcode_path, TRUE, $stop_printing);
-		if (Printer__getLengthFromJson($array_info, $array_filament)) {
-			if ($exchange_extruder) {
-				Printer__inverseFilament($array_filament);
-			}
-			if ($model_calibration == TRUE) {
-				$CI = &get_instance();
-				$CI->load->helper('corestatus');
-				
-				$id_model = CORESTATUS_VALUE_MID_CALIBRATION;
-			}
-			$ret_val = Printer_printFromFile($gcode_path, $id_model, TRUE, $array_filament);
-		}
-		else {
-			$ret_val = ERROR_INTERNAL;
-		}
+		$ret_val = Printer_printFromFile($gcode_path, $id_model, TRUE, $array_filament);
 	}
 	
 	return $ret_val;
@@ -217,7 +217,7 @@ function Printer_printFromSlice($exchange_extruder = FALSE, $array_temper = arra
 	
 	// temporary change
 	//TODO remove me if it is necessary
-	$ret_val = Printer__changeGcode($gcode_path, $exchange_extruder, $array_temper);
+	$ret_val = Printer__changeGcode($gcode_path, $array_filament, $exchange_extruder, $array_temper);
 	if ($ret_val != ERROR_OK) {
 		return $ret_val;
 	}
@@ -662,7 +662,7 @@ function Printer__inverseFilament(&$array_filament) {
 	return;
 }
 
-function Printer__changeGcode(&$gcode_path, $exchange_extruder = FALSE, $array_temper = array()) {
+function Printer__changeGcode(&$gcode_path, $array_filament = array(), $exchange_extruder = FALSE, $array_temper = array()) {
 	$temp_r = 0; // right normal temper
 	$temp_rs = 0; // right start temper
 	$temp_l = 0; // left normal temper
@@ -704,6 +704,12 @@ function Printer__changeGcode(&$gcode_path, $exchange_extruder = FALSE, $array_t
 // 		}
 	}
 	// temporary change end
+	else if (!array_key_exists('r', $array_filament) || $array_filament['r'] <= 0) {
+		// ignore the cartridge which we do not need
+		$CI->load->helper('slicer');
+		$temp_r = SLICER_VALUE_DEFAULT_TEMPER;
+		$temp_rs = SLICER_VALUE_DEFAULT_FIRST_TEMPER;
+	}
 	else {
 		$cr = PrinterState_getCartridgeAsArray($json_cartridge, 'r');
 		if ($cr == ERROR_OK) {
@@ -734,6 +740,12 @@ function Printer__changeGcode(&$gcode_path, $exchange_extruder = FALSE, $array_t
 // 			}
 		}
 		// temporary change end
+		else if (!array_key_exists('l', $array_filament) || $array_filament['l'] <= 0) {
+			// ignore the cartridge which we do not need
+			$CI->load->helper('slicer');
+			$temp_l = SLICER_VALUE_DEFAULT_TEMPER;
+			$temp_ls = SLICER_VALUE_DEFAULT_FIRST_TEMPER;
+		}
 		else {
 			$cr = PrinterState_getCartridgeAsArray($json_cartridge, 'l');
 			if ($cr == ERROR_OK) {
