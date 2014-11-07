@@ -18,6 +18,8 @@ $lang['filament_unloaded']
 	= 'déchargé';
 $lang['filament_empty']
 	= 'vide';
+$lang['filament_error']
+	= 'erreur';
 $lang['load_filament']
 	= 'Charger';
 $lang['change_filament']

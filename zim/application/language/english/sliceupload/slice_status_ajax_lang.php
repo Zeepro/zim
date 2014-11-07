@@ -17,6 +17,8 @@ $lang['filament_unloaded']
 	= 'unloaded';
 $lang['filament_empty']
 	= 'empty';
+$lang['filament_error']
+	= 'error';
 $lang['load_filament']
 	= 'Load';
 $lang['change_filament']
