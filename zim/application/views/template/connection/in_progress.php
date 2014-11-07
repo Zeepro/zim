@@ -112,7 +112,7 @@ function check_internet()
 	
 		pixel.src = "http://home.zeepro.com/assets/img/pixel.png?_=" + (new Date()).getTime();
 		count++;
-		if (count == 5)
+		if (count == 60)
 		{
 			clearInterval(check_internet_interval);
 			$(".ui-loader").css("display", "none");
