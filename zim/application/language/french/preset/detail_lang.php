@@ -166,8 +166,16 @@ $lang['thin_walls']
 	= 'Détection des murs fins';
 $lang['overhangs']
 	= 'Détection des périmètres en surplomb';
-$lang['randomize_start']
-	= 'Point de départ aléatoire';
+// $lang['randomize_start']
+// 	= 'Point de départ aléatoire';
+$lang['seam_position']
+	= 'Point de départ';
+$lang['seam_position1']
+	= 'Aléatoire';
+$lang['seam_position2']
+	= 'Au plus proche';
+$lang['seam_position3']
+	= 'Aligné';
 $lang['external_perimeters_first']
 	= 'Périmètre extérieur en premier';
 $lang['fill_density']

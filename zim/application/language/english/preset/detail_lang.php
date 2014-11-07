@@ -166,8 +166,16 @@ $lang['thin_walls']
 	= 'Detect thin walls';
 $lang['overhangs']
 	= 'Detect bridging perimeters';
-$lang['randomize_start']
-	= 'Randomize starting points';
+// $lang['randomize_start']
+// 	= 'Randomize starting points';
+$lang['seam_position']
+	= 'Seam position';
+$lang['seam_position1']
+	= 'Random';
+$lang['seam_position2']
+	= 'Nearest';
+$lang['seam_position3']
+	= 'Aligned';
 $lang['external_perimeters_first']
 	= 'External perimeters first';
 $lang['fill_density']

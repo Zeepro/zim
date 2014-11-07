@@ -130,7 +130,8 @@ class Preset extends MY_Controller {
 			// end of old for 1.0
 			$this->form_validation->set_rules('thin_walls', 'thin_walls', 'required');
 			$this->form_validation->set_rules('overhangs', 'overhangs', 'required');
-			$this->form_validation->set_rules('randomize_start', 'randomize_start', 'required');
+// 			$this->form_validation->set_rules('randomize_start', 'randomize_start', 'required'); // old for 1.0
+			$this->form_validation->set_rules('seam_position', 'seam_position', 'required'); // new for 1.1.7
 			$this->form_validation->set_rules('external_perimeters_first', 'external_perimeters_first', 'required');
 			$this->form_validation->set_rules('fill_density', 'fill_density', 'required');
 			$this->form_validation->set_rules('fill_pattern', 'fill_pattern', 'required');
@@ -217,7 +218,8 @@ class Preset extends MY_Controller {
 						// end of old for 1.0
 						'thin_walls'							=> $this->input->post('thin_walls'),
 						'overhangs'								=> $this->input->post('overhangs'),
-						'randomize_start'						=> $this->input->post('randomize_start'),
+// 						'randomize_start'						=> $this->input->post('randomize_start'),
+						'seam_position'							=> $this->input->post('seam_position'),
 						'external_perimeters_first'				=> $this->input->post('external_perimeters_first'),
 						'fill_density'							=> $this->input->post('fill_density'),
 						'fill_pattern'							=> $this->input->post('fill_pattern'),
@@ -328,7 +330,8 @@ class Preset extends MY_Controller {
 
 				'thin_walls'							=> t('thin_walls'),
 				'overhangs'								=> t('overhangs'),
-				'randomize_start'						=> t('randomize_start'),
+// 				'randomize_start'						=> t('randomize_start'), // old for 1.0
+				'seam_position'							=> t('seam_position'), // new for 1.1.7
 				'external_perimeters_first'				=> t('external_perimeters_first'),
 				'fill_density'							=> t('fill_density'),
 				'fill_pattern'							=> t('fill_pattern'),
@@ -446,6 +449,9 @@ class Preset extends MY_Controller {
 				'support_material_pattern1'		=> t('support_material_pattern1'),
 				'support_material_pattern2'		=> t('support_material_pattern2'),
 				'support_material_pattern3'		=> t('support_material_pattern3'),
+				'seam_position1'				=> t('seam_position1'),
+				'seam_position2'				=> t('seam_position2'),
+				'seam_position3'				=> t('seam_position3'),
 				// value
 				'layer_height_value'							=> $array_setting['layer_height'],
 				'first_layer_height_value'						=> $array_setting['first_layer_height'],
@@ -461,7 +467,10 @@ class Preset extends MY_Controller {
 				// end of old for 1.0
 				'thin_walls_value'								=> ($array_setting['thin_walls'] == TRUE) ? $option_selected : NULL,
 				'overhangs_value'								=> ($array_setting['overhangs'] == TRUE) ? $option_selected : NULL,
-				'randomize_start_value'							=> ($array_setting['randomize_start'] == TRUE) ? $option_selected : NULL,
+// 				'randomize_start_value'							=> ($array_setting['randomize_start'] == TRUE) ? $option_selected : NULL,
+				'seam_position_value1'							=> NULL,
+				'seam_position_value2'							=> NULL,
+				'seam_position_value3'							=> NULL,
 				'external_perimeters_first_value'				=> ($array_setting['external_perimeters_first'] == TRUE) ? $option_selected : NULL,
 				'fill_density_value'							=> $array_setting['fill_density'],
 // 				'fill_pattern_value'							=> $array_setting['fill_pattern'],
@@ -689,6 +698,23 @@ class Preset extends MY_Controller {
 				
 			case 'honeycomb':
 				$template_data['support_material_pattern_value3'] = $option_selected;
+				break;
+				
+			default:
+				break;
+		}
+		
+		switch($array_setting['seam_position']) {
+			case 'random':
+				$template_data['seam_position_value1'] = $option_selected;
+				break;
+				
+			case 'nearest':
+				$template_data['seam_position_value2'] = $option_selected;
+				break;
+				
+			case 'aligned':
+				$template_data['seam_position_value3'] = $option_selected;
 				break;
 				
 			default:

@@ -121,12 +121,13 @@
 					<h4>{layer_perimeter_subtitle5}</h4>
 					<div class="ui-grid-a">
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
-							<label for="randomize_start">{randomize_start}</label>
+							<label for="seam_position">{seam_position}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<select name="randomize_start" id="randomize_start" data-role="slider" data-track-theme="a" data-theme="a">
-								<option value="0">{switch_off}</option>
-								<option value="1" {randomize_start_value}>{switch_on}</option>
+							<select name="seam_position" id="seam_position">
+								<option value="random" {seam_position_value1}>{seam_position1}</option>
+								<option value="nearest" {seam_position_value2}>{seam_position2}</option>
+								<option value="aligned" {seam_position_value3}>{seam_position3}</option>
 							</select>
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
