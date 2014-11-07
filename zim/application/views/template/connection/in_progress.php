@@ -7,9 +7,10 @@
 			<div id="error_box" style="display:none;">
 				{connect_error_msg}
 			</div>
-			<div id="err_popup" data-role="popup" data-dismissible="false">
+			<div id="err_popup" data-role="popup" data-dismissible="false" class="ui-content">
 				<p>We had trouble connecting and registering your zim.<br />
 				Before trying again, make sure you're connected to the WiFi network you selected.</p>
+				<a id="try_again" data-role="button" href="#">Try again</a>
 			</div>
 		</div>
 	</div>
@@ -25,36 +26,14 @@ $(document).on('pageshow', function()
 // Start magic
 */
 
-var count = -1;
-var error = false;
-
-check_internet_interval = setInterval(function()
+$("#try_again").on("click", function()
 {
-	var pixel = new Image();
-	
+	$(".ui-loader").css("display", "block");
+	$("div#err_popup").popup("close");
+	check_internet();
+});
 
-	pixel.src = "http://home.zeepro.com/assets/img/pixel.png?_=" + (new Date()).getTime();
-	count++;
-	if (count == 60)
-	{
-		clearInterval(check_internet_interval);
-		$(".ui-loader").css("display", "none");
-		$("div#err_popup").popup();
-		$("div#err_popup").popup("open");
-		error = true;
-	}
-	setTimeout(function()
-	{
-		if (pixel.height != 0)
-		{
-			clearInterval(check_internet_interval);
-			console.log("found_image");
-		}
-	}, 500);
-		console.log("count :" + count);
-}, 1000);
-
-setTimeout(function()
+function ping_printer()
 {
 	var interval;
 	var counter = 0;
@@ -62,12 +41,6 @@ setTimeout(function()
 	
 	interval = setInterval(function()
 	{
-		if (error)
-		{
-			clearInterval(interval);
-			return;
-		}
-
 		var image = new Image();
 		var image2 = new Image();
 		var image3 = new Image();
@@ -127,7 +100,38 @@ setTimeout(function()
 			}
 		}, 1000);
 	}, 2000);
-}, 30000);
+}
+
+function check_internet()
+{
+	var count = -1;
+	check_internet_interval = setInterval(function()
+	{
+		var pixel = new Image();
+		
+	
+		pixel.src = "http://home.zeepro.com/assets/img/pixel.png?_=" + (new Date()).getTime();
+		count++;
+		if (count == 5)
+		{
+			clearInterval(check_internet_interval);
+			$(".ui-loader").css("display", "none");
+			$("div#err_popup").popup();
+			$("div#err_popup").popup("open");
+		}
+		setTimeout(function()
+		{
+			if (pixel.height != 0)
+			{
+				clearInterval(check_internet_interval);
+				ping_printer();
+			}
+		}, 500);
+	}, 1000);
+}
+
+check_internet();
+
 </script>
 
 </div>

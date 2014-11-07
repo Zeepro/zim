@@ -84,7 +84,7 @@
 				<h4>Temperature</h4>
 				<div class="ui-grid-a">
 					<div class="ui-block-a">
-						<div class="ui-bar ui-bar-c">
+						<div class="ui-bar ui-bar-f">
 							<label for="temper_l">Left</label>
 							<div style="width:40px;float:left;margin-right:10px;">
 								<input type="text" data-clear-btn="false" name="temper_l_current" id="temper_l_current" value="0" disabled>
@@ -98,7 +98,7 @@
 						</div>
 					</div>
 					<div class="ui-block-b">
-						<div class="ui-bar ui-bar-c">
+						<div class="ui-bar ui-bar-f">
 							<label for="temper_r">Right</label>
 							<div style="width:40px;float:left;margin-right:10px;">
 								<input type="text" data-clear-btn="false" name="temper_r_current" id="temper_r_current" value="0" disabled>
@@ -117,7 +117,7 @@
 				<h4>Filament</h4>
 				<div class="ui-grid-a">
 					<div class="ui-block-a">
-						<div class="ui-bar ui-bar-c">
+						<div class="ui-bar ui-bar-f">
 							<label for="temper_l">Left</label>
 							<div style="width:350px;float:left;margin-right:10px;">
 								<input type="text" data-clear-btn="false" name="rfid_l_current" id="rfid_l_current" value="NEED REFRESH" disabled>
@@ -135,7 +135,7 @@
 						</div>
 					</div>
 					<div class="ui-block-b">
-						<div class="ui-bar ui-bar-c">
+						<div class="ui-bar ui-bar-f">
 							<label for="temper_r">Right</label>
 							<div style="width:350px;float:left;margin-right:10px;">
 								<input type="text" data-clear-btn="false" name="rfid_r_current" id="rfid_r_current" value="NEED REFRESH" disabled>
