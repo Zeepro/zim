@@ -204,7 +204,7 @@ class Connection extends MY_Controller {
 							PrinterLog_logError('can not set need activation status', __FILE__, __LINE__);
 						}
 						ZimAPI_restartNetwork();
-						$this->output->set_header("Location:/connection/in_progress");
+						$this->output->set_header("Location:/connection/in_progress/" . $ssid);
 							
 						return;
 					}
@@ -492,7 +492,7 @@ class Connection extends MY_Controller {
 		return;
 	}
 	
-	public function in_progress()
+	public function in_progress($ssid = NULL)
 	{
 		$template_data = array();
 		$body_page = NULL;
@@ -513,6 +513,7 @@ class Connection extends MY_Controller {
 				'printersn'			=> ZimAPI_getSerial(),
 				'config_printer'	=> t('config_printer'),
 				'connect_error_msg'	=> t('connect_error_msg'),
+				'popup'				=> t('popup', $ssid ? $ssid : "XXX")
 		);
 		
 		$body_page = $this->parser->parse('template/connection/in_progress', $template_data, TRUE);

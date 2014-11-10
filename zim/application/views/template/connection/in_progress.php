@@ -1,21 +1,21 @@
-<div data-role="page" data-url="/connection/in_progress">
+<div data-role="page">
 	<header data-role="header" class="page-header"></header>
-	<div class="logo"><div id="link_logo"></div></div>
+	<div class="logo">
+		<div id="link_logo"></div>
+	</div>
 	<div data-role="content">
-		<div id="container" style="text-align:center;">
+		<div id="container" style="text-align: center;">
 			<p id="hint_box">{config_printer}</p>
-			<div id="error_box" style="display:none;">
-				{connect_error_msg}
-			</div>
-			<div id="err_popup" data-role="popup" data-dismissible="false" class="ui-content">
-				<p>We had trouble connecting and registering your zim.<br />
-				Before trying again, make sure you're connected to the WiFi network you selected.</p>
+			<div id="error_box" style="display: none;">{connect_error_msg}</div>
+			<div id="err_popup" data-role="popup" data-dismissible="false"
+				class="ui-content">
+				<p>{popup}</p>
 				<a id="try_again" data-role="button" href="#">Try again</a>
 			</div>
 		</div>
 	</div>
 
-<script>
+	<script>
 
 $(document).on('pageshow', function()
 {

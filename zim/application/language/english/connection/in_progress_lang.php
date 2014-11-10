@@ -1,6 +1,7 @@
 <?php
 
 $lang['config_printer'] = "Registering zim on your WiFi network can take some time (up to 3min). Please do not close or try to refresh this page.";
+$lang['popup'] = "We had trouble connecting and registering your zim.<br />Before trying again, make sure you're connected to the %s WiFi network.";
 $lang['connect_error_msg']
 	= 'Registration of your zim was not successful.<br/><br/>
 		If you see "Zim_initialization" within your WiFi networks list on your device, select it and go to <a href="http://10.0.0.1">http://10.0.0.1</a> to start over the configuration of your zim.<br/><br />
