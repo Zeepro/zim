@@ -45,6 +45,8 @@ $lang['support_material_pattern2']
 	= 'rectilinear grid';
 $lang['support_material_pattern3']
 	= 'honeycomb';
+$lang['support_material_pattern4']
+	= 'pillars';
 
 $lang['layer_perimeter_title']
 	= 'Layers and perimeters';

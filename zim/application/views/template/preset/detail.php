@@ -431,6 +431,7 @@
 									<option value="rectilinear" {support_material_pattern_value1}>{support_material_pattern1}</option>
 									<option value="rectilinear-grid" {support_material_pattern_value2}>{support_material_pattern2}</option>
 									<option value="honeycomb" {support_material_pattern_value3}>{support_material_pattern3}</option>
+									<option value="pillars" {support_material_pattern_value4}>{support_material_pattern4}</option>
 								</select>
 							</div>
 						</div></div>

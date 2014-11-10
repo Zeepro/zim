@@ -80,6 +80,8 @@ $lang['support_material_pattern2']
 = 'grille';
 $lang['support_material_pattern3']
 = 'nid d\'abeille';
+$lang['support_material_pattern4']
+= 'piliers';
 
 $lang['layer_perimeter_title']
 	= 'Couche et périmètres';

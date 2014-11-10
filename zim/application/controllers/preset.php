@@ -449,6 +449,7 @@ class Preset extends MY_Controller {
 				'support_material_pattern1'		=> t('support_material_pattern1'),
 				'support_material_pattern2'		=> t('support_material_pattern2'),
 				'support_material_pattern3'		=> t('support_material_pattern3'),
+				'support_material_pattern4'		=> t('support_material_pattern4'),
 				'seam_position1'				=> t('seam_position1'),
 				'seam_position2'				=> t('seam_position2'),
 				'seam_position3'				=> t('seam_position3'),
@@ -519,6 +520,7 @@ class Preset extends MY_Controller {
 				'support_material_pattern_value1'				=> NULL,
 				'support_material_pattern_value2'				=> NULL,
 				'support_material_pattern_value3'				=> NULL,
+				'support_material_pattern_value4'				=> NULL,
 				'support_material_spacing_value'				=> $array_setting['support_material_spacing'],
 				'support_material_angle_value'					=> $array_setting['support_material_angle'],
 				'support_material_interface_layers_value'		=> $array_setting['support_material_interface_layers'],
@@ -698,6 +700,10 @@ class Preset extends MY_Controller {
 				
 			case 'honeycomb':
 				$template_data['support_material_pattern_value3'] = $option_selected;
+				break;
+				
+			case 'pillars':
+				$template_data['support_material_pattern_value4'] = $option_selected;
 				break;
 				
 			default:
