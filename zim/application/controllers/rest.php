@@ -1513,9 +1513,9 @@ class Rest extends MY_Controller {
 // 		$cr = Slicer_reloadPreset();
 		
 		// check platform and filament present (do not check filament quantity)
-		if ($cr == ERROR_OK) {
+// 		if ($cr == ERROR_OK) {
 			$cr = Slicer_checkPlatformColor($array_cartridge);
-		}
+// 		}
 		
 		if ($cr == ERROR_OK) {
 			$cr = Slicer_changeTemperByCartridge($array_cartridge);
