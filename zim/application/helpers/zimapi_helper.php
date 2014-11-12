@@ -1132,10 +1132,10 @@ function ZimAPI_getVersion($next_boot = FALSE) {
 		$version = trim(shell_exec(ZIMAPI_CMD_VERSION));
 	}
 	
-	//FIXME remove me as soon as possible
-	if ($version == 'dev_release_1.2') { // error version after flash SD or recovery
-		$version = trim(@file_get_contents($CI->config->item('version_file')));
-	}
+// 	//FIX/ME remove me as soon as possible
+// 	if ($version == 'dev_release_1.2') { // error version after flash SD or recovery
+// 		$version = trim(@file_get_contents($CI->config->item('version_file')));
+// 	}
 	
 	return $version;
 }
@@ -1638,7 +1638,8 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 				// end of old for 1.0
 				'thin_walls',
 				'overhangs',
-				'randomize_start',
+// 				'randomize_start', // old for 1.0
+				'seam_position', // new for 1.1.7
 				'external_perimeters_first',
 				'fill_density',
 				'fill_pattern',
@@ -1754,8 +1755,11 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 	if (!array_key_exists('overhangs', $array_setting)) {
 		$array_setting['overhangs'] = 1;
 	}
-	if (!array_key_exists('randomize_start', $array_setting)) {
-		$array_setting['randomize_start'] = 0;
+// 	if (!array_key_exists('randomize_start', $array_setting)) { // old for 1.0
+// 		$array_setting['randomize_start'] = 0;
+// 	}
+	if (!array_key_exists('seam_position', $array_setting)) { // new for 1.1.7
+		$array_setting['seam_position'] = 'random';
 	}
 	if (!array_key_exists('external_perimeters_first', $array_setting)) {
 		$array_setting['external_perimeters_first'] = 0;

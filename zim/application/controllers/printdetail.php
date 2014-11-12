@@ -12,7 +12,7 @@ class Printdetail extends MY_Controller {
 				'corestatus',
 		) );
 	}
-	 
+	
 	private function set_led() {
 		$ret_val = 0;
 		$status_strip = 0;
@@ -402,7 +402,7 @@ class Printdetail extends MY_Controller {
 		
 		if ($print_slice == TRUE) {
 			$template_data['restart_url'] = '/printdetail/printslice';
-			$template_data['return_url']	= '/sliceupload/slice?callback';
+// 			$template_data['return_url']	= '/sliceupload/slice?callback';
 		}
 		else if ($print_calibration == TRUE) {
 // 			$template_data['restart_url'] = '/printdetail/printcalibration';
