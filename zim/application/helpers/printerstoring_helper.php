@@ -13,6 +13,41 @@ define('PRINTERSTORING_FILE_IMG_PNG',	'image.png');
 define('PRINTERSTORING_FILE_IMG_JPG',	'image.jpg');
 define('PRINTERSTORING_FILE_INFO_JSON',	'info.json');
 
+function PrinterStoring_initialFile() {
+	$ret_val = TRUE;
+	$CI = &get_instance();
+	$array_check = array(
+			$CI->config->item('base_library'),
+			$CI->config->item('stl_library'),
+			$CI->config->item('gcode_library'),
+	);
+	
+	foreach ($array_check as $folder_check) {
+		if (file_exists($folder_check)) {
+			if (is_dir($folder_check)) {
+				continue;
+			}
+			else {
+				$ret_val = FALSE;
+				$CI->load->helper('printerlog');
+				PrinterLog_logMessage('illegal file detected, try to unlink: ' . $folder_check, __FILE__, __LINE__);
+				@unlink($folder_check);
+				usleep(3); // make sure that file is deleted
+			}
+		}
+		
+		$ret_val = mkdir($folder_check);
+		if ($ret_val == FALSE) {
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('library initialization create error: ' . $folder_check, __FILE__, __LINE__);
+			
+			break;
+		}
+	}
+	
+	return $ret_val;
+}
+
 //internal function
 function PrinterStoring__getLastId($folderpath) {
 	$id = -1;

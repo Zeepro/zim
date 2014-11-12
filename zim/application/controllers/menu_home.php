@@ -37,7 +37,8 @@ class Menu_home extends MY_Controller {
 				'menu_printerstate'	=> t('Configuration'),
 				'manage'			=> t('manage'),
 				'upload'			=> t('upload'),
-				'about'				=> t('about')
+				'about'				=> t('about'),
+				'library_visible'	=> ($this->config->item('use_sdcard') == TRUE) ? 'block' : 'none',
 		);
 		
 		

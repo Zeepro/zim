@@ -123,9 +123,17 @@ function CoreStatus_initialFile() {
 	}
 	$CI->config->set_item('use_sdcard', $sdcard);
 	
+	// initialization of preset
 	$CI->load->helper('zimapi');
 	if (!ZimAPI_initialFile()) {
 		return FALSE;
+	}
+	// initialization of library
+	if ($sdcard) {
+		$CI->load->helper('printerstoring');
+		if (!PrinterStoring_initialFile()) {
+			return FALSE;
+		}
 	}
 	
 	$state_file = $CI->config->item('conf') . CORESTATUS_FILENAME_WORK;
