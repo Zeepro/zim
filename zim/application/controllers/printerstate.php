@@ -1128,7 +1128,7 @@ class Printerstate extends MY_Controller {
 		
 		// parse the main body
 		$template_data = array(
-// 				'hint'			=> t('Press to reset network'),
+ 				'reset_hint'	=> t('reset_hint'),
 				'reset_button'	=> t('Reset the printer\'s network'),
 				'error'			=> $error,
 				'back'			=> t('back'),

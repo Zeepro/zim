@@ -9,6 +9,7 @@
 	<!-- 		<h2 style="text-align: center;">{hint}</h2> -->
 			<form method="post" accept-charset="utf-8">
 				<div>
+					<p>{reset_hint}</p>
 					<input type="submit" value="{reset_button}" />
 				</div>
 				{error}
