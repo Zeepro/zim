@@ -515,7 +515,7 @@ function PrinterStoring_storeGcode($name, $length = 0) {
 	}
 
 	// store captured image
-	$this->load->helper('zimapi');
+	$CI->load->helper('zimapi');
 	$image_path = ZIMAPI_FILEPATH_CAPTURE;
 	if (file_exists($image_path) === false) {
 	 	$CI->load->helper('printerlog');
@@ -529,7 +529,8 @@ function PrinterStoring_storeGcode($name, $length = 0) {
 	}
 
 	// store file(s)
-	$file_path = $CI->config->item('temp') . '_sliced_model.gcode';
+	$CI->load->helper('slicer');
+	$file_path = $CI->config->item('temp') . SLICER_FILE_MODEL;
 	if (@file_exists($file_path) == false) {
 		PrinterStoring_deleteGcode($model_id);
 		$CI->load->helper('printerlog');
@@ -546,6 +547,8 @@ function PrinterStoring_storeGcode($name, $length = 0) {
 	return ERROR_OK;
 }
 
+//FIXME this function doesn't verify any conditions before launching (filament, temperature, etc.)
+//TODO transfer this function to proper helper: printer_helper.php with adaption with corestatus_helper.php
 function PrinterStoring_printGcode($id) {
 	global $CFG;
 	$CI = &get_instance();

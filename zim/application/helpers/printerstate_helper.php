@@ -77,6 +77,10 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_OFFSET_X_LABEL',	'\ X');
 	define('PRINTERSTATE_OFFSET_Y_LABEL',	'\ Y');
 	define('PRINTERSTATE_POWER_OFF',		' G4\ S2 M2002'); // 2s of delay before launching shutdown
+	define('PRINTERSTATE_LOAD_FILA_PVA_R',	' M1625');
+	define('PRINTERSTATE_LOAD_FILA_PVA_L',	' M1626');
+	define('PRINTERSTATE_UNIN_FILA_PVA_R',	' M1627');
+	define('PRINTERSTATE_UNIN_FILA_PVA_L',	' M1628');
 	
 	global $CFG;
 	if ($CFG->config['simulator']) {
@@ -178,6 +182,11 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_VALUE_ENDSTOP_OPEN',				'open');
 	define('PRINTERSTATE_VALUE_MAXTEMPER_BEFORE_UNLOAD',	50);
 	define('PRINTERSTATE_VALUE_FACTOR_NOZZLE_OFFSET',		10);
+	
+	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD_PVA',		202);
+	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD_PVA',		15);
+	define('PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_LOAD_PVA',		240);
+	define('PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_UNLOAD_PVA',	360);
 	
 	define('PRINTERSTATE_PRM_EXTRUDER',			'extruder');
 	define('PRINTERSTATE_PRM_TEMPER',			'temp');
@@ -1585,8 +1594,10 @@ function PrinterState_checkStatusAsArray() {
 					PrinterLog_logError('API error when getting temperatures in printing', __FILE__, __LINE__);
 				}
 				else {
-					$data_json[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_EXT_TEMP_L] = $data_temperature[PRINTERSTATE_LEFT_EXTRUD];
-					$data_json[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_EXT_TEMP_R] = $data_temperature[PRINTERSTATE_RIGHT_EXTRUD];
+					$data_json[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_EXT_TEMP_L]
+							= array_key_exists(PRINTERSTATE_LEFT_EXTRUD, $data_temperature) ? $data_temperature[PRINTERSTATE_LEFT_EXTRUD] : 0;
+					$data_json[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_EXT_TEMP_R]
+							= array_key_exists(PRINTERSTATE_RIGHT_EXTRUD, $data_temperature) ? $data_temperature[PRINTERSTATE_RIGHT_EXTRUD] : 0;
 				}
 			}
 		}

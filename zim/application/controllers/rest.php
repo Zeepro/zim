@@ -1670,7 +1670,7 @@ class Rest extends MY_Controller {
 	}
 	
 	//==========================================================
-	//library part
+	//library part - Julien
 	//==========================================================
 	public function libstorestl() {
 		$cr = ERROR_OK;
@@ -1873,7 +1873,8 @@ class Rest extends MY_Controller {
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			// get filament length from sliced Extended Parameters
 			$this->load->helper('printerstate');
-			$info = json_decode(PrinterState_checkStatus(), true);
+// 			$info = json_decode(PrinterState_checkStatus(), true);
+			$info = PrinterState_checkStatusAsArray();
 
 			$length = 0;
 			if (array_key_exists('eXtended_parameters', $info)) {

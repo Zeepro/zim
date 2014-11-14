@@ -89,6 +89,7 @@ var var_firstRun = true;
 var var_onPlay = false;
 var var_ajax;
 var var_prime = {var_prime};
+var var_slice = {var_slice};
 // var var_finish = false;
 var var_ajax_lock = false;
 var var_finish = false;
@@ -266,20 +267,6 @@ function stopPrint()
 	return;
 }
 
-function getUrlParameter(sParam)
-{
-    var sPageURL = window.location.search.substring(1);
-    var sURLVariables = sPageURL.split('&');
-    for (var i = 0; i < sURLVariables.length; i++) 
-    {
-        var sParameterName = sURLVariables[i].split('=');
-        if (sParameterName[0] == sParam) 
-        {
-            return sParameterName[1];
-        }
-    }
-} 
-
 function storegcode() {
 	if ($('#checkbox_storegcode').is(":checked")) {
 		$.ajax({
@@ -316,35 +303,45 @@ function finishAction() {
 	.attr({'id': 'again_button', 'onclick' : 'again()', 'data-icon' : 'refresh'}).html('{again_button}')
 	.button().button('refresh');
 
-	// add checkbox + name input, store the gcode file in the library -> add onclick on home/printagain button
-	if (getUrlParameter('id') == "slice") {
-		$("#print_detail_info").append('<div id=\'parent_checkbox\'><label><input type="checkbox" id="checkbox_storegcode" value="1" />{storegcode_info}</label><input type="text" id="storegcode_name" value="{storegcode_name}" onclick="if (this.value == \'{storegcode_name}\') {this.value=\'\';}" onfocus="this.select()" onblur="this.value=!this.value?\'{storegcode_name}\':this.value;"/></div>');
-		//$("#print_detail_info").append("<div class=\"ui-checkbox ui-mini\"><label class=\"ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left ui-checkbox-off\"><input type=\"checkbox\" name=\"checkbox_storegcode\" id=\"checkbox_storegcode\">{storegcode_info}</label></div> \
-	  //  <div class=\"ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset\"><input type=\"text\" name=\"storegcode_name\" id=\"storegcode_name\" value=\"{storegcode_name}\" /></div>");
-		$("div#parent_checkbox").checkboxradio({mini: true});
-		$("div#parent_checkbox").trigger("create");
-   	$("#storegcode_name").parent().toggle(false);
-		$("#checkbox_storegcode").click(function() {
-    	$("#storegcode_name").parent().toggle(this.checked);
-		});
-		$("#again_button").attr("onclick", "storegcode(); again()");
-		$('button#print_action').click(function(){storegcode(); window.location.href='/'; return false;});
-	}
+// 	// library function - add checkbox + name input, store the gcode file in the library -> add onclick on home/printagain button
+// 	if (var_slice == true) {
+// 		$("#print_detail_info").append('<div id=\'parent_checkbox\'><label><input type="checkbox" id="checkbox_storegcode" value="1" />{storegcode_info}</label><input type="text" id="storegcode_name" value="{storegcode_name}" onclick="if (this.value == \'{storegcode_name}\') {this.value=\'\';}" onfocus="this.select()" onblur="this.value=!this.value?\'{storegcode_name}\':this.value;"/></div>');
+// 		//$("#print_detail_info").append("<div class=\"ui-checkbox ui-mini\"><label class=\"ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left ui-checkbox-off\"><input type=\"checkbox\" name=\"checkbox_storegcode\" id=\"checkbox_storegcode\">{storegcode_info}</label></div> \
+// 		//  <div class=\"ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset\"><input type=\"text\" name=\"storegcode_name\" id=\"storegcode_name\" value=\"{storegcode_name}\" /></div>");
+// 		$("div#parent_checkbox").checkboxradio({mini: true});
+// 		$("div#parent_checkbox").trigger("create");
+// 		$("#storegcode_name").parent().toggle(false);
+// 		$("#checkbox_storegcode").click(function() {
+// 			$("#storegcode_name").parent().toggle(this.checked);
+// 		});
+// 		$("#again_button").attr("onclick", "storegcode(); again()");
+// 		$('button#print_action').click(function(){storegcode(); window.location.href='/'; return false;});
+// 	}
 
-	// add loading + button Download Timelapse + Encode
-	$("#print_detail_info").append('<div id=\'timelapse\'><label id="timelapse_info">{timelapse_info}</label><a href="#" id="timelapse_button" data-ajax="false" data-role="button" class="ui-link ui-btn ui-shadow ui-corner-all ui-disabled" role="button" disable>{timelapse_button}</a></div>');
-
+	if (var_prime == false) {
+		// add loading + button Download Timelapse + Encode
+		$("#print_detail_info").append('<div id=\'timelapse\'><label id="timelapse_info">{timelapse_info}</label><a href="#" id="timelapse_button" data-ajax="false" data-role="button" class="ui-link ui-btn ui-shadow ui-corner-all ui-disabled" role="button" disable>{timelapse_button}</a></div>');
+		
 		$.ajax({
 			cache: false,
 			type: "POST",
-			url: "/printdetail/camera_stop",
-			data: { },
+			url: "/printdetail/camera_stop_ajax",
+			data: {
+// 				capture: ((var_slice == true) ? 1 : 0),
+				capture: 0, // gcode library isn't ready to public
+			},
 //			dataType: "json",
 			success: function (data, textStatus, xhr) {
 				if (data != '') {
 					$('label#timelapse_info').html('{timelapse_ok}');
 					$('a#timelapse_button').removeClass('ui-disabled');
+					$('a#timelapse_button').addClass('externalLink');
 					$('a#timelapse_button').attr('href', data);
+					$('a#timelapse_button').click(function(event) {
+						event.preventDefault();
+						event.stopPropagation();
+						window.open(this.href, '_blank');
+					});
 				}
 				else {
 					$('label#timelapse_info').html('{timelapse_error}');
@@ -355,6 +352,7 @@ function finishAction() {
 				console.log(data);
 			},
 		});
+	}
 
 	return;
 }

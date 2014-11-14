@@ -54,12 +54,15 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_FILENAME_SOFTWARE',	'Software.json');
 	define('ZIMAPI_FILEPATH_CAPTURE',	'/var/www/tmp/image.jpg');
 	define('ZIMAPI_FILEPATH_UPGRADE',	'/config/conf/profile.json');
-	define('ZIMAPI_PRM_CAMERA_TIMELAPSE', 'ffmpeg -v quiet -r 10 -f image2 -s 640x360 -i /var/www/tmp/img%03d.jpg -i /var/www/tmp/logo_calque_60.png -y -filter_complex "[0:v][1:v]overlay=380:5" -vcodec libx264 -crf 35 /var/www/tmp/timelapse.mp4');
+	define('ZIMAPI_PRM_CAMERA_TIMELAPSE', 'ffmpeg -v quiet -r 10 -f image2 -s 640x360 -i /var/www/tmp/img%03d.jpg -i /var/www/images/logo_calque_60.png -y -filter_complex "[0:v][1:v]overlay=380:5" -vcodec libx264 -crf 35 /var/www/tmp/timelapse.mp4');
 	define('ZIMAPI_FILENAME_TIMELAPSE', 'timelapse.mp4');
 	define('ZIMAPI_FILEPATH_TIMELAPSE', '/var/www/tmp/timelapse.mp4');
 	define('ZIMAPI_PRM_CAMERA_PRINTSTART',
+	' -v quiet -r 15 -s 640x480 -f video4linux2 -i /dev/video0 -vf "crop=640:360:0:60" -minrate 512k -maxrate 512k -bufsize 2512k -map 0 -force_key_frames "expr:gte(t,n_forced*2)" -c:v libx264 -r 15 -threads 2 -crf 35 -profile:v baseline -b:v 512k -pix_fmt yuv420p -flags -global_header -f hls -hls_time 5 -hls_wrap 20 -hls_list_size 10 /var/www/tmp/zim.m3u8');
+	define('ZIMAPI_PRM_CAMERA_PRINTSTART_TIMELAPSE',
 			' -v quiet -r 15 -s 640x480 -f video4linux2 -i /dev/video0 -vf "crop=640:360:0:60" -minrate 512k -maxrate 512k -bufsize 2512k -map 0 -force_key_frames "expr:gte(t,n_forced*2)" -c:v libx264 -r 15 -threads 2 -crf 35 -profile:v baseline -b:v 512k -pix_fmt yuv420p -flags -global_header -f hls -hls_time 5 -hls_wrap 20 -hls_list_size 10 /var/www/tmp/zim.m3u8 -f image2 -vf fps=fps={fps} -qscale:v 2 /var/www/tmp/img%03d.jpg');
 	define('ZIMAPI_PRM_CAMERA_STOP',	' stop ');
+	define('ZIMAPI_PRM_END_TIMELAPSE',	' clean_tl ');
 	define('ZIMAPI_PRM_CAMERA_CAPTURE',
 			' -v quiet -f video4linux2 -i /dev/video0 -y -vframes 1 /var/www/tmp/image.jpg');
 // 	define('ZIMAPI_TITLE_MODE',			'mode');
@@ -76,12 +79,13 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_TITLE_PRESET_RAFT',		'raft_layers');
 	define('ZIMAPI_TITLE_PRESET_SUPPORT',	'support_material');
 	
-	define('ZIMAPI_VALUE_DEFAULT_RHO',		600);
-	define('ZIMAPI_VALUE_DEFAULT_DELTA',	45);
-	define('ZIMAPI_VALUE_DEFAULT_THETA',	30);
-	define('ZIMAPI_VALUE_DEFAULT_LENGTH', 8000);
-	define('ZIMAPI_VALUE_DEFAULT_SPEED', 0.5);
-	define('ZIMAPI_VALUE_DEFAULT_TL_LENGTH', 30);
+	define('ZIMAPI_VALUE_DEFAULT_RHO',			600);
+	define('ZIMAPI_VALUE_DEFAULT_DELTA',		45);
+	define('ZIMAPI_VALUE_DEFAULT_THETA',		30);
+	define('ZIMAPI_VALUE_DEFAULT_LENGTH',		8000);
+	define('ZIMAPI_VALUE_DEFAULT_SPEED',		0.5);
+	define('ZIMAPI_VALUE_DEFAULT_TL_LENGTH',	30);
+	define('ZIMAPI_VALUE_DEFAULT_TL_OFFSET',	300); // 5 minutes
 
 	define('ZIMAPI_PRM_CAPTURE',	'picture');
 	define('ZIMAPI_PRM_VIDEO_MODE',	'video');
@@ -904,6 +908,23 @@ function ZimAPI_cameraOff() {
 		$CI->load->helper('printerlog');
 		PrinterLog_logError('write camera status error', __FILE__, __LINE__);
 		return FALSE;
+	}
+	
+	return TRUE;
+}
+
+function ZimAPI_cleanTimeLapseTempFile() {
+	global $CFG;
+	$output = NULL;
+	$ret_val = 0;
+	$command = $CFG->config['camera'] . ZIMAPI_PRM_END_TIMELAPSE;
+	
+	exec($command, $output, $ret_val);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		$CI = &get_instance();
+		$CI->load->helper('printerlog');
+		PrinterLog_logMessage('camera clean timelapse command error', __FILE__, __LINE__);
+// 		return FALSE; // we ignore this error
 	}
 	
 	return TRUE;
@@ -2095,6 +2116,7 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 function ZimAPI__getModebyParameter($parameter) {
 	switch ($parameter) {
 		case ZIMAPI_PRM_CAMERA_PRINTSTART:
+		case ZIMAPI_PRM_CAMERA_PRINTSTART_TIMELAPSE: //FIXME with fps variable, this case has no sense
 			return ZIMAPI_VALUE_MODE_HLS;
 			break;
 			
