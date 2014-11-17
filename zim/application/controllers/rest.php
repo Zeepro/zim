@@ -746,6 +746,10 @@ class Rest extends MY_Controller {
 					}
 					break;
 					
+				case PRINTERSTATE_PRM_POSITION:
+					$cr = PrinterState_getPosition($display);
+					break;
+					
 				case ZIMAPI_PRM_CAPTURE:
 					$path_capture = '';
 					$password = $this->input->get('password');

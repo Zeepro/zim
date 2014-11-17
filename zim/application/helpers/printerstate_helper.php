@@ -81,6 +81,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_LOAD_FILA_PVA_L',	' M1626');
 	define('PRINTERSTATE_UNIN_FILA_PVA_R',	' M1627');
 	define('PRINTERSTATE_UNIN_FILA_PVA_L',	' M1628');
+	define('PRINTERSTATE_GET_POSITION',		' M114');
 	
 	global $CFG;
 	if ($CFG->config['simulator']) {
@@ -143,6 +144,9 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_TITLE_PRINT_XMAX',	'xmax');
 	define('PRINTERSTATE_TITLE_PRINT_YMAX',	'ymax');
 	define('PRINTERSTATE_TITLE_PRINT_ZMAX',	'zmax');
+	define('PRINTERSTATE_TITLE_POSITION_X',	'x');
+	define('PRINTERSTATE_TITLE_POSITION_Y',	'y');
+	define('PRINTERSTATE_TITLE_POSITION_Z',	'z');
 	
 	define('PRINTERSTATE_JSON_PRINTER', 		'Printer.json');
 	define('PRINTERSTATE_TITLE_JSON_NB_EXTRUD', 'ExtrudersNumber');
@@ -202,6 +206,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_PRM_ENDSTOP',			'endstop');
 	define('PRINTERSTATE_PRM_FILAMENT',			'filament');
 	define('PRINTERSTATE_PRM_OFFSET',			'offsetadjustment');
+	define('PRINTERSTATE_PRM_POSITION',			'position');
 	
 	define('PRINTERSTATE_CHANGECART_UNLOAD_F',	'unload_filament');
 	define('PRINTERSTATE_CHANGECART_REMOVE_C',	'remove_cartridge');
@@ -3202,11 +3207,66 @@ function PrinterState_powerOff() {
 	exec($command, $output, $ret_val);
 	PrinterLog_logArduino($command, $output);
 	if ($ret_val != ERROR_NORMAL_RC_OK) {
-		PrinterLog_logError('power off error', __FILE__, __LINE__);
+		PrinterLog_logError('power off command error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
 	
 	return ERROR_OK;
+}
+
+function PrinterState_getPositionAsArray(&$array_pos) {
+	global $CFG;
+	$command = $CFG->config['arcontrol_c'] . PRINTERSTATE_GET_POSITION;
+	$output = array();
+	$ret_val = 0;
+	
+	$array_pos = array();
+	
+	exec($command, $output, $ret_val);
+	PrinterLog_logArduino($command, $output);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		PrinterLog_logError('get position command error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	
+	if (count($output) > 0) {
+		$last_output = $output[0];
+		$pos_x = strpos($last_output, 'X');
+		$pos_y = strpos($last_output, 'Y');
+		$pos_z = strpos($last_output, 'Z');
+		$pos_e = strpos($last_output, 'E');
+		
+		if ($pos_x === FALSE || $pos_y === FALSE || $pos_z === FALSE || $pos_e === FALSE) {
+			PrinterLog_logError('get position invalid return', __FILE__, __LINE__);
+			return ERROR_INTERNAL;
+		}
+		
+		$array_pos[PRINTERSTATE_TITLE_POSITION_X] = (float) substr($last_output, $pos_x + 2, $pos_y - $pos_x - 2);
+		$array_pos[PRINTERSTATE_TITLE_POSITION_Y] = (float) substr($last_output, $pos_y + 2, $pos_z - $pos_y - 2);
+		$array_pos[PRINTERSTATE_TITLE_POSITION_Z] = (float) substr($last_output, $pos_z + 2, $pos_e - $pos_z - 2);
+		
+		return ERROR_OK;
+	}
+	else {
+		PrinterLog_logError('get position no return', __FILE__, __LINE__);
+	}
+	
+	return ERROR_INTERNAL;
+}
+
+function PrinterState_getPosition(&$json_position) {
+	$array_data = array();
+	$cr = 0;
+	
+	$cr = PrinterState_getPositionAsArray($array_data);
+	if ($cr == ERROR_OK) {
+		$json_position = json_encode($array_data);
+	}
+	else {
+		$json_position = array();
+	}
+	
+	return $cr;
 }
 
 //internal function
