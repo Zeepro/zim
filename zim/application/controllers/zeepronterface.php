@@ -28,7 +28,7 @@ class Zeepronterface extends MY_Controller {
 		// parse all page
 		$template_data = array(
 				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>Zeepronterface</title>',
+				'headers'		=> '<title>Pronterface#</title>',
 				'contents'		=> $body_page,
 		);
 
@@ -40,7 +40,7 @@ class Zeepronterface extends MY_Controller {
 	public function stop() {
 		$this->load->helper('printerstate');
 		PrinterState_stopPrinting();
-		$this->output->set_header('Location: /pronterface');
+		$this->output->set_header('Location: /zeepronterface');
 
 		return;
 	}
@@ -255,6 +255,7 @@ class Zeepronterface extends MY_Controller {
 		return;
 	}
 	
+	// not in use
 	public function emulator() {
 		$cr = 0;
 		$gcode = NULL;

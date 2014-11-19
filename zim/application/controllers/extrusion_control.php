@@ -37,6 +37,7 @@ class Extrusion_control extends MY_Controller {
 		return;
 	}
 	
+	// stop printing (but no access when in printing due to my_controller, why we put here?)
 	public function stop() {
 		$this->load->helper('printerstate');
 		PrinterState_stopPrinting();
@@ -69,6 +70,7 @@ class Extrusion_control extends MY_Controller {
 		$this->output->set_status_header(403);
 		return;
 	}
+	
 	public function heat($extruder = NULL, $temper = NULL) {
 		$cr = 0;
 		
@@ -139,87 +141,6 @@ class Extrusion_control extends MY_Controller {
 				
 		$this->output->set_status_header(200);
 		print json_encode($array_rfid);
-		return;
-	}
-	
-	public function emulator() {
-		$cr = 0;
-		$gcode = NULL;
-		$command = '';
-		$output = NULL;
-		$ret_val = 0;
-// 		$path_file = '';
-		
-		$this->load->helper(array('detectos', 'printer'));
-// 		if (DectectOS_checkWindows()) {
-// 			$command = 'php ' . $this->config->item('bin') . 'GCEmulator.php ' . $this->config->item('temp') . ' ';
-// 		}
-// 		else {
-// 			$command = $this->config->item('bin') . 'GCEmulator.php p=' . $this->config->item('temp') . ' v=';
-// 		}
-		
-		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-			$upload_config = array (
-					'upload_path'	=> $this->config->item('temp'),
-					'allowed_types'	=> '*',
-// 					'allowed_types'	=> 'gcode',
-					'overwrite'		=> TRUE,
-					'remove_spaces'	=> TRUE,
-					'encrypt_name'	=> TRUE,
-			);
-			$this->load->library('upload', $upload_config);
-			
-			if ($this->upload->do_upload('f')) {
-				$gcode = $this->upload->data();
-// 				$path_file = $this->config->item('temp') . PRONTERFACE_EMULATOR_LOG;
-				
-				$context = stream_context_create(
-						array('http' => array('ignore_errors' => TRUE))
-				);
-				$url = 'http://localhost:' . $_SERVER['SERVER_PORT'] . '/bin/GCEmulator.php?p='
-						. $this->config->item('temp') . '&v=' . $gcode['full_path'];
-				
-				Printer_preparePrint();
-				$response = @file_get_contents($url, FALSE, $context);
-				
-				if ($response === FALSE) {
-					$cr = 403;
-				}
-				else {
-					$cr = ERROR_OK;
-					$this->output->set_content_type('txt_u');
-					$this->load->library('parser');
-					$this->parser->parse('template/plaintxt', array('display' => $response));
-				}
-				
-// 				$command .= $gcode['full_path'] . ' > ' . $path_file;
-// 				PrinterLog_logArduino($command);
-// 				system($command, $ret_val);
-// 				if ($ret_val != ERROR_NORMAL_RC_OK) {
-// 					$this->output->set_status_header(404);
-// 				}
-// 				else if (!file_exists($path_file)) {
-// 					$this->output->set_status_header(404);
-// 				} else {
-// 					$this->load->helper('file');
-// 					$this->output->set_content_type(get_mime_by_extension($path_file))->set_output(@file_get_contents($path_file));
-// 				}
-			}
-			else {
-				$cr = 403;
-			}
-		}
-		else {
-			$cr = 403;
-		}
-		
-		if ($cr != ERROR_OK) {
-			$this->output->set_status_header($cr);
-			$this->output->set_content_type('txt_u');
-			$this->load->library('parser');
-			$this->parser->parse('template/plaintxt', array('display' => $cr . MyERRMSG($cr)));
-		}
-		
 		return;
 	}
 }

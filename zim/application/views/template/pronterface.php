@@ -1,4 +1,4 @@
-<div data-role="page" data-url="/pronterface">
+<div data-role="page" data-url="/zeepronterface">
 	<div id="overlay"></div>
 	<header data-role="header" class="page-header">
 	</header>
@@ -183,7 +183,7 @@
 					<input type="file" data-clear-btn="true" name="f" id="file_n_e">
 					<input type="submit" value="Send" data-icon="arrow-r" data-iconpos="right">
 				</form> -->
-				<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete" onclick="javascript: window.location.href='/pronterface/stop';">Stop</button>
+				<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete" onclick="javascript: window.location.href='/zeepronterface/stop';">Stop</button>
 			</div>
 			<label for="gcode_detail_info">Output</label>
 			<textarea name="gcode_detail_info" id="gcode_detail_info" style="height: 300px !important;" disabled></textarea>
@@ -244,7 +244,7 @@ function refreshCheckTemper() {
 	}
 	
 	var_ajax = $.ajax({
-		url: "/pronterface/temper_ajax",
+		url: "/zeepronterface/temper_ajax",
 		type: "GET",
 		cache: false,
 		beforeSend: function() {
@@ -280,10 +280,10 @@ function home(var_axis) {
 
 	var_axis = typeof var_axis !== 'undefined' ? var_axis : 'all';
 	if (var_axis == 'all') {
-		var_url = "/pronterface/home";
+		var_url = "/zeepronterface/home";
 	}
 	else {
-		var_url = "/pronterface/home/" + var_axis;
+		var_url = "/zeepronterface/home/" + var_axis;
 	}
 	var_ajax = $.ajax({
 		url: var_url,
@@ -333,7 +333,7 @@ function move(var_axis, var_value) {
 		else {
 			var_speed = $("#xy_speed").val();
 		}
-		var_url = "/pronterface/move/" + var_axis + '/' + var_value + '/' + var_speed;
+		var_url = "/zeepronterface/move/" + var_axis + '/' + var_value + '/' + var_speed;
 	}
 	var_ajax = $.ajax({
 		url: var_url,
@@ -376,7 +376,7 @@ function level(var_point) {
 		return false;
 	}
 	else {
-		var_url = "/pronterface/level/" + var_point;
+		var_url = "/zeepronterface/level/" + var_point;
 	}
 	var_ajax = $.ajax({
 		url: var_url,
@@ -429,7 +429,7 @@ function heat(var_extruder, var_value) {
 		}
 	}
 
-	var_url = "/pronterface/heat/" + var_extruder + '/' + var_value;
+	var_url = "/zeepronterface/heat/" + var_extruder + '/' + var_value;
 	var_ajax = $.ajax({
 		url: var_url,
 		type: "GET",
@@ -493,7 +493,7 @@ function extrude(var_extruder, var_direction) {
 	}
 	var_speed = $(id_speed).val();
 
-	var_url = "/pronterface/extrude/" + var_extruder + '/' + var_value + '/' + var_speed;
+	var_url = "/zeepronterface/extrude/" + var_extruder + '/' + var_value + '/' + var_speed;
 	var_ajax = $.ajax({
 		url: var_url,
 		type: "GET",
@@ -529,7 +529,7 @@ function refreshRfid() {
 	}
 	
 	var_ajax = $.ajax({
-		url: "/pronterface/rfid_ajax",
+		url: "/zeepronterface/rfid_ajax",
 		type: "GET",
 		cache: false,
 		beforeSend: function() {
