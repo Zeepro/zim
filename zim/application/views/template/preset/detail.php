@@ -439,7 +439,7 @@
 							<label for="support_material_spacing">{support_material_spacing}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" style="text-align:right;" data-clear-btn="false" name="support_material_spacing" id="support_material_spacing" value="{support_material_spacing_value}" min="1" max="10" step="0.01">
+							<input type="number" style="text-align:right;" data-clear-btn="false" name="support_material_spacing" id="support_material_spacing" value="{support_material_spacing_value}" min="1" step="0.01">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="support_material_angle">{support_material_angle}</label>
