@@ -19,7 +19,7 @@
 		setTimeout(function()
 		{	
 			if ({tromboning})
-				window.location.href = "{url_after_reboot}";
+				window.location.href = "https://home.zeepro.com";
 			else
 			{
 				var ping = new Image();
@@ -29,7 +29,7 @@
 					if (ping.height > 0)
 					{
 						clearInterval(interval);
-						window.location.href = "{url_after_reboot}";
+						window.location.href = "/";
 					}
 				}, 5000);
 			}
