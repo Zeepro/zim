@@ -183,11 +183,12 @@ class Manage extends MY_Controller {
 	public function rebooting()
 	{
 		$this->load->library('parser');
-		$this->load->helper('zimapi');
+		$this->load->helper(array('zimapi', 'corestatus'));
 		
 		$this->lang->load('manage/reboot', $this->config->item('language'));
 		$template_data = array(
 				'hint'	=> t('hint'),
+				'url_after_reboot'	=> CoreStatus_checkTromboning() ? "https://home.zeepro.com" : "/"
 		);
 		$this->parser->parse('template/manage/rebooting', $template_data);
 		$body_page = $this->parser->parse('template/manage/index', $template_data, TRUE);
@@ -208,14 +209,12 @@ class Manage extends MY_Controller {
 	public function reboot_confirm()
 	{
 		$this->load->library('parser');
-		$this->load->helper('corestatus');
 		$this->lang->load('manage/reboot', $this->config->item('language'));
 
 		$template_data = array(
 			'confirm_message'	=> t('confirm_message'),
 			'yes_reboot'		=> t('yes_reboot'),
-			'no_reboot'			=> t('no_reboot'),
-			'url_after_reboot'	=> CoreStatus_checkTromboning() ? "https://home.zeepro.com" : "/" 
+			'no_reboot'			=> t('no_reboot')
 		);
 		$body_page = $this->parser->parse('template/manage/reboot_confirm', $template_data, TRUE);
 		// parse all page
