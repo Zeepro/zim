@@ -37,3 +37,5 @@ $lang['set_preset']
 	= 'Printing presets';
 $lang['nozzles_adjustments']
 	= 'Nozzles offset adjustments';
+$lang['support']
+	= 'Support & FAQ';

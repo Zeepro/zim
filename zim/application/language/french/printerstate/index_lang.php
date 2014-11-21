@@ -37,3 +37,5 @@ $lang['set_preset']
 	= 'Présélections d\'impression';
 $lang['nozzles_adjustments']
 	= 'Ajustement du décalage des buses';
+$lang['support']
+	= 'Support & FAQ';

@@ -452,6 +452,7 @@ class Printerstate extends MY_Controller {
 				'function_on'			=> t('function_on'),
 				'function_off'			=> t('function_off'),
 				'nozzles_adjustments'	=> t('nozzles_adjustments'),
+				'support'				=> t('support')
 		);
 		
 		$body_page = $this->parser->parse('template/printerstate/index', $template_data, TRUE);
