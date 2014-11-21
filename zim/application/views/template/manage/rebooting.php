@@ -16,19 +16,23 @@
 		</div>
 	</div>
 	<script>
-		var ping = new Image();
-
 		setTimeout(function()
-		{
-			var interval = setInterval(function()
+		{	
+			if ({tromboning})
+				window.location.href = "{url_after_reboot}";
+			else
 			{
-				ping.src = "/assets/images/pixel.png?_=" + (new Date()).getTime();
-				if (ping.height > 0)
+				var ping = new Image();
+				var interval = setInterval(function()
 				{
-					clearInterval(interval);
-					window.location.href = "{url_after_reboot}";
-				}
-			}, 5000);
+					ping.src = "/assets/images/pixel.png?_=" + (new Date()).getTime();
+					if (ping.height > 0)
+					{
+						clearInterval(interval);
+						window.location.href = "{url_after_reboot}";
+					}
+				}, 5000);
+			}
 		}, 25000);
 	</script>
 </div>

@@ -188,7 +188,7 @@ class Manage extends MY_Controller {
 		$this->lang->load('manage/reboot', $this->config->item('language'));
 		$template_data = array(
 				'hint'	=> t('hint'),
-				'url_after_reboot'	=> CoreStatus_checkTromboning() ? "https://home.zeepro.com" : "/"
+				'tromboning'	=> CoreStatus_checkTromboning() ? "true" : "false"
 		);
 		$this->parser->parse('template/manage/rebooting', $template_data);
 		$body_page = $this->parser->parse('template/manage/index', $template_data, TRUE);
