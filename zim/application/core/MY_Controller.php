@@ -60,7 +60,7 @@ class MY_Controller extends CI_Controller {
 		}
 		
 		// check tromboning autorisation
-		if (CoreStatus_checkTromboning()) {
+		if (CoreStatus_checkTromboning(FALSE)) {
 			$status_text = ERROR_REMOTE_REFUSE . ' ' . MyERRMSG(ERROR_REMOTE_REFUSE);
 			
 			$this->load->helper(array('printerlog', 'errorcode'));
@@ -179,8 +179,18 @@ class MY_Controller extends CI_Controller {
 					echo 'Not in printing / canceling';
 					exit;
 				}
-				else if (CoreStatus_checkCallPrinting()) {
+				else if (CoreStatus_checkCallPrinting() || CoreStatus_checkCallCanceling()) {
 					$url_redirect = '/';
+				}
+				else {
+					if (CoreStatus_checkInPrinted()) {
+						if (CoreStatus_checkCallEndPrinting($url_redirect) || CoreStatus_checkCallEndPrintingPlus()) {
+							return;
+						}
+					}
+					else if (CoreStatus_checkCallEndPrinting()) {
+						$url_redirect = '/'; // redirect to homepage when we have no timelapse
+					}
 				}
 				
 				if ($url_redirect) {

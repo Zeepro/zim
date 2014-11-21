@@ -54,11 +54,13 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_FILENAME_SOFTWARE',	'Software.json');
 	define('ZIMAPI_FILEPATH_CAPTURE',	'/var/www/tmp/image.jpg');
 	define('ZIMAPI_FILEPATH_UPGRADE',	'/config/conf/profile.json');
-	define('ZIMAPI_PRM_CAMERA_TIMELAPSE', 'ffmpeg -v quiet -r 10 -f image2 -s 640x360 -i /var/www/tmp/img%03d.jpg -i /var/www/images/logo_calque_60.png -y -filter_complex "[0:v][1:v]overlay=380:5" -vcodec libx264 -crf 35 /var/www/tmp/timelapse.mp4');
-	define('ZIMAPI_FILENAME_TIMELAPSE', 'timelapse.mp4');
-	define('ZIMAPI_FILEPATH_TIMELAPSE', '/var/www/tmp/timelapse.mp4');
+	define('ZIMAPI_FILENAME_TIMELAPSE',	'timelapse.mp4');
+	define('ZIMAPI_FILEPATH_TIMELAPSE',	'/var/www/tmp/timelapse.mp4');
+	define('ZIMAPI_FILEPATH_TL_TMPIMG',	'/var/www/tmp/img001.jpg');
+	define('ZIMAPI_CMD_GENERATION_TIMELAPSE',
+			'nice -n 19 ffmpeg -v quiet -r 10 -f image2 -s 640x360 -i /var/www/tmp/img%03d.jpg -i /var/www/images/logo_calque_60.png -y -filter_complex "[0:v][1:v]overlay=380:5" -vcodec libx264 -crf 35 /var/www/tmp/timelapse.mp4');
 	define('ZIMAPI_PRM_CAMERA_PRINTSTART',
-	' -v quiet -r 15 -s 640x480 -f video4linux2 -i /dev/video0 -vf "crop=640:360:0:60" -minrate 512k -maxrate 512k -bufsize 2512k -map 0 -force_key_frames "expr:gte(t,n_forced*2)" -c:v libx264 -r 15 -threads 2 -crf 35 -profile:v baseline -b:v 512k -pix_fmt yuv420p -flags -global_header -f hls -hls_time 5 -hls_wrap 20 -hls_list_size 10 /var/www/tmp/zim.m3u8');
+			' -v quiet -r 15 -s 640x480 -f video4linux2 -i /dev/video0 -vf "crop=640:360:0:60" -minrate 512k -maxrate 512k -bufsize 2512k -map 0 -force_key_frames "expr:gte(t,n_forced*2)" -c:v libx264 -r 15 -threads 2 -crf 35 -profile:v baseline -b:v 512k -pix_fmt yuv420p -flags -global_header -f hls -hls_time 5 -hls_wrap 20 -hls_list_size 10 /var/www/tmp/zim.m3u8');
 	define('ZIMAPI_PRM_CAMERA_PRINTSTART_TIMELAPSE',
 			' -v quiet -r 15 -s 640x480 -f video4linux2 -i /dev/video0 -vf "crop=640:360:0:60" -minrate 512k -maxrate 512k -bufsize 2512k -map 0 -force_key_frames "expr:gte(t,n_forced*2)" -c:v libx264 -r 15 -threads 2 -crf 35 -profile:v baseline -b:v 512k -pix_fmt yuv420p -flags -global_header -f hls -hls_time 5 -hls_wrap 20 -hls_list_size 10 /var/www/tmp/zim.m3u8 -f image2 -vf fps=fps={fps} -qscale:v 2 /var/www/tmp/img%03d.jpg');
 	define('ZIMAPI_PRM_CAMERA_STOP',	' stop ');
@@ -83,10 +85,18 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_VALUE_DEFAULT_DELTA',		45);
 	define('ZIMAPI_VALUE_DEFAULT_THETA',		30);
 	define('ZIMAPI_VALUE_DEFAULT_LENGTH',		8000);
-	define('ZIMAPI_VALUE_DEFAULT_SPEED',		0.5);
+	define('ZIMAPI_VALUE_DEFAULT_SPEED',		0.78);
 	define('ZIMAPI_VALUE_DEFAULT_TL_LENGTH',	30);
 	define('ZIMAPI_VALUE_DEFAULT_TL_OFFSET',	300); // 5 minutes
-
+	define('ZIMAPI_VALUE_MANDRILL_KEY',			'2Zgc9PkAhAoJH8oNBt2q8A');
+	define('ZIMAPI_VALUE_TL_FROM_EMAIL',		'zim-motion@zeepro.com');
+	define('ZIMAPI_VALUE_TL_FROM_NAME',			'Zim');
+	define('ZIMAPI_VALUE_TL_SUBACCOUNT',		'zim-motion');
+	define('ZIMAPI_VALUE_TL_MIMETYPE',			'video/mp4');
+	define('ZIMAPI_VALUE_TL_IP_POOL',			'Main Pool');
+	define('ZIMAPI_VALUE_TL_VIDEO_NAME',		'zimmotion.mp4');
+	define('ZIMAPI_VALUE_TL_MANDRILL_API',		'https://mandrillapp.com/api/1.0/messages/send.json');
+	
 	define('ZIMAPI_PRM_CAPTURE',	'picture');
 	define('ZIMAPI_PRM_VIDEO_MODE',	'video');
 	define('ZIMAPI_PRM_PRESET',		'slicerpreset');
@@ -247,7 +257,13 @@ function ZimAPI_getNetworkInfoAsArray(&$array_data) {
 			if ($ret_val != ERROR_NORMAL_RC_OK) {
 				return ERROR_INTERNAL;
 			}
-			$array_data[ZIMAPI_TITLE_GATEWAY] = $output[0];
+			if (count($output)) {
+				$array_data[ZIMAPI_TITLE_GATEWAY] = $output[0];
+			}
+			else {
+				//TODO check here if it's better to return internal error here or not
+				$array_data[ZIMAPI_TITLE_GATEWAY] = NULL;
+			}
 		}
 		
 		// get DNS
@@ -913,7 +929,7 @@ function ZimAPI_cameraOff() {
 	return TRUE;
 }
 
-function ZimAPI_cleanTimeLapseTempFile() {
+function ZimAPI_cleanTimelapseTempFile() {
 	global $CFG;
 	$output = NULL;
 	$ret_val = 0;
@@ -928,6 +944,174 @@ function ZimAPI_cleanTimeLapseTempFile() {
 	}
 	
 	return TRUE;
+}
+
+function ZimAPI_encodeTimelapse(&$path_timelapse) {
+	$output = NULL;
+	$ret_val = 0;
+	
+	exec(ZIMAPI_CMD_GENERATION_TIMELAPSE, $output, $ret_val);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		$CI = &get_instance();
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('encode timelapse command error', __FILE__, __LINE__);
+// 		PrinterLog_logError(ZIMAPI_CMD_GENERATION_TIMELAPSE, __FILE__, __LINE__);
+		return FALSE;
+	}
+	
+	// clean temporary image files
+	ZimAPI_cleanTimelapseTempFile();
+	
+	$path_timelapse = ZIMAPI_FILEPATH_TIMELAPSE;
+	
+	return TRUE;
+}
+
+function ZimAPI_checkTimelapse(&$done = FALSE) {
+	$ret_val = file_exists(ZIMAPI_FILEPATH_TIMELAPSE);
+	
+	if ($ret_val == TRUE && !file_exists(ZIMAPI_FILEPATH_TL_TMPIMG)) {
+		$done = TRUE;
+	}
+	else {
+		$done = FALSE;
+	}
+	
+	return $ret_val;
+}
+
+function ZimAPI_removeTimelapse() {
+	$ret_val = unlink(ZIMAPI_FILEPATH_TIMELAPSE);
+	
+	if ($ret_val == FALSE) {
+		$CI = &get_instance();
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('remove timelapse video file error', __FILE__, __LINE__);
+	}
+	
+	return $ret_val;
+}
+
+function ZimAPI_sendMandrillEmail($array_senddata) {
+	$send_context = NULL;
+	$result = NULL;
+	$json_data = array();
+	
+// 	$array_senddata = json_encode($array_senddata);
+	$send_context = stream_context_create(array(
+			'http' => array(
+					'header'		=> "Content-type: application/x-www-form-urlencoded",
+// 					'header'		=> "Content-type: application/json\r\nConnection: close\r\nContent-length: " . strlen($array_senddata) . "\r\n",
+					'method'		=> 'POST',
+					'content'		=> http_build_query($array_senddata),
+// 					'content'		=> $array_senddata,
+					'ignore_errors'	=> TRUE,
+			),
+	));
+	
+	$result = @file_get_contents(ZIMAPI_VALUE_TL_MANDRILL_API, FALSE, $send_context);
+	
+	// check response
+	if ($result === FALSE || is_null($http_response_header)) {
+		return ERROR_NO_PRINT; // act as no internet access
+	}
+	
+	$json_data = json_decode($result, TRUE);
+	
+	if (count($json_data) == 0
+			|| (count($json_data) == 1 && !array_key_exists('status', $json_data[0]))
+			|| (count($json_data) > 1 && !array_key_exists('status', $json_data))) {
+		$matches = array();
+		$CI = &get_instance();
+		
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('decode json data return error, return: ' . $result, __FILE__, __LINE__);
+		
+		if (count($http_response_header)) {
+			preg_match('#HTTP/\d+\.\d+ (\d+)#', $http_response_header[0], $matches);
+			PrinterLog_logDebug('send email mandrill status code: ' . $matches[1], __FILE__, __LINE__);
+		}
+		
+		return ERROR_INTERNAL;
+	}
+	else {
+		$CI = &get_instance();
+		$json_element = array();
+		
+		if (count($json_data) == 1) {
+			$json_element = $json_data[0];
+		}
+		else {
+			$json_element = $json_data;
+		}
+		
+		switch ($json_element['status']) {
+			case 'sent':
+			case 'queued':
+				$CI->load->helper('printerlog');
+				PrinterLog_logDebug('send email json: ' . $result, __FILE__, __LINE__);
+// 				PrinterLog_logDebug('send to mandrill json: ' . json_encode($array_senddata));
+				break;
+				
+			case 'error':
+			default:
+				$CI->load->helper('printerlog');
+				PrinterLog_logError('send email error', __FILE__, __LINE__);
+				PrinterLog_logDebug('return json: ' . $result, __FILE__, __LINE__);
+				
+				return ERROR_WRONG_PRM;
+				break;
+		}
+	}
+	
+	return ERROR_OK;
+}
+
+function ZimAPI_sendTimelapse($email) {
+	$CI = &get_instance();
+	$array_senddata = array();
+	
+	// check email validation
+	if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+		return ERROR_WRONG_PRM;
+	}
+	
+	$CI->lang->load('sendtimelapse', $CI->config->item('language'));
+	
+	// prepare mandrill json array
+	$array_senddata = array(
+			'key'		=> ZIMAPI_VALUE_MANDRILL_KEY,
+			'message'	=> array(
+					'from_email'			=> ZIMAPI_VALUE_TL_FROM_EMAIL,
+					'from_name'				=> ZIMAPI_VALUE_TL_FROM_NAME,
+					'subaccount'			=> ZIMAPI_VALUE_TL_SUBACCOUNT,
+					'html'					=> t('timelapse_email_html'),
+					'subject'				=> t('timelapse_email_subject'),
+					'to'					=> array(array('email' => $email)),
+					'important'				=> FALSE,
+					'track_opens'			=> NULL,
+					'track_clicks'			=> NULL,
+					'auto_text'				=> NULL,
+					'auto_html'				=> NULL,
+					'inline_css'			=> NULL,
+					'url_strip_qs'			=> NULL,
+					'preserve_recipients'	=> NULL,
+					'view_content_link'		=> NULL,
+					'tracking_domain'		=> NULL,
+					'signing_domain'		=> NULL,
+					'return_path_domain'	=> NULL,
+					'merge'					=> FALSE,
+					'attachments'			=> array(array(
+							'type'		=> ZIMAPI_VALUE_TL_MIMETYPE,
+							'name'		=> ZIMAPI_VALUE_TL_VIDEO_NAME,
+							'content'	=> base64_encode(file_get_contents(ZIMAPI_FILEPATH_TIMELAPSE)),
+					)), //TODO pass filepath into send api function for performance
+			),
+			'async'		=> FALSE,
+			'ip_pool'	=> ZIMAPI_VALUE_TL_IP_POOL,
+	);
+	
+	return ZimAPI_sendMandrillEmail($array_senddata);
 }
 
 function ZimAPI_getPresetList($set_localization = TRUE) {
@@ -2187,41 +2371,4 @@ function ZimAPI__setPresetLocalization(&$array_json) {
 	
 	return;
 	
-}
-
-function ZimAPI_encodeTimelapse(&$path_timelapse) {
-		global $CFG;
-	$output = NULL;
-	$ret_val = 0;
-	$info_camera = '';
-	
-	// if (!ZimAPI_checkCamera($info_camera)) {
-	// 	return FALSE;
-	// }
-	// if ($info_camera != ZIMAPI_VALUE_MODE_OFF) {
-	// 	$CI = &get_instance();
-	// 	$CI->load->helper('printerlog');
-	// 	PrinterLog_logError('encode can not run when camera is on', __FILE__, __LINE__);
-	// 	return FALSE;
-	// }
-	
-	exec(ZIMAPI_PRM_CAMERA_TIMELAPSE, $output, $ret_val);
-	if ($ret_val != ERROR_NORMAL_RC_OK) {
-		$CI = &get_instance();
-		$CI->load->helper('printerlog');
-		PrinterLog_logError('encode timelapse command error', __FILE__, __LINE__);
-		PrinterLog_logError(ZIMAPI_PRM_CAMERA_TIMELAPSE, __FILE__, __LINE__);
-		return FALSE;
-	}
-	
-	// $CI = &get_instance();
-	// $CI->load->helper('detectos');
-	// if (DectectOS_checkWindows()) {
-	// 	$path_timelapse = $CFG->config['bin'] . 'capture.jpg';
-	// }
-	// else {
-		$path_timelapse = ZIMAPI_FILEPATH_TIMELAPSE;
-	// }
-	
-	return TRUE;
 }

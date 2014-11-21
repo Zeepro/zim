@@ -483,6 +483,248 @@ class Printdetail extends MY_Controller {
 		return;
 	}
 	
+// 	public function slice() {
+// 		$this->load->library('parser');
+// 		$this->parser->parse('template/plaintxt', array('display' => 'IN CONSTRUCTION, goto /rest/status or any rest service'));
+// 	}
+	
+	public function cancel() {
+		$ret_val = NULL;
+		$this->load->helper('printer');
+		
+		$ret_val = Printer_stopPrint();
+		if ($ret_val == TRUE) {
+			$template_data = array();
+			$body_page = '';
+			$status_current = NULL;
+			$array_status = array();
+			
+			$this->load->library('parser');
+			$this->lang->load('printdetail', $this->config->item('language'));
+			
+			$this->load->helper('zimapi');
+			if (!ZimAPI_cameraOn(ZIMAPI_PRM_CAMERA_PRINTSTART)) {
+				$this->load->helper('printerlog');
+				PrinterLog_logError('can not set camera', __FILE__, __LINE__);
+			}
+			
+			// parse the main body
+			$template_data = array(
+					'title'			=> t('Control your printing'),
+					'wait_info'		=> t('wait_hint_cancel'),
+					'finish_info'	=> t('finish_hint_cancel'),
+					'return_button'	=> t('Home'),
+					'return_url'	=> '/',
+					'video_url'		=> $this->config->item('video_url'),
+			);
+			
+			CoreStatus_checkInIdle($status_current, $array_status);
+			if (is_array($array_status) && array_key_exists(CORESTATUS_TITLE_PRINTMODEL, $array_status)
+					&& in_array($array_status[CORESTATUS_TITLE_PRINTMODEL],
+							array(CORESTATUS_VALUE_MID_PRIME_L, CORESTATUS_VALUE_MID_PRIME_R)
+					)) {
+				$template_data['title'] = t('title_prime');
+			}
+			
+			$body_page = $this->parser->parse('template/printdetail/cancel', $template_data, TRUE);
+			
+			// parse all page
+			$template_data = array(
+					'lang'			=> $this->config->item('language_abbr'),
+					'headers'		=> '<title>' . t('printdetail_cancel_pagetitle') . '</title>',
+					'contents'		=> $body_page,
+			);
+			
+			$this->parser->parse('template/basetemplate', $template_data);
+			
+			return;
+		}
+		else {
+			$this->load->helper('printerlog');
+			PrinterLog_logError('can not stop printing', __FILE__, __LINE__);
+			$this->output->set_status_header(403);
+			return;
+		}
+		
+		return;
+	}
+	
+	public function recovery() {
+		$ret_val = NULL;
+		$body_page = NULL;
+		$template_data = array();
+		
+		//TODO finish me for recovery
+		$this->load->helper('printer');
+		$this->load->library('parser');
+		$this->lang->load('printdetail', $this->config->item('language'));
+		
+		// parse the main body
+		$template_data = array(
+				'title'			=> t('Control your printing'),
+				'wait_info'		=> t('wait_hint_recovery'),
+				'finish_info'	=> t('finish_hint_recovery'),
+				'return_button'	=> t('Home'),
+				'return_url'	=> '/',
+		);
+		
+		$body_page = $this->parser->parse('template/printdetail/recovery', $template_data, TRUE);
+		
+		// parse all page
+		$template_data = array(
+				'lang'			=> $this->config->item('language_abbr'),
+				'headers'		=> '<title>' . t('printdetail_recovery_pagetitle') . '</title>',
+				'contents'		=> $body_page,
+		);
+		
+		$this->parser->parse('template/basetemplate', $template_data);
+		
+		return;
+	}
+	
+	public function timelapse() {
+		$body_page = NULL;
+		$template_data = array();
+		$array_info = array();
+		$status_current = NULL;
+		$array_status = array();
+		$restart_url = NULL;
+		
+		$this->load->library('parser');
+		$this->load->helper('zimapi');
+		$this->lang->load('printdetail', $this->config->item('language'));
+		
+		if (CoreStatus_checkInIdle($status_current, $array_status) && array_key_exists(CORESTATUS_TITLE_PRINTMODEL, $array_status)) {
+			$model_id = NULL;
+			$abb_cartridge = NULL;
+			
+			switch ($array_status[CORESTATUS_TITLE_PRINTMODEL]) {
+				case CORESTATUS_VALUE_MID_SLICE:
+					$preset_id = NULL;
+					$preset_name = t('timelapse_info_presetname_unknown');
+					
+					$array_info[] = array(
+							'title'	=> t('timelapse_info_modelname_title'),
+							'value'	=> t('timelapse_info_modelname_slice'),
+					);
+					
+					$this->load->helper('zimapi');
+					if (ZimAPI_getPreset($preset_id)) {
+						$array_json = array();
+						
+						if (ERROR_OK == ZimAPI_getPresetInfoAsArray($preset_id, $array_json)) {
+							$preset_name = $array_json[ZIMAPI_TITLE_PRESET_NAME];
+						}
+					}
+					$array_info[] = array(
+							'title'	=> t('timelapse_info_presetname_title'),
+							'value'	=> $preset_name,
+					);
+					
+					$restart_url = '/printdetail/printslice';
+					break;
+					
+				case CORESTATUS_VALUE_MID_PRIME_R:
+					$abb_cartridge = 'r';
+					// treat priming in the same way
+					
+				case CORESTATUS_VALUE_MID_PRIME_L:
+					// never reach here normally (no timelapse for priming in principe, just for safety)
+					$array_info[] = array(
+							'title'	=> t('timelapse_info_modelname_title'),
+							'value'	=> t('timelapse_info_modelname_prime'),
+					);
+					
+					if (is_null($abb_cartridge)) {
+						$abb_cartridge = 'l';
+					}
+					$restart_url = '/printdetail/printprime?r&v=' . $abb_cartridge;
+					//TODO we lose callback info here
+					break;
+					
+				case CORESTATUS_VALUE_MID_CALIBRATION:
+					$this->load->helper('printlist');
+					$model_id = ModelList_codeModelHash(PRINTLIST_MODEL_CALIBRATION);
+					$restart_url = '/printmodel/detail?id=calibration';
+					// treat as a normal pre-sliced model
+					
+				default:
+					// treat as pre-sliced model
+					$model_data = array();
+					$model_name = t('timelapse_info_modelname_unknown');
+					
+					if (is_null($model_id)) {
+						$this->load->helper('printlist');
+						$model_id = $array_status[CORESTATUS_TITLE_PRINTMODEL];
+					}
+					
+					if (ERROR_OK == ModelList__getDetailAsArray($model_id, $model_data, TRUE)) {
+						$model_name = $model_data[PRINTLIST_TITLE_NAME];
+					}
+					$array_info[] = array(
+							'title'	=> t('timelapse_info_modelname_title'),
+							'value'	=> $model_name,
+					);
+					
+					if (is_null($restart_url)) {
+						$restart_url = '/printdetail/printmodel?id=' . $model_id;
+					}
+					break;
+			}
+			
+			if (array_key_exists(CORESTATUS_TITLE_ELAPSED_TIME, $array_status)) {
+				$display_time = NULL;
+				
+				$this->load->helper('timedisplay');
+				$display_time = TimeDisplay__convertsecond($array_status[CORESTATUS_TITLE_ELAPSED_TIME], '');
+				
+				$array_info[] = array(
+						'title'	=> t('timelapse_info_elapsedtime_title'),
+						'value'	=> $display_time,
+				);
+			}
+		}
+		else {
+			$this->load->helper('printerlog');
+			PrinterLog_logError('unintended status detected in timelapse page: ' . $status_current, __FILE__, __LINE__);
+			$this->output->set_header('Location: /');
+			
+			return;
+		}
+		
+		// parse the main body
+		$template_data = array(
+				'loading_player'		=> t('loading_player'),
+				'finish_info'			=> t('Congratulation, your printing is complete!'),
+				'home_button'			=> t('Home'),
+				'video_error'			=> t('video_error'),
+				'timelapse_title'		=> t('timelapse_title'),
+// 				'timelapse_button'		=> t('timelapse_button'),
+				'send_email_button'		=> t('send_email_button'),
+				'send_email_hint'		=> t('send_email_hint'),
+				'send_email_action'		=> t('send_email_action'),
+				'send_email_error'		=> t('send_email_error'),
+				'send_email_wrong'		=> t('send_email_wrong'),
+				'video_url'				=> '/tmp/' . ZIMAPI_FILENAME_TIMELAPSE,
+				'timelapse_info_title'	=> t('timelapse_info_title'),
+				'timelapse_info'		=> $array_info,
+				'again_button'			=> t('Print again'),
+		);
+		
+		$body_page = $this->parser->parse('template/printdetail/timelapse', $template_data, TRUE);
+		
+		// parse all page
+		$template_data = array(
+				'lang'			=> $this->config->item('language_abbr'),
+				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Printing details') . '</title>',
+				'contents'		=> $body_page,
+		);
+		
+		$this->parser->parse('template/basetemplate', $template_data);
+		
+		return;
+	}
+	
 	public function status_ajax() {
 		$template_data = array();
 // 		$printing_status = '';
@@ -569,102 +811,6 @@ class Printdetail extends MY_Controller {
 		$this->parser->parse('template/printdetail/status_ajax', $template_data);
 		
 		$this->output->set_content_type('text/plain; charset=UTF-8');
-		
-		return;
-	}
-	
-	public function slice() {
-		$this->load->library('parser');
-		$this->parser->parse('template/plaintxt', array('display' => 'IN CONSTRUCTION, goto /rest/status or any rest service'));
-	}
-	
-	public function cancel() {
-		$ret_val = NULL;
-		$this->load->helper('printer');
-		
-		$ret_val = Printer_stopPrint();
-		if ($ret_val == TRUE) {
-			$template_data = array();
-			$body_page = '';
-			$status_current = NULL;
-			$array_status = array();
-			
-			$this->load->library('parser');
-			$this->lang->load('printdetail', $this->config->item('language'));
-			
-			$this->load->helper('zimapi');
-			if (!ZimAPI_cameraOn(ZIMAPI_PRM_CAMERA_PRINTSTART)) {
-				$this->load->helper('printerlog');
-				PrinterLog_logError('can not set camera', __FILE__, __LINE__);
-			}
-			
-			// parse the main body
-			$template_data = array(
-					'title'			=> t('Control your printing'),
-					'wait_info'		=> t('wait_hint_cancel'),
-					'finish_info'	=> t('finish_hint_cancel'),
-					'return_button'	=> t('Home'),
-					'return_url'	=> '/',
-					'video_url'		=> $this->config->item('video_url'),
-			);
-			
-			CoreStatus_checkInIdle($status_current, $array_status);
-			if (is_array($array_status) && array_key_exists(CORESTATUS_TITLE_PRINTMODEL, $array_status)
-					&& in_array($array_status[CORESTATUS_TITLE_PRINTMODEL],
-							array(CORESTATUS_VALUE_MID_PRIME_L, CORESTATUS_VALUE_MID_PRIME_R)
-					)) {
-				$template_data['title'] = t('title_prime');
-			}
-			
-			$body_page = $this->parser->parse('template/printdetail/cancel', $template_data, TRUE);
-			
-			// parse all page
-			$template_data = array(
-					'lang'			=> $this->config->item('language_abbr'),
-					'headers'		=> '<title>' . t('printdetail_cancel_pagetitle') . '</title>',
-					'contents'		=> $body_page,
-			);
-			
-			$this->parser->parse('template/basetemplate', $template_data);
-			
-			return;
-		}
-		else {
-			$this->load->helper('printerlog');
-			PrinterLog_logError('can not stop printing', __FILE__, __LINE__);
-			$this->output->set_status_header(403);
-			return;
-		}
-		
-		return;
-	}
-	
-	public function recovery() {
-		$ret_val = NULL;
-		//TODO finish me for recovery
-		$this->load->helper('printer');
-		$this->load->library('parser');
-		$this->lang->load('printdetail', $this->config->item('language'));
-		
-		// parse the main body
-		$template_data = array(
-				'title'			=> t('Control your printing'),
-				'wait_info'		=> t('wait_hint_recovery'),
-				'finish_info'	=> t('finish_hint_recovery'),
-				'return_button'	=> t('Home'),
-				'return_url'	=> '/',
-		);
-		
-		$body_page = $this->parser->parse('template/printdetail/recovery', $template_data, TRUE);
-		
-		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('printdetail_recovery_pagetitle') . '</title>',
-				'contents'		=> $body_page,
-		);
-		
-		$this->parser->parse('template/basetemplate', $template_data);
 		
 		return;
 	}
@@ -804,11 +950,66 @@ class Printdetail extends MY_Controller {
 			return null;
 		}
 		
-		ZimAPI_cleanTimeLapseTempFile(); // clean temporary image files
-		
 		echo '/tmp/' . ZIMAPI_FILENAME_TIMELAPSE;
 		
 		return;
 //		return $timelapse_path;
+	}
+	
+	public function timelapse_ready_ajax() {
+		$is_ready = FALSE;
+		$status_code = 200;
+		
+		if (CoreStatus_checkInPrinted($is_ready)) {
+			if ($is_ready == TRUE) {
+				$status_code = 202;
+			}
+			else {
+				$status_code = 200;
+			}
+		}
+		else {
+			$status_code = 403;
+		}
+		
+		$this->output->set_status_header($status_code);
+		
+		return;
+	}
+	
+	public function timelapse_end_ajax() {
+		$status_code = 200;
+		
+		if (!CoreStatus_checkInPrinted()) {
+			$status_code = 403;
+		}
+		else if (!ZimAPI_removeTimelapse()) {
+			$status_code = 500;
+		}
+		
+		$this->output->set_status_header($status_code);
+		
+		return;
+	}
+	
+	public function sendemail_ajax() {
+		$cr = 0;
+		$display = NULL;
+		
+		$this->load->helper('zimapi');
+		
+		$email = $this->input->post('email');
+		
+		if ($email) {
+			$cr = ZimAPI_sendTimelapse($email);
+		}
+		else {
+			$cr = ERROR_MISS_PRM;
+		}
+		
+		$display = $cr . " " . t(MyERRMSG($cr));
+		$this->output->set_status_header($cr, $display);
+		
+		return;
 	}
 }

@@ -135,7 +135,8 @@ class Sliceupload extends MY_Controller {
 		// cleanup old upload temporary files
 		$this->_clean_upload_folder();
 		
-		if (ERROR_OK == Slicer_listModel($response) && $response != "[]") {
+		if (ERROR_OK == Slicer_listModel($response) && $response != "[]"
+				&& ERROR_OK == Slicer_checkPlatformModel()) {
 			$template_data = array(
 					'text'	=> t('button_goto_slice'),
 					'link'	=> '/sliceupload/slice',
@@ -380,7 +381,7 @@ class Sliceupload extends MY_Controller {
 		$template_data = array(
 				'home'				=> t('home'),
 				'back'				=> t('back'),
-				'cancel_button'		=> t('cancel'),
+				'cancel_button'		=> t('cancel_button'),
 				'max_percent'		=> $scalemax,
 				'xsize'				=> $xsize,
 				'ysize'				=> $ysize,
@@ -431,23 +432,23 @@ class Sliceupload extends MY_Controller {
 						$array_return = array();
 						
 						$this->load->helper('slicer');
-						$cr = Slicer_addModel($array_model);
-// 						$cr = Slicer_addModel($array_model, FALSE, $array_return);
-// 						if ($cr == ERROR_OK) {
-// 							try {
-// 								if ($array_return[SLICER_TITLE_MAXSCALE] < 100) {
-// 									$display = json_encode($array_return);
-// 									$this->output->set_status_header(202);
-// 									$this->output->set_content_type('txt_u');
-// 									$this->load->library('parser');
-// 									$this->parser->parse('template/plaintxt', array('display' => $display)); //optional
+// 						$cr = Slicer_addModel($array_model);
+						$cr = Slicer_addModel($array_model, FALSE, $array_return);
+						if ($cr == ERROR_OK) {
+							try {
+								if ($array_return[SLICER_TITLE_MAXSCALE] < 100) {
+									$display = json_encode($array_return);
+									$this->output->set_status_header(202);
+									$this->output->set_content_type('txt_u');
+									$this->load->library('parser');
+									$this->parser->parse('template/plaintxt', array('display' => $display)); //optional
 									
-// 									return;
-// 								}
-// 							} catch (Exception $e) {
-// 								$cr = ERROR_INTERNAL;
-// 							}
-// 						}
+									return;
+								}
+							} catch (Exception $e) {
+								$cr = ERROR_INTERNAL;
+							}
+						}
 					}
 				}
 			}

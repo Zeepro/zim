@@ -511,8 +511,8 @@ function Printer_checkPrintStatus(&$return_data) {
 	
 	$return_data = array(
 			'print_percent'	=> $data_status[PRINTERSTATE_TITLE_PERCENT],
-			'print_temperL'	=> $temper_status[PRINTERSTATE_LEFT_EXTRUD],
-			'print_temperR'	=> $temper_status[PRINTERSTATE_RIGHT_EXTRUD],
+			'print_temperL'	=> count($temper_status) ? $temper_status[PRINTERSTATE_LEFT_EXTRUD] : 0,
+			'print_temperR'	=> count($temper_status) ? $temper_status[PRINTERSTATE_RIGHT_EXTRUD] : 0,
 	);
 	
 	// get time remaining if exists

@@ -96,4 +96,34 @@ $lang['wait_hint_recovery_printing']
 $lang['wait_hint_recovery_unknown']
 	= 'Waiting for recovery from unknwon status...';
 
+//printdetail timelapse()
+$lang['timelapse_title']
+	= 'Zim-motion view';
+$lang['send_email_button']
+	= 'Share by email';
+$lang['send_email_hint']
+	= 'Email your zim-motion to:';
+$lang['send_email_action']
+	= 'Send';
+$lang['send_email_error']
+	= 'Sending email error';
+$lang['send_email_wrong']
+	= 'Incorrect email address';
+$lang['timelapse_info_title']
+	= 'Print summary';
+$lang['timelapse_info_modelname_title']
+	= 'Model name';
+$lang['timelapse_info_modelname_slice']
+	= '(Model sliced by printer)';
+$lang['timelapse_info_modelname_prime']
+	= '(System model for priming)';
+$lang['timelapse_info_modelname_unknown']
+	= '(Unknown model)';
+$lang['timelapse_info_presetname_title']
+	= 'Printing preset name';
+$lang['timelapse_info_presetname_unknown']
+	= '(Unknown preset)';
+$lang['timelapse_info_elapsedtime_title']
+	= 'Elapsed time';
+
 ?>

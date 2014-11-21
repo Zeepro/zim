@@ -186,6 +186,9 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_VALUE_ENDSTOP_OPEN',				'open');
 	define('PRINTERSTATE_VALUE_MAXTEMPER_BEFORE_UNLOAD',	50);
 	define('PRINTERSTATE_VALUE_FACTOR_NOZZLE_OFFSET',		10);
+	define('PRINTERSTATE_VALUE_FILAMENT_PLA_LOAD_TEMPER',	220);
+	define('PRINTERSTATE_VALUE_FILAMENT_ABS_LOAD_TEMPER',	260);
+	define('PRINTERSTATE_VALUE_FILAMENT_PVA_LOAD_TEMPER',	200);
 	
 	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD_PVA',		202);
 	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD_PVA',		15);
@@ -1518,6 +1521,7 @@ function PrinterState_checkStatusAsArray() {
 		
 		// check if we need to change idle into sliced or not
 		PrinterState_checkSlicedCondition($data_json);
+		//TODO add timelapse checking
 		
 		return $data_json;
 	}
@@ -1545,6 +1549,7 @@ function PrinterState_checkStatusAsArray() {
 		// try to change idle into sliced if necessary
 		if ($status_current == CORESTATUS_VALUE_IDLE) {
 			PrinterState_checkSlicedCondition($data_json);
+			//TODO add timelapse checking
 		}
 		
 		return $data_json;
@@ -1790,7 +1795,30 @@ function PrinterState_loadFilament($abb_filament) {
 			// pre-heat nozzle
 			$ret_val = PrinterState_getCartridgeAsArray($array_cartridge, $abb_filament);
 			if ($ret_val == ERROR_OK) {
-				PrinterState_setTemperature($array_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1], 'e', $abb_filament);
+				// we let unknown type pass because we have already launched loading, and we heat nozzle to minimum extrusion temperature
+				$temper_load = PRINTERSTATE_TEMPER_CHANGE_MIN;
+				
+				switch ($array_cartridge[PRINTERSTATE_TITLE_MATERIAL]) {
+					case PRINTERSTATE_DESP_MATERIAL_PLA:
+						$temper_load = PRINTERSTATE_VALUE_FILAMENT_PLA_LOAD_TEMPER;
+						break;
+						
+					case PRINTERSTATE_DESP_MATERIAL_ABS:
+						$temper_load = PRINTERSTATE_VALUE_FILAMENT_ABS_LOAD_TEMPER;
+						break;
+						
+					case PRINTERSTATE_DESP_MATERIAL_PVA:
+						$temper_load = PRINTERSTATE_VALUE_FILAMENT_PVA_LOAD_TEMPER;
+						break;
+						
+					default:
+						PrinterLog_logError('unknown filament type in loading', __FILE__, __LINE__);
+// 						return ERROR_INTERNAL;
+						break;
+				}
+				
+// 				PrinterState_setTemperature($array_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1], 'e', $abb_filament);
+				PrinterState_setTemperature($temper_load, 'e', $abb_filament);
 			}
 			else {
 				PrinterLog_logError('set temperature after loading error (reading cartridge)', __FILE__, __LINE__);
@@ -1935,15 +1963,15 @@ function PrinterState_unloadFilament($abb_filament) {
 	// fix temperature according to filament type
 	switch ($array_cartridge[PRINTERSTATE_TITLE_MATERIAL]) {
 		case PRINTERSTATE_DESP_MATERIAL_PLA:
-			$temper_unload = 220;
+			$temper_unload = PRINTERSTATE_VALUE_FILAMENT_PLA_LOAD_TEMPER;
 			break;
 			
 		case PRINTERSTATE_DESP_MATERIAL_ABS:
-			$temper_unload = 260;
+			$temper_unload = PRINTERSTATE_VALUE_FILAMENT_ABS_LOAD_TEMPER;
 			break;
 			
 		case PRINTERSTATE_DESP_MATERIAL_PVA:
-			$temper_unload = 200;
+			$temper_unload = PRINTERSTATE_VALUE_FILAMENT_PVA_LOAD_TEMPER;
 			break;
 			
 		default:
@@ -2269,11 +2297,10 @@ function PrinterState_getNbExtruder() {
 }
 
 function PrinterState_getPrintSize(&$size_array) {
-	global $CFG;
 	$tmp_array = array();
-	$printerinfo_fullpath = $CFG->config['hardconf'] . PRINTERSTATE_JSON_PRINTER;
-	
 	$CI= &get_instance();
+	$printerinfo_fullpath = $CI->config->item('hardconf') . PRINTERSTATE_JSON_PRINTER;
+	
 	$CI->load->helper('json');
 	
 	$size_array = array();
@@ -2286,7 +2313,7 @@ function PrinterState_getPrintSize(&$size_array) {
 		$CI = &get_instance();
 		$CI->load->helper('printerlog');
 		PrinterLog_logError('read printer json error', __FILE__, __LINE__);
-		return 0;
+		return ERROR_INTERNAL;
 	}
 	
 	foreach (array(PRINTERSTATE_TITLE_PRINT_XMAX, PRINTERSTATE_TITLE_PRINT_YMAX, PRINTERSTATE_TITLE_PRINT_ZMAX) as $key) {
@@ -2295,7 +2322,7 @@ function PrinterState_getPrintSize(&$size_array) {
 		}
 	}
 	
-	return;
+	return ERROR_OK;
 }
 
 function PrinterState_getMarlinVersion(&$version_marlin) {

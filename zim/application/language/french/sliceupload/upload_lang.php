@@ -36,3 +36,17 @@ $lang['wait_in_restart']
 	= 'Slicer ne répond pas, relance de slicer en cours...';
 $lang['wait_in_boot']
 	= 'Lancement de slicer en cours...';
+
+//reducesize
+$lang['reducesize_title']
+	= 'Avertissement';
+$lang['reducesize_text']
+	= 'Le modèle est plus gros que le plateau d\'impression.';
+$lang['reducesize_scale']
+	= 'Réduisez-le SVP :';
+$lang['reduced_size']
+	= 'Taille après réduction :';
+$lang['resize_button']
+	= 'Ok';
+$lang['cancel_button']
+	= 'Annuler';

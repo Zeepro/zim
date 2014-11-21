@@ -1,7 +1,7 @@
-<div id="overlay"></div>
 <div data-role="page" data-url="/sliceupload/reducesize">
+	<div id="overlay"></div>
 	<header data-role="header" class="page-header">
-		<a href="javascript:history.back();" data-icon="back" data-ajax="false">{back}</a>
+		<a href="javascript:history.back();" data-icon="back" data-ajax="false" style="display: none;">{back}</a>
 	</header>
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
@@ -17,9 +17,9 @@
 				<input type="hidden" name="ms" value="{max_percent}">
 				<label for="sizepercentage">{reducesize_scale}</label>
 				<input type="range" name="sizepercentage" id="sizepercentage" value="{max_percent}" min="1" max="100">
-				<div id="dimension"><center>{reduced_size}: <span id="x_size"></span>mm x <span id="y_size"></span>mm x <span id="z_size"></span>mm</center></div>
+				<div id="dimension"><center>{reduced_size} <span id="x_size"></span>mm x <span id="y_size"></span>mm x <span id="z_size"></span>mm</center></div>
 				<input id="resize_button" type="button" value="{resize_button}">
-				<input type="button" value="{cancel_button}" onclick="javascript:history.back();">
+				<input type="button" value="{cancel_button}" onclick='javascript: window.location.href = "/sliceupload/upload";'>
 			</form>
 		</div>
 	</div>

@@ -95,4 +95,34 @@ $lang['wait_hint_recovery_printing']
 $lang['wait_hint_recovery_unknown']
 	= 'En attante de la récupération d\'un état inconnu...';
 
+//printdetail timelapse()
+$lang['timelapse_title']
+	= 'Zim-motion Aperçu';
+$lang['send_email_button']
+	= 'Partager par mail';
+$lang['send_email_hint']
+	= 'Envoyer votre zim-motion à :';
+$lang['send_email_action']
+	= 'Envoyer';
+$lang['send_email_error']
+	= 'Erreur d\'envoie de mail';
+$lang['send_email_wrong']
+	= 'Erreur d\'adresse mail';
+$lang['timelapse_info_title']
+	= 'Résumé d\'impression';
+$lang['timelapse_info_modelname_title']
+	= 'Nom de modèle';
+$lang['timelapse_info_modelname_slice']
+	= '(Modèle slicé par imprimante)';
+$lang['timelapse_info_modelname_prime']
+	= '(Modèle du système pour amorçage)';
+$lang['timelapse_info_modelname_unknown']
+	= '(Modèle inconnu)';
+$lang['timelapse_info_presetname_title']
+	= 'Nom de préselection d\'impression';
+$lang['timelapse_info_presetname_unknown']
+	= '(Préselection inconnue)';
+$lang['timelapse_info_elapsedtime_title']
+	= 'Temps passé';
+
 ?>

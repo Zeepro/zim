@@ -25,6 +25,7 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 // 	define('CORESTATUS_TITLE_LASTSTATUS',	'LastState');
 	define('CORESTATUS_TITLE_SUBSTATUS',	'Substate');
 	define('CORESTATUS_TITLE_PRINTMODEL',	'PrintMID');
+	define('CORESTATUS_TITLE_ELAPSED_TIME',	'ElapsedTime');
 	
 	define('CORESTATUS_VALUE_IDLE',				'idle');
 	define('CORESTATUS_VALUE_PRINT',			'printing');
@@ -184,11 +185,11 @@ function CoreStatus_initialFile() {
 	return TRUE;
 }
 
-function CoreStatus_checkTromboning() {
+function CoreStatus_checkTromboning($pure_check = TRUE) {
 	global $CFG;
 	$state_file = $CFG->config['conf'] . CORESTATUS_FILENAME_REMOTEOFF;
 	
-	if (!file_exists($state_file)) {
+	if (!$pure_check && !file_exists($state_file)) {
 		return FALSE;
 	}
 	
@@ -286,6 +287,14 @@ function CoreStatus_checkInPause() {
 	return FALSE;
 }
 
+function CoreStatus_checkInPrinted(&$done = FALSE) {
+	// check printed status by timelapse file detection
+	$CI = &get_instance();
+	$CI->load->helper('zimapi');
+	
+	return ZimAPI_checkTimelapse($done);
+}
+
 function CoreStatus_checkCallREST() {
 	return CoreStatus__checkCallController('rest');
 }
@@ -351,6 +360,29 @@ function CoreStatus_checkCallPrinting($array_status = array(), &$url_redirect = 
 			'/printdetail/status_ajax'	=> NULL,
 			'/printdetail/cancel'		=> NULL, // for canceling printing
 			'/printdetail/cancel_ajax'	=> NULL, // for canceling printing
+	));
+}
+
+function CoreStatus_checkCallEndPrinting(&$url_redirect = '') {
+	$url_redirect = '/printdetail/timelapse';
+	
+	return CoreStatus__checkCallURI(array(
+			'/printdetail/timelapse'			=> NULL,
+			'/printdetail/timelapse_ready_ajax'	=> NULL,
+			'/printdetail/timelapse_end_ajax'	=> NULL,
+			'/printdetail/sendemail_ajax'		=> NULL,
+	));
+}
+
+function CoreStatus_checkCallEndPrintingPlus() {
+	// for print again
+	return CoreStatus__checkCallURI(array(
+			'/printdetail/printmodel'			=> NULL,
+			'/printdetail/printslice'			=> NULL,
+			'/printdetail/printmodel_temp'		=> NULL,
+			'/printdetail/printslice_temp'		=> NULL,
+			'/printmodel/detail'				=> array('id' => CORESTATUS_VALUE_MID_CALIBRATION),
+			'/printdetail/printprime'			=> NULL,
 	));
 }
 
@@ -515,15 +547,16 @@ function CoreStatus_checkCallNoBlockPageInConnection() {
 
 function CoreStatus_setInIdle($last_error = FALSE, $error_message = FALSE) {
 	$status_previous = '';
+	$array_previous = array();
 	$array_status = array(CORESTATUS_TITLE_STARTTIME => NULL);
-	$ret_val = CoreStatus_checkInIdle($status_previous);
+	$ret_val = CoreStatus_checkInIdle($status_previous, $array_previous);
 	if ($ret_val == TRUE) {
 		return TRUE; // we are already in idle
 	}
 	else if ($status_previous == CORESTATUS_VALUE_PRINT
 			|| $status_previous == CORESTATUS_VALUE_CANCEL) {
-		// stop camera http live streaming
-		$ret_val = 0;
+// 		// stop camera http live streaming
+// 		$ret_val = 0;
 		
 // 		$CI = &get_instance();
 // 		$CI->load->helper('zimapi');
@@ -532,8 +565,20 @@ function CoreStatus_setInIdle($last_error = FALSE, $error_message = FALSE) {
 // 			return FALSE;
 // 		}
 		
+		// calculate elapsed time
+		$time_pass = 0;
+		$CI = &get_instance();
+		
+		$CI->load->helper('printerstate'); //TODO think if it's necessary to pass this filepath out of this heavy helper (printerstate)
+		$time_pass = (file_exists(PRINTERSTATE_FILE_PRINTLOG) && array_key_exists(CORESTATUS_TITLE_STARTTIME, $array_previous))
+				? (filemtime(PRINTERSTATE_FILE_PRINTLOG) - $array_previous[CORESTATUS_TITLE_STARTTIME])
+				: (time() - $array_previous[CORESTATUS_TITLE_STARTTIME]);
+		
+		$array_status[CORESTATUS_TITLE_ELAPSED_TIME] = $time_pass;
+		
 		CoreStatus_setInPause(FALSE); // not necessary in any case, just a safty
-		$array_status[CORESTATUS_TITLE_PRINTMODEL] = NULL;
+		// comment initialization of model id to save model info
+// 		$array_status[CORESTATUS_TITLE_PRINTMODEL] = NULL;
 	}
 // 	else if ($status_previous == CORESTATUS_VALUE_UNLOAD_FILA_L
 // 			|| $status_previous == CORESTATUS_VALUE_UNLOAD_FILA_R) {
@@ -606,8 +651,9 @@ function CoreStatus_setInPrinting($model_id) {
 		
 		return CoreStatus__setInStatus(CORESTATUS_VALUE_PRINT,
 				array(
-						CORESTATUS_TITLE_STARTTIME	=> time(),
-						CORESTATUS_TITLE_PRINTMODEL	=> $model_id,
+						CORESTATUS_TITLE_STARTTIME		=> time(),
+						CORESTATUS_TITLE_ELAPSED_TIME	=> 0,
+						CORESTATUS_TITLE_PRINTMODEL		=> $model_id,
 				)
 		);
 // 	}

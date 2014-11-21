@@ -19,6 +19,7 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 	define('SLICER_URL_RENDERING',		'preview?');
 	define('SLICER_URL_ADD_STATUS',		'addstatus');
 	define('SLICER_URL_SETPARAMETER',	'setparameter?');
+	define('SLICER_URL_CHECKSIZES',		'checksizes');
 	
 	define('SLICER_PRM_ID',		'id');
 	define('SLICER_PRM_XPOS',	'xpos');
@@ -55,11 +56,12 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 	define('SLICER_OFFSET_VALUE_COLOR2EXTRUDER',	-1);
 	
 	define('SLICER_RESPONSE_OK',		200);
+	define('SLICER_RESPONSE_OK_ACK',	202);
 	define('SLICER_RESPONSE_MISS_PRM',	432);
 	define('SLICER_RESPONSE_ADD_ERROR',	433);
 	define('SLICER_RESPONSE_WRONG_PRM',	433);
 	define('SLICER_RESPONSE_ERROR',		499);
-	define('SLICER_RESPONSE_NO_MODEL',	453);
+	define('SLICER_RESPONSE_NO_MODEL',	441);
 	
 	define('SLICER_TIMEOUT_WITHLIMIT',	5);
 	define('SLICER_TIMEOUT_NOLIMIT',	300);
@@ -106,6 +108,7 @@ function Slicer_addModel($models_path, $auto_resize = TRUE, &$array_return = arr
 	
 	switch ($ret_val) {
 		case SLICER_RESPONSE_OK:
+		case SLICER_RESPONSE_OK_ACK:
 			$cr = ERROR_OK;
 			break;
 			
@@ -183,7 +186,8 @@ function Slicer_getModelFile($model_id, &$path_model) {
 			break;
 			
 		case SLICER_RESPONSE_WRONG_PRM:
-			$cr = ERROR_WRONG_PRM;
+		case SLICER_RESPONSE_NO_MODEL:
+			$cr = $ret_val;
 			break;
 			
 		default:
@@ -337,6 +341,36 @@ function Slicer_listModel(&$response) {
 	return $cr;
 }
 
+function Slicer_checkPlatformModel() {
+	$cr = 0;
+	$response = NULL;
+	$ret_val = Slicer__requestSlicer(SLICER_URL_CHECKSIZES, TRUE, $response);
+	
+	switch ($ret_val) {
+		case SLICER_RESPONSE_OK:
+			$nb_oversize = (int) $response;
+			if ($nb_oversize == 0) {
+				$cr = ERROR_OK;
+				break;
+			}
+			// switch break through when number is over 0
+			
+		case SLICER_RESPONSE_OK_ACK:
+			$cr = ERROR_WRONG_PRM;
+			break;
+			
+		case SLICER_RESPONSE_NO_MODEL:
+			$cr = ERROR_EMPTY_PLATFORM;
+			break;
+			
+		default:
+			$cr = ERROR_INTERNAL;
+			break;
+	}
+	
+	return $cr;
+}
+
 function Slicer_checkPlatformColor(&$array_cartridge = array()) {
 	$cr = 0;
 	$array_platform = array();
@@ -441,6 +475,7 @@ function Slicer_setModel($array_data) {
 		case SLICER_RESPONSE_OK:
 		case SLICER_RESPONSE_WRONG_PRM:
 		case SLICER_RESPONSE_MISS_PRM:
+		case SLICER_RESPONSE_NO_MODEL:
 			$cr = $ret_val;
 			break;
 			
@@ -762,8 +797,8 @@ function Slicer__changeURLPort() {
 			$slicer_url .= $port_slicer . '/';
 		}
 		$CI->config->set_item('slicer_url', $slicer_url);
-		$CI->load->helper('printerlog');
-		PrinterLog_logDebug('found slic3r port file, url: ' . $slicer_url, __FILE__, __LINE__);
+// 		$CI->load->helper('printerlog');
+// 		PrinterLog_logDebug('found slic3r port file, url: ' . $slicer_url, __FILE__, __LINE__);
 	}
 	else {
 		$CI->load->helper('printerlog');
