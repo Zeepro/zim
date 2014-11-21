@@ -38,7 +38,8 @@ class Menu_home extends MY_Controller {
 				'manage'			=> t('manage'),
 				'upload'			=> t('upload'),
 				'about'				=> t('about'),
-				'library_visible'	=> ($this->config->item('use_sdcard') == TRUE) ? 'block' : 'none',
+// 				'library_visible'	=> ($this->config->item('use_sdcard') == TRUE) ? 'block' : 'none',
+				'library_visible'	=> 'none', // disable library until it is finished to simplify test
 		);
 		
 		
