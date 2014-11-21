@@ -5,7 +5,6 @@
 	<div data-role="content">
 		<div id="container">
 			<a href="/manage/reboot_confirm"><b>{update_available}</b></a>
-<!-- 			<h2>{title}</h2> -->
 			<ul data-role="listview" id="listview_print" class="shadowBox" data-inset="true">
 				<li><a href="/printmodel/listmodel">
 					<h2>{menu_printlist}</h2></a>
@@ -39,7 +38,7 @@
 		</div>
 	</div>
 	<script>
-		var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
+		var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g));
 
 		if (iOS)
 			$("#upload_li").remove();

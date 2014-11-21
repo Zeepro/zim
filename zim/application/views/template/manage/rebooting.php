@@ -26,7 +26,7 @@
 				if (ping.height > 0)
 				{
 					clearInterval(interval);
-					window.location.href = "/";
+					window.location.href = "{url_after_reboot}";
 				}
 			}, 5000);
 		}, 25000);
