@@ -1,5 +1,5 @@
 <?php
 $lang['timelapse_email_html']
-	= '<p>Example HTML content to explain zim-motion FR</p>';
+	= '<p>Bonjour,<br/><br/>Votre vidéo zim-motion est dans la pièce jointe.<br/>N\'hésitez pas de la partager si vous êtes content !<br/><br/>Equipe Zeepro</p>';
 $lang['timelapse_email_subject']
-	= 'Your zim-motion FR';
+	= 'Votre zim-motion';

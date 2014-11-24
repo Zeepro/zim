@@ -43,6 +43,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_AFTER_UNIN_FILA',	' G99');
 	define('PRINTERSTATE_HOMING',			' G28');
 	define('PRINTERSTATE_MOVE',				' G1\ '); // add space in the last
+	define('PRINTERSTATE_MOVE_BLOCK',		' G5\ '); // add space in the last
 	define('PRINTERSTATE_HEAD_LED_ON',		' M1200');
 	define('PRINTERSTATE_HEAD_LED_OFF',		' M1201');
 	define('PRINTERSTATE_STRIP_LED_ON',		' M1202');
@@ -2467,11 +2468,17 @@ function PrinterState_move($axis, $value, $speed = NULL) {
 	}
 	
 	switch($axis) {
+		case 'E':
+			$command = $arcontrol_fullpath . PRINTERSTATE_MOVE_BLOCK;
+			// switch break through
+			
 		case 'X':
 		case 'Y':
 		case 'Z':
-		case 'E':
-			$command = $arcontrol_fullpath . PRINTERSTATE_MOVE . $axis . $value;
+			if (strlen($command) == 0) {
+				$command = $arcontrol_fullpath . PRINTERSTATE_MOVE;
+			}
+			$command .= $axis . $value;
 			if (!is_null($speed)) {
 				$command .= '\ F' . $speed;
 			}

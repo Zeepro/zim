@@ -100,7 +100,7 @@ $lang['wait_hint_recovery_unknown']
 $lang['timelapse_title']
 	= 'Zim-motion view';
 $lang['send_email_button']
-	= 'Share by email';
+	= 'Share via email';
 $lang['send_email_hint']
 	= 'Email your zim-motion to:';
 $lang['send_email_action']
@@ -124,6 +124,6 @@ $lang['timelapse_info_presetname_title']
 $lang['timelapse_info_presetname_unknown']
 	= '(Unknown preset)';
 $lang['timelapse_info_elapsedtime_title']
-	= 'Elapsed time';
+	= 'Print time';
 
 ?>

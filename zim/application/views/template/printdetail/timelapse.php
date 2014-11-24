@@ -108,16 +108,16 @@ function finish_timelapse() {
 function restart_print() {
 	$("#overlay").addClass("gray-overlay");
 	$(".ui-loader").css("display", "block");
-	window.location.replace="{restart_url}";
+	window.location.replace("{restart_url}");
 }
 
 function send_email() {
-	var email_reg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+// 	var email_reg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
 	
-	if(!email_reg.test($.trim($("#email_timelapse").val()))) {
-		$("#email_timelapse_error").css('display','block');
-		return;
-	}
+// 	if(!email_reg.test($.trim($("#email_timelapse").val()))) {
+// 		$("#email_timelapse_error").css('display','block');
+// 		return;
+// 	}
 	
 	var_ajax_send_email = $.ajax({
 		url: "/printdetail/sendemail_ajax",
@@ -139,7 +139,16 @@ function send_email() {
 		$("#timelapse_right_panel").panel("close");
 	})
 	.fail(function() {
-		$("#sending_timelapse_error").css('display','block');
+		switch(var_ajax_send_email.status) {
+			case 432:
+			case 433:
+				$("#email_timelapse_error").css('display','block');
+				break;
+				
+			default:
+				$("#sending_timelapse_error").css('display','block');
+				break;
+		}
 	});
 }
 
@@ -158,7 +167,7 @@ var_interval_video_check = setInterval(function() {
 		// do nothing when status code is 200
 	})
 	.fail(function() {
-		alert('check video failed');
+		console.log('check video failed');
 	});
 }, 3000);
 
@@ -168,12 +177,12 @@ $("#email_timelapse").keyup(function() {
 	$("#sending_timelapse_error").css('display','none');
 });
 
-// open new tab / window for video
-$('a#timelapse_button').click(function(event) {
-	event.preventDefault();
-	event.stopPropagation();
-	window.open(this.href, '_blank');
-});
+// // open new tab / window for video
+// $('a#timelapse_button').click(function(event) {
+// 	event.preventDefault();
+// 	event.stopPropagation();
+// 	window.open(this.href, '_blank');
+// });
 
 // $.ajax({
 // 	type:"POST",

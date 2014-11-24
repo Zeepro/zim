@@ -88,7 +88,7 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_VALUE_DEFAULT_SPEED',		0.78);
 	define('ZIMAPI_VALUE_DEFAULT_TL_LENGTH',	30);
 	define('ZIMAPI_VALUE_DEFAULT_TL_OFFSET',	300); // 5 minutes
-	define('ZIMAPI_VALUE_MANDRILL_KEY',			'2Zgc9PkAhAoJH8oNBt2q8A');
+	define('ZIMAPI_VALUE_MANDRILL_KEY',			'fvdIarvGVCRpDHmV41swgA');
 	define('ZIMAPI_VALUE_TL_FROM_EMAIL',		'zim-motion@zeepro.com');
 	define('ZIMAPI_VALUE_TL_FROM_NAME',			'Zim');
 	define('ZIMAPI_VALUE_TL_SUBACCOUNT',		'zim-motion');
@@ -996,6 +996,7 @@ function ZimAPI_sendMandrillEmail($array_senddata) {
 	$send_context = NULL;
 	$result = NULL;
 	$json_data = array();
+	$send_status = FALSE;
 	
 // 	$array_senddata = json_encode($array_senddata);
 	$send_context = stream_context_create(array(
@@ -1017,10 +1018,28 @@ function ZimAPI_sendMandrillEmail($array_senddata) {
 	}
 	
 	$json_data = json_decode($result, TRUE);
+	foreach($json_data as $json_element) {
+		if (is_array($json_element)) {
+			if (array_key_exists('status', $json_element)
+					&& in_array($json_element['status'], array('sent', 'queued'))) {
+				$send_status = TRUE;
+			}
+			else {
+				$send_status = FALSE;
+				break;
+			}
+		}
+		//TODO check if this case exists or not
+		else if (array_key_exists('status', $json_data) && $json_data['status'] != 'error') {
+			$send_status = TRUE;
+			break;
+		}
+		else {
+			break;
+		}
+	}
 	
-	if (count($json_data) == 0
-			|| (count($json_data) == 1 && !array_key_exists('status', $json_data[0]))
-			|| (count($json_data) > 1 && !array_key_exists('status', $json_data))) {
+	if ($send_status == FALSE) {
 		$matches = array();
 		$CI = &get_instance();
 		
@@ -1036,44 +1055,33 @@ function ZimAPI_sendMandrillEmail($array_senddata) {
 	}
 	else {
 		$CI = &get_instance();
-		$json_element = array();
-		
-		if (count($json_data) == 1) {
-			$json_element = $json_data[0];
-		}
-		else {
-			$json_element = $json_data;
-		}
-		
-		switch ($json_element['status']) {
-			case 'sent':
-			case 'queued':
-				$CI->load->helper('printerlog');
-				PrinterLog_logDebug('send email json: ' . $result, __FILE__, __LINE__);
-// 				PrinterLog_logDebug('send to mandrill json: ' . json_encode($array_senddata));
-				break;
-				
-			case 'error':
-			default:
-				$CI->load->helper('printerlog');
-				PrinterLog_logError('send email error', __FILE__, __LINE__);
-				PrinterLog_logDebug('return json: ' . $result, __FILE__, __LINE__);
-				
-				return ERROR_WRONG_PRM;
-				break;
-		}
+		$CI->load->helper('printerlog');
+		PrinterLog_logDebug('send email json: ' . $result, __FILE__, __LINE__);
+// 		PrinterLog_logDebug('send to mandrill json: ' . json_encode($array_senddata));
 	}
 	
 	return ERROR_OK;
 }
 
-function ZimAPI_sendTimelapse($email) {
+function ZimAPI_sendTimelapse($emails) {
 	$CI = &get_instance();
 	$array_senddata = array();
+	$array_to = array();
 	
 	// check email validation
-	if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-		return ERROR_WRONG_PRM;
+	foreach($emails as $email) {
+		$email = trim($email);
+		
+		if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+			return ERROR_WRONG_PRM;
+		}
+		else {
+			$array_to[] = array('email' => $email);
+		}
+	}
+	
+	if (count($array_to) == 0) {
+		return ERROR_MISS_PRM;
 	}
 	
 	$CI->lang->load('sendtimelapse', $CI->config->item('language'));
@@ -1087,7 +1095,7 @@ function ZimAPI_sendTimelapse($email) {
 					'subaccount'			=> ZIMAPI_VALUE_TL_SUBACCOUNT,
 					'html'					=> t('timelapse_email_html'),
 					'subject'				=> t('timelapse_email_subject'),
-					'to'					=> array(array('email' => $email)),
+					'to'					=> $array_to,
 					'important'				=> FALSE,
 					'track_opens'			=> NULL,
 					'track_clicks'			=> NULL,

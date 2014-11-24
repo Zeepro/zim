@@ -709,6 +709,7 @@ class Printdetail extends MY_Controller {
 				'timelapse_info_title'	=> t('timelapse_info_title'),
 				'timelapse_info'		=> $array_info,
 				'again_button'			=> t('Print again'),
+				'restart_url'			=> $restart_url ? $restart_url : '/',
 		);
 		
 		$body_page = $this->parser->parse('template/printdetail/timelapse', $template_data, TRUE);
@@ -1001,7 +1002,9 @@ class Printdetail extends MY_Controller {
 		$email = $this->input->post('email');
 		
 		if ($email) {
-			$cr = ZimAPI_sendTimelapse($email);
+			$emails = explode(',', $email);
+			
+			$cr = ZimAPI_sendTimelapse($emails);
 		}
 		else {
 			$cr = ERROR_MISS_PRM;

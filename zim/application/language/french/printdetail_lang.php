@@ -123,6 +123,6 @@ $lang['timelapse_info_presetname_title']
 $lang['timelapse_info_presetname_unknown']
 	= '(Préselection inconnue)';
 $lang['timelapse_info_elapsedtime_title']
-	= 'Temps passé';
+	= 'Temps d\'impression';
 
 ?>

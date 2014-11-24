@@ -41,9 +41,9 @@ $lang['wait_in_boot']
 $lang['reducesize_title']
 	= 'Warning';
 $lang['reducesize_text']
-	= 'The model is larger than the print volume.';
+	= 'The model size is bigger than the available print surface.';
 $lang['reducesize_scale']
-	= 'Please scale it down:';
+	= 'Please scale it down (you will still be able to further adjust it):';
 $lang['reduced_size']
 	= 'Reduced size:';
 $lang['resize_button']

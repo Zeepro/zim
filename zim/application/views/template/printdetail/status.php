@@ -96,6 +96,8 @@ var var_finish = false;
 var var_temper_holder;
 var var_temper_l = null;
 var var_temper_r = null;
+var var_timelapse_int;
+var var_timelapse_ajax;
 
 $(document).ready(checkPrintStatus());
 
@@ -352,6 +354,19 @@ function finishAction() {
 				console.log(data);
 			},
 		});
+		
+		// do redirection when timelapse is here (even in generation)
+		var_timelapse_int = setInterval(function() {
+			var_timelapse_ajax = $.ajax({
+				cache: false,
+				type: "HEAD",
+				url: "/tmp/timelapse.mp4",
+				success: function() {
+					clearInterval(var_timelapse_int);
+					window.location.href="/printdetail/timelapse";
+				}
+			});
+		}, 2000);
 	}
 
 	return;

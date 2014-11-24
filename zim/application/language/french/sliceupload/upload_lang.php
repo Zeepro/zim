@@ -41,9 +41,9 @@ $lang['wait_in_boot']
 $lang['reducesize_title']
 	= 'Avertissement';
 $lang['reducesize_text']
-	= 'Le modèle est plus gros que le plateau d\'impression.';
+	= 'La taille du modèle est plus gros que le plateau d\'impression.';
 $lang['reducesize_scale']
-	= 'Réduisez-le SVP :';
+	= 'Réduisez-le SVP (Vous pourrez encore le changer) :';
 $lang['reduced_size']
 	= 'Taille après réduction :';
 $lang['resize_button']

@@ -117,7 +117,7 @@ function Printer_printFromPrime($abb_extruder, $first_run = TRUE) {
 		
 		// modify the temperature of gcode file according to cartridge info
 		//TODO test me
-		$ret_val = Printer__changeGcode($gcode_path, $array_filament);
+		$ret_val = Printer__changeGcode($gcode_path, $array_filament, FALSE, array(), TRUE);
 		if ($ret_val != ERROR_OK) {
 			return $ret_val;
 		}
@@ -662,7 +662,7 @@ function Printer__inverseFilament(&$array_filament) {
 	return;
 }
 
-function Printer__changeGcode(&$gcode_path, $array_filament = array(), $exchange_extruder = FALSE, $array_temper = array()) {
+function Printer__changeGcode(&$gcode_path, $array_filament = array(), $exchange_extruder = FALSE, $array_temper = array(), $temper_material = FALSE) {
 	$temp_r = 0; // right normal temper
 	$temp_rs = 0; // right start temper
 	$temp_l = 0; // left normal temper
@@ -713,8 +713,33 @@ function Printer__changeGcode(&$gcode_path, $array_filament = array(), $exchange
 	else {
 		$cr = PrinterState_getCartridgeAsArray($json_cartridge, 'r');
 		if ($cr == ERROR_OK) {
-			$temp_r = $json_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER];
-			$temp_rs = $json_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1];
+			if ($temper_material) {
+				//TODO need to reunion all getting temperature functions
+				switch ($json_cartridge[PRINTERSTATE_TITLE_MATERIAL]) {
+					case PRINTERSTATE_DESP_MATERIAL_PLA:
+						$temp_rs = PRINTERSTATE_VALUE_FILAMENT_PLA_LOAD_TEMPER;
+						break;
+						
+					case PRINTERSTATE_DESP_MATERIAL_ABS:
+						$temp_rs = PRINTERSTATE_VALUE_FILAMENT_ABS_LOAD_TEMPER;
+						break;
+						
+					case PRINTERSTATE_DESP_MATERIAL_PVA:
+						$temp_rs = PRINTERSTATE_VALUE_FILAMENT_PVA_LOAD_TEMPER;
+						break;
+						
+					default:
+						PrinterLog_logError('unknown filament type in priming', __FILE__, __LINE__);
+// 						return ERROR_INTERNAL;
+						$temp_rs = SLICER_VALUE_DEFAULT_FIRST_TEMPER;
+						break;
+				}
+				$temp_r = $temp_rs;
+			}
+			else {
+				$temp_r = $json_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER];
+				$temp_rs = $json_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1];
+			}
 		}
 		else if ($cr == ERROR_MISS_RIGT_CART) {
 			$CI->load->helper('slicer');
@@ -749,8 +774,33 @@ function Printer__changeGcode(&$gcode_path, $array_filament = array(), $exchange
 		else {
 			$cr = PrinterState_getCartridgeAsArray($json_cartridge, 'l');
 			if ($cr == ERROR_OK) {
-				$temp_l = $json_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER];
-				$temp_ls = $json_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1];
+				if ($temper_material) {
+					//TODO need to reunion all getting temperature functions
+					switch ($json_cartridge[PRINTERSTATE_TITLE_MATERIAL]) {
+						case PRINTERSTATE_DESP_MATERIAL_PLA:
+							$temp_ls = PRINTERSTATE_VALUE_FILAMENT_PLA_LOAD_TEMPER;
+							break;
+							
+						case PRINTERSTATE_DESP_MATERIAL_ABS:
+							$temp_ls = PRINTERSTATE_VALUE_FILAMENT_ABS_LOAD_TEMPER;
+							break;
+							
+						case PRINTERSTATE_DESP_MATERIAL_PVA:
+							$temp_ls = PRINTERSTATE_VALUE_FILAMENT_PVA_LOAD_TEMPER;
+							break;
+							
+						default:
+							PrinterLog_logError('unknown filament type in priming', __FILE__, __LINE__);
+// 							return ERROR_INTERNAL;
+							$temp_ls = SLICER_VALUE_DEFAULT_FIRST_TEMPER;
+							break;
+					}
+					$temp_l = $temp_ls;
+				}
+				else {
+					$temp_l = $json_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER];
+					$temp_ls = $json_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1];
+				}
 			}
 			else if ($cr == ERROR_MISS_LEFT_CART) {
 				$CI->load->helper('slicer');
