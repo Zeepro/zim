@@ -20,7 +20,7 @@
 					<br />
 					<input type="file" data-clear-btn="true" name="file_c2" id="file_upload3" />
 				</div>
-				<input id="upload_submit" type="submit" value="{upload_button}" data-icon="arrow-r" data-iconpos="right" onclick='javascript: uploadfile_wait();' />
+				<input type="submit" value="{upload_button}" data-icon="arrow-r" data-iconpos="right" onclick='javascript: uploadfile_wait();' />
 			</div>
 			</form>
 			{goto_slice}
@@ -44,11 +44,6 @@
 		$("#file_upload1").val("");
 	});
 */
-
-$("input#upload_submit").on("click", function()
-{
-	$(".ui-loader").css('display', 'block');
-});
 
 function uploadfile_wait() {
 	// this create a blocked spinner when we return to this page by back button
