@@ -20,7 +20,9 @@
 		setTimeout(function()
 		{	
 			if ({tromboning})
-				window.location.href = "https://home.zeepro.com";
+			{
+				setTimeout(function(){window.location.href = "https://home.zeepro.com";}, 30000);
+			}
 			else
 			{
 				var ping = new Image();

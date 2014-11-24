@@ -47,7 +47,7 @@
 				</li>
 			</ul>
 			<ul data-role="listview" class="shadowBox" data-inset="true">
-				<li><a href="http://zeeproks.freshdesk.com/support/home">
+				<li><a href="http://zimsupport.zeepro.com/support/home" target="_blank">
 					<h2>{support}</h2></a>
 				</li>
 			</ul>
