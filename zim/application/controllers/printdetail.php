@@ -308,82 +308,93 @@ class Printdetail extends MY_Controller {
 		$this->lang->load('printerstate/index', $this->config->item('language'));
 		
 		$this->load->helper(array('zimapi', 'printerstate'));
-
+		
 		$id = $this->input->get('id');
-
-		// get print length
-		$length = 0;
-		// if just sliced model, get value from temporary json file
-		if ($id == CORESTATUS_VALUE_MID_SLICE) {
-			$temp_json = array();
+		$callback = $this->input->get('cb');
+		$abb_cartridge = $this->input->get('v');
+		
+		if ($abb_cartridge || $id == CORESTATUS_VALUE_MID_CALIBRATION) {
+			// do not launch timelapse image generation for priming and calibration model
+			if (!ZimAPI_cameraOn(ZIMAPI_PRM_CAMERA_PRINTSTART)) {
+				$this->load->helper('printerlog');
+				PrinterLog_logError('can not set camera', __FILE__, __LINE__);
+			}
+		}
+		else {
+			// get print length for timelapse
+			$length = 0;
 			
-			$this->load->helper(array('printerstate', 'slicer'));
-			$temp_json = json_read($this->config->item('temp') . SLICER_FILE_TEMP_DATA, TRUE);
-			if (!isset($temp_json['error'])) {
-				foreach($temp_json['json'] as $temp_filament) {
-					if (array_key_exists(PRINTERSTATE_TITLE_NEED_L, $temp_filament)) {
-						$length += $temp_filament[PRINTERSTATE_TITLE_NEED_L];
+			// if just sliced model, get value from temporary json file
+			if ($id == CORESTATUS_VALUE_MID_SLICE) {
+				$temp_json = array();
+				
+				$this->load->helper(array('printerstate', 'slicer'));
+				$temp_json = json_read($this->config->item('temp') . SLICER_FILE_TEMP_DATA, TRUE);
+				if (!isset($temp_json['error'])) {
+					foreach($temp_json['json'] as $temp_filament) {
+						if (array_key_exists(PRINTERSTATE_TITLE_NEED_L, $temp_filament)) {
+							$length += $temp_filament[PRINTERSTATE_TITLE_NEED_L];
+						}
 					}
 				}
 			}
-		}
-		else if ($id == CORESTATUS_VALUE_MID_CALIBRATION) {
-			$this->load->helper('printlist');
-			ModelList_codeModelHash(PRINTLIST_MODEL_CALIBRATION);
-		}
-		// if presliced model get from helper
-		else if ($id == CORESTATUS_VALUE_MID_CALIBRATION || strlen($id) == 32) {
-			$model_info = array();
-			$mid = NULL;
-			
-			if ($id == CORESTATUS_VALUE_MID_CALIBRATION) {
-				$mid = ModelList_codeModelHash(PRINTLIST_MODEL_CALIBRATION);
+// 			else if ($id == CORESTATUS_VALUE_MID_CALIBRATION) {
+// 				$this->load->helper('printlist');
+// 				ModelList_codeModelHash(PRINTLIST_MODEL_CALIBRATION);
+// 			}
+			// if presliced model get from helper
+// 			else if ($id == CORESTATUS_VALUE_MID_CALIBRATION || strlen($id) == 32) {
+			else if (strlen($id) == 32) {
+				$model_info = array();
+// 				$mid = NULL;
+				
+// 				if ($id == CORESTATUS_VALUE_MID_CALIBRATION) {
+// 					$mid = ModelList_codeModelHash(PRINTLIST_MODEL_CALIBRATION);
+// 				}
+// 				else {
+// 					$mid = $id;
+// 				}
+				
+				$this->load->helper('printlist');
+// 				if (ERROR_OK == ModelList__getDetailAsArray($mid, $model_info) && !is_null($model_info)) {
+				if (ERROR_OK == ModelList__getDetailAsArray($id, $model_info) && !is_null($model_info)) {
+					foreach (array(PRINTLIST_TITLE_LENG_F1, PRINTLIST_TITLE_LENG_F2) as $key_length) {
+						if (array_key_exists($key_length, $model_info)) {
+							$length += $model_info[$key_length];
+						}
+					}
+				}
 			}
+			// if from gcode library
 			else {
-				$mid = $id;
+				$this->load->helper('printerstoring');
+				$info = PrinterStoring_getInfo("gcode", $id);
+				
+				//$length += (array_key_exists('length', $info) ? $info['length'] : 0);
+			}
+			if ($length == 0) {
+				$this->load->helper('printerlog');
+				PrinterLog_logMessage('detected zero filament length, use default length instead', __FILE__, __LINE__);
+				$length = ZIMAPI_VALUE_DEFAULT_LENGTH;
 			}
 			
-			$this->load->helper('printlist');
-			if (ERROR_OK == ModelList__getDetailAsArray($mid, $model_info) && !is_null($model_info)) {
-				foreach (array(PRINTLIST_TITLE_LENG_F1, PRINTLIST_TITLE_LENG_F2) as $key_length) {
-					if (array_key_exists($key_length, $model_info)) {
-						$length += $model_info[$key_length];
-					}
-				}
+			// 30s timelapse at 10 fps, so 300 / print time with 0.5mm/s average speed
+			$camera_prm = str_replace('{fps}',
+					(ZIMAPI_VALUE_DEFAULT_TL_LENGTH * 10 / ($length / ZIMAPI_VALUE_DEFAULT_SPEED + ZIMAPI_VALUE_DEFAULT_TL_OFFSET)),
+					ZIMAPI_PRM_CAMERA_PRINTSTART_TIMELAPSE);
+			if (!ZimAPI_cameraOn($camera_prm)) {
+				$this->load->helper('printerlog');
+				PrinterLog_logError('can not set camera', __FILE__, __LINE__);
 			}
-		}
-		// if from gcode library
-		else {
-			$this->load->helper('printerstoring');
-			$info = PrinterStoring_getInfo("gcode", $id);
-
-			//$length += (array_key_exists('length', $info) ? $info['length'] : 0);
-		}
-		if ($length == 0) {
-			$this->load->helper('printerlog');
-			PrinterLog_logMessage('detected zero filament length, use default length instead', __FILE__, __LINE__);
-			$length = ZIMAPI_VALUE_DEFAULT_LENGTH;
-		}
-
-		// 30s timelapse at 10 fps, so 300 / print time with 0.5mm/s average speed
-		$camera_prm = str_replace('{fps}',
-				(ZIMAPI_VALUE_DEFAULT_TL_LENGTH * 10 / ($length / ZIMAPI_VALUE_DEFAULT_SPEED + ZIMAPI_VALUE_DEFAULT_TL_OFFSET)),
-				ZIMAPI_PRM_CAMERA_PRINTSTART_TIMELAPSE);
-		if (!ZimAPI_cameraOn($camera_prm)) {
-			$this->load->helper('printerlog');
-			PrinterLog_logError('can not set camera', __FILE__, __LINE__);
-		}
-		// test for debug
-		else {
-			$this->load->helper('printerlog');
-			PrinterLog_logDebug('camera parameter: ' . $camera_prm, __FILE__, __LINE__);
+			// test for debug
+			else {
+				$this->load->helper('printerlog');
+				PrinterLog_logDebug('camera parameter: ' . $camera_prm, __FILE__, __LINE__);
+			}
 		}
 		
 		//TODO improve passing the real value of LED later
 		$this->get_led($status_strip, $status_head);
-		
-		$callback = $this->input->get('cb');
-		$abb_cartridge = $this->input->get('v');
 		
 		if ($id == CORESTATUS_VALUE_MID_SLICE) {
 			$print_slice = TRUE;
@@ -820,6 +831,7 @@ class Printdetail extends MY_Controller {
 		// parse the ajax part
 		$template_data = array(
 // 				'print_percent'	=> t('Percentage: %d%%', array($data_status['print_percent'])),
+				'percent_title'	=> t('percent_title'),
 				'value_percent'	=> $data_status['print_percent'],
 				'print_remain'	=> $time_remain,
 				'hold_temper'	=> $hold_temper,
