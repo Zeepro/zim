@@ -125,6 +125,7 @@ function send_email() {
 		type: "POST",
 		data: {
 				email: $('#email_timelapse').val(),
+				model: "{send_email_modelname}",
 		},
 		beforeSend: function() {
 			$("#overlay").addClass("gray-overlay");

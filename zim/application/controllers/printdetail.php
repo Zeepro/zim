@@ -589,6 +589,7 @@ class Printdetail extends MY_Controller {
 		$status_current = NULL;
 		$array_status = array();
 		$restart_url = NULL;
+		$model_displayname = NULL;
 		
 		$this->load->library('parser');
 		$this->load->helper('zimapi');
@@ -601,11 +602,26 @@ class Printdetail extends MY_Controller {
 			switch ($array_status[CORESTATUS_TITLE_PRINTMODEL]) {
 				case CORESTATUS_VALUE_MID_SLICE:
 					$preset_id = NULL;
+					$model_filename = array();
 					$preset_name = t('timelapse_info_presetname_unknown');
 					
+					$this->load->helper('slicer');
+					if (ERROR_OK == Slicer_getModelFile(0, $model_filename, TRUE)) {
+						foreach($model_filename as $model_basename) {
+							if (strlen($model_displayname)) {
+								$model_displayname .= ' + ' . $model_basename;
+							}
+							else {
+								$model_displayname = $model_basename;
+							}
+						}
+					}
+					else {
+						$model_displayname = t('timelapse_info_modelname_slice');
+					}
 					$array_info[] = array(
 							'title'	=> t('timelapse_info_modelname_title'),
-							'value'	=> t('timelapse_info_modelname_slice'),
+							'value'	=> $model_displayname,
 					);
 					
 					$this->load->helper('zimapi');
@@ -651,7 +667,7 @@ class Printdetail extends MY_Controller {
 				default:
 					// treat as pre-sliced model
 					$model_data = array();
-					$model_name = t('timelapse_info_modelname_unknown');
+					$model_displayname = t('timelapse_info_modelname_unknown');
 					
 					if (is_null($model_id)) {
 						$this->load->helper('printlist');
@@ -659,11 +675,11 @@ class Printdetail extends MY_Controller {
 					}
 					
 					if (ERROR_OK == ModelList__getDetailAsArray($model_id, $model_data, TRUE)) {
-						$model_name = $model_data[PRINTLIST_TITLE_NAME];
+						$model_displayname = $model_data[PRINTLIST_TITLE_NAME];
 					}
 					$array_info[] = array(
 							'title'	=> t('timelapse_info_modelname_title'),
-							'value'	=> $model_name,
+							'value'	=> $model_displayname,
 					);
 					
 					if (is_null($restart_url)) {
@@ -710,6 +726,7 @@ class Printdetail extends MY_Controller {
 				'timelapse_info'		=> $array_info,
 				'again_button'			=> t('Print again'),
 				'restart_url'			=> $restart_url ? $restart_url : '/',
+				'send_email_modelname'	=> $model_displayname,
 		);
 		
 		$body_page = $this->parser->parse('template/printdetail/timelapse', $template_data, TRUE);
@@ -1000,11 +1017,12 @@ class Printdetail extends MY_Controller {
 		$this->load->helper('zimapi');
 		
 		$email = $this->input->post('email');
+		$model = $this->input->post('model');
 		
-		if ($email) {
+		if ($email && $model) {
 			$emails = explode(',', $email);
 			
-			$cr = ZimAPI_sendTimelapse($emails);
+			$cr = ZimAPI_sendTimelapse($emails, $model);
 		}
 		else {
 			$cr = ERROR_MISS_PRM;

@@ -120,7 +120,7 @@ $lang['timelapse_info_modelname_prime']
 $lang['timelapse_info_modelname_unknown']
 	= '(Unknown model)';
 $lang['timelapse_info_presetname_title']
-	= 'Printing preset name';
+	= 'Printing Preset';
 $lang['timelapse_info_presetname_unknown']
 	= '(Unknown preset)';
 $lang['timelapse_info_elapsedtime_title']

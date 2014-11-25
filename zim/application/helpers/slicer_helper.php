@@ -169,20 +169,53 @@ function Slicer_removeModel($model_id) {
 	return $cr;
 }
 
-function Slicer_getModelFile($model_id, &$path_model) {
+function Slicer_getModelFile($model_id, &$path_models, $basename = FALSE) {
 	$cr = 0;
 	$ret_val = Slicer__requestSlicer(SLICER_URL_GET_MODELFILE . $model_id, TRUE, $response);
 	
 	switch ($ret_val) {
 		case SLICER_RESPONSE_OK:
-			if (file_exists($response)) {
-				//TODO zip it and return file to user or compress it by lighttpd/php via gzip
-				$path_model = $response;
+			$CI = NULL;
+			
+// 			if (file_exists($response)) {
+// 				//TO/DO zip it and return file to user or compress it by lighttpd/php via gzip (slow)
+// 				$path_model = $response;
+// 				$cr = ERROR_OK;
+// 			}
+// 			else {
+// 				$cr = ERROR_INTERNAL;
+// 			}
+			$path_models = explode('|', $response);
+			if (count($path_models)) {
 				$cr = ERROR_OK;
+				foreach($path_models as $path_model) {
+					if (!file_exists($path_model)) {
+						$CI = &get_instance();
+						$CI->load->helper('printerlog');
+						PrinterLog_logError('file not found in get model file: ' . $path_model, __FILE__, __LINE__);
+						
+						$cr = ERROR_INTERNAL;
+						break;
+					}
+				}
+				if ($cr == ERROR_OK) {
+					if ($basename) { // basename the filepath to get filename
+						$tmp_array = $path_models;
+						$path_models = array();
+						
+						foreach($tmp_array as $path_model) {
+							$path_models[] = basename($path_model);
+						}
+					}
+					break;
+				}
 			}
-			else {
-				$cr = ERROR_INTERNAL;
-			}
+			
+			$CI = &get_instance();
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('unknown response in get model file: ' . $response, __FILE__, __LINE__);
+			
+			$cr = ERROR_INTERNAL;
 			break;
 			
 		case SLICER_RESPONSE_WRONG_PRM:

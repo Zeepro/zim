@@ -1309,27 +1309,30 @@ class Rest extends MY_Controller {
 	//platform web service
 	//==========================================================
 	public function getmodel() {
-		$cr = 0;
-		$id_model = $this->input->get('id');
+// 		$cr = 0;
+// 		$id_model = $this->input->get('id');
 		
-		if ($id_model !== FALSE) {
-			$path_model = '';
+// 		if ($id_model !== FALSE) {
+// 			$path_model = '';
 			
-			$this->load->helper('slicer');
-			$cr = Slicer_getModelFile($id_model, $path_model);
+// 			$this->load->helper('slicer');
+// 			$cr = Slicer_getModelFile($id_model, $path_model);
 			
-			if ($cr != ERROR_OK) {
-				$this->_return_cr($cr);
-			}
-			else {
-				$this->load->helper('file');
-				$this->output->set_content_type(get_mime_by_extension($path_model))->set_output(@file_get_contents($path_model));
-			}
-		}
-		else {
-			$this->_return_cr(ERROR_MISS_PRM);
-		}
+// 			if ($cr != ERROR_OK) {
+// 				$this->_return_cr($cr);
+// 			}
+// 			else {
+// 				$this->load->helper('file');
+// 				$this->output->set_content_type(get_mime_by_extension($path_model))->set_output(@file_get_contents($path_model));
+// 			}
+// 		}
+// 		else {
+// 			$this->_return_cr(ERROR_MISS_PRM);
+// 		}
 		
+// 		return;
+		//TODO rewrite it if necessary (deprecated function and not works correctly after structure change, so we disable it for now)
+		$this->_return_under_construction();
 		return;
 	}
 	

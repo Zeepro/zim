@@ -1063,7 +1063,7 @@ function ZimAPI_sendMandrillEmail($array_senddata) {
 	return ERROR_OK;
 }
 
-function ZimAPI_sendTimelapse($emails) {
+function ZimAPI_sendTimelapse($emails, $model_name = NULL) {
 	$CI = &get_instance();
 	$array_senddata = array();
 	$array_to = array();
@@ -1094,7 +1094,7 @@ function ZimAPI_sendTimelapse($emails) {
 					'from_name'				=> ZIMAPI_VALUE_TL_FROM_NAME,
 					'subaccount'			=> ZIMAPI_VALUE_TL_SUBACCOUNT,
 					'html'					=> t('timelapse_email_html'),
-					'subject'				=> t('timelapse_email_subject'),
+					'subject'				=> t('timelapse_email_subject') . ' ' . $model_name,
 					'to'					=> $array_to,
 					'important'				=> FALSE,
 					'track_opens'			=> NULL,

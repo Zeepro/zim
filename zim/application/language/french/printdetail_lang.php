@@ -119,7 +119,7 @@ $lang['timelapse_info_modelname_prime']
 $lang['timelapse_info_modelname_unknown']
 	= '(Modèle inconnu)';
 $lang['timelapse_info_presetname_title']
-	= 'Nom de préselection d\'impression';
+	= 'Préselection d\'impression';
 $lang['timelapse_info_presetname_unknown']
 	= '(Préselection inconnue)';
 $lang['timelapse_info_elapsedtime_title']

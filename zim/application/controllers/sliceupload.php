@@ -60,7 +60,7 @@ class Sliceupload extends MY_Controller {
 					'allowed_types'	=> '*',
 					'overwrite'		=> FALSE,
 					'remove_spaces'	=> TRUE,
-					'encrypt_name'	=> TRUE,
+// 					'encrypt_name'	=> TRUE,
 			);
 			$this->load->library('upload', $upload_config);
 			
