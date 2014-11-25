@@ -90,6 +90,7 @@ var var_onPlay = false;
 var var_ajax;
 var var_prime = {var_prime};
 var var_slice = {var_slice};
+var var_calibration = {var_calibration};
 // var var_finish = false;
 var var_ajax_lock = false;
 var var_finish = false;
@@ -320,7 +321,7 @@ function finishAction() {
 // 		$('button#print_action').click(function(){storegcode(); window.location.href='/'; return false;});
 // 	}
 
-	if (var_prime == false) {
+	if (var_prime == false && var_calibration == false) {
 		// add loading + button Download Timelapse + Encode
 		$("#print_detail_info").append('<div id=\'timelapse\'><label id="timelapse_info">{timelapse_info}</label><a href="#" id="timelapse_button" data-ajax="false" data-role="button" class="ui-link ui-btn ui-shadow ui-corner-all ui-disabled" role="button" disable>{timelapse_button}</a></div>');
 		

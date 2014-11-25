@@ -408,6 +408,7 @@ class Printdetail extends MY_Controller {
 				'restart_url'		=> '/printdetail/printmodel?id=' . $id,
 				'var_prime'			=> 'false',
 				'var_slice'			=> 'false',
+				'var_calibration'	=> $print_calibration ? 'true' : 'false',
 				'again_button'		=> t('Print again'),
 				'video_url'			=> $this->config->item('video_url'),
 				'strip_led'			=> t('strip_led'),
@@ -425,7 +426,7 @@ class Printdetail extends MY_Controller {
 				'timelapse_error'	=> t('timelapse_error'),
 				'timelapse_ok'		=> t('timelapse_ok'),
 				'timelapse_info'	=> t('timelapse_info'),
-				'timelapse_button'	=> t('timelapse_button')
+				'timelapse_button'	=> t('timelapse_button'),
 		);
 		
 		if ($print_slice == TRUE) {
@@ -659,6 +660,7 @@ class Printdetail extends MY_Controller {
 					break;
 					
 				case CORESTATUS_VALUE_MID_CALIBRATION:
+					// never reach here normally (no timelapse for calibration model, just for safety)
 					$this->load->helper('printlist');
 					$model_id = ModelList_codeModelHash(PRINTLIST_MODEL_CALIBRATION);
 					$restart_url = '/printmodel/detail?id=calibration';
@@ -817,7 +819,8 @@ class Printdetail extends MY_Controller {
 		
 		// parse the ajax part
 		$template_data = array(
-				'print_percent'	=> t('Percentage: %d%%', array($data_status['print_percent'])),
+// 				'print_percent'	=> t('Percentage: %d%%', array($data_status['print_percent'])),
+				'value_percent'	=> $data_status['print_percent'],
 				'print_remain'	=> $time_remain,
 				'hold_temper'	=> $hold_temper,
 				'print_temperL'	=> t('Temperature of the left extruder: %d °C', array($temper_l)),
