@@ -26,7 +26,7 @@
 					<div class="ui-block-a" style="width:1%;position:relative;top:11px;left:28px;">
 						<span id="size_percentage"></span>
 					</div>
-					<div class="ui-block-b" id="size-slider">
+					<div class="ui-block-b" id="size-slider" style="width:75%">
 						<input type="range" name="sizepercentage" id="sizepercentage" value="{max_percent}" min="1" max="100">
 					</div>
 				</div>
