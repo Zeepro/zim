@@ -26,8 +26,7 @@
 		<style type="text/css">
 			div.logo {
 				width:100%; 
-				height:110px; 
-				/*background:url("/assets/images/logo-1.png") top center no-repeat;*/
+				height:110px;
 				background:url("/assets/images/logo-white.png") top center no-repeat;
 				background-size: 212px 59px;
 			}

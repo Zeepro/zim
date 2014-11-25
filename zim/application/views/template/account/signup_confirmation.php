@@ -6,6 +6,7 @@
 	<div data-role="content">
 		<div id="container">
 			<h3>{code_title}</h3>
+			<div class="zim-error">{error}</div>
 			<?php
 				$this->load->helper('form');
 			

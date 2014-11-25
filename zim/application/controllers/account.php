@@ -126,7 +126,7 @@ class Account extends MY_Controller
 	public function signup_confirmation()
 	{
 		$file = 'template/account/signup_confirmation';
-		$data = array();
+		$error = "";
 		$this->load->library('parser');
 		$this->load->helper('url');
 		$this->lang->load('signup_confirmation', $this->config->item('language'));
@@ -172,20 +172,26 @@ class Account extends MY_Controller
 					$file = 'template/activation/activation_form';
 					$data = array('email' => $this->session->userdata('email'), 'password' => $this->session->userdata('password'), 'returnUrl' => '');
 				}
+				$error = t('code_err');
 			}
+			else
+				$error = t('no_code');
 		}
+		$data = array(
+				'error'			=> $error,
+				'back'			=> t('back'),
+				'give_name'		=> t('give_name'),
+				'activate'		=> t('activate'),
+				'name_printer'	=> t('name_printer'),
+				'code_title'	=> t('code_title')
+		);
 		$body_page = $this->parser->parse($file, $data, TRUE);
 		
 		// parse all page
 		$template_data = array(
 				'lang'			=> $this->config->item('language_abbr'),
 				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Home') . '</title>',
-				'contents'		=> $body_page,
-				'back'			=> t('back'),
-				'give_name'		=> t('give_name'),
-				'activate'		=> t('activate'),
-				'name_printer'	=> t('name_printer'),
-				'code_title'	=> t('code_title')
+				'contents'		=> $body_page
 		);
 		$this->parser->parse('template/basetemplate', $template_data);
 		return;
@@ -272,8 +278,10 @@ class Account extends MY_Controller
 				else if ($result == 432)
 					$data['error'] = t('missing_parameter') . '<br />';
 			}
+			else if ($_POST['password'] != $_POST['confirm'])
+				$data['error'] = t("wrong_pass") . '<br />';
 			else
-				$data['error'] = t('missing_parameter') . '<br />';
+				$data['error'] = t('missing_parameter') . '<br />';;
 		}
 		
 		// add skip button if in wizard
