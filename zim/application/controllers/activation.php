@@ -139,6 +139,8 @@ class Activation extends MY_Controller
 				break;
 
 			case 'skip':
+				$this->output->set_header("Location: /menu_home");
+				return;
 			default:
 				if ($mode != 'skip') {
 					$this->load->helper('printerlog');

@@ -513,7 +513,7 @@ class Connection extends MY_Controller {
 				'printersn'			=> ZimAPI_getSerial(),
 				'config_printer'	=> t('config_printer'),
 				'connect_error_msg'	=> t('connect_error_msg'),
-				'popup'				=> t('popup', $ssid ? $ssid : "XXX")
+				'popup'				=> t('popup', $ssid ? urldecode($ssid) : "XXX")
 		);
 		
 		$body_page = $this->parser->parse('template/connection/in_progress', $template_data, TRUE);
