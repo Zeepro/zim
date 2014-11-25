@@ -1,10 +1,28 @@
 					<p>{in_finish}</p>
 					<div id="print_detail_info_temper_l">{print_temperL}<br></div><br>
 					<div id="print_detail_info_temper_r">{print_temperR}<br></div><br>
-					<p>{print_percent}</p>
+ 					<p>{percent_title}</p>
+					<div id="print_progress"></div>
 					<p>{print_remain}</p>
 					
+					
 <script type="text/javascript">
+
+var value_percent = {value_percent};
+
+$('<input>').appendTo("div#print_progress")
+.attr({'id':'percentage_slider','data-highlight':'true','value':value_percent, 'type':'range', 'min':'0','max':'100'}).slider(
+{
+	create: function (e, ui)
+	{
+		$(this).parent().find('input').hide();
+		$(this).parent().find('input').css('margin-left','-9999px'); // Fix for some FF versions
+		$(this).parent().find('.ui-slider-track').css('margin-left','0px');
+		$(this).parent().find('.ui-slider-track').css('margin-right','0px');
+		$(this).parent().find('.ui-slider-handle').hide();
+	}
+});
+
 <!--
 var_temper_holder = {hold_temper};
 if (var_temper_holder == false) {
