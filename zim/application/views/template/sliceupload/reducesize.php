@@ -4,6 +4,12 @@
 		<a href="javascript:history.back();" data-icon="back" data-ajax="false" style="display: none;">{back}</a>
 	</header>
 	<div class="logo"><div id="link_logo"></div></div>
+	<style>
+    	input[type=number]
+    	{
+        	display : none !important;
+		}
+	</style>
 	<div data-role="content">
 		<div id="container">
 			<h2>{reducesize_title}</h2>
@@ -15,8 +21,15 @@
 				<input type="hidden" name="y" value="{ysize}">
 				<input type="hidden" name="z" value="{zsize}">
 				<input type="hidden" name="ms" value="{max_percent}">
-				<label for="sizepercentage">{reducesize_scale}</label>
-				<input type="range" name="sizepercentage" id="sizepercentage" value="{max_percent}" min="1" max="100">
+				<label for="sizepercentage">{reducesize_scale}</label><br />
+				<div class="ui-grid-a">
+					<div class="ui-block-a" style="width:1%;position:relative;top:11px;left:28px;">
+						<span id="size_percentage"></span>
+					</div>
+					<div class="ui-block-b" id="size-slider">
+						<input type="range" name="sizepercentage" id="sizepercentage" value="{max_percent}" min="1" max="100">
+					</div>
+				</div>
 				<div id="dimension"><center>{reduced_size} <span id="x_size"></span>mm x <span id="y_size"></span>mm x <span id="z_size"></span>mm</center></div>
 				<input id="resize_button" type="button" value="{resize_button}">
 				<input type="button" value="{cancel_button}" onclick='javascript: window.location.href = "/sliceupload/upload";'>
@@ -33,6 +46,7 @@ var var_model_id = {id};
 var var_ajax;
 
 $(document).ready(function () {
+	$("span#size_percentage").html($("#sizepercentage").val() + "%");
 	$(".ui-slider-handle").attr('style', "left: 100%;");
 	$("#sizepercentage").attr('max', var_max_percent);
 // 	$('#sizepercentage').val(var_max_percent);
@@ -78,6 +92,11 @@ $('#resize_button').on('click', function() {
 	});
 	
 	return;
+});
+
+$("#size-slider").on("change", function()
+{
+	$("span#size_percentage").html($("#sizepercentage").val() + "%");
 });
 </script>
 

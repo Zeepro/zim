@@ -41,9 +41,9 @@ $lang['wait_in_boot']
 $lang['reducesize_title']
 	= 'Avertissement';
 $lang['reducesize_text']
-	= 'La taille du modèle est plus gros que le plateau d\'impression.';
+	= "La taille du modèle d'origine est supérieure à la taille du plateau d\'impression.";
 $lang['reducesize_scale']
-	= 'Réduisez-le SVP (Vous pourrez encore le changer) :';
+	= "zim l'a automatiquement réduit à la plus grande taille possible. Vous pouvez encore l'ajuster.";
 $lang['reduced_size']
 	= 'Taille après réduction :';
 $lang['resize_button']

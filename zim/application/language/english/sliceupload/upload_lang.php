@@ -41,9 +41,9 @@ $lang['wait_in_boot']
 $lang['reducesize_title']
 	= 'Warning';
 $lang['reducesize_text']
-	= 'The model size is bigger than the available print surface.';
+	= 'The original model size is bigger than the available print surface.';
 $lang['reducesize_scale']
-	= 'Please scale it down (you will still be able to further adjust it):';
+	= 'zim automatically scaled it to the biggest possible size. You can further adjust it if needed.';
 $lang['reduced_size']
 	= 'Reduced size:';
 $lang['resize_button']
