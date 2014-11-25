@@ -75,6 +75,8 @@ $lang['in_finish']
 	= 'Finalizing printing...';
 $lang['in_finish_prime']
 	= 'Finalizing priming...';
+$lang['percent_title']
+	= 'Print progression:';
 
 //printdetail cancel()
 $lang['printdetail_cancel_pagetitle']

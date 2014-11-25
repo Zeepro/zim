@@ -74,6 +74,8 @@ $lang['in_finish']
 	= 'En attente de finalisation de l\'impression...';
 $lang['in_finish_prime']
 	= 'En attente de finalisation de l\'amorçage...';
+$lang['percent_title']
+	= 'Progression de l\impression :';
 
 //printdetail cancel()
 $lang['printdetail_cancel_pagetitle']
