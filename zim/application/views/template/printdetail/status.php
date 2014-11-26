@@ -362,7 +362,7 @@ function finishAction() {
 		$("#print_detail_info").html('<p>{finish_info}</p>');
 		// change return button
 		$('button#print_action').attr('onclick','').unbind('click');
-		$('button#print_action').click(function(){window.location.href='/'; return false;});
+		$('button#print_action').click(function(){window.location.href='{return_url}'; return false;});
 		$('button#print_action').parent().find('span.ui-btn-text').text('{return_button}');
 		$('button#print_action').html('{return_button}');
 		var_finish = true;
