@@ -75,7 +75,7 @@ $lang['in_finish']
 $lang['in_finish_prime']
 	= 'En attente de finalisation de l\'amorçage...';
 $lang['percent_title']
-	= 'Progression de l\impression :';
+	= 'Progression de l\'impression :';
 
 //printdetail cancel()
 $lang['printdetail_cancel_pagetitle']
@@ -126,5 +126,7 @@ $lang['timelapse_info_presetname_unknown']
 	= '(Préselection inconnue)';
 $lang['timelapse_info_elapsedtime_title']
 	= 'Temps d\'impression';
+$lang['send_email_multi']
+	= 'Note: Pour autres adresses mail, ajoutez une virgule.';
 
 ?>

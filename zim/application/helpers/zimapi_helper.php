@@ -81,7 +81,7 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_TITLE_PRESET_RAFT',		'raft_layers');
 	define('ZIMAPI_TITLE_PRESET_SUPPORT',	'support_material');
 	
-	define('ZIMAPI_VALUE_DEFAULT_RHO',			600);
+	define('ZIMAPI_VALUE_DEFAULT_RHO',			600); // 800 for future usage with platform change
 	define('ZIMAPI_VALUE_DEFAULT_DELTA',		45);
 	define('ZIMAPI_VALUE_DEFAULT_THETA',		30);
 	define('ZIMAPI_VALUE_DEFAULT_LENGTH',		8000);

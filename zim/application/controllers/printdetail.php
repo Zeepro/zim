@@ -734,6 +734,7 @@ class Printdetail extends MY_Controller {
 				'send_email_action'		=> t('send_email_action'),
 				'send_email_error'		=> t('send_email_error'),
 				'send_email_wrong'		=> t('send_email_wrong'),
+				'send_email_multi'		=> t('send_email_multi'),
 				'video_url'				=> '/tmp/' . ZIMAPI_FILENAME_TIMELAPSE,
 				'timelapse_info_title'	=> t('timelapse_info_title'),
 				'timelapse_info'		=> $array_info,
@@ -1036,6 +1037,10 @@ class Printdetail extends MY_Controller {
 		
 		if ($email && $model) {
 			$emails = explode(',', $email);
+			// check parenthesis surround, add them if not exist
+			if (strlen($model) && ($model[0] != '(' || $model[strlen($model) - 1] != ')')) {
+				$model = '(' . $model . ')';
+			}
 			
 			$cr = ZimAPI_sendTimelapse($emails, $model);
 		}

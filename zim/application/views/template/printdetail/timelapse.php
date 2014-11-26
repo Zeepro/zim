@@ -36,6 +36,7 @@
 	<div data-role="panel" id="timelapse_right_panel" data-display="overlay" data-position="right">
 		<h3>{send_email_hint}</h3>
 		<input type="text" name="name" id="email_timelapse" value="" data-clear-btn="true">
+		<p style="">{send_email_multi}</p>
 		<span class="zim-error" id="email_timelapse_wrong" style="display: none;">{send_email_wrong}</span>
 		<span class="zim-error" id="sending_timelapse_error" style="display: none;">{send_email_error}</span>
 		<button class="ui-btn ui-shadow ui-corner-all" id="email_timelapse_submit" onclick='javascript: send_email();'>{send_email_action}</button>

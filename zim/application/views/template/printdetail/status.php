@@ -292,20 +292,7 @@ function storegcode() {
 
 function finishAction() {
 	finishLoop();
-	// display info
-	$("#print_detail_info").html('<p>{finish_info}</p>');
-	// change return button
-	$('button#print_action').attr('onclick','').unbind('click');
-	$('button#print_action').click(function(){window.location.href='/'; return false;});
-	$('button#print_action').parent().find('span.ui-btn-text').text('{return_button}');
-	$('button#print_action').html('{return_button}');
-	var_finish = true;
-
-	// add restart button for print again
-	$('<div>').appendTo('#container')
-	.attr({'id': 'again_button', 'onclick' : 'again()', 'data-icon' : 'refresh'}).html('{again_button}')
-	.button().button('refresh');
-
+	
 // 	// library function - add checkbox + name input, store the gcode file in the library -> add onclick on home/printagain button
 // 	if (var_slice == true) {
 // 		$("#print_detail_info").append('<div id=\'parent_checkbox\'><label><input type="checkbox" id="checkbox_storegcode" value="1" />{storegcode_info}</label><input type="text" id="storegcode_name" value="{storegcode_name}" onclick="if (this.value == \'{storegcode_name}\') {this.value=\'\';}" onfocus="this.select()" onblur="this.value=!this.value?\'{storegcode_name}\':this.value;"/></div>');
@@ -320,10 +307,10 @@ function finishAction() {
 // 		$("#again_button").attr("onclick", "storegcode(); again()");
 // 		$('button#print_action').click(function(){storegcode(); window.location.href='/'; return false;});
 // 	}
-
+	
 	if (var_prime == false && var_calibration == false) {
 		// add loading + button Download Timelapse + Encode
-		$("#print_detail_info").append('<div id=\'timelapse\'><label id="timelapse_info">{timelapse_info}</label><a href="#" id="timelapse_button" data-ajax="false" data-role="button" class="ui-link ui-btn ui-shadow ui-corner-all ui-disabled" role="button" disable>{timelapse_button}</a></div>');
+// 		$("#print_detail_info").append('<div id=\'timelapse\'><label id="timelapse_info">{timelapse_info}</label><a href="#" id="timelapse_button" data-ajax="false" data-role="button" class="ui-link ui-btn ui-shadow ui-corner-all ui-disabled" role="button" disable>{timelapse_button}</a></div>');
 		
 		$.ajax({
 			cache: false,
@@ -335,23 +322,24 @@ function finishAction() {
 			},
 //			dataType: "json",
 			success: function (data, textStatus, xhr) {
-				if (data != '') {
-					$('label#timelapse_info').html('{timelapse_ok}');
-					$('a#timelapse_button').removeClass('ui-disabled');
-					$('a#timelapse_button').addClass('externalLink');
-					$('a#timelapse_button').attr('href', data);
-					$('a#timelapse_button').click(function(event) {
-						event.preventDefault();
-						event.stopPropagation();
-						window.open(this.href, '_blank');
-					});
-				}
-				else {
-					$('label#timelapse_info').html('{timelapse_error}');
-				}
+// 				if (data != '') {
+// 					$('label#timelapse_info').html('{timelapse_ok}');
+// 					$('a#timelapse_button').removeClass('ui-disabled');
+// 					$('a#timelapse_button').addClass('externalLink');
+// 					$('a#timelapse_button').attr('href', data);
+// 					$('a#timelapse_button').click(function(event) {
+// 						event.preventDefault();
+// 						event.stopPropagation();
+// 						window.open(this.href, '_blank');
+// 					});
+// 				}
+// 				else {
+// 					$('label#timelapse_info').html('{timelapse_error}');
+// 				}
+				console.log(data);
 			},
 			error: function (data, textStatus, xhr) {
-				$('label#timelapse_info').html('{timelapse_error}');
+// 				$('label#timelapse_info').html('{timelapse_error}');
 				console.log(data);
 			},
 		});
@@ -368,6 +356,21 @@ function finishAction() {
 				}
 			});
 		}, 2000);
+	}
+	else {
+		// display info
+		$("#print_detail_info").html('<p>{finish_info}</p>');
+		// change return button
+		$('button#print_action').attr('onclick','').unbind('click');
+		$('button#print_action').click(function(){window.location.href='/'; return false;});
+		$('button#print_action').parent().find('span.ui-btn-text').text('{return_button}');
+		$('button#print_action').html('{return_button}');
+		var_finish = true;
+		
+		// add restart button for print again
+		$('<div>').appendTo('#container')
+		.attr({'id': 'again_button', 'onclick' : 'again()', 'data-icon' : 'refresh'}).html('{again_button}')
+		.button().button('refresh');
 	}
 
 	return;

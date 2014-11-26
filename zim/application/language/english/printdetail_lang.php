@@ -127,5 +127,7 @@ $lang['timelapse_info_presetname_unknown']
 	= '(Unknown preset)';
 $lang['timelapse_info_elapsedtime_title']
 	= 'Print time';
+$lang['send_email_multi']
+	= 'Note: For every other email address, add a comma.';
 
 ?>
