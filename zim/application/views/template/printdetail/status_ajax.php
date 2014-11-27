@@ -4,6 +4,7 @@
  					<p>{percent_title}</p>
 					<div id="print_progress"></div>
 					<p>{print_remain}</p>
+					<p>{print_passed}</p>
 					
 					
 <script type="text/javascript">
