@@ -125,6 +125,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_TITLE_STATUS',		'status');
 	define('PRINTERSTATE_TITLE_PERCENT',	'percentage');
 	define('PRINTERSTATE_TITLE_DURATION',	'duration');
+	define('PRINTERSTATE_TITLE_PASSTIME',	'passtime');
 	define('PRINTERSTATE_TITLE_VERSION',	'ver');
 	define('PRINTERSTATE_TITLE_VERSION_N',	'ver_next');
 	define('PRINTERSTATE_TITLE_TYPE',		'type');
@@ -1586,12 +1587,12 @@ function PrinterState_checkStatusAsArray() {
 			PrinterLog_logDebug('check in idle - checkstatusasarray', __FILE__, __LINE__);
 			$data_json[PRINTERSTATE_TITLE_STATUS] = CORESTATUS_VALUE_IDLE;
 		} else {
-			// in printing / canceling, then check their difference in json
-			CoreStatus_checkInIdle($status_current);
-			if ($status_current == CORESTATUS_VALUE_CANCEL) {
-				$data_json[PRINTERSTATE_TITLE_STATUS] = CORESTATUS_VALUE_CANCEL;
-				return $data_json;
-			}
+// 			// in printing / canceling, then check their difference in json
+// 			CoreStatus_checkInIdle($status_current);
+// 			if ($status_current == CORESTATUS_VALUE_CANCEL) {
+// 				$data_json[PRINTERSTATE_TITLE_STATUS] = CORESTATUS_VALUE_CANCEL;
+// 				return $data_json;
+// 			}
 			$data_json[PRINTERSTATE_TITLE_STATUS] = CORESTATUS_VALUE_PRINT;
 			$data_json[PRINTERSTATE_TITLE_PERCENT] = $output[0];
 			// we can calculate duration by mid(to get total duration) and percentage
@@ -1622,10 +1623,12 @@ function PrinterState_checkStatusAsArray() {
 	// try to calculate time remained when percentage is passed offset
 	$ret_val = CoreStatus_getStartTime($time_start);
 	if ($ret_val == ERROR_NORMAL_RC_OK || $time_start) {
+		$time_pass = time() - $time_start;
+		$data_json[PRINTERSTATE_TITLE_PASSTIME] = $time_pass;
+		
 		if (isset($data_json[PRINTERSTATE_TITLE_PERCENT]) &&
 				$data_json[PRINTERSTATE_TITLE_PERCENT] >= PRINTERSTATE_VALUE_OFFSET_TO_CAL_TIME) {
 			$percentage_finish = $data_json[PRINTERSTATE_TITLE_PERCENT];
-			$time_pass = time() - $time_start;
 			
 			$data_json[PRINTERSTATE_TITLE_DURATION] = (int)($time_pass / $percentage_finish * (100 - $percentage_finish));
 		}

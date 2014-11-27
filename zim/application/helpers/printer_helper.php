@@ -513,6 +513,7 @@ function Printer_checkPrintStatus(&$return_data) {
 			'print_percent'	=> $data_status[PRINTERSTATE_TITLE_PERCENT],
 			'print_temperL'	=> count($temper_status) ? $temper_status[PRINTERSTATE_LEFT_EXTRUD] : 0,
 			'print_temperR'	=> count($temper_status) ? $temper_status[PRINTERSTATE_RIGHT_EXTRUD] : 0,
+			'print_tpassed'	=> $data_status[PRINTERSTATE_TITLE_PASSTIME],
 	);
 	
 	// get time remaining if exists

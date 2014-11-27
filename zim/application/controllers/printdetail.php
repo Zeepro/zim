@@ -762,7 +762,8 @@ class Printdetail extends MY_Controller {
 // 		$printing_status = '';
 		$ret_val = 0;
 		$data_status = array();
-		$time_remain = 0;
+		$time_remain = NULL;
+		$time_passed = NULL;
 		$temper_l = 0;
 		$temper_r = 0;
 		$finish_hint = NULL;
@@ -805,6 +806,7 @@ class Printdetail extends MY_Controller {
 		else {
 			$time_remain = t('Time remaining: ') . t('unknown');
 		}
+		$time_passed = TimeDisplay__convertsecond($data_status['print_tpassed'], t('time_elapsed'));
 		
 		if ($data_status['print_percent'] == 100) {
 			$current_status = NULL;
@@ -835,6 +837,7 @@ class Printdetail extends MY_Controller {
 				'percent_title'	=> t('percent_title'),
 				'value_percent'	=> $data_status['print_percent'],
 				'print_remain'	=> $time_remain,
+				'print_passed'	=> $time_passed,
 				'hold_temper'	=> $hold_temper,
 				'print_temperL'	=> t('Temperature of the left extruder: %d °C', array($temper_l)),
 				'print_temperR'	=> t('Temperature of the right extruder: %d °C', array($temper_r)),

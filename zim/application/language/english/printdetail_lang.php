@@ -4,6 +4,8 @@ $lang['ZeePro Personal Printer 21 - Printing details']
 	= 'Zim - Printing details';
 $lang['Time remaining: ']
 	= 'Time remaining: ';
+$lang['time_elapsed']
+	= 'Elapsed time: ';
 $lang['unknown']
 	= 'unknown';
 $lang['under calculating']
