@@ -201,8 +201,12 @@ class Sliceupload extends MY_Controller {
 			
 			foreach ($list_preset as $preset) {
 				$list_display[] = array(
-						'name'	=> $preset[ZIMAPI_TITLE_PRESET_NAME],
-						'id'	=> $preset[ZIMAPI_TITLE_PRESET_ID],
+						'name'		=> $preset[ZIMAPI_TITLE_PRESET_NAME],
+						'id'		=> $preset[ZIMAPI_TITLE_PRESET_ID],
+						'infill'	=> $preset[ZIMAPI_TITLE_PRESET_INFILL],
+						'skirt'		=> $preset[ZIMAPI_TITLE_PRESET_SKIRT],
+						'raft'		=> $preset[ZIMAPI_TITLE_PRESET_RAFT],
+						'support'	=> $preset[ZIMAPI_TITLE_PRESET_SUPPORT],
 				);
 			}
 			sort($list_display);
@@ -510,10 +514,12 @@ class Sliceupload extends MY_Controller {
 		// load 4 extra parameters
 		//TODO finish me (syntax in comment need be changed to function)
 // 		if ($density !== FALSE) {
-// 			$density = (float)$density;
-// 			if ($density <= 0 || $density >= 1) {
-// 				$cr = ERROR_MISS_PRM;
-// 				break;
+// 			if (FALSE == strpos('%', $density)) {
+// 				$density = (float)$density;
+// 				if ($density <= 0 || $density >= 1) {
+// 					$cr = ERROR_MISS_PRM;
+// 					break;
+// 				}
 // 			}
 // 			$array_setting['fill_density'] = $density;
 // 		}
@@ -529,7 +535,7 @@ class Sliceupload extends MY_Controller {
 // 		if (count($array_setting) == 0) {
 // 			$cr = ERROR_MISS_PRM;
 // 		}
-// 		else {
+// 		else if ($cr == ERROR_OK) {
 // 			$cr = Slicer_changeParameter($array_setting);
 // 		}
 		
@@ -1051,6 +1057,48 @@ class Sliceupload extends MY_Controller {
 		
 		$display = 200 . " " . t(MyERRMSG(200));
 		$this->output->set_status_header(200, $display);
+		
+		return;
+	}
+	
+	function preset_prm_ajax() {
+		$ret_val = 0;
+		$display = NULL;
+		$array_setting = array();
+		$id = $this->input->get('id');
+		
+		$this->load->helper('zimapi');
+		$this->load->library('parser');
+		$ret_val = ZimAPI_getPresetSettingAsArray($id, $array_setting);
+		
+		if ($ret_val == ERROR_OK) {
+			if (array_key_exists(ZIMAPI_TITLE_PRESET_INFILL, $array_setting)
+					&& array_key_exists(ZIMAPI_TITLE_PRESET_SKIRT, $array_setting)
+					&& array_key_exists(ZIMAPI_TITLE_PRESET_RAFT, $array_setting)
+					&& array_key_exists(ZIMAPI_TITLE_PRESET_SUPPORT, $array_setting)) {
+				$array_display = array();
+				
+				$array_display[ZIMAPI_TITLE_PRESET_INFILL]	= $array_setting[ZIMAPI_TITLE_PRESET_INFILL];
+				$array_display[ZIMAPI_TITLE_PRESET_SKIRT]	= $array_setting[ZIMAPI_TITLE_PRESET_SKIRT];
+				$array_display[ZIMAPI_TITLE_PRESET_RAFT]	= $array_setting[ZIMAPI_TITLE_PRESET_RAFT];
+				$array_display[ZIMAPI_TITLE_PRESET_SUPPORT]	= $array_setting[ZIMAPI_TITLE_PRESET_SUPPORT];
+				$display = json_encode($array_display);
+				
+				$this->output->set_status_header($ret_val, $display);
+				$this->output->set_content_type('application/json; charset=UTF-8');
+				$this->parser->parse('template/plaintxt', array('display' => $display));
+				
+				return;
+			}
+			else {
+				$ret_val = ERROR_INTERNAL;
+			}
+		}
+		
+		$display = $ret_val . " " . t(MyERRMSG($ret_val));
+		$this->output->set_status_header($ret_val, $display);
+		$this->output->set_content_type('text/plain; charset=UTF-8');
+		$this->parser->parse('template/plaintxt', array('display' => $display));
 		
 		return;
 	}

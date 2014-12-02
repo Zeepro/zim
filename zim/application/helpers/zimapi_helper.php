@@ -57,6 +57,8 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_FILENAME_TIMELAPSE',	'timelapse.mp4');
 	define('ZIMAPI_FILEPATH_TIMELAPSE',	'/var/www/tmp/timelapse.mp4');
 	define('ZIMAPI_FILEPATH_TL_TMPIMG',	'/var/www/tmp/img001.jpg');
+	define('ZIMAPI_FILEPATH_ENDPRINT',	'/var/www/bin/timelapse_end_print.sh');
+	define('ZIMAPI_FILEPATH_ENDCANCEL',	'/var/www/bin/timelapse_end_cancel.sh');
 	define('ZIMAPI_CMD_GENERATION_TIMELAPSE',
 			'nice -n 19 ffmpeg -v quiet -r 10 -f image2 -s 640x360 -i /var/www/tmp/img%03d.jpg -i /var/www/images/logo_calque_60.png -y -filter_complex "[0:v][1:v]overlay=380:5" -vcodec libx264 -crf 35 /var/www/tmp/timelapse.mp4');
 	define('ZIMAPI_PRM_CAMERA_PRINTSTART',
@@ -81,7 +83,7 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_TITLE_PRESET_RAFT',		'raft_layers');
 	define('ZIMAPI_TITLE_PRESET_SUPPORT',	'support_material');
 	
-	define('ZIMAPI_VALUE_DEFAULT_RHO',			600); // 800 for future usage with platform change
+	define('ZIMAPI_VALUE_DEFAULT_RHO',			800);
 	define('ZIMAPI_VALUE_DEFAULT_DELTA',		45);
 	define('ZIMAPI_VALUE_DEFAULT_THETA',		30);
 	define('ZIMAPI_VALUE_DEFAULT_LENGTH',		8000);
@@ -1793,7 +1795,7 @@ function ZimAPI_setPresetSetting($id_preset, $array_input, $name_preset = NULL) 
 		$json_data = array(
 				ZIMAPI_TITLE_PRESET_ID		=> ZimAPI__codePresetHash($name_preset),
 				ZIMAPI_TITLE_PRESET_NAME	=> $name_preset,
-				ZIMAPI_TITLE_PRESET_INFILL	=> (float) $array_setting[ZIMAPI_TITLE_PRESET_INFILL],
+				ZIMAPI_TITLE_PRESET_INFILL	=> $array_setting[ZIMAPI_TITLE_PRESET_INFILL],
 				ZIMAPI_TITLE_PRESET_SKIRT	=> (int) $array_setting[ZIMAPI_TITLE_PRESET_SKIRT],
 				ZIMAPI_TITLE_PRESET_RAFT	=> (int) $array_setting[ZIMAPI_TITLE_PRESET_RAFT],
 				ZIMAPI_TITLE_PRESET_SUPPORT	=> (int) $array_setting[ZIMAPI_TITLE_PRESET_SUPPORT],

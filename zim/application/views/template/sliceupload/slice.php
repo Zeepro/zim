@@ -13,10 +13,11 @@
 				<div data-role="fieldcontain">
 					<select name="preset_menu" id="preset_menu">
 					{preset_list}
-						<option value="{id}">{name}</option>
+						<option id="p{id}" value="{id}" data-infill="{infill}" data-skirt="{skirt}" data-raft="{raft}" data-support="{support}">{name}</option>
 					{/preset_list}
 						<option value="_GOTO_PRESET_LIST_">{goto_preset}</option>
 					</select>
+					<!-- usage: $("option#p" + $("select#preset_menu").val()).attr("data-xxx"), or use /sliceupload/preset_prm_ajax?id=[PRESET_ID_HERE] to get json info -->
 				</div>
 				<a href="#" id="slice_button" class="ui-disabled" data-role="button" onclick="javascript: startSlice();">{slice_button}</a>
 			</div>
