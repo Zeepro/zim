@@ -63,6 +63,34 @@ class Printdetail extends MY_Controller {
 		return;
 	}
 	
+	private function get_extra_info(&$array_temper, &$exchange_extruder) {
+		$temperature_r = 0;
+		$temperature_l = 0;
+		
+		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+			$temperature_r = (int) $this->input->post('r');
+			$temperature_l = (int) $this->input->post('l');
+			$exchange_extruder = (int) $this->input->post('exchange');
+		}
+		else {
+			$status_current = NULL;
+			$array_status = array();
+			
+			$this->load->helper('corestatus');
+			if (CoreStatus_checkInIdle($status_current, $array_status)) {
+				$temperature_r = $array_status[CORESTATUS_TITLE_P_TEMPER_R];
+				$temperature_l = $array_status[CORESTATUS_TITLE_P_TEMPER_L];
+				$exchange_extruder = $array_status[CORESTATUS_TITLE_P_EXCH_BUS];
+			}
+		}
+		
+		if ($temperature_r > 0) $array_temper['r'] = $temperature_r;
+		if ($temperature_l > 0) $array_temper['l'] = $temperature_l;
+		$exchange_extruder = ($exchange_extruder != 0) ? TRUE : FALSE;
+		
+		return;
+	}
+	
 	public function index() {
 		$this->output->set_header('Location: /');
 		return;
@@ -124,73 +152,20 @@ class Printdetail extends MY_Controller {
 	}
 	
 	public function printmodel() {
-		$cr = 0;
-		$model_calibration = FALSE;
-		$mid = $this->input->get('id');
-		$exchange_extruder = (int) $this->input->post('exchange');
-		
-		// check model id, and then send it to print command
-		$this->load->helper(array('printer', 'printlist'));
-// 		$callback = $this->input->get('cb');
-		
-		$exchange_extruder = ($exchange_extruder != 0) ? TRUE : FALSE;
-		
-		if ($mid) {
-			if ($mid == ModelList_codeModelHash(PRINTLIST_MODEL_CALIBRATION)) {
-// 				$this->output->set_header('Location: /printdetail/printcalibration');
-// 				return;
-				$model_calibration = TRUE;
-			}
-			$this->set_led();
-			$cr = Printer_printFromModel($mid, $model_calibration, $exchange_extruder);
-// 			$cr = Printer_startPrintingStatusFromModel($mid);
-			if ($cr != ERROR_OK) {
-				if ($model_calibration) {
-					$this->output->set_header('Location: /printmodel/detail?id=calibration');
-				}
-				else {
-					$this->output->set_header('Location: /printmodel/listmodel');
-				}
-				return;
-			}
-		}
-		else {
-			$this->output->set_header('Location: /printmodel/listmodel');
-			return;
-		}
-		
-// 		if ($callback) {
-// 			$this->output->set_header('Location: /printdetail/status?id=' . $mid . '&cb=' . $callback);
-// 		}
-// 		else {
-//  			$this->output->set_header('Location: /printdetail/status');
-// 		}
-		if ($model_calibration) {
-// 			$this->output->set_header('Location: /printdetail/status?id=calibration');
-			$this->output->set_header('Location: /printdetail/status?id=' . CORESTATUS_VALUE_MID_CALIBRATION);
-		}
-		else {
-			$this->output->set_header('Location: /printdetail/status?id=' . $mid);
-		}
-		
-		return;
+		$this->printmodel_temp();
 	}
 	
 	public function printmodel_temp() {
 		$cr = 0;
 		$model_calibration = FALSE;
 		$mid = $this->input->get('id');
-		$temperature_r = (int) $this->input->post('r');
-		$temperature_l = (int) $this->input->post('l');
-		$exchange_extruder = (int) $this->input->post('exchange');
+		$exchange_extruder = 0;
 		$array_temper = array();
 		
 		// check model id, and then send it to print command
 		$this->load->helper(array('printer', 'printlist'));
 		
-		if ($temperature_r > 0) $array_temper['r'] = $temperature_r;
-		if ($temperature_l > 0) $array_temper['l'] = $temperature_l;
-		$exchange_extruder = ($exchange_extruder != 0) ? TRUE : FALSE;
+		$this->get_extra_info($array_temper, $exchange_extruder);
 		
 		if ($mid) {
 			if ($mid == ModelList_codeModelHash(PRINTLIST_MODEL_CALIBRATION)) {
@@ -227,38 +202,17 @@ class Printdetail extends MY_Controller {
 	}
 	
 	public function printslice() {
-		$cr = 0;
-		$exchange_extruder = (int) $this->input->post('exchange');
-		
-		$this->load->helper('printer');
-		$exchange_extruder = ($exchange_extruder != 0) ? TRUE : FALSE;
-		
-		$this->set_led();
-		$cr = Printer_printFromSlice($exchange_extruder);
-		if ($cr != ERROR_OK) {
-			$this->output->set_header('Location: /sliceupload/slice?callback');
-			return;
-		}
-		else {
-// 			$this->output->set_header('Location: /printdetail/status?id=slice');
-			$this->output->set_header('Location: /printdetail/status?id=' . CORESTATUS_VALUE_MID_SLICE);
-		}
-		
-		return;
+		$this->printslice_temp();
 	}
 	
 	public function printslice_temp() {
 		$cr = 0;
-		$temperature_r = (int) $this->input->post('r');
-		$temperature_l = (int) $this->input->post('l');
-		$exchange_extruder = (int) $this->input->post('exchange');
+		$exchange_extruder = 0;
 		$array_temper = array();
 		
 		$this->load->helper('printer');
 		
-		if ($temperature_r > 0) $array_temper['r'] = $temperature_r;
-		if ($temperature_l > 0) $array_temper['l'] = $temperature_l;
-		$exchange_extruder = ($exchange_extruder != 0) ? TRUE : FALSE;
+		$this->get_extra_info($array_temper, $exchange_extruder);
 		
 		$this->set_led();
 		$cr = Printer_printFromSlice($exchange_extruder, $array_temper);
@@ -301,7 +255,6 @@ class Printdetail extends MY_Controller {
 		$status_head = FALSE;
 		$ret_val = 0;
 		$option_selected = 'selected="selected"';
-		$camera_prm = NULL;
 		
 		$this->load->library('parser');
 		$this->lang->load('printdetail', $this->config->item('language'));
@@ -321,6 +274,7 @@ class Printdetail extends MY_Controller {
 			}
 		}
 		else {
+			$camera_prm = NULL;
 			// get print length for timelapse
 			$length = 0;
 			
@@ -372,17 +326,8 @@ class Printdetail extends MY_Controller {
 				
 				//$length += (array_key_exists('length', $info) ? $info['length'] : 0);
 			}
-			if ($length == 0) {
-				$this->load->helper('printerlog');
-				PrinterLog_logMessage('detected zero filament length, use default length instead', __FILE__, __LINE__);
-				$length = ZIMAPI_VALUE_DEFAULT_LENGTH;
-			}
 			
-			// 30s timelapse at 10 fps, so 300 / print time with 0.5mm/s average speed
-			$camera_prm = str_replace('{fps}',
-					(ZIMAPI_VALUE_DEFAULT_TL_LENGTH * 10 / ($length / ZIMAPI_VALUE_DEFAULT_SPEED + ZIMAPI_VALUE_DEFAULT_TL_OFFSET)),
-					ZIMAPI_PRM_CAMERA_PRINTSTART_TIMELAPSE);
-			if (!ZimAPI_cameraOn($camera_prm)) {
+			if (!ZimAPI_cameraOn(ZIMAPI_PRM_CAMERA_PRINTSTART_TIMELAPSE, $length)) {
 				$this->load->helper('printerlog');
 				PrinterLog_logError('can not set camera', __FILE__, __LINE__);
 			}
@@ -710,6 +655,17 @@ class Printdetail extends MY_Controller {
 				$array_info[] = array(
 						'title'	=> t('timelapse_info_elapsedtime_title'),
 						'value'	=> $display_time,
+				);
+			}
+			
+			if (array_key_exists(CORESTATUS_TITLE_P_TEMPER_L, $array_status)
+					&& array_key_exists(CORESTATUS_TITLE_P_TEMPER_R, $array_status)) {
+				$array_info[] = array(
+						'title'	=> t('timelapse_info_temperature_title'),
+						'value'	=> t('timelapse_info_temperature_value', array(
+								$array_status[CORESTATUS_TITLE_P_TEMPER_L],
+								$array_status[CORESTATUS_TITLE_P_TEMPER_R],
+						)),
 				);
 			}
 		}

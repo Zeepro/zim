@@ -130,5 +130,9 @@ $lang['timelapse_info_elapsedtime_title']
 	= 'Temps d\'impression';
 $lang['send_email_multi']
 	= 'Note: Pour autres adresses mail, ajoutez une virgule.';
+$lang['timelapse_info_temperature_title']
+	= 'Température d\'impression';
+$lang['timelapse_info_temperature_value']
+	= 'Gauche : %d °C, Droite : %d °C';
 
 ?>

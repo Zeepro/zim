@@ -26,6 +26,9 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_TITLE_SUBSTATUS',	'Substate');
 	define('CORESTATUS_TITLE_PRINTMODEL',	'PrintMID');
 	define('CORESTATUS_TITLE_ELAPSED_TIME',	'ElapsedTime');
+	define('CORESTATUS_TITLE_P_TEMPER_L',	'PrintTemperatureL');
+	define('CORESTATUS_TITLE_P_TEMPER_R',	'PrintTemperatureR');
+	define('CORESTATUS_TITLE_P_EXCH_BUS',	'PrintExchangeBus');
 	
 	define('CORESTATUS_VALUE_IDLE',				'idle');
 	define('CORESTATUS_VALUE_PRINT',			'printing');
@@ -637,7 +640,7 @@ function CoreStatus_cleanSliced() {
 // }
 
 // function CoreStatus_setInPrinting($model_id, $stop_printing = FALSE) {
-function CoreStatus_setInPrinting($model_id) {
+function CoreStatus_setInPrinting($model_id, $exchange_extruder = FALSE, $array_temper = array()) {
 // 	if ($stop_printing == FALSE) {
 		// start camera http live streaming
 		$ret_val = 0;
@@ -654,6 +657,9 @@ function CoreStatus_setInPrinting($model_id) {
 						CORESTATUS_TITLE_STARTTIME		=> time(),
 						CORESTATUS_TITLE_ELAPSED_TIME	=> 0,
 						CORESTATUS_TITLE_PRINTMODEL		=> $model_id,
+						CORESTATUS_TITLE_P_TEMPER_L		=> array_key_exists('l', $array_temper) ? $array_temper['l'] : 0,
+						CORESTATUS_TITLE_P_TEMPER_R		=> array_key_exists('r', $array_temper) ? $array_temper['r'] : 0,
+						CORESTATUS_TITLE_P_EXCH_BUS		=> $exchange_extruder ? 1 : 0,
 				)
 		);
 // 	}

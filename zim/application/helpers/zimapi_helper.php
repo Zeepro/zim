@@ -73,6 +73,7 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_TITLE_COMMAND',		'command');
 	define('ZIMAPI_VALUE_MODE_OFF',		'off');
 	define('ZIMAPI_VALUE_MODE_HLS',		'hls');
+	define('ZIMAPI_VALUE_MODE_HLS_IMG',	'hls+image');
 	define('ZIMAPI_TITLE_PRESET',		'preset');
 	define('ZIMAPI_PRM_UTIL_REBOOT',	' reboot');
 	
@@ -831,7 +832,7 @@ function ZimAPI_cameraCapture(&$path_capture) {
 	return TRUE;
 }
 
-function ZimAPI_cameraOn($parameter) {
+function ZimAPI_cameraOn($parameter, $timelapse_length = 0) {
 	global $CFG;
 	$output = NULL;
 	$ret_val = 0;
@@ -839,9 +840,22 @@ function ZimAPI_cameraOn($parameter) {
 	$data_json = array();
 	$fp = 0;
 	
-	$command = $CFG->config['camera'] . $parameter;
 	$status_file = $CFG->config['temp'] . ZIMAPI_FILENAME_CAMERA;
 	$mode_request = ZimAPI__getModebyParameter($parameter);
+	
+	// complete command parameter if in timelapse mode
+	if ($parameter == ZIMAPI_PRM_CAMERA_PRINTSTART_TIMELAPSE) {
+		// assign a default value
+		if ($timelapse_length == 0) {
+			$timelapse_length = ZIMAPI_VALUE_DEFAULT_LENGTH;
+		}
+		
+		// 30s timelapse at 10 fps, so 300 / print time with 0.5mm/s average speed
+		$parameter = str_replace('{fps}',
+					(ZIMAPI_VALUE_DEFAULT_TL_LENGTH * 10 / ($timelapse_length / ZIMAPI_VALUE_DEFAULT_SPEED + ZIMAPI_VALUE_DEFAULT_TL_OFFSET)),
+					ZIMAPI_PRM_CAMERA_PRINTSTART_TIMELAPSE);
+	}
+	$command = $CFG->config['camera'] . $parameter;
 	
 	$ret_val = ZimAPI_checkCamera($mode_current);
 	if ($ret_val == FALSE) {
@@ -2310,8 +2324,11 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 function ZimAPI__getModebyParameter($parameter) {
 	switch ($parameter) {
 		case ZIMAPI_PRM_CAMERA_PRINTSTART:
-		case ZIMAPI_PRM_CAMERA_PRINTSTART_TIMELAPSE: //FIXME with fps variable, this case has no sense
 			return ZIMAPI_VALUE_MODE_HLS;
+			break;
+			
+		case ZIMAPI_PRM_CAMERA_PRINTSTART_TIMELAPSE:
+			return ZIMAPI_VALUE_MODE_HLS_IMG;
 			break;
 			
 		default:

@@ -131,5 +131,9 @@ $lang['timelapse_info_elapsedtime_title']
 	= 'Print time';
 $lang['send_email_multi']
 	= 'Note: For every other email address, add a comma.';
+$lang['timelapse_info_temperature_title']
+	= 'Print temperature';
+$lang['timelapse_info_temperature_value']
+	= 'Left: %d °C, Right: %d °C';
 
 ?>

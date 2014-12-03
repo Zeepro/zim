@@ -312,37 +312,37 @@ function finishAction() {
 		// add loading + button Download Timelapse + Encode
 // 		$("#print_detail_info").append('<div id=\'timelapse\'><label id="timelapse_info">{timelapse_info}</label><a href="#" id="timelapse_button" data-ajax="false" data-role="button" class="ui-link ui-btn ui-shadow ui-corner-all ui-disabled" role="button" disable>{timelapse_button}</a></div>');
 		
-		$.ajax({
-			cache: false,
-			type: "POST",
-			url: "/printdetail/camera_stop_ajax",
-			data: {
-// 				capture: ((var_slice == true) ? 1 : 0),
-				capture: 0, // gcode library isn't ready to public
-			},
-//			dataType: "json",
-			success: function (data, textStatus, xhr) {
-// 				if (data != '') {
-// 					$('label#timelapse_info').html('{timelapse_ok}');
-// 					$('a#timelapse_button').removeClass('ui-disabled');
-// 					$('a#timelapse_button').addClass('externalLink');
-// 					$('a#timelapse_button').attr('href', data);
-// 					$('a#timelapse_button').click(function(event) {
-// 						event.preventDefault();
-// 						event.stopPropagation();
-// 						window.open(this.href, '_blank');
-// 					});
-// 				}
-// 				else {
-// 					$('label#timelapse_info').html('{timelapse_error}');
-// 				}
-				console.log(data);
-			},
-			error: function (data, textStatus, xhr) {
-// 				$('label#timelapse_info').html('{timelapse_error}');
-				console.log(data);
-			},
-		});
+// 		$.ajax({
+// 			cache: false,
+// 			type: "POST",
+// 			url: "/printdetail/camera_stop_ajax",
+// 			data: {
+// // 				capture: ((var_slice == true) ? 1 : 0),
+// 				capture: 0, // gcode library isn't ready to public
+// 			},
+// //			dataType: "json",
+// 			success: function (data, textStatus, xhr) {
+// // 				if (data != '') {
+// // 					$('label#timelapse_info').html('{timelapse_ok}');
+// // 					$('a#timelapse_button').removeClass('ui-disabled');
+// // 					$('a#timelapse_button').addClass('externalLink');
+// // 					$('a#timelapse_button').attr('href', data);
+// // 					$('a#timelapse_button').click(function(event) {
+// // 						event.preventDefault();
+// // 						event.stopPropagation();
+// // 						window.open(this.href, '_blank');
+// // 					});
+// // 				}
+// // 				else {
+// // 					$('label#timelapse_info').html('{timelapse_error}');
+// // 				}
+// 				console.log(data);
+// 			},
+// 			error: function (data, textStatus, xhr) {
+// // 				$('label#timelapse_info').html('{timelapse_error}');
+// 				console.log(data);
+// 			},
+// 		});
 		
 		// do redirection when timelapse is here (even in generation)
 		var_timelapse_int = setInterval(function() {

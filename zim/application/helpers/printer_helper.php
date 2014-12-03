@@ -15,6 +15,7 @@ if (!defined('PRINTER_FN_CHARGE')) {
 	define('PRINTER_FN_RETRACT',		'_retract.gcode');
 	define('PRINTER_FN_PRINTPRIME_L',	'_print_prime_left.gcode');
 	define('PRINTER_FN_PRINTPRIME_R',	'_print_prime_right.gcode');
+	define('PRINTER_FN_END_PRINT',		'_print_endscript.sh');
 	define('PRINTER_PRM_TEMPER_L_N',	' -ll ');	// left temperature for other layer (if exist)
 	define('PRINTER_PRM_TEMPER_L_F',	' -l ');	// left temperature for first layer (or all layer)
 	define('PRINTER_PRM_TEMPER_R_N',	' -rr ');	// right temperature for other layer (if exist)
@@ -25,12 +26,31 @@ if (!defined('PRINTER_FN_CHARGE')) {
 // 	define('PRINTER_VALUE_DEFAULT_TEMPER',	230);
 }
 
-function Printer_preparePrint($need_prime = TRUE) {
+function Printer_preparePrint($model_id, $need_prime = TRUE) {
 	$cr = 0;
 	$gcode_path = '';
 	
 	$CI = &get_instance();
-	$CI->load->helper('printlist');
+	$CI->load->helper(array('printlist', 'corestatus'));
+	
+	if (!in_array($model_id, array(
+			CORESTATUS_VALUE_MID_CALIBRATION,
+			CORESTATUS_VALUE_MID_PRIME_L,
+			CORESTATUS_VALUE_MID_PRIME_R))) {
+		$CI->load->helper('zimapi');
+		
+		if (file_exists(ZIMAPI_FILEPATH_ENDPRINT)) {
+			copy(ZIMAPI_FILEPATH_ENDPRINT, $CI->config->item('temp') . PRINTER_FN_END_PRINT);
+			chmod($CI->config->item('temp') . PRINTER_FN_END_PRINT, 0775);
+		}
+		else {
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('prepare end print script error', __FILE__, __LINE__);
+		}
+	}
+	else {
+		@unlink($CI->config->item('temp') . PRINTER_FN_END_PRINT);
+	}
 	
 	if ($need_prime == TRUE) {
 		$cr = Printer__getFileFromModel(ModelList_codeModelHash(PRINTLIST_MODEL_PRINTPRIME_L),
@@ -110,6 +130,7 @@ function Printer_printFromPrime($abb_extruder, $first_run = TRUE) {
 	$ret_val = Printer__getFileFromModel($id_model, $gcode_path, NULL, $array_info);
 	if (($ret_val == ERROR_OK) && $gcode_path) {
 		$array_filament = array();
+		$array_temper = array();
 		
 		if (!Printer__getLengthFromJson($array_info, $array_filament)) {
 			return ERROR_INTERNAL; // $ret_val = ERROR_INTERNAL;
@@ -117,12 +138,12 @@ function Printer_printFromPrime($abb_extruder, $first_run = TRUE) {
 		
 		// modify the temperature of gcode file according to cartridge info
 		//TODO test me
-		$ret_val = Printer__changeGcode($gcode_path, $array_filament, FALSE, array(), TRUE);
+		$ret_val = Printer__changeGcode($gcode_path, $array_filament, FALSE, $array_temper, TRUE);
 		if ($ret_val != ERROR_OK) {
 			return $ret_val;
 		}
 		
-		$ret_val = Printer_printFromFile($gcode_path, $model_id, FALSE, $array_filament);
+		$ret_val = Printer_printFromFile($gcode_path, $model_id, FALSE, FALSE, $array_filament, $array_temper);
 	}
 	
 	return $ret_val;
@@ -173,7 +194,8 @@ function Printer_printFromModel($id_model, $model_calibration, $exchange_extrude
 		// temporary change end
 		
 // 		$ret_val = Printer_printFromFile($gcode_path, TRUE, $stop_printing);
-		$ret_val = Printer_printFromFile($gcode_path, $id_model, TRUE, $array_filament);
+		$ret_val = Printer_printFromFile($gcode_path, $id_model, TRUE, $exchange_extruder,
+				$array_filament, $array_temper);
 	}
 	
 	return $ret_val;
@@ -226,13 +248,15 @@ function Printer_printFromSlice($exchange_extruder = FALSE, $array_temper = arra
 	}
 	// temporary change end
 	
-	$ret_val = Printer_printFromFile($gcode_path, CORESTATUS_VALUE_MID_SLICE, TRUE, $array_filament);
+	$ret_val = Printer_printFromFile($gcode_path, CORESTATUS_VALUE_MID_SLICE, TRUE, $exchange_extruder,
+			$array_filament, $array_temper);
 	
 	return $ret_val;
 }
 
 // function Printer_printFromFile($gcode_path, $need_prime = TRUE, $stop_printing = FALSE) {
-function Printer_printFromFile($gcode_path, $model_id, $need_prime = TRUE, $array_filament = array()) {
+function Printer_printFromFile($gcode_path, $model_id, $need_prime = TRUE, $exchange_extruder = FALSE,
+		$array_filament = array(), $array_temper = array()) {
 	global $CFG;
 	$command = '';
 	$output = array();
@@ -281,7 +305,7 @@ function Printer_printFromFile($gcode_path, $model_id, $need_prime = TRUE, $arra
 	}
 	
 	// prepare subprinting gcode files
-	$ret_val = Printer_preparePrint($need_prime);
+	$ret_val = Printer_preparePrint($model_id, $need_prime);
 	if ($ret_val != ERROR_OK) {
 		return $ret_val;
 	}
@@ -297,7 +321,7 @@ function Printer_printFromFile($gcode_path, $model_id, $need_prime = TRUE, $arra
 		}
 	
 		// change status json file
-		$ret_val = CoreStatus_setInPrinting($model_id);
+		$ret_val = CoreStatus_setInPrinting($model_id, $exchange_extruder, $array_temper);
 // 	}
 // 	else {
 // 		$ret_val = CoreStatus_setInCanceling();
@@ -370,7 +394,13 @@ function Printer_stopPrint() {
 		}
 		else {
 			// in printing
-			$CI->load->helper(array('printlist', 'printerstate'));
+			$CI->load->helper(array('printlist', 'printerstate', 'zimapi'));
+			
+			// change end print script if we cancel printing to not generate timelapse
+			if (file_exists($CI->config->item('temp') . PRINTER_FN_END_PRINT) && file_exists(ZIMAPI_FILEPATH_ENDCANCEL)) {
+				copy(ZIMAPI_FILEPATH_ENDCANCEL, $CI->config->item('temp') . PRINTER_FN_END_PRINT);
+				chmod($CI->config->item('temp') . PRINTER_FN_END_PRINT, 0775);
+			}
 			
 			// call stop printing gcode status
 			$cr = PrinterState_stopPrinting();
@@ -504,9 +534,9 @@ function Printer_checkPrintStatus(&$return_data) {
 	$temper_status = PrinterState_getExtruderTemperaturesAsArray();
 	if (!is_array($temper_status)) {
 		// log internal error
-		$this->load->helper('printerlog');
+		$CI->load->helper('printerlog');
 		PrinterLog_logError('API error when getting temperatures in printing', __FILE__, __LINE__);
-		return FALSE;
+// 		return FALSE;
 	}
 	
 	$return_data = array(
@@ -663,7 +693,7 @@ function Printer__inverseFilament(&$array_filament) {
 	return;
 }
 
-function Printer__changeGcode(&$gcode_path, $array_filament = array(), $exchange_extruder = FALSE, $array_temper = array(), $temper_material = FALSE) {
+function Printer__changeGcode(&$gcode_path, $array_filament = array(), $exchange_extruder = FALSE, &$array_temper = array(), $temper_material = FALSE) {
 	$temp_r = 0; // right normal temper
 	$temp_rs = 0; // right start temper
 	$temp_l = 0; // left normal temper
@@ -754,6 +784,9 @@ function Printer__changeGcode(&$gcode_path, $array_filament = array(), $exchange
 		// we have at least one value not initialised to call change temper program
 		return ($cr == ERROR_OK) ? ERROR_INTERNAL : $cr;
 	}
+	else {
+		$array_temper['r'] = $temp_r;
+	}
 	
 	if (PrinterState_getNbExtruder() >= 2) {
 		// temporary change - make it possible to change temperature not according to cartridge
@@ -814,6 +847,9 @@ function Printer__changeGcode(&$gcode_path, $array_filament = array(), $exchange
 		if ($temp_l * $temp_ls == 0) {
 			// we have at least one value not initialised to call change temper program
 			return ($cr == ERROR_OK) ? ERROR_INTERNAL : $cr;
+		}
+		else {
+			$array_temper['l'] = $temp_l;
 		}
 	}
 	
