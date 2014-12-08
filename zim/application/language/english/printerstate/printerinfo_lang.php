@@ -31,3 +31,7 @@ $lang['printer_no_sso']
 	= '(Printer not activated)';
 $lang['hostname']
 	= 'Hostname';
+$lang['profile_title']
+	= 'Upgrade profile';
+$lang['button_release']
+	= 'Release notes';

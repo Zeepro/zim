@@ -13,7 +13,7 @@
 	 			<style type="text/css">div#myVideo_wrapper {margin: 0 auto;}</style>
 				<div id="myVideo">{loading_player}</div>
 <!-- 				<a href="#" id="timelapse_button" data-ajax="false" data-role="button" class="ui-link ui-btn ui-shadow ui-corner-all">{timelapse_button}</a> -->
-				<a href="#timelapse_right_panel" data-role="button" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-mail">{send_email_button}</a>
+				<a id="send_email_button" href="#timelapse_right_panel" data-role="button" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-mail" style="display:none;">{send_email_button}</a>
 			</div>
 			<div data-role="collapsible" data-collapsed="false" style="align: center;">
 				<h4>{timelapse_info_title}</h4>
@@ -164,7 +164,9 @@ var_interval_video_check = setInterval(function() {
 		if (var_ajax_video_check.status == 202) {
 			$('a#timelapse_button').attr('href', "{video_url}");
 			load_jwplayer_video();
+			$('a#send_email_button').show();
 			clearInterval(var_interval_video_check);
+			var_interval_video_check = 0;
 		}
 		// do nothing when status code is 200
 	})
@@ -177,6 +179,13 @@ var_interval_video_check = setInterval(function() {
 $("#email_timelapse").keyup(function() { 
 	$("#email_timelapse_error").css('display','none');
 	$("#sending_timelapse_error").css('display','none');
+});
+
+$('a#send_email_button').click(function(event) {
+	if (var_interval_video_check != 0) {
+		event.preventDefault();
+		event.stopPropagation();
+	}
 });
 
 // // open new tab / window for video

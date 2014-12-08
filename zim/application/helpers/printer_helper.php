@@ -366,12 +366,6 @@ function Printer_printFromFile($gcode_path, $model_id, $need_prime = TRUE, $exch
 //		return ERROR_INTERNAL;
 //	}
 
-	// reduce the quantity of filament here
-	$ret_val = PrinterState_changeFilament();
-	if ($ret_val != ERROR_OK) {
-		return $ret_val;
-	}
-
 	return ERROR_OK;
 }
 

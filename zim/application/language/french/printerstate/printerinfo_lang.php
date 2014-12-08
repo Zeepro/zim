@@ -31,3 +31,7 @@ $lang['printer_no_sso']
 	= '(Imprimante non activée)';
 $lang['hostname']
 	= "Nom d'hôte";
+$lang['profile_title']
+	= 'Profil de mise à jour';
+$lang['button_release']
+	= 'Notes de mise à jour';

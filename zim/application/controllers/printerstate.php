@@ -496,7 +496,13 @@ class Printerstate extends MY_Controller {
 		$array_info = array(
 				array(
 						'title'	=> t('version_title'),
-						'value'	=> $temp_info[PRINTERSTATE_TITLE_VERSION],
+						'value'	=> $this->parser->parse('template/printerstate/printerinfo_grid_b',
+								array(
+										'id'		=> 'button_release',
+										'value'		=> $temp_info[PRINTERSTATE_TITLE_VERSION],
+										'link'		=> ZIMAPI_VALUE_RELEASENOTE_URL,
+										'button'	=> '{button_release}',
+								), TRUE),
 				),
 				array(
 						'title'	=> t('next_version_title'),
@@ -528,9 +534,14 @@ class Printerstate extends MY_Controller {
 				),
 				array(
 						'title' => t('sso_name'),
-						'value'	=> "<div style='text-align:center'>"
-								. (array_key_exists(PRINTERSTATE_TITLE_SSO_NAME, $temp_info) ? $temp_info[PRINTERSTATE_TITLE_SSO_NAME] : "")
-								. "<a data-role='button' href='/activation/?returnUrl=printerstate/printerinfo'>{button_sso}</a></div>",
+						'value'	=> $this->parser->parse('template/printerstate/printerinfo_grid_b',
+								array(
+										'id'		=> 'button_sso',
+										'value'		=> array_key_exists(PRINTERSTATE_TITLE_SSO_NAME, $temp_info)
+												? $temp_info[PRINTERSTATE_TITLE_SSO_NAME] : "",
+										'link'		=> '/activation/?returnUrl=printerstate/printerinfo',
+										'button'	=> '{button_sso}',
+								), TRUE),
 				),
 // 				array(
 // 						'title'	=> t('hostname'),
@@ -541,12 +552,13 @@ class Printerstate extends MY_Controller {
 		
 		// parse the main body
 		$template_data = array(
-				'array_info'	=> $array_info,
-				'back'			=> t('back'),
-				'home'			=> t('Home'),
-				'button_sso'	=> (array_key_exists(PRINTERSTATE_TITLE_SSO_NAME, $temp_info)
+				'array_info'		=> $array_info,
+				'back'				=> t('back'),
+				'home'				=> t('Home'),
+				'button_sso'		=> (array_key_exists(PRINTERSTATE_TITLE_SSO_NAME, $temp_info)
 						? t('button_rename_sso') : t('button_active_sso')),
-				'button_fqdn'	=> t('button_rename_sso')
+				'button_fqdn'		=> t('button_rename_sso'),
+				'button_release'	=> t('button_release'),
 		);
 		
 		$body_page = $this->parser->parse('template/printerstate/printerinfo', $template_data, TRUE);
@@ -555,6 +567,37 @@ class Printerstate extends MY_Controller {
 		$template_data = array(
 				'lang'			=> $this->config->item('language_abbr'),
 				'headers'		=> '<title>' . t('printerstate_printerinfo_pagetitle') . '</title>',
+				'contents'		=> $body_page,
+		);
+		
+		$this->parser->parse('template/basetemplate', $template_data);
+		
+		return;
+	}
+	
+	public function upgradenote() {
+		$template_data = array();
+		$body_page = NULL;
+		$note_html = NULL;
+		
+		$this->load->helper('zimapi');
+		$this->load->library('parser');
+		$this->lang->load('printerstate/upgradenote', $this->config->item('language'));
+		
+		ZimAPI_getUpgradeNote($note_html);
+		
+		$template_data = array(
+				'note_title'	=> t('releasenote_title'),
+				'note_body'		=> $note_html,
+				'reboot_button'	=> t('releasenote_reboot'),
+		);
+		
+		$body_page = $this->parser->parse('template/printerstate/upgradenote', $template_data, TRUE);
+		
+		// parse all page
+		$template_data = array(
+				'lang'			=> $this->config->item('language_abbr'),
+				'headers'		=> '<title>' . t('printerstate_upgradenote_pagetitle') . '</title>',
 				'contents'		=> $body_page,
 		);
 		

@@ -4,7 +4,7 @@
 	{
     	display: none !important;
 	}
-</style>
+	</style>
 	<header data-role="header" class="page-header">
 		<a href="javascript:history.back();" data-icon="back" data-ajax="false">{back}</a>
 		<a href="/" data-icon="home" data-ajax="false">{home}</a>
@@ -24,4 +24,12 @@
 			</table>
 		</div>
 	</div>
+
+<script type="text/javascript">
+$('a#button_release').click(function(event) {
+	event.preventDefault();
+	event.stopPropagation();
+	window.open(this.href, '_blank');
+});
+</script>
 </div>

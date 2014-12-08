@@ -4,7 +4,7 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
-			<a href="/manage/reboot_confirm"><b>{update_available}</b></a>
+			<a href="/printerstate/upgradenote"><b>{update_available}</b></a>
 			<ul data-role="listview" id="listview_print" class="shadowBox" data-inset="true">
 				<li><a href="/printmodel/listmodel">
 					<h2>{menu_printlist}</h2></a>

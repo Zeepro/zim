@@ -1,11 +1,12 @@
 #!/bin/sh
 
+PATH=$PATH:/bin
+
 TIMELAPSE=/var/www/tmp/timelapse.mp4
+TEMPVIDEO=/var/www/tmp/tempvideo.mp4
+CAMERAINF=/tmp/Camera.json
 
-# stop ffmpeg
+# stop ffmpeg and clean temporary file
 /etc/init.d/ffmpeg stop
-/bin/rm -fv /tmp/Camera.json
-
-# clean temporary file
-/bin/rm -fv $TIMELAPSE
+rm -fv $CAMERAINF $TEMPVIDEO $TIMELAPSE
 /etc/init.d/ffmpeg clean_tl

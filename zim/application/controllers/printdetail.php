@@ -153,6 +153,8 @@ class Printdetail extends MY_Controller {
 	
 	public function printmodel() {
 		$this->printmodel_temp();
+		
+		return;
 	}
 	
 	public function printmodel_temp() {
@@ -203,6 +205,8 @@ class Printdetail extends MY_Controller {
 	
 	public function printslice() {
 		$this->printslice_temp();
+		
+		return;
 	}
 	
 	public function printslice_temp() {
@@ -679,7 +683,7 @@ class Printdetail extends MY_Controller {
 		
 		// parse the main body
 		$template_data = array(
-				'loading_player'		=> t('loading_player'),
+				'loading_player'		=> t('timelapse_info'),
 				'finish_info'			=> t('Congratulation, your printing is complete!'),
 				'home_button'			=> t('Home'),
 				'video_error'			=> t('video_error'),
@@ -691,7 +695,7 @@ class Printdetail extends MY_Controller {
 				'send_email_error'		=> t('send_email_error'),
 				'send_email_wrong'		=> t('send_email_wrong'),
 				'send_email_multi'		=> t('send_email_multi'),
-				'video_url'				=> '/tmp/' . ZIMAPI_FILENAME_TIMELAPSE,
+				'video_url'				=> '/tmp/' . ZIMAPI_FILENAME_TIMELAPSE . '?_=' . time(),
 				'timelapse_info_title'	=> t('timelapse_info_title'),
 				'timelapse_info'		=> $array_info,
 				'again_button'			=> t('Print again'),

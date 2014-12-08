@@ -1482,6 +1482,7 @@ function PrinterState_checkSlicedCondition(&$data_json) {
 	return ERROR_OK;
 }
 
+//TODO union printing status into PrinterState_checkBusyStatus()
 function PrinterState_checkStatusAsArray() {
 	global $CFG;
 	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
@@ -1557,7 +1558,7 @@ function PrinterState_checkStatusAsArray() {
 		return $data_json;
 	}
 	
-	$ret_val = 0;
+	$ret_val = ERROR_NORMAL_RC_OK;
 	$command = $arcontrol_fullpath . PRINTERSTATE_CHECK_STATE;
 //	exec($command, $output, $ret_val);
 //	if (!PrinterState_filterOutput($output, $command)) {
@@ -1586,6 +1587,15 @@ function PrinterState_checkStatusAsArray() {
 			$CI->load->helper('printerlog');
 			PrinterLog_logDebug('check in idle - checkstatusasarray', __FILE__, __LINE__);
 			$data_json[PRINTERSTATE_TITLE_STATUS] = CORESTATUS_VALUE_IDLE;
+			if (!CoreStatus_setInIdle()) {
+				PrinterLog_logError('cannot set in idle - checkstatusasarray', __FILE__, __LINE__);
+			}
+			
+			// check if we need to change idle into sliced or not
+			PrinterState_checkSlicedCondition($data_json);
+			//TODO add timelapse checking
+			
+			return $data_json;
 		} else {
 // 			// in printing / canceling, then check their difference in json
 // 			CoreStatus_checkInIdle($status_current);
@@ -1635,14 +1645,6 @@ function PrinterState_checkStatusAsArray() {
 	}
 	
 	return $data_json;
-}
-
-function PrinterState_changeFilament($left_filament = 0, $right_filament = 0) {
-	//TODO we need this function to reduce the quantity of filament (add used value)
-	// so we also need a function to change the cartridge info
-	// in the other hand, when we stop a printing task, how can we get the quantity that was used
-	
-	return ERROR_OK;
 }
 
 function PrinterState_cartridgeNumber2Abbreviate($number) {

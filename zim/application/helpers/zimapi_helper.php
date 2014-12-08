@@ -20,6 +20,7 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_CMD_SERIAL',			'[ -f /fab/macaddr.txt ] && cat /fab/macaddr.txt || ifconfig -a | grep eth0 | awk \'{print $5}\' | head -n 1');
 	define('ZIMAPI_CMD_VERSION',		'zfw_printenv version`zfw_printenv last_good`');
 	define('ZIMAPI_CMD_VERSION_REBOOT',	'zfw_printenv version`zfw_printenv update` || zfw_printenv version`zfw_printenv last_good`');
+	define('ZIMAPI_CMD_PROFILE_LINK',	'cat /fab/profile.txt || cat /config/local/upgrade_profile');
 	define('ZIMAPI_CMD_SETHOSTNAME',	ZIMAPI_CMD_CONFIG_NET . '-n ');
 	define('ZIMAPI_CMD_GETHOSTNAME',	'cat /etc/hostname');
 	define('ZIMAPI_CMD_USB_CONNECT',	'[ `cat /sys/class/gpio/gpio3_pg9/value` -eq 0 ]');
@@ -59,7 +60,7 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_FILEPATH_TL_TMPIMG',	'/var/www/tmp/img001.jpg');
 	define('ZIMAPI_FILEPATH_ENDPRINT',	'/var/www/bin/timelapse_end_print.sh');
 	define('ZIMAPI_FILEPATH_ENDCANCEL',	'/var/www/bin/timelapse_end_cancel.sh');
-	define('ZIMAPI_CMD_GENERATION_TIMELAPSE',
+	define('ZIMAPI_CMD_GENERATION_TIMELAPSE', // abandoned
 			'nice -n 19 ffmpeg -v quiet -r 10 -f image2 -s 640x360 -i /var/www/tmp/img%03d.jpg -i /var/www/images/logo_calque_60.png -y -filter_complex "[0:v][1:v]overlay=380:5" -vcodec libx264 -crf 35 /var/www/tmp/timelapse.mp4');
 	define('ZIMAPI_PRM_CAMERA_PRINTSTART',
 			' -v quiet -r 15 -s 640x480 -f video4linux2 -i /dev/video0 -vf "crop=640:360:0:60" -minrate 512k -maxrate 512k -bufsize 2512k -map 0 -force_key_frames "expr:gte(t,n_forced*2)" -c:v libx264 -r 15 -threads 2 -crf 35 -profile:v baseline -b:v 512k -pix_fmt yuv420p -flags -global_header -f hls -hls_time 5 -hls_wrap 20 -hls_list_size 10 /var/www/tmp/zim.m3u8');
@@ -99,6 +100,7 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_VALUE_TL_IP_POOL',			'Main Pool');
 	define('ZIMAPI_VALUE_TL_VIDEO_NAME',		'zimmotion.mp4');
 	define('ZIMAPI_VALUE_TL_MANDRILL_API',		'https://mandrillapp.com/api/1.0/messages/send.json');
+	define('ZIMAPI_VALUE_RELEASENOTE_URL',		'http://zimsupport.zeepro.com/support/solutions/articles/5000050231-release-notes');
 	
 	define('ZIMAPI_PRM_CAPTURE',	'picture');
 	define('ZIMAPI_PRM_VIDEO_MODE',	'video');
@@ -1493,6 +1495,10 @@ function ZimAPI_getUpgradeMode(&$mode, &$profile = NULL) {
 		$mode = 'on';
 	}
 	
+	if (is_null($profile)) {
+		$profile = shell_exec(ZIMAPI_CMD_PROFILE_LINK);
+	}
+	
 	return TRUE;
 }
 
@@ -1502,6 +1508,10 @@ function ZimAPI_setUpgradeMode($mode, $profile = NULL) {
 	$CI = &get_instance();
 	
 	$mode = strtolower($mode);
+	if ($mode == 'change' && is_null($profile)) {
+		// do not accept empty profile in change mode
+		return ERROR_WRONG_PRM;
+	}
 	
 	switch ($mode) {
 		case 'change':
@@ -1544,6 +1554,45 @@ function ZimAPI_setUpgradeMode($mode, $profile = NULL) {
 	}
 	
 	return ERROR_OK;
+}
+
+function ZimAPI_getUpgradeNote(&$note_html = '') {
+	$count = 0;
+	$html = NULL;
+	$article_children = NULL;
+	
+	try {
+		include_once BASEPATH . '/../assets/simple_html_dom.php'; // use include instead of required to avoid fatal error
+		
+		$note_html = ''; // initialization of text
+		$html = file_get_html(ZIMAPI_VALUE_RELEASENOTE_URL);
+		$article_children = $html->find('article', 0)->children();
+		
+		foreach($article_children as $ele_child) {
+			if (count($ele_child->find('u'))) {
+				++$count;
+				if ($count > 1) {
+					break;
+				}
+			}
+			else {
+				if (count($ele_child->find('hr'))) {
+					break;
+				}
+				$note_html .= $ele_child . "\n";
+			}
+		}
+		
+		$html->clear();
+	} catch (Exception $e) {
+		$CI = &get_instance();
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('get upgrade release note error', __FILE__, __LINE__);
+		
+		return FALSE;
+	}
+	
+	return TRUE;
 }
 
 function ZimAPI_getTromboning() {
@@ -1688,6 +1737,7 @@ function ZimAPI_shutdown() {
 	return PrinterState_powerOff();
 }
 
+//TODO move preset functions into another helper
 function ZimAPI_getPresetInfoAsArray($preset_id, &$array_info, &$system_preset = NULL, $set_localization = TRUE) {
 	$presetlist_basepath = NULL;
 	$tmp_array = NULL;
@@ -1796,6 +1846,10 @@ function ZimAPI_setPresetSetting($id_preset, $array_input, $name_preset = NULL) 
 		return $ret_val;
 	}
 	
+	if (!ZimAPI_fixPresetSetting($array_setting)) {
+		return ERROR_INTERNAL;
+	}
+	
 	// assign new setting
 	foreach ($array_input as $key => $value) {
 		$array_setting[$key] = $value;
@@ -1847,6 +1901,27 @@ function ZimAPI_setPresetSetting($id_preset, $array_input, $name_preset = NULL) 
 	}
 	
 	return ERROR_OK;
+}
+
+function ZimAPI_fixPresetSetting(&$array_setting) {
+	$array_bedsize = array();
+	$CI = &get_instance();
+	
+	// auto fix bed size and print center by hardconf json file
+	$CI->load->helper('printerstate');
+	if (ERROR_OK == PrinterState_getPrintSize($array_bedsize)
+			&& array_key_exists(PRINTERSTATE_TITLE_PRINT_XMAX, $array_bedsize)
+			&& array_key_exists(PRINTERSTATE_TITLE_PRINT_YMAX, $array_bedsize)) {
+		$array_setting['bed_size'] = $array_bedsize[PRINTERSTATE_TITLE_PRINT_XMAX]
+				. ',' . $array_bedsize[PRINTERSTATE_TITLE_PRINT_YMAX];
+		$array_setting['print_center'] = $array_bedsize[PRINTERSTATE_TITLE_PRINT_XMAX] / 2
+				. ',' . $array_bedsize[PRINTERSTATE_TITLE_PRINT_YMAX] / 2;
+	}
+	else {
+		return FALSE;
+	}
+	
+	return TRUE;
 }
 
 function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {

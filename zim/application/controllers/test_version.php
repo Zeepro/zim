@@ -34,14 +34,21 @@ class Test_version extends CI_Controller {
 		$temp_info = array();
 		$array_info = array();
 		$sso_name = NULL;
-	
+		$upgrade_mode = NULL;
+		$profile_link = NULL;
+		
 		$this->load->helper(array('printerstate', 'zimapi'));
 		$this->load->library('parser');
 		$this->lang->load('printerstate/printerinfo', $this->config->item('language'));
 		ZimAPI_getPrinterSSOName($sso_name);
-	
+		ZimAPI_getUpgradeMode($upgrade_mode, $profile_link);
+		
 		$temp_info = PrinterState_getInfoAsArray();
 		$array_info = array(
+				array(
+						'title'	=> t('profile_title'),
+						'value'	=> $upgrade_mode . ' [ ' . $profile_link . ' ]',
+				),
 				array(
 						'title'	=> t('version_title'),
 						'value'	=> $temp_info[PRINTERSTATE_TITLE_VERSION],
@@ -71,23 +78,23 @@ class Test_version extends CI_Controller {
 						'value'	=> $temp_info[ZIMAPI_TITLE_IP],
 				)
 		);
-	
+		
 		// parse the main body
 		$template_data = array(
 				'array_info'	=> $array_info,
 		);
-	
+		
 		$body_page = $this->parser->parse('template/test_version', $template_data, TRUE);
-	
+		
 		// parse all page
 		$template_data = array(
 				'lang'			=> $this->config->item('language_abbr'),
 				'headers'		=> '<title>' . t('printerstate_printerinfo_pagetitle') . '</title>',
 				'contents'		=> $body_page,
 		);
-	
+		
 		$this->parser->parse('template/basetemplate', $template_data);
-	
+		
 		return;
 	}
 }
