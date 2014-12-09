@@ -1,11 +1,17 @@
 <div data-role="page" data-url="/printdetail/timelapse">
 	<div id="overlay"></div>
 	<header data-role="header" class="page-header">
+		<a href="#home_popup" data-rel="popup" class="ui-btn ui-icon-home ui-btn-icon-left ui-corner-all ui-shadow" data-transition="pop">{home_button}</a>
 	</header>
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container" style="text-align: center;">
 			<p>{finish_info}</p>
+			<div id="home_popup" data-role="popup" data-dismissible="false" class="ui-content" style="max-width:250px;">
+				{home_popup_text}
+		        <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back" data-transition="flow" onclick="javascript: finish_timelapse();">{yes}</a>
+		        <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back">{no}</a>
+			</div>
 			<div data-role="collapsible" data-collapsed="false" style="align: center;">
 				<h4>{timelapse_title}</h4>
 				<script type="text/javascript" src="/assets/jwplayer/jwplayer.js"></script>
@@ -29,7 +35,8 @@
 					</tbody>
 				</table>
 			</div>
-			<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-home" id="print_action" onclick='javascript: finish_timelapse();'>{home_button}</button>
+			<a href="#home_popup" data-rel="popup" data-role="button" class="ui-btn ui-icon-home ui-btn-icon-left ui-corner-all ui-shadow" data-transition="pop">{home_button}</a>
+			<!--<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-home" id="print_action" onclick='javascript: finish_timelapse();'>{home_button}</button>-->
 			<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh" id="print_action" onclick='javascript: restart_print();'>{again_button}</button>
 		</div>
 	</div>
