@@ -7,6 +7,7 @@
 	<div data-role="content">
 		<div id="container">
 			<h2 style="text-align:center">{note_title}</h2>
+			<style>p {margin: 0;}</style>
 			<div>{note_body}</div>
 			<a href="/manage/rebooting" data-role="button">{reboot_button}</a>
 		</div>

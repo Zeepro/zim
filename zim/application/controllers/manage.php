@@ -83,9 +83,13 @@ class Manage extends MY_Controller {
 		return;
 	}
 	
-	public function move($axis = NULL, $value = NULL, $speed = NULL) {
-		if (is_null($axis) || is_null($value) || is_null($speed)
-				|| ((int)$value == 0) || ((int)$speed == 0)) {
+	public function move() {
+		$axis = $this->input->get('axis');
+		$value = $this->input->get('value');
+		$speed = $this->input->get('speed');
+		
+		if ($axis === FALSE || $value === FALSE || $speed === FALSE
+				|| ((float)$value == 0) || ((int)$speed == 0)) {
 			$this->output->set_status_header(403);
 			return;
 		}
@@ -97,7 +101,7 @@ class Manage extends MY_Controller {
 			$axis = strtoupper($axis);
 			$cr = PrinterState_relativePositioning(TRUE);
 			if ($cr == ERROR_OK) {
-				$cr = PrinterState_move($axis, (int)$value, (int)$speed * 60);
+				$cr = PrinterState_move($axis, (float)$value, (int)$speed * 60);
 			}
 			if ($cr == ERROR_OK) {
 				$cr = PrinterState_relativePositioning(FALSE);

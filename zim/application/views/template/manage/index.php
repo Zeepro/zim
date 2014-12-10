@@ -137,6 +137,9 @@
 						</div>
 					
 					<div class="grid_4 prefix_6 suffix_6">
+						<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" onclick="move('Z', -0.1);">0.1</a>
+					</div>
+					<div class="grid_4 prefix_6 suffix_6">
 						<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" onclick="move('Z', -1);">1</a>
 					</div>
 					<div class="grid_4 prefix_6 suffix_6">
@@ -147,6 +150,9 @@
 					</div>
 					<div class="grid_4 prefix_6 suffix_6">
 						<input type="number" style="text-align:right;" data-clear-btn="false" name="z_speed" id="z_speed" value="5" min="1" max="10"/><center style="padding-left:22px">mm/s</center>
+					</div>
+					<div class="grid_4 prefix_6 suffix_6">
+						<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" onclick="move('Z', 0.1);">0.1</a>
 					</div>
 					<div class="grid_4 prefix_6 suffix_6">
 						<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" onclick="move('Z', 1);">1</a>
@@ -425,12 +431,17 @@ function move(var_axis, var_value) {
 		else {
 			var_speed = $("#xy_speed").val();
 		}
-		var_url = "/manage/move/" + var_axis + '/' + var_value + '/' + var_speed;
+		var_url = "/manage/move";
 	}
 	var_ajax = $.ajax({
 		url: var_url,
 		type: "GET",
 		cache: false,
+		data: {
+				'axis': var_axis,
+				'value': var_value,
+				'speed': var_speed
+		},
 		beforeSend: function() {
 			$("#overlay").addClass("gray-overlay");
 			$(".ui-loader").css("display", "block");

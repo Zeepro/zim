@@ -25,7 +25,10 @@
 					<td colspan="3"></td>
 					<td><a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" data-inline="true" onclick="move('Y', 1);">1</a></td>
 					<td colspan="3"></td>
-					<td><a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" data-inline="true" onclick="move('Z', -1);">1</a></td>
+					<td>
+						<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" data-inline="true" onclick="move('Z', -1);">1</a>
+						<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" data-inline="true" onclick="move('Z', -0.1);">0.1</a>
+					</td>
 				</tr>
 				<tr>
 					<td><a href="#" data-role="button" data-icon="arrow-l" data-iconpos="left" data-inline="true" onclick="move('X', -50);">50</a></td>
@@ -42,7 +45,10 @@
 					<td colspan="2"></td>
 					<td><a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" data-inline="true" onclick="move('Y', -1);">1</a></td>
 					<td colspan="3"></td>
-					<td><a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" data-inline="true" onclick="move('Z', 1);">1</a></td>
+					<td>
+						<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" data-inline="true" onclick="move('Z', 1);">1</a>
+						<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" data-inline="true" onclick="move('Z', 0.1);">0.1</a>
+					</td>
 				</tr>
 				<tr>
 					<td colspan="3"></td>
@@ -333,12 +339,17 @@ function move(var_axis, var_value) {
 		else {
 			var_speed = $("#xy_speed").val();
 		}
-		var_url = "/zeepronterface/move/" + var_axis + '/' + var_value + '/' + var_speed;
+		var_url = "/zeepronterface/move";
 	}
 	var_ajax = $.ajax({
 		url: var_url,
 		type: "GET",
 		cache: false,
+		data: {
+				'axis' : var_axis,
+				'value' : var_value,
+				'speed' : var_speed
+		},
 		beforeSend: function() {
 			$("#overlay").addClass("gray-overlay");
 			$(".ui-loader").css("display", "block");
