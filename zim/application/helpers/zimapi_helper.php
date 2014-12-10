@@ -1140,6 +1140,12 @@ function ZimAPI_sendTimelapse($emails, $model_name = NULL) {
 	return ZimAPI_sendMandrillEmail($array_senddata);
 }
 
+//TODO finish me
+function ZimAPI_backupPresets() {
+	// in principle, we backup only user presets, but not system preset
+	// the system will decide which folder it takes (/config/conf/presetlist/ or /sdcard/conf/presetlist)
+}
+
 function ZimAPI_getPresetList($set_localization = TRUE) {
 	$array_data = ZimAPI_getPresetListAsArray($set_localization);
 	$CI = &get_instance();

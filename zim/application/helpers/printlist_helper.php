@@ -167,7 +167,7 @@ function ModelList_add($data_array) {
 				}
 			}
 
-			//model filament1 length
+			//model filament2 length
 			if (isset($data_array['l2'])) {
 				$model_filament2 = (int) $data_array['l2'];
 				if ($model_filament2 <= 0) {
@@ -175,7 +175,7 @@ function ModelList_add($data_array) {
 				}
 			}
 
-			//model filament1 length
+			//model filament1 color
 			if (isset($data_array['c1'])) {
 				$model_color1 = $data_array['c1'];
 				if (ModelList__changeColorName($model_color1) != ERROR_OK) {
@@ -183,7 +183,7 @@ function ModelList_add($data_array) {
 				}
 			}
 
-			//model filament1 length
+			//model filament1 color
 			if (isset($data_array['c2'])) {
 				$model_color2 = $data_array['c2'];
 				if (ModelList__changeColorName($model_color2) != ERROR_OK) {

@@ -50,6 +50,7 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 // 	define('CORESTATUS_VALUE_MID_REPRIME_L',	'remprime_left');
 // 	define('CORESTATUS_VALUE_MID_CANCEL',		'cancel');
 	define('CORESTATUS_VALUE_MID_CALIBRATION',	'calibration');
+	define('CORESTATUS_VALUE_MID_PREFIXGCODE',	'gcode');
 	
 	define('CORESTATUS_CMD_CHECK_SD',		'echo writable > ');
 	define('CORESTATUS_SUFFIX_CONF',		'conf/');

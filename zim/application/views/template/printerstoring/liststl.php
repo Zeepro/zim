@@ -38,6 +38,14 @@ function printmodel(clicked_id){
 			url: "/rest/libprintstl",
 			data: { "id": id},
 //			dataType: "json",
+			beforeSend: function() {
+				$("#overlay").addClass("gray-overlay");
+				$(".ui-loader").css("display", "block");
+			},
+			complete: function() {
+				$("#overlay").removeClass("gray-overlay");
+				$(".ui-loader").css("display", "none");
+			},
 			success: function (data, textStatus, xhr) {
 				window.location.href = "/sliceupload/slice";
 			},
@@ -59,6 +67,14 @@ function deletemodel(clicked_id){
 			url: "/rest/libdeletestl",
 			data: { "id": id},
 //			dataType: "json",
+			beforeSend: function() {
+				$("#overlay").addClass("gray-overlay");
+				$(".ui-loader").css("display", "block");
+			},
+			complete: function() {
+				$("#overlay").removeClass("gray-overlay");
+				$(".ui-loader").css("display", "none");
+			},
 			success: function (data, textStatus, xhr) {
 				$('#' + clicked_id).closest('li').remove();
 			},

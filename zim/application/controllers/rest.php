@@ -1878,18 +1878,22 @@ class Rest extends MY_Controller {
 		$this->load->helper('printerstoring');
 	
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+			//TODO perhaps use some functions to get infos directly
+			$length_r = 0;
+			$length_l = 0;
+			
 			// get filament length from sliced Extended Parameters
 			$this->load->helper('printerstate');
-// 			$info = json_decode(PrinterState_checkStatus(), true);
 			$info = PrinterState_checkStatusAsArray();
 
-			$length = 0;
-			if (array_key_exists('eXtended_parameters', $info)) {
-				$length += (array_key_exists('r_length', $info['eXtended_parameters']) ? $info['eXtended_parameters']['r_length'] : 0);
-				$length += (array_key_exists('l_length', $info['eXtended_parameters']) ? $info['eXtended_parameters']['l_length'] : 0);
+			if (array_key_exists(PRINTERSTATE_TITLE_EXTEND_PRM, $info)) {
+				$length_r = array_key_exists(PRINTERSTATE_TITLE_EXT_LENG_R, $info[PRINTERSTATE_TITLE_EXTEND_PRM])
+						? $info[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_EXT_LENG_R] : 0;
+				$length_l = array_key_exists(PRINTERSTATE_TITLE_EXT_LENG_L, $info[PRINTERSTATE_TITLE_EXTEND_PRM])
+						? $info[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_EXT_LENG_L] : 0;
 			}
 			if (($name = $this->input->post('name'))) {
-					$cr = PrinterStoring_storeGcode($name, $length);
+					$cr = PrinterStoring_storeGcode($name, $length_r, $length_l);
 			}
 			else {
 				$cr = ERROR_MISS_PRM;

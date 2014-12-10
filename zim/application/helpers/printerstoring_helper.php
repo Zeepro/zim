@@ -3,15 +3,22 @@
 if (!defined('BASEPATH'))
 	exit('No direct script access allowed');
 
-define('PRINTERSTORING_FILE_STL1_BZ2',	'model1.stl.bz2');
-define('PRINTERSTORING_FILE_STL2_BZ2',	'model2.stl.bz2');
-define('PRINTERSTORING_FILE_STL1_EXT',	'model1.stl');
-define('PRINTERSTORING_FILE_STL2_EXT',	'model2.stl');
-define('PRINTERSTORING_FILE_GCODE_BZ2',	'model.gcode.bz2');
-define('PRINTERSTORING_FILE_GCODE_EXT',	'model.gcode');
-define('PRINTERSTORING_FILE_IMG_PNG',	'image.png');
-define('PRINTERSTORING_FILE_IMG_JPG',	'image.jpg');
-define('PRINTERSTORING_FILE_INFO_JSON',	'info.json');
+if (!defined('PRINTERSTORING_FILE_STL1_BZ2')) {
+	define('PRINTERSTORING_FILE_STL1_BZ2',	'model1.stl.bz2');
+	define('PRINTERSTORING_FILE_STL2_BZ2',	'model2.stl.bz2');
+// 	define('PRINTERSTORING_FILE_STL1_EXT',	'model1.stl');
+// 	define('PRINTERSTORING_FILE_STL2_EXT',	'model2.stl');
+	define('PRINTERSTORING_FILE_STL1_EXT',	'1.stl');
+	define('PRINTERSTORING_FILE_STL2_EXT',	'2.stl');
+	define('PRINTERSTORING_FILE_GCODE_BZ2',	'model.gcode.bz2');
+	define('PRINTERSTORING_FILE_GCODE_EXT',	'model.gcode');
+	define('PRINTERSTORING_FILE_IMG_PNG',	'image.png');
+	define('PRINTERSTORING_FILE_IMG_JPG',	'image.jpg');
+	define('PRINTERSTORING_FILE_INFO_JSON',	'info.json');
+	
+	define('PRINTERSTORING_TITLE_LENG_R',	'l1');
+	define('PRINTERSTORING_TITLE_LENG_L',	'l2');
+}
 
 function PrinterStoring_initialFile() {
 	$ret_val = TRUE;
@@ -257,18 +264,19 @@ function PrinterStoring_deleteStl($id) {
 	return ERROR_OK;
 }
 
-function PrinterStoring_getInfo($type, $id) {
+function PrinterStoring_getInfo($type, $id, &$folderpath = NULL) {
 	global $CFG;
 	$CI = &get_instance();
 	if ($type == "stl") {
-		$info_file = $CFG->config['stl_library'] . sprintf('%06d', $id) . '/' . PRINTERSTORING_FILE_INFO_JSON;
+		$folderpath = $CFG->config['stl_library'] . sprintf('%06d', $id) . '/';
 	}
 	else if ($type == "gcode") {
-		$info_file = $CFG->config['gcode_library'] . sprintf('%06d', $id) . '/' . PRINTERSTORING_FILE_INFO_JSON;
+		$folderpath = $CFG->config['gcode_library'] . sprintf('%06d', $id) . '/';
 	}
 	else {
 		return null;
 	}
+	$info_file = $folderpath . PRINTERSTORING_FILE_INFO_JSON;
 
 	try {
 		if (($str = @file_get_contents($info_file)) === false || ($info = json_decode($str, true)) != TRUE || !array_key_exists('name', $info)) {
@@ -420,6 +428,19 @@ function PrinterStoring__extractFile($filepath, $filename) {
 	return $extracted_path;
 }
 
+function PrinterStoring__generateFilename($raw_name) {
+	$return_name = NULL;
+	$CI = &get_instance();
+	
+	$CI->load->helper('security');
+	// remove unsecurity chars and non ascii chars
+	$return_name = filter_var(sanitize_filename($raw_name), FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
+	// replace space
+	$return_name = str_replace(' ', '_', $return_name);
+	
+	return $return_name;
+}
+
 function PrinterStoring_printStl($id) {
 	global $CFG;
 	$CI = &get_instance();
@@ -427,6 +448,8 @@ function PrinterStoring_printStl($id) {
 
 	$info_file = $CFG->config['stl_library'] . sprintf('%06d', $id) . '/' . PRINTERSTORING_FILE_INFO_JSON;
 	try {
+		$name_stl1 = NULL;
+		
 //		$str = file_get_contents($info_file);
 		if (($str = @file_get_contents($info_file)) === false || ($info = json_decode($str, true)) != TRUE || !array_key_exists('name', $info)) {
 			$CI->load->helper('printerlog');
@@ -438,10 +461,14 @@ function PrinterStoring_printStl($id) {
 
 		// extract, copy model file(s) to tmp and addModel to slicer
 		$model_file1 = $CFG->config['stl_library'] . sprintf('%06d', $id) . '/' . PRINTERSTORING_FILE_STL1_BZ2;
-		if (($file_path = PrinterStoring__extractFile($model_file1, PRINTERSTORING_FILE_STL1_EXT)) !== null) {
+		$name_stl1 = PrinterStoring__generateFilename($info['name'] . PRINTERSTORING_FILE_STL1_EXT);
+		if (($file_path = PrinterStoring__extractFile($model_file1, $name_stl1)) !== null) {
 			if ($info["multiple"] === true) {
+				$name_stl2 = NULL;
+				
 				$model_file2 = $CFG->config['stl_library'] . sprintf('%06d', $id) . '/' . PRINTERSTORING_FILE_STL2_BZ2;
-				if (($file2_path = PrinterStoring__extractFile($model_file2, PRINTERSTORING_FILE_STL2_EXT)) !== null) {
+				$name_stl2 = PrinterStoring__generateFilename($info['name'] . PRINTERSTORING_FILE_STL2_EXT);
+				if (($file2_path = PrinterStoring__extractFile($model_file2, $name_stl2)) !== null) {
 					return Slicer_addModel(array($file_path, $file2_path));
 				}
 				else {
@@ -456,6 +483,7 @@ function PrinterStoring_printStl($id) {
 		}
 		else {
 			$CI->load->helper('printerlog');
+			PrinterLog_logDebug('after name: ' . $name_stl1);
 			PrinterLog_logError('could not extract the stl model', __FILE__, __LINE__);
 			return ERROR_INTERNAL;
 		}
@@ -469,7 +497,7 @@ function PrinterStoring_printStl($id) {
 	return ERROR_OK;
 }
 
-function PrinterStoring_storeGcode($name, $length = 0) {
+function PrinterStoring_storeGcode($name, $length_r = 0, $length_l = 0) {
 	global $CFG;
 	$CI = &get_instance();
 	$gcode_library_path = $CFG->config['gcode_library'];
@@ -501,10 +529,12 @@ function PrinterStoring_storeGcode($name, $length = 0) {
 	$info_file = $model_folder . PRINTERSTORING_FILE_INFO_JSON;
 
 	$info = array(
-		"id" => $model_id,
-		"name" => $name,
-		"creation_date" => date("Y-m-d"),
-		"length" => $length
+			"id" => $model_id,
+			"name" => $name,
+			"creation_date" => date("Y-m-d"),
+// 			"length" => $length
+			PRINTERSTORING_TITLE_LENG_R	=> $length_r,
+			PRINTERSTORING_TITLE_LENG_L	=> $length_l,
 	);
 
 	if (!PrinterStoring__createInfoFile($info_file, $info)) {
