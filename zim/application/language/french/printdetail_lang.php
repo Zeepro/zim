@@ -11,7 +11,7 @@ $lang['unknown']
 $lang['under calculating']
 	= 'estimation en cours';
 $lang['Control your printing']
-	= 'Contrôler votre impression';
+	= 'Suivez votre impression';
 $lang['Printing details']
 	= 'Détail de l\'impression';
 $lang['cancel_confirm']
@@ -102,6 +102,8 @@ $lang['wait_hint_recovery_unknown']
 //printdetail timelapse()
 $lang['timelapse_title']
 	= 'Zim-motion Aperçu';
+$lang['home_popup_text']
+	= '<h3 class="ui-title">WARNING :</h3><p>Vous êtes sur le point d\'être redirigés vers la page d\'accueil.</p>';
 $lang['send_email_button']
 	= 'Partager par mail';
 $lang['send_email_hint']

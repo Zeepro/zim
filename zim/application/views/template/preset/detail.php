@@ -451,7 +451,7 @@
 							<label for="support_material_interface_layers">{support_material_interface_layers}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" style="text-align:right;" data-clear-btn="false" name="support_material_interface_layers" id="support_material_interface_layers" value="{support_material_interface_layers_value}" min="0" max="10">
+							<input type="number" style="text-align:right;" data-clear-btn="false" name="support_material_interface_layers" id="support_material_interface_layers" value="{support_material_interface_layers_value}" min="0" />
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="support_material_interface_spacing">{support_material_interface_spacing}</label>
