@@ -1019,4 +1019,20 @@ class Printdetail extends MY_Controller {
 		
 		return;
 	}
+	public function video_upload()
+	{
+		$this->load->library('parser');
+		$data = array(
+		);
+		$body_page = $this->parser->parse($file, $data, TRUE);
+		
+		// parse all page
+		$template_data = array(
+				'lang'			=> $this->config->item('language_abbr'),
+				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Home') . '</title>',
+				'contents'		=> $body_page
+		);
+		$this->parser->parse('template/basetemplate', $template_data);
+		return;
+	}
 }
