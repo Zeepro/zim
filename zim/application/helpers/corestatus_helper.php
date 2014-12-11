@@ -346,7 +346,7 @@ function CoreStatus_checkCallPrinting($array_status = array(), &$url_redirect = 
 				
 			case CORESTATUS_VALUE_MID_SLICE:
 			case CORESTATUS_VALUE_MID_CALIBRATION:
-			default:
+			default: // presliced model + gcode library case
 				if (is_null($array_status[CORESTATUS_TITLE_PRINTMODEL])) {
 					$CI = &get_instance();
 					$CI->load->helper('printerlog');
@@ -375,6 +375,9 @@ function CoreStatus_checkCallEndPrinting(&$url_redirect = '') {
 			'/printdetail/timelapse_ready_ajax'	=> NULL,
 			'/printdetail/timelapse_end_ajax'	=> NULL,
 			'/printdetail/sendemail_ajax'		=> NULL,
+			'/printdetail/connect_google'		=> NULL,
+			'/printdetail/connect_google/true'	=> NULL,
+			'/printdetail/video_upload'			=> NULL,
 	));
 }
 

@@ -176,7 +176,7 @@ function Printer_printFromModel($id_model, $model_calibration, $exchange_extrude
 			if ($model_calibration == TRUE) {
 				$CI = &get_instance();
 				$CI->load->helper('corestatus');
-		
+				
 				$id_model = CORESTATUS_VALUE_MID_CALIBRATION;
 			}
 		}
@@ -207,7 +207,7 @@ function Printer_printFromModel($id_model, $model_calibration, $exchange_extrude
 function Printer_printFromSlice($exchange_extruder = FALSE, $array_temper = array()) {
 	$ret_val = 0;
 	$file_temp_data = NULL;
-	$temp_json = array();
+	$data_json = array();
 	$array_filament = array();
 	
 	$CI = &get_instance();
@@ -220,18 +220,15 @@ function Printer_printFromSlice($exchange_extruder = FALSE, $array_temper = arra
 	
 	// check filaments
 	//TODO test me
-	$CI->load->helper(array('printerstate', 'json', 'corestatus'));
+	$CI->load->helper(array('printerstate', 'corestatus'));
 	
-	$file_temp_data = $CI->config->item('temp') . SLICER_FILE_TEMP_DATA;
-	$temp_json = json_read($file_temp_data, TRUE);
-	if (isset($temp_json['error'])) {
+	if (ERROR_OK != PrinterState_getSlicedJson($data_json)) {
 		$CI->load->helper('printerlog');
 		PrinterLog_logError('read temp data file error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
 	else {
 		// move all the verification of filament into printFromFile by array_filament
-		$data_json = $temp_json['json'];
 		foreach ($data_json as $abb_filament => $array_temp) {
 			$array_filament[$abb_filament] = $array_temp[PRINTERSTATE_TITLE_NEED_L];
 		}
@@ -282,7 +279,7 @@ function Printer_printFromLibrary($id_gcode, $exchange_extruder = FALSE, $array_
 		}
 		// temporary change end
 		
-		$this->load->helper('corestatus');
+		$CI->load->helper('corestatus');
 		$ret_val = Printer_printFromFile($gcode_path, CORESTATUS_VALUE_MID_PREFIXGCODE . $id_gcode, TRUE,
 				$exchange_extruder, $array_filament, $array_temper);
 	}

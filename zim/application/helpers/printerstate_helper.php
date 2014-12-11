@@ -1160,7 +1160,102 @@ function PrinterState_afterFileCommand() {
 	return TRUE;
 }
 
-function PrinterState_checkBusyStatus(&$status_current, &$array_data = array(), $printafterslice = TRUE) {
+function PrinterState__setSlicedJson($array_slicer, &$array_ret = array()) {
+	$CI = &get_instance();
+	$CI->load->helper('slicer');
+	
+	// copy the data we need and check filament
+	foreach ($array_slicer as $abb_filament => $volume_need) {
+		$data_cartridge = array();
+		$tmp_ret = 0;
+			
+		$tmp_ret = PrinterState_checkFilament($abb_filament, $volume_need, $data_cartridge);
+		
+		// we will ignore the error of cartridge checking if slicing is well done (default value assigned even if not true)
+		if (in_array($tmp_ret, array(
+				ERROR_OK, ERROR_MISS_LEFT_FILA, ERROR_MISS_RIGT_FILA,
+				ERROR_LOW_LEFT_FILA, ERROR_LOW_RIGT_FILA,
+		))) {
+			$array_data[$abb_filament] = array(
+					PRINTERSTATE_TITLE_COLOR		=> $data_cartridge[PRINTERSTATE_TITLE_COLOR],
+					PRINTERSTATE_TITLE_EXT_TEMPER	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER],
+					PRINTERSTATE_TITLE_EXT_TEMP_1	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1],
+					PRINTERSTATE_TITLE_NEED_L		=> $volume_need,
+					PRINTERSTATE_TITLE_MATERIAL		=> $data_cartridge[PRINTERSTATE_TITLE_MATERIAL], // for different material check
+			);
+		}
+		else {
+			$array_data[$abb_filament] = array(
+					PRINTERSTATE_TITLE_COLOR		=> PRINTERSTATE_VALUE_DEFAULT_COLOR,
+					PRINTERSTATE_TITLE_EXT_TEMPER	=> SLICER_VALUE_DEFAULT_TEMPER,
+					PRINTERSTATE_TITLE_EXT_TEMP_1	=> SLICER_VALUE_DEFAULT_FIRST_TEMPER,
+					PRINTERSTATE_TITLE_NEED_L		=> $volume_need,
+					PRINTERSTATE_TITLE_MATERIAL		=> PRINTERSTATE_DESP_MATERIAL_PLA, // for different material check
+			);
+		}
+		
+		//TODO use the exact fail code in parameter error_type of PrinterState_getCartridgeAsArray to decide whether we break and return error or not
+		
+		$array_ret[$abb_filament] = $tmp_ret;
+		if ($tmp_ret != ERROR_OK) {
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('check filament error after slicing, cr: ' . $ret_val, __FILE__, __LINE__);
+		}
+	}
+	
+	// save the json file
+	try {
+		$fp = fopen($CI->config->item('temp') . SLICER_FILE_TEMP_DATA, 'w');
+		if ($fp) {
+			fwrite($fp, json_encode($array_data));
+			fclose($fp);
+		}
+		else {
+			throw new Exception('can not open file');
+		}
+	} catch (Exception $e) {
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('can not save temp json file', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	
+	return ERROR_OK;
+}
+
+function PrinterState_getSlicedJson(&$data_json) {
+	$cr = 0;
+	$CI = &get_instance();
+	$CI->load->helper('slicer');
+	$file_temp_data = $CI->config->item('temp') . SLICER_FILE_TEMP_DATA;
+	
+	if (!file_exists($file_temp_data)) {
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('call sliced json file, but file not found', __FILE__, __LINE__);
+		
+		$cr = ERROR_INTERNAL;
+	}
+	else {
+		$data_json = array();
+		$temp_json = array();
+			
+		$CI->load->helper('json');
+		$temp_json = json_read($file_temp_data, TRUE);
+		if (isset($temp_json['error'])) {
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('read temp sliced json data file error', __FILE__, __LINE__);
+			
+			$cr = ERROR_INTERNAL;
+		}
+		else {
+			$cr = ERROR_OK;
+			$data_json = $temp_json['json'];
+		}
+	}
+	
+	return $cr;
+}
+
+function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) {
 	$ret_val = 0;
 	$time_wait = NULL;
 	$time_max = NULL;
@@ -1235,79 +1330,13 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array(), 
 				return TRUE;
 			}
 			elseif ($progress == 100) {
-				// copy the data we need and check filament first
-				$ret_val = ERROR_OK;
-				foreach ($array_slicer as $abb_filament => $volume_need) {
-					$data_cartridge = array();
-					$tmp_ret = 0;
-					
-					$tmp_ret = PrinterState_checkFilament($abb_filament, $volume_need, $data_cartridge);
-// 					$array_data[$abb_filament] = array(
-// 							PRINTERSTATE_TITLE_COLOR		=> $data_cartridge[PRINTERSTATE_TITLE_COLOR],
-// 							PRINTERSTATE_TITLE_EXT_TEMPER	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER],
-// 							PRINTERSTATE_TITLE_EXT_TEMP_1	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1],
-// 							PRINTERSTATE_TITLE_NEED_L		=> $volume_need,
-// 							PRINTERSTATE_TITLE_MATERIAL		=> $data_cartridge[PRINTERSTATE_TITLE_MATERIAL], // for different material check
-// 					);
-					if (in_array($tmp_ret, array(
-							ERROR_OK, ERROR_MISS_LEFT_FILA, ERROR_MISS_RIGT_FILA,
-							ERROR_LOW_LEFT_FILA, ERROR_LOW_RIGT_FILA,
-					))) {
-						$array_data[$abb_filament] = array(
-								PRINTERSTATE_TITLE_COLOR		=> $data_cartridge[PRINTERSTATE_TITLE_COLOR],
-								PRINTERSTATE_TITLE_EXT_TEMPER	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER],
-								PRINTERSTATE_TITLE_EXT_TEMP_1	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1],
-								PRINTERSTATE_TITLE_NEED_L		=> $volume_need,
-								PRINTERSTATE_TITLE_MATERIAL		=> $data_cartridge[PRINTERSTATE_TITLE_MATERIAL], // for different material check
-						);
-					}
-					else {
-						$array_data[$abb_filament] = array(
-								PRINTERSTATE_TITLE_COLOR		=> PRINTERSTATE_VALUE_DEFAULT_COLOR,
-								PRINTERSTATE_TITLE_EXT_TEMPER	=> SLICER_VALUE_DEFAULT_TEMPER,
-								PRINTERSTATE_TITLE_EXT_TEMP_1	=> SLICER_VALUE_DEFAULT_FIRST_TEMPER,
-								PRINTERSTATE_TITLE_NEED_L		=> $volume_need,
-								PRINTERSTATE_TITLE_MATERIAL		=> PRINTERSTATE_DESP_MATERIAL_PLA, // for different material check
-						);
-					}
-					
-					// we will ignore the error of cartridge checking if slicing is well done (default value assigned even if not true)
-					//TODO use the exact fail code in parameter error_type of PrinterState_getCartridgeAsArray to decide whether we change ret_val or not
-// 					// only assign return value when no error, so we can grap all data we need in checking loop
-// 					if ($ret_val == ERROR_OK) {
-// 						$ret_val = $tmp_ret;
-// 					}
-				}
-				
-				// save the temp file for every service (attention: do not change $ret_val in this block!)
+				// set temp json file for every service
+				$ret_val = PrinterState__setSlicedJson($array_slicer);
 				$status_current = CORESTATUS_VALUE_IDLE;
-				try {
-					$fp = fopen($CI->config->item('temp') . SLICER_FILE_TEMP_DATA, 'w');
-					if ($fp) {
-						fwrite($fp, json_encode($array_data));
-						fclose($fp);
-					}
-					else {
-						throw new Exception('can not open file');
-					}
-				} catch (Exception $e) {
-					$this->load->helper('printerlog');
-					PrinterLog_logError('can not save temp json file', __FILE__, __LINE__);
-					$ret_val = ERROR_INTERNAL;
-				}
 				
 				if ($ret_val != ERROR_OK) {
-					$CI->load->helper('printerlog');
-					PrinterLog_logError('check filament error after slicing, cr: ' . $ret_val, __FILE__, __LINE__);
 					$array_data[PRINTERSTATE_TITLE_LASTERROR] = $ret_val;
-				}
-				
-// 				// try to start printing after slicing if necessary
-// 				if ($printafterslice == FALSE) {
-				
-// 				CoreStatus_setInIdle($ret_val);
-				if ($ret_val == ERROR_INTERNAL) {
-					CoreStatus_setInIdle(ERROR_INTERNAL);
+					CoreStatus_setInIdle($ret_val);
 				}
 				else {
 					CoreStatus_setInIdle();
@@ -1612,7 +1641,7 @@ function PrinterState_checkStatusAsArray() {
 				$data_temperature = PrinterState_getExtruderTemperaturesAsArray();
 				if (!is_array($data_temperature)) {
 					// log internal error
-					$this->load->helper('printerlog');
+					$CI->load->helper('printerlog');
 					PrinterLog_logError('API error when getting temperatures in printing', __FILE__, __LINE__);
 				}
 				else {

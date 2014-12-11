@@ -474,9 +474,6 @@ class Sliceupload extends MY_Controller {
 			$this->load->helper('printerlog');
 			PrinterLog_logError('add model in slicer error, ' . $cr, __FILE__, __LINE__);
 		}
-// 		else {
-// 			unlink($this->config->item('temp') . SLICER_FILE_TEMP_DATA);
-// 		}
 		
 		return;
 	}
@@ -644,7 +641,7 @@ class Sliceupload extends MY_Controller {
 		$state_f_r = NULL;
 		$change_left = '';
 		$change_right = '';
-		$file_temp_data = NULL;
+		$data_json = array();
 // 		$array_key_real_temper = 'real_temperature'; //TODO think about if we need to declare this key name in helper or not
 		$error = NULL;
 		$option_selected = 'selected="selected"';
@@ -652,27 +649,10 @@ class Sliceupload extends MY_Controller {
 		$array_need = array('r' => 'false', 'l' => 'false');
 		
 		$this->load->helper(array('printerstate', 'slicer'));
-		$file_temp_data = $this->config->item('temp') . SLICER_FILE_TEMP_DATA;
 		$this->load->library('parser');
 		$this->lang->load('sliceupload/slice_status_ajax', $this->config->item('language'));
 		
-		if (!file_exists($file_temp_data)) {
-			$this->load->helper('printerlog');
-			PrinterLog_logError('callback return to slice page without temp data file', __FILE__, __LINE__);
-			$cr = ERROR_INTERNAL;
-		}
-		else {
-			$data_json = array();
-			$temp_json = array();
-			
-			$this->load->helper('json');
-			$temp_json = json_read($file_temp_data, TRUE);
-			if (isset($temp_json['error'])) {
-				$this->load->helper('printerlog');
-				PrinterLog_logError('read temp data file error', __FILE__, __LINE__);
-				$cr = ERROR_INTERNAL;
-			}
-		}
+		$cr = PrinterState_getSlicedJson($data_json);
 		
 		if ($cr != ERROR_OK) {
 			$display = $cr . " " . t(MyERRMSG($cr));
@@ -689,7 +669,6 @@ class Sliceupload extends MY_Controller {
 			$state_f_l = $state_f_r = t('filament_ok');
 			$change_left = $change_right = t('change_filament');
 			
-			$data_json = $temp_json['json'];
 			foreach (array('r', 'l') as $abb_filament) {
 				$data_cartridge = array();
 				$data_slice = array();
@@ -892,105 +871,40 @@ class Sliceupload extends MY_Controller {
 		$cr = 0;
 		$path_image = NULL;
 		$display = NULL;
+		$rho = $this->input->get('rho');
+		$theta = $this->input->get('theta');
+		$delta = $this->input->get('delta');
+		$color1 = $this->input->get('color_right');
+		$color2 = $this->input->get('color_left');
 		
-// 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-// 			$rho = $this->input->post('rho');
-// 			$theta = $this->input->post('theta');
-// 			$delta = $this->input->post('delta');
-			$rho = $this->input->get('rho');
-			$theta = $this->input->get('theta');
-			$delta = $this->input->get('delta');
-			$color1 = $this->input->get('color_right');
-			$color2 = $this->input->get('color_left');
-// 			$inverse = (int) $this->input->get('inverse');
+		// check color input
+		if (!preg_match('/^#[0-9A-Fa-f]{6}$/', $color1)) {
+			$color1 = NULL;
+		}
+		if (!preg_match('/^#[0-9A-Fa-f]{6}$/', $color2)) {
+			$color2 = NULL;
+		}
+		
+		if ($rho === FALSE || $theta === FALSE || $delta === FALSE) {
+			$cr = ERROR_MISS_PRM;
+		}
+		else if ((int)$rho < 0) {
+			$cr = ERROR_WRONG_PRM;
+		}
+		else {
+			$file_info = array();
+			$file_cartridge = NULL;
 			
-// 			$inverse = ($inverse != 0) ? TRUE : FALSE;
-			// check color input
-			if (!preg_match('/^#[0-9A-Fa-f]{6}$/', $color1)) {
-				$color1 = NULL;
-			}
-			if (!preg_match('/^#[0-9A-Fa-f]{6}$/', $color2)) {
-				$color2 = NULL;
-			}
+			$this->load->helper('slicer');
+			$cr = Slicer_rendering((int)$rho, (int)$theta, (int)$delta, $path_image, $color1, $color2);
 			
-			if ($rho === FALSE || $theta === FALSE || $delta === FALSE) {
-				$cr = ERROR_MISS_PRM;
+			if ($cr == ERROR_OK) {
+				//TODO add the possibility of making path everywhere, but not only in /var/www/tmp/
+				$this->load->helper('file');
+				$file_info = get_file_info(realpath($path_image), array('name'));
+				$display = '/tmp/' . $file_info['name'] . '?' . time();
 			}
-			else if ((int)$rho < 0) {
-				$cr = ERROR_WRONG_PRM;
-			}
-			else {
-				$file_info = array();
-				$file_cartridge = NULL;
-// 				$color1 = NULL;
-// 				$color2 = NULL;
-				
-				$this->load->helper('slicer');
-				
-// 				// load color from slicer temp data
-// 				$cr = ERROR_OK;
-// 				$file_cartridge = $this->config->item('temp') . SLICER_FILE_TEMP_DATA;
-// 				if (file_exists($file_cartridge)) {
-// 					$this->load->helper(array('json', 'printerstate'));
-// 					$temp_json = json_read($file_cartridge, TRUE);
-					
-// 					if (isset($temp_json['error'])) {
-// 						$this->load->helper('printerlog');
-// 						PrinterLog_logError('read temp data file error', __FILE__, __LINE__);
-// 						$cr = ERROR_INTERNAL;
-// 					}
-// 					else {
-// // 						unset($temp_json['json']['e']); //FIX/ME try to find a better way to remove error code
-// // 						$nb_cartridge = count($temp_json['json']);
-// // 						$inverse = ($inverse != 0 && $nb_cartridge > 1) ? TRUE : FALSE;
-						
-// 						foreach ($temp_json['json'] as $abb_cartridge => $data_cartridge) {
-// 							switch ($abb_cartridge) {
-// 								case 'r':
-// 									if ($inverse) {
-// 										$color2 = $data_cartridge[PRINTERSTATE_TITLE_COLOR];
-// 									}
-// 									else {
-// 										$color1 = $data_cartridge[PRINTERSTATE_TITLE_COLOR];
-// 									}
-// 									break;
-									
-// 								case 'l':
-// 									if ($inverse) {
-// 										$color1 = $data_cartridge[PRINTERSTATE_TITLE_COLOR];
-// 									}
-// 									else {
-// 										$color2 = $data_cartridge[PRINTERSTATE_TITLE_COLOR];
-// 									}
-// 									break;
-									
-// 								default:
-// 									$this->load->helper('printerlog');
-// 									PrinterLog_logError('unknown cartridge abb: ' . $abb_cartridge, __FILE__, __LINE__);
-// 									$cr = ERROR_INTERNAL;
-// 									break;
-// 							}
-// 							if ($cr != ERROR_OK) {
-// 								break;
-// 							}
-// 						}
-// 					}
-// 				}
-				
-// 				if ($cr == ERROR_OK) {
-					$cr = Slicer_rendering((int)$rho, (int)$theta, (int)$delta, $path_image, $color1, $color2);
-// 				}
-				if ($cr == ERROR_OK) {
-					//TODO add the possibility of making path everywhere, but not only in /var/www/tmp/
-					$this->load->helper('file');
-					$file_info = get_file_info(realpath($path_image), array('name'));
-					$display = '/tmp/' . $file_info['name'] . '?' . time();
-				}
-			}
-// 		}
-// 		else {
-// 			$cr = ERROR_WRONG_PRM;
-// 		}
+		}
 		
 		if ($cr != ERROR_OK) {
 			$display = $cr . " " . t(MyERRMSG($cr));

@@ -340,5 +340,190 @@ class Printerstoring extends MY_Controller {
 		
 		$this->parser->parse('template/basetemplate', $template_data);
 	}
+	
+	public function gcodedetail() {
+		$body_page = NULL;
+		$data_json = array();
+		$gid = $this->input->get('id');
+		$array_data = array();
+		$check_left = NULL;
+		$check_right = NULL;
+		$change_left = NULL;
+		$change_right = NULL;
+		$enable_print = TRUE;
+		
+		$this->load->helper(array('printerstoring', 'printerstate'));
+		$data_json = PrinterStoring_getInfo('gcode', $gid);
+		
+		if (is_null($data_json)) {
+			$this->output->set_header('Location: /printerstoring/listgcode');
+			
+			return;
+		}
+		
+		$this->load->library('parser');
+// 		$this->lang->load('printerstoring/gcodedetail', $this->config->item('language'));
+		
+		$check_left = $check_right = t('filament_ok');
+		$change_left = $change_right = t('change_filament');
+		
+		foreach (array('r', 'l') as $abb_filament) {
+			$data_cartridge = array();
+			$tmp_ret = 0;
+			$volume_need = 0;
+			$key_length = NULL;
+			$key_material = NULL;
+			
+			if ($abb_filament == 'l') {
+				$key_length = PRINTERSTORING_TITLE_LENG_L;
+				$key_material = PRINTERSTORING_TITLE_MATER_L;
+			}
+			else { // $abb_filament == 'r'
+				$key_length = PRINTERSTORING_TITLE_LENG_R;
+				$key_material = PRINTERSTORING_TITLE_MATER_R;
+			}
+			
+			if ($data_json[$key_length] > 0) {
+				$volume_need = $data_json[$key_length];
+// 				$array_need[$abb_filament] = 'true';
+			}
+			else if ($abb_filament == 'l') {
+				$state_f_l = t('filament_not_need');
+			}
+			else { // $abb_filament == 'r'
+				$state_f_r = t('filament_not_need');
+			}
+			
+			$tmp_ret = PrinterState_checkFilament($abb_filament, $volume_need, $data_cartridge);
+			if (in_array($tmp_ret, array(
+					ERROR_OK, ERROR_MISS_LEFT_FILA, ERROR_MISS_RIGT_FILA,
+					ERROR_LOW_LEFT_FILA, ERROR_LOW_RIGT_FILA,
+			))) {
+				$array_data[$abb_filament] = array(
+						PRINTERSTATE_TITLE_COLOR		=> $data_cartridge[PRINTERSTATE_TITLE_COLOR],
+						PRINTERSTATE_TITLE_EXT_TEMPER	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER],
+						PRINTERSTATE_TITLE_MATERIAL		=> $data_cartridge[PRINTERSTATE_TITLE_MATERIAL],
+						PRINTERSTATE_TITLE_NEED_L		=> $volume_need,
+				);
+			}
+			else {
+				$array_data[$abb_filament] = array(
+						PRINTERSTATE_TITLE_COLOR		=> PRINTERSTATE_VALUE_DEFAULT_COLOR,
+						PRINTERSTATE_TITLE_EXT_TEMPER	=> 0,
+						PRINTERSTATE_TITLE_MATERIAL		=> NULL,
+						PRINTERSTATE_TITLE_NEED_L		=> $volume_need,
+				);
+			}
+			
+			if ($volume_need > 0 && $data_json[$key_material] != $data_cartridge[PRINTERSTATE_TITLE_MATERIAL]) {
+				$required_material = t('require_' . $data_json[$key_material]);
+				
+				if ($abb_filament == 'l') {
+					$check_left = $required_material;
+				}
+				else { // $abb_filament == 'r'
+					$check_right = $required_material;
+				}
+				
+				$enable_print = FALSE; // disable print when material is different
+			}
+			else {
+				// treat error
+				switch ($tmp_ret) {
+					case ERROR_OK:
+						// do nothing if no error
+						break;
+						
+					case ERROR_LOW_RIGT_FILA:
+						$check_right = t('filament_not_enough');
+						break;
+						
+					case ERROR_MISS_RIGT_FILA:
+						$check_right = t('filament_unloaded');
+						$change_right = t('load_filament');
+						break;
+						
+					case ERROR_MISS_RIGT_CART:
+						$check_right = t('filament_empty');
+						$change_right = t('load_filament');
+						break;
+						
+					case ERROR_LOW_LEFT_FILA:
+						$check_left = t('filament_not_enough');
+						break;
+						
+					case ERROR_MISS_LEFT_FILA:
+						$check_left = t('filament_unloaded');
+						$change_left = t('load_filament');
+						break;
+						
+					case ERROR_MISS_LEFT_CART:
+						$check_left = t('filament_empty');
+						$change_left = t('load_filament');
+						break;
+						
+					default:
+						$this->load->helper('printerlog');
+						PrinterLog_logError('unexpected return when getting detail of gcode library model: ' . $cr, __FILE__, __LINE__);
+						
+						// assign error message if necessary
+						if ($abb_filament == 'l') {
+							$check_left = t('filament_error');
+						}
+						else { // $abb_filament == 'r'
+							$check_right = t('filament_error');
+						}
+						break;
+				}
+			}
+			
+			// block print
+			if ($enable_print == TRUE && $tmp_ret != ERROR_OK && $volume_need > 0) {
+				$enable_print = FALSE;
+			}
+		}
+		
+		$template_data = array(
+				'home'				=> t('home'),
+				'back'				=> t('back'),
+				'id'				=> $gid,
+				'title'				=> $data_json['name'],
+				'photo_title'		=> t('photo_title'),
+				'title_current'		=> t('filament_title'),
+				'error'				=> t('filament_error'),
+				'state_c_l'			=> $array_data['l'][PRINTERSTATE_TITLE_COLOR],
+				'state_c_r'			=> $array_data['r'][PRINTERSTATE_TITLE_COLOR],
+				'state_f_l'			=> $check_left,
+				'state_f_r'			=> $check_right,
+				'need_filament_l'	=> $array_data['l'][PRINTERSTATE_TITLE_NEED_L],
+				'need_filament_r'	=> $array_data['r'][PRINTERSTATE_TITLE_NEED_L],
+				'temper_filament_l'	=> $array_data['l'][PRINTERSTATE_TITLE_EXT_TEMPER],
+				'temper_filament_r'	=> $array_data['r'][PRINTERSTATE_TITLE_EXT_TEMPER],
+				'print_button'		=> t('print_button'),
+				'change_filament_l'	=> $change_left,
+				'change_filament_r'	=> $change_right,
+				'enable_print'		=> $enable_print ? 'true' : 'false',
+// 				'needprint_right'	=> $array_need['r'],
+// 				'needprint_left'	=> $array_need['l'],
+				'temp_adjustments_l'=> t('temp_adjustments_l'),
+				'temp_adjustments_r'=> t('temp_adjustments_r'),
+				'temper_max'		=> PRINTERSTATE_TEMPER_CHANGE_MAX,
+				'temper_min'		=> PRINTERSTATE_TEMPER_CHANGE_MIN,
+				'temper_delta'		=> PRINTERSTATE_TEMPER_CHANGE_VAL,
+		);
+		
+		$body_page = $this->parser->parse('template/printerstoring/gcodedetail', $template_data, TRUE);
+		
+		// parse all page
+		$template_data = array(
+				'lang'			=> $this->config->item('language_abbr'),
+				'headers'		=> '<title>' . t('printerstoring_gcodedetail_pagetitle') . '</title>',
+				'contents'		=> $body_page,
+		);
+		
+		$this->parser->parse('template/basetemplate', $template_data);
+		
+		return;
+	}
 
 }

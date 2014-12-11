@@ -18,6 +18,8 @@ if (!defined('PRINTERSTORING_FILE_STL1_BZ2')) {
 	
 	define('PRINTERSTORING_TITLE_LENG_R',	'l1');
 	define('PRINTERSTORING_TITLE_LENG_L',	'l2');
+	define('PRINTERSTORING_TITLE_MATER_R',	'm1');
+	define('PRINTERSTORING_TITLE_MATER_L',	'm2');
 }
 
 function PrinterStoring_initialFile() {
@@ -336,6 +338,7 @@ function PrinterStoring_deleteGcode($id) {
 	return ERROR_OK;
 }
 
+//FIXME image link is real server path, it must be a user url
 function PrinterStoring_listStl() {
 	global $CFG;
 	$CI = &get_instance();
@@ -375,6 +378,7 @@ function PrinterStoring_listStl() {
 	return json_encode($modellist);
 }
 
+//FIXME image link is real server path, it must be a user url
 function PrinterStoring_listGcode() {
 	global $CFG;
 	$CI = &get_instance();
@@ -436,7 +440,8 @@ function PrinterStoring__generateFilename($raw_name) {
 	// remove unsecurity chars and non ascii chars
 	$return_name = filter_var(sanitize_filename($raw_name), FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
 	// replace space
-	$return_name = str_replace(' ', '_', $return_name);
+	$return_name = str_replace(array(' ', '`', '|', ':', '*', '%', ',', '^'), '_', $return_name);
+	//TODO check if we need to filter '(' and ')' for interface or not
 	
 	return $return_name;
 }
@@ -497,10 +502,13 @@ function PrinterStoring_printStl($id) {
 	return ERROR_OK;
 }
 
-function PrinterStoring_storeGcode($name, $length_r = 0, $length_l = 0) {
+function PrinterStoring_storeGcode($name) {
 	global $CFG;
 	$CI = &get_instance();
 	$gcode_library_path = $CFG->config['gcode_library'];
+	$data_json = NULL;
+	$array_length = array();
+	$array_material = array();
 
 	// check if library folder exist
 	if (@is_dir($gcode_library_path) == false) {
@@ -523,18 +531,39 @@ function PrinterStoring_storeGcode($name, $length_r = 0, $length_l = 0) {
 		$CI->load->helper('printerlog');
 		PrinterLog_logError('could not create the model folder', __FILE__, __LINE__);
 		return ERROR_DISK_FULL;
-	}	
+	}
+	
+	// get length and material info
+	$CI->load->helper('printerstate');
+	if (ERROR_OK != PrinterState_getSlicedJson($data_json)) {
+		return ERROR_INTERNAL;
+	}
+	
+	foreach(array('r', 'l') as $abb_cartridge) {
+		if (array_key_exists($abb_cartridge, $data_json)
+				&& array_key_exists(PRINTERSTATE_TITLE_NEED_L, $data_json[$abb_cartridge])
+				&& $data_json[$abb_cartridge][PRINTERSTATE_TITLE_NEED_L] > 0) {
+			$array_length[$abb_cartridge] = $data_json[$abb_cartridge][PRINTERSTATE_TITLE_NEED_L];
+			$array_material[$abb_cartridge] = $data_json[$abb_cartridge][PRINTERSTATE_TITLE_MATERIAL];
+		}
+		else {
+			$array_length[$abb_cartridge] = 0;
+			$array_material[$abb_cartridge] = NULL;
+		}
+	}
 
 	// create info file
 	$info_file = $model_folder . PRINTERSTORING_FILE_INFO_JSON;
-
+	
 	$info = array(
 			"id" => $model_id,
 			"name" => $name,
 			"creation_date" => date("Y-m-d"),
 // 			"length" => $length
-			PRINTERSTORING_TITLE_LENG_R	=> $length_r,
-			PRINTERSTORING_TITLE_LENG_L	=> $length_l,
+			PRINTERSTORING_TITLE_LENG_R		=> $array_length['r'],
+			PRINTERSTORING_TITLE_LENG_L		=> $array_length['l'],
+			PRINTERSTORING_TITLE_MATER_R	=> $array_material['r'],
+			PRINTERSTORING_TITLE_MATER_L	=> $array_material['l'],
 	);
 
 	if (!PrinterStoring__createInfoFile($info_file, $info)) {
@@ -579,43 +608,9 @@ function PrinterStoring_storeGcode($name, $length_r = 0, $length_l = 0) {
 
 //FIXME this function doesn't verify any conditions before launching (filament, temperature, etc.)
 //TODO transfer this function to proper helper: printer_helper.php with adaption with corestatus_helper.php
-function PrinterStoring_printGcode($id) {
-	global $CFG;
+function PrinterStoring_printGcode($id_gcode, $exchange_extruder = FALSE, $array_temper = array()) {
 	$CI = &get_instance();
-	$CI->load->helper('slicer');
-
-	$model_path = $CFG->config['gcode_library'] . sprintf('%06d', $id) . '/';
-	$info_file = $model_path . PRINTERSTORING_FILE_INFO_JSON;
-	try {
-//		$str = file_get_contents($info_file);
-		if (($str = @file_get_contents($info_file)) === false || ($info = json_decode($str, true)) != TRUE || !array_key_exists('name', $info)) {
-			$CI->load->helper('printerlog');
-			PrinterLog_logError('gcode model id not found', __FILE__, __LINE__);
-			return ERROR_UNKNOWN_MODEL;
-		}
-
-		// extract, copy model file(s) to tmp and addModel to slicer
-		$model_file = $model_path . PRINTERSTORING_FILE_GCODE_BZ2;
-		if (($file_path = PrinterStoring__extractFile($model_file, PRINTERSTORING_FILE_GCODE_EXT)) !== null) {
-			$CI->load->helper('printer');
-			$cr = Printer_printFromFile($file_path, $id);
-			if ($cr != TRUE) {
-				$CI->load->helper('printerlog');
-				PrinterLog_logError('gcode model print error', __FILE__, __LINE__);
-				return ERROR_INTERNAL;
-			}
-		}
-		else {
-			$CI->load->helper('printerlog');
-			PrinterLog_logError('could not extract the gcode model', __FILE__, __LINE__);
-			return ERROR_INTERNAL;
-		}
-	}
-	catch (Exception $e) {
-		$CI->load->helper('printerlog');
-		PrinterLog_logError('gcode model print error', __FILE__, __LINE__);
-		return ERROR_INTERNAL;
-	}
-
-	return ERROR_OK;
+	$CI->load->helper('printer');
+	
+	return Printer_printFromLibrary($id_gcode, $exchange_extruder, $array_temper);
 }

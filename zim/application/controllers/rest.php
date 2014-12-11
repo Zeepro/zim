@@ -1910,25 +1910,25 @@ class Rest extends MY_Controller {
 
 	public function libprintgcode() {
 		$cr = ERROR_OK;
-		$id = NULL;
-
-		$this->load->helper('printerstoring');
-	
-		if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-				
-			if (($id = $this->input->get('id'))) {
-				if (intval($id) < 1) {
-					$cr = ERROR_WRONG_PRM;
-				}
-				else {
-					$cr = PrinterStoring_printGcode(intval($id));
-				}
+		$id = $this->input->get('id');
+		
+		$this->load->helper('printer');
+		
+		if ($id) {
+			$id = (int) $id;
+			if ($id < 1) {
+				$cr = ERROR_WRONG_PRM;
 			}
 			else {
-				$cr = ERROR_MISS_PRM;
+				$cr = Printer_printFromLibrary($id);
 			}
-			$this->_return_cr($cr);
 		}
+		else {
+			$cr = ERROR_MISS_PRM;
+		}
+		
+		$this->_return_cr($cr);
+		
 		return;
 	}
 }
