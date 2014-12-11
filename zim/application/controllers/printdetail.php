@@ -1120,6 +1120,9 @@ class Printdetail extends MY_Controller {
 		}
 		if ($client->getAccessToken() && $in_upload_state != "")
 		{
+			// load helper to get video path
+			$this->load->helper('zimapi');
+			
 			// 			if ($in_upload_state != "")
 				// 			{
 			try
@@ -1127,7 +1130,7 @@ class Printdetail extends MY_Controller {
 				//AFF THE VIEW
 	
 				//REPLACE this value with the path to the file you are uploading.
-				$videoPath = BASEPATH . '../images/powered.mp4';
+				$videoPath = ZIMAPI_FILEPATH_TIMELAPSE;
 	
 				//Create a snippet with title, description, tags and category ID
 				// Create an asset resource and set its snippet metadata and type.
