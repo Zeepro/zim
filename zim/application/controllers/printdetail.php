@@ -725,6 +725,7 @@ class Printdetail extends MY_Controller {
 				'timelapse_title'		=> t('timelapse_title'),
 // 				'timelapse_button'		=> t('timelapse_button'),
 				'send_email_button'		=> t('send_email_button'),
+				'send_yt_button'		=> t('send_yt_button'),
 				'send_email_hint'		=> t('send_email_hint'),
 				'send_email_action'		=> t('send_email_action'),
 				'send_email_error'		=> t('send_email_error'),
@@ -1053,10 +1054,11 @@ class Printdetail extends MY_Controller {
 	}
 	public function video_upload()
 	{
+		$state = $_GET['state'];
+		$code = $_GET['code'];
 		$this->load->library('parser');
-		$data = array(
-		);
-		$body_page = $this->parser->parse($file, $data, TRUE);
+		$data = array('state' => $state, 'code' => $code);
+		$body_page = $this->parser->parse('template/printdetail/video_upload', $data, TRUE);
 		
 		// parse all page
 		$template_data = array(
@@ -1065,6 +1067,163 @@ class Printdetail extends MY_Controller {
 				'contents'		=> $body_page
 		);
 		$this->parser->parse('template/basetemplate', $template_data);
+		return;
+	}
+
+	public function connect_google($in_upload_state = "")
+	{
+		set_include_path(get_include_path() . PATH_SEPARATOR . BASEPATH . '../assets/google_api/src');
+		require_once 'Google/Client.php';
+		require_once 'Google/Service/YouTube.php';
+		$this->load->library('session');
+		// 		$this->session->sess_destroy();
+		//session_start();
+	
+	
+	
+		$client = new Google_Client();
+		$client->setApplicationName("Test youtube upload");
+		$client->setClientId("607574717756-dki0mh9seat7g8rsj34rtd79aeh47oo3.apps.googleusercontent.com");
+		$client->setClientSecret("yX_irSTlQVjGM5miuHlhaDHg");
+		$client->setScopes('https://www.googleapis.com/auth/youtube');
+		//		$client->setDeveloperKey("AIzaSyCoUgRm1SYZ9Tk8TMOhy7tmlGDbNgKigfw");
+		$redirect = filter_var('https://sso.zeepro.com/redirect.ashx', FILTER_SANITIZE_URL);
+		$client->setRedirectUri($redirect);
+		$client->setAccessType('offline');
+	
+		$youtube = new Google_Service_YouTube($client);
+	
+		if (isset($_GET['code']))
+		{
+			if (strval($this->session->userdata('state')) !== strval($_GET['state']))
+			{
+				var_dump($this->session->all_userdata());
+				die('The session state did not match.');
+			}
+			$client->authenticate($_GET['code']);
+			$this->session->set_userdata('token', $client->getAccessToken());
+			$this->session->set_userdata('code', $_GET['code']);
+			//header('Location: ' . $redirect);
+		}
+	
+		if ($this->session->userdata('token') !== FALSE)
+		{
+			$client->setAccessToken($this->session->userdata('token'));
+			if ($client->isAccessTokenExpired())
+			{
+				$currentTokenData = json_decode($this->session->userdata('token'));
+				if (isset($currentTokenData->refresh_token))
+				{
+					$client->refreshToken($tokenData->refresh_token);
+				}
+			}
+		}
+		if ($client->getAccessToken() && $in_upload_state != "")
+		{
+			// 			if ($in_upload_state != "")
+				// 			{
+			try
+			{
+				//AFF THE VIEW
+	
+				//REPLACE this value with the path to the file you are uploading.
+				$videoPath = BASEPATH . '../images/powered.mp4';
+	
+				//Create a snippet with title, description, tags and category ID
+				// Create an asset resource and set its snippet metadata and type.
+				// This example sets the video's title, description, keyword tags, and
+				// video category.
+				$snippet = new Google_Service_YouTube_VideoSnippet();
+				$snippet->setTitle("3D printing by zim");
+				$snippet->setDescription("Time-lapse video powered by zim 3D printer, the reference in personal 3D printing. Visit zeepro.com to join the zim experience!");
+				$snippet->setTags(array("Zim", "Zeepro"));
+					
+				// Numeric video category. See https://developers.google.com/youtube/v3/docs/videoCategories/list
+				$snippet->setCategoryId("22");
+					
+				// Set the video's status to "public". Valid statuses are "public", "private" and "unlisted".
+				$status = new Google_Service_YouTube_VideoStatus();
+				$status->privacyStatus = "unlisted";
+					
+				// Associate the snippet and status objects with a new video resource.
+				$video = new Google_Service_YouTube_Video();
+				$video->setSnippet($snippet);
+				$video->setStatus($status);
+					
+				// Specify the size of each chunk of data, in bytes. Set a higher value for
+				// reliable connection as fewer chunks lead to faster uploads. Set a lower
+				// value for better recovery on less reliable connections.
+				$chunkSizeBytes = 1 * 1024 * 1024;
+					
+				// Setting the defer flag to true tells the client to return a request which can be called
+				// with ->execute(); instead of making the API call immediately.
+				$client->setDefer(true);
+					
+				// Create a request for the API's videos.insert method to create and upload the video.
+				$insertRequest = $youtube->videos->insert("status,snippet", $video);
+					
+				// Create a MediaFileUpload object for resumable uploads.
+				$media = new Google_Http_MediaFileUpload($client, $insertRequest, 'video/mp4', null, true, $chunkSizeBytes);
+				$media->setFileSize(filesize($videoPath));
+	
+				// Read the media file and upload it chunk by chunk.
+				$status = false;
+				$handle = fopen($videoPath, "rb");
+				while (!$status && !feof($handle))
+				{
+					$chunk = fread($handle, $chunkSizeBytes);
+					$status = $media->nextChunk($chunk);
+				}
+				fclose($handle);
+	
+				// If you want to make other calls after the file upload, set setDefer back to false
+				$client->setDefer(false);
+				//$client->revokeToken($this->session->userdata('token'));
+				//$this->session->unset_userdata('token');
+				echo "<h3>Video Uploaded</h3><ul>";
+				echo sprintf('<li>%s (%s)</li>', $status['snippet']['title'], $status['id']);
+				echo '</ul>';
+			}
+			catch (Google_ServiceException $e)
+			{
+				die();
+				echo sprintf('<p>A service error occurred: <code>%s</code></p>',
+						htmlspecialchars($e->getMessage()));
+			}
+			catch (Google_Exception $e)
+			{
+				die();
+				echo sprintf('<p>An client error occurred: <code>%s</code></p>',
+						htmlspecialchars($e->getMessage()));
+			}
+			$this->session->set_userdata('token', $client->getAccessToken());
+			// 			}
+			// 			else
+				// 				$this->output->set_header("Location: /printdetail/video_upload?state=" . $this->session->userdata('state') . '&code=' . $this->session->userdata('code'));
+		}
+		else
+		{
+			$this->load->helper(array('zimapi', 'corestatus'));
+			$prefix = CoreStatus_checkTromboning() ? 'https://' : 'http://';
+			$data = array('printersn' => ZimAPI_getSerial(), 'URL' => $prefix . $_SERVER['HTTP_HOST'] . '/printdetail/video_upload');
+				
+			$options = array('http' => array('header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+					'method'  => 'POST',
+					'content' => http_build_query($data)));
+			$context = stream_context_create($options);
+			@file_get_contents('https://sso.zeepro.com/url.ashx', false, $context);
+			$result = substr($http_response_header[0], 9, 3);
+			if ($result == 200)
+			{
+				//echo 'ca marche';
+			}
+			$state = ZimAPI_getSerial();
+			$client->setState($state);
+			$this->session->set_userdata('state', $state);
+			$authUrl = $client->createAuthUrl();
+			$this->output->set_header("Location: " . $authUrl);
+			//	echo "<br /><a href='$authUrl'>click</a>";
+		}
 		return;
 	}
 }

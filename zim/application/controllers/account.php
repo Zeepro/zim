@@ -11,7 +11,6 @@ class Account extends MY_Controller
 		$context = NULL;
 		$printer_name = NULL;
 		$cr = 0;
-		$data = array();
 		$option = array();
 		
 		$this->load->helper('zimapi');
@@ -190,7 +189,7 @@ class Account extends MY_Controller
 		// parse all page
 		$template_data = array(
 				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Home') . '</title>',
+				'headers'		=> '<title>Zim</title>',
 				'contents'		=> $body_page
 		);
 		$this->parser->parse('template/basetemplate', $template_data);

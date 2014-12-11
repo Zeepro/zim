@@ -106,6 +106,8 @@ $lang['home_popup_text']
 	= '<h3 class="ui-title">WARNING :</h3><p>Vous êtes sur le point d\'être redirigés vers la page d\'accueil.</p>';
 $lang['send_email_button']
 	= 'Partager par mail';
+$lang['send_yt_button']
+	= 'Partager sur Youtube';
 $lang['send_email_hint']
 	= 'Envoyer votre zim-motion à :';
 $lang['send_email_action']

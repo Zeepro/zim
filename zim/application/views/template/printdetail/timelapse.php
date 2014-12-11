@@ -20,6 +20,7 @@
 				<div id="myVideo">{loading_player}</div>
 <!-- 				<a href="#" id="timelapse_button" data-ajax="false" data-role="button" class="ui-link ui-btn ui-shadow ui-corner-all">{timelapse_button}</a> -->
 				<a id="send_email_button" href="#timelapse_right_panel" data-role="button" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-mail" style="display:none;">{send_email_button}</a>
+				<a id="send_yt_button" href="/printdetail/connect_google" data-ajax="false" data-role="button" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-mail" style="display:none;">{send_yt_button}</a>
 			</div>
 			<div data-role="collapsible" data-collapsed="false" style="align: center;">
 				<h4>{timelapse_info_title}</h4>
@@ -172,6 +173,7 @@ var_interval_video_check = setInterval(function() {
 			$('a#timelapse_button').attr('href', "{video_url}");
 			load_jwplayer_video();
 			$('a#send_email_button').show();
+			$('a#send_yt_button').show();
 			clearInterval(var_interval_video_check);
 			var_interval_video_check = 0;
 		}

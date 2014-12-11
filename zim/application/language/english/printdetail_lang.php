@@ -107,6 +107,8 @@ $lang['timelapse_title']
 	= 'Zim-motion view';
 $lang['send_email_button']
 	= 'Share via email';
+$lang['send_yt_button']
+	= 'Share via Youtube';
 $lang['send_email_hint']
 	= 'Email your zim-motion to:';
 $lang['send_email_action']
