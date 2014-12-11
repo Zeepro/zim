@@ -151,6 +151,44 @@ class Printdetail extends MY_Controller {
 		return;
 	}
 	
+	public function printgcode($gid = NULL) {
+		$this->printgcode_temp($gid);
+		
+		return;
+	}
+	
+	public function printgcode_temp($gid = NULL) {
+		$exchange_extruder = 0;
+		$array_temper = array();
+		
+		$this->get_extra_info($array_temper, $exchange_extruder);
+		
+		if (is_null($gid)) {
+			$gid = (int) $this->input->get('id');
+		}
+		
+		if ($gid) {
+			$gcode_info = array();
+			
+			$this->load->helper(array('printerstoring', 'corestatus'));
+			
+			$gcode_info = PrinterStoring_getInfo("gcode", $gid);
+			if (!is_null($gcode_info)) {
+				$cr = PrinterStoring_printGcode($gid);
+				
+				if ($cr == ERROR_OK) {
+					$this->output->set_header('Location: /printdetail/status?id=' . CORESTATUS_VALUE_MID_PREFIXGCODE . $gid);
+					
+					return;
+				}
+			}
+		}
+		
+		$this->output->set_header('Location: /printerstoring/listgcode');
+		
+		return;
+	}
+	
 	public function printmodel() {
 		$this->printmodel_temp();
 		
@@ -165,11 +203,19 @@ class Printdetail extends MY_Controller {
 		$array_temper = array();
 		
 		// check model id, and then send it to print command
-		$this->load->helper(array('printer', 'printlist'));
+		$this->load->helper(array('printer', 'printlist', 'corestatus'));
 		
 		$this->get_extra_info($array_temper, $exchange_extruder);
 		
 		if ($mid) {
+			if (strpos($mid, CORESTATUS_VALUE_MID_PREFIXGCODE) === 0) {
+				$gid = (int) substr($mid, strlen(CORESTATUS_VALUE_MID_PREFIXGCODE) - 1);
+				
+				$this->printgcode_temp($gid);
+				
+				return;
+			}
+			
 			if ($mid == ModelList_codeModelHash(PRINTLIST_MODEL_CALIBRATION)) {
 // 				$this->output->set_header('Location: /printdetail/printcalibration');
 // 				return;
@@ -278,7 +324,6 @@ class Printdetail extends MY_Controller {
 			}
 		}
 		else {
-			$camera_prm = NULL;
 			// get print length for timelapse
 			$length = 0;
 			
@@ -286,35 +331,34 @@ class Printdetail extends MY_Controller {
 			if ($id == CORESTATUS_VALUE_MID_SLICE) {
 				$temp_json = array();
 				
-				$this->load->helper(array('printerstate', 'slicer'));
-				$temp_json = json_read($this->config->item('temp') . SLICER_FILE_TEMP_DATA, TRUE);
-				if (!isset($temp_json['error'])) {
-					foreach($temp_json['json'] as $temp_filament) {
+				$this->load->helper('printerstate');
+				
+				if (ERROR_OK == PrinterState_getSlicedJson($temp_json)) {
+					foreach($temp_json as $temp_filament) {
 						if (array_key_exists(PRINTERSTATE_TITLE_NEED_L, $temp_filament)) {
 							$length += $temp_filament[PRINTERSTATE_TITLE_NEED_L];
 						}
 					}
 				}
 			}
-// 			else if ($id == CORESTATUS_VALUE_MID_CALIBRATION) {
-// 				$this->load->helper('printlist');
-// 				ModelList_codeModelHash(PRINTLIST_MODEL_CALIBRATION);
-// 			}
+			// if gcode file from user library
+			else if (strpos($id, CORESTATUS_VALUE_MID_PREFIXGCODE) === 0) {
+				$gcode_info = array();
+				
+				$this->load->helper('printerstoring');
+				$id = (int) substr($id, strlen(CORESTATUS_VALUE_MID_PREFIXGCODE) - 1);
+				
+				$gcode_info = PrinterStoring_getInfo("gcode", $id);
+				if (!is_null($gcode_info) && array_key_exists(PRINTERSTORING_TITLE_LENG_R, $gcode_info)
+						&& array_key_exists(PRINTERSTORING_TITLE_LENG_L, $gcode_info)) {
+					$length = $gcode_info[PRINTERSTORING_TITLE_LENG_R] + $gcode_info[PRINTERSTORING_TITLE_LENG_L];
+				}
+			}
 			// if presliced model get from helper
-// 			else if ($id == CORESTATUS_VALUE_MID_CALIBRATION || strlen($id) == 32) {
 			else if (strlen($id) == 32) {
 				$model_info = array();
-// 				$mid = NULL;
-				
-// 				if ($id == CORESTATUS_VALUE_MID_CALIBRATION) {
-// 					$mid = ModelList_codeModelHash(PRINTLIST_MODEL_CALIBRATION);
-// 				}
-// 				else {
-// 					$mid = $id;
-// 				}
 				
 				$this->load->helper('printlist');
-// 				if (ERROR_OK == ModelList__getDetailAsArray($mid, $model_info) && !is_null($model_info)) {
 				if (ERROR_OK == ModelList__getDetailAsArray($id, $model_info) && !is_null($model_info)) {
 					foreach (array(PRINTLIST_TITLE_LENG_F1, PRINTLIST_TITLE_LENG_F2) as $key_length) {
 						if (array_key_exists($key_length, $model_info)) {
@@ -323,22 +367,10 @@ class Printdetail extends MY_Controller {
 					}
 				}
 			}
-			// if from gcode library
-			else {
-				$this->load->helper('printerstoring');
-				$info = PrinterStoring_getInfo("gcode", $id);
-				
-				//$length += (array_key_exists('length', $info) ? $info['length'] : 0);
-			}
 			
 			if (!ZimAPI_cameraOn(ZIMAPI_PRM_CAMERA_PRINTSTART_TIMELAPSE, $length)) {
 				$this->load->helper('printerlog');
-				PrinterLog_logError('can not set camera', __FILE__, __LINE__);
-			}
-			// test for debug
-			else {
-				$this->load->helper('printerlog');
-				PrinterLog_logDebug('camera parameter: ' . $camera_prm, __FILE__, __LINE__);
+				PrinterLog_logError('can not set camera with timelapse, length: ' . $length, __FILE__, __LINE__);
 			}
 		}
 		
