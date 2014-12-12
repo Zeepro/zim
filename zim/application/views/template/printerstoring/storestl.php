@@ -8,7 +8,7 @@
 		<div id="container">
 			<form action="/printerstoring/storestl" method="post" enctype="multipart/form-data" data-ajax="false">
 			<label for="slider"><h2>{name}</h2></label>
-			<input type="text" name="name" id="name" value="" data-clear-btn="true" />
+			<input type="text" name="name" id="name" value="" data-clear-btn="true" required />
 			<br />
 			<div id="set" data-role="collapsible-set" data-inset="false">
 				<div id="tab1" data-role="collapsible" data-collapsed="false">
@@ -26,7 +26,7 @@
 				<input type="submit" value="{upload_button}" data-icon="arrow-r" data-iconpos="right" onclick='javascript: uploadfile_wait();' />
 			</div>
 			</form>
-			<span id="upload_error">{error}</span>
+			<span class="zim-error" id="upload_error">{error}</span>
 		</div>
 	</div>
 </div>
@@ -49,6 +49,9 @@
 
 function uploadfile_wait() {
 	// this create a blocked spinner when we return to this page by back button
+	if ($("#name").val() == "") {
+		return;
+	}
 	$("#overlay").addClass("gray-overlay");
 	$(".ui-loader").css("display", "block");
 }
