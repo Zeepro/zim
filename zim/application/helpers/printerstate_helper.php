@@ -1199,7 +1199,7 @@ function PrinterState__setSlicedJson($array_slicer, &$array_ret = array()) {
 		$array_ret[$abb_filament] = $tmp_ret;
 		if ($tmp_ret != ERROR_OK) {
 			$CI->load->helper('printerlog');
-			PrinterLog_logError('check filament error after slicing, cr: ' . $ret_val, __FILE__, __LINE__);
+			PrinterLog_logError('check filament error after slicing, cr: ' . $tmp_ret, __FILE__, __LINE__);
 		}
 	}
 	
