@@ -812,6 +812,8 @@ class Sliceupload extends MY_Controller {
 // 				'real_temper_l'		=> isset($array_data['l']) ? $array_data['l'][$array_key_real_temper] : 200,
 // 				'real_temper_r'		=> isset($array_data['r']) ? $array_data['r'][$array_key_real_temper] : 200,
 				'print_button'		=> t('print_button'),
+				'left_temperature'	=> t('left_temperature'),
+				'right_temperature'	=> t('right_temperature'),
 				'change_left'		=> $change_left,
 				'change_right'		=> $change_right,
 				'enable_print'		=> ($cr == ERROR_OK) ? 'true' : 'false',

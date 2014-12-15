@@ -1,4 +1,10 @@
 <div data-role="page" data-url="/sliceupload/slice">
+	<style>
+    	input[type=number]
+    	{
+        	display : none !important;
+		}
+	</style>
 	<div id="overlay"></div>
 	<header data-role="header" class="page-header">
 		<a href="#" data-icon="back" data-ajax="false" style="visibility:hidden">{back}</a>

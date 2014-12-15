@@ -24,14 +24,14 @@
 					<p style="text-align: left;">{error_msg}</p>
 					<div class="ui-grid-a">
 						<div class="ui-block-a"><div id="left_cartridge" class="ui-bar ui-bar-f">
-							<div id="temper_l">
-								<label>Left temperature</label>
-								<input type="range" id="slider_left" name="l" value="{temper_l}" min="160" max="260" />
-							</div>
+						<label>{left_temperature}:<span id="temperature_text_1">{temper_l}</span>°C</label>
+						<div id="temper_l">
+							<input type="range" id="slider_left" name="l" value="{temper_l}" min="160" max="260" />
+						</div>
 						</div></div>
 						<div class="ui-block-b"><div id="right_cartridge" class="ui-bar ui-bar-f">
+							<label>{right_temperature}:<span id="temperature_text_2">{temper_r}</span>°C</label>
 							<div id="temper_r">
-								<label>Right temperature</label>
 								<input type="range" id="slider_right" name="r" value="{temper_r}" min="160" max="260" />
 							</div>
 						</div></div>
@@ -175,4 +175,13 @@ $("input#exchange_extruder").change(function() {
 	}
 });
 
+$("div#temper_l").on("change", function()
+{
+	$("#temperature_text_1").html($("#slider_left").val());
+});
+
+$("div#temper_r").on("change", function()
+{
+	$("#temperature_text_2").html($("#slider_right").val());
+});
 </script>

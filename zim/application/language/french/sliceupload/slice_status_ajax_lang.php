@@ -7,7 +7,10 @@ $lang['cartridge_material_diff_msg']
 	= 'Détecté la différence entre des matériels des cartouches utilisées, ce qui peut-être dérangera la qualité d\'impression';
 $lang['suggest_reslice']
 	= 'Si vous n\'êtes pas sûr ce que vous faites, nous vous proposez de slicer à nouveau le modèle avec des mêmes matériels';
-
+$lang['left_temperature']
+	= 'Température gauche';
+$lang['right_temperature']
+	= 'Température droite';
 $lang['filament_ok']
 	= 'ok';
 $lang['filament_not_need']
