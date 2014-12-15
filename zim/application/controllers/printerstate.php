@@ -349,6 +349,7 @@ class Printerstate extends MY_Controller {
 		$this->lang->load('printerstate/changecartridge', $this->config->item('language'));
 		$template_data = array (
 				'next_phase'	=> PRINTERSTATE_CHANGECART_UNLOAD_F,
+				'unload_error'	=> t('unload_error'),
 				'home_button'	=> t('home'),
 		);
 		$template_name = 'template/printerstate/changecartridge_ajax/error_unloading';

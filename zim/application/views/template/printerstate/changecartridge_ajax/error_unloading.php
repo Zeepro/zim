@@ -1,4 +1,4 @@
-<span>UNLOAD ERROR</span>
+<span>{unload_error}</span>
 <script type="text/javascript">
 var_next_phase = '{next_phase}';
 $('<div>').appendTo('#cartridge_detail_info')

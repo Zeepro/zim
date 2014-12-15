@@ -40,6 +40,8 @@ $lang['No model']
 	= 'Pas de modèle';
 $lang['Error']
 	= 'Erreur';
+$lang['unload_error']
+	= 'Potentielle erreur de déchargement, veuillez essayer de retirer la cartouche';
 $lang['Remove the cartridge above']
 	= 'Retirez la cartouche';
 $lang['Insert the cartridge above']

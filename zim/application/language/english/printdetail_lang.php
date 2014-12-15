@@ -102,7 +102,7 @@ $lang['wait_hint_recovery_unknown']
 
 //printdetail timelapse()
 $lang['home_popup_text']
-	= '<h3 class="ui-title">WARNING :</h3><p>You are about to be redirected to the HOME page menu.</p>';
+	= '<p>You are about to be redirected to the HOME page menu.</p>';
 $lang['timelapse_title']
 	= 'Zim-motion view';
 $lang['send_email_button']

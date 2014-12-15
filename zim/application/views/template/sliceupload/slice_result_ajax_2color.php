@@ -11,14 +11,12 @@
 								<img src="/images/cartridge.png" style="width: 100%">
 							</div>
 							<p id="state_f_l">{state_f_l}</p>
-							<p>{temper_l} °C</p>
 						</div></div>
 						<div class="ui-block-b"><div id="right_cartridge" class="ui-bar ui-bar-f">
 							<div style="width: 75px; height: 75px; background-color: {cartridge_c_r}; margin: 0 auto;">
 								<img src="/images/cartridge.png" style="width: 100%">
 							</div>
 							<p id="state_f_r">{state_f_r}</p>
-							<p>{temper_r} °C</p>
 						</div></div>
 					</div>
 					<p style="text-align: left;">{error_msg}</p>

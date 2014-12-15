@@ -73,7 +73,8 @@
 		<script type="text/javascript">
 			$(document).on("pageinit", function()
 			{
-				$('div#link_logo').click(function(){window.location.href='/'; return false;});
+				if (typeof timelapse == 'undefined')
+					$('div#link_logo').click(function(){window.location.href='/'; return false;});
 			});
 		</script>
 	</head>

@@ -52,6 +52,14 @@
 </div>
 
 <script>
+
+var timelapse = "timelapse";
+
+$("div#link_logo").on('click', function()
+{
+	$("div#home_popup").popup("open");
+});
+
 var var_interval_video_check;
 var var_ajax_video_check;
 var var_ajax_timelapse_end;
