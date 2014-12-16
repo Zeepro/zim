@@ -10,8 +10,8 @@
 		<meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
 		<meta http-equiv="pragma" content="no-cache" />
 		{headers}
-		<link rel="stylesheet" href="/styles/Custom-zim.min.css" />
 		<link rel="stylesheet" href="/styles/jquery.mobile-1.4.0.min.css" />
+		<link rel="stylesheet" href="/styles/Custom-zim.min.css" />
 		<script src="/scripts/jquery-1.9.1.min.js"></script>
 		<script>
 			$(document).bind("mobileinit", function() {
