@@ -1,4 +1,4 @@
-<div data-role="page" data-url="/printerstoring/liststl">
+<div data-role="page" data-url="/printerstoring/liststl" style="overflow:hidden;">
 	<div id="overlay"></div>
 	<header data-role="header" class="page-header">
 		<a href="javascript:history.back();" data-icon="back" data-ajax="false">{back}</a>
@@ -10,11 +10,6 @@
 		<p>{list_info}</p>
 		<div id="container">
 <!-- 			<h2>{title}</h2> -->
-			<div id="delete_popup" data-role="popup" data-dismissible="false" class="ui-content" style="max-width: 250px; text-align: center;">
-				{delete_popup_text}
-				<a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back" data-transition="flow" onclick="javascript: deletemodel();">{delete_yes}</a>
-				<a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back">{delete_no}</a>
-			</div>
 			<ul data-role="listview" id="listview" class="shadowBox" data-inset="true" data-filter="true" data-filter-placeholder="" data-filter-theme="d" data-split-icon="delete" data-split-theme="b">
 				{list}
 				<li id="stlmodel_{id}">
@@ -28,6 +23,19 @@
 			</ul>
 			<img src="/assets/images/shadow2.png" class="shadow" alt="shadow">
 		</div>
+		<div id="delete_popup" data-role="popup" data-dismissible="false" class="ui-content" style="max-width: 250px; text-align: center;">
+				{delete_popup_text}
+				<br />
+				<br />
+				<div class="ui-grid-a">
+					<div class="ui-block-a">
+						<a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back" data-transition="flow" onclick="javascript: deletemodel();">{delete_yes}</a>
+					</div>
+					<div class="ui-block-b">
+						<a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back">{delete_no}</a>
+					</div>
+				</div>
+			</div>
 	</div>
 	
 <script type="text/javascript">

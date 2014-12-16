@@ -23,8 +23,14 @@
 			<div style="height:50px;"></div>
 			<div id="delete_popup" data-role="popup" data-dismissible="false" class="ui-content" style="max-width: 250px; text-align: center;">
 				{delete_popup_text}
-				<a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-transition="flow" onclick="javascript: delete_preset();">{delete_yes}</a>
-				<a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back">{delete_no}</a>
+				<div class="ui-grid-a">
+					<div class="ui-block-a">
+						<a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-transition="flow" onclick="javascript: delete_preset();">{delete_yes}</a>
+					</div>
+					<div class="ui-block-b">
+						<a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back">{delete_no}</a>
+					</div>
+				</div>
 			</div>
 			<ul data-role="listview" id="listview" class="shadowBox" data-inset="true" data-filter="true" data-filter-placeholder="{search_hint}" data-filter-theme="d" data-filter-theme="d" data-split-icon="delete" data-split-theme="b">
 				{model_lists}
