@@ -18,7 +18,7 @@
 					<a href="/printerstoring/libraries"><h2>{my_library}</h2></a>
 				</li>
 				<li>
-					<a href="http://zeepro.com/"><h2>{my_zim_shop}</h2></a>
+					<a href="http://zeepro.com/collections/all"><h2>{my_zim_shop}</h2></a>
 				</li>
 			</ul>
 			<ul data-role="listview" id="listview_manage" class="shadowBox" data-inset="true">

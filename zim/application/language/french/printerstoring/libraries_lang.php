@@ -6,7 +6,7 @@ $lang['home']
 	= 'accueil';
 
 $lang['libraries_info']
-	= '<b>Ma Biblioth&egrave;que</b> est le r&eacutepertoire dans lequel vous pouvez enregistrer vos mod&egrave;les.<br />Mais il va aussi vous permettre de lancer des impressions depuis votre PC, smartphone ou tablette !';
+	= '<b>Ma Biblioth&egrave;que</b> est le r&eacutepertoire dans lequel vous pouvez enregistrer vos mod&egrave;les.<br />Utilisez-le également pour déclencher une impression depuis votre appareil mobile !';
 
 $lang['stl_models']
 	= 'Mes mod&egrave;les';

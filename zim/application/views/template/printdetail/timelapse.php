@@ -1,4 +1,10 @@
 <div data-role="page" data-url="/printdetail/timelapse">
+	<style>
+		.ui-icon-myicon:after
+		{
+			background-image: url("/images/youtube_icon.png");
+		}
+	</style>
 	<div id="overlay"></div>
 	<header data-role="header" class="page-header">
 		<a href="#home_popup" data-rel="popup" class="ui-btn ui-icon-home ui-btn-icon-left ui-corner-all ui-shadow" data-transition="pop">{home_button}</a>
@@ -20,7 +26,7 @@
 				<div id="myVideo">{loading_player}</div>
 <!-- 				<a href="#" id="timelapse_button" data-ajax="false" data-role="button" class="ui-link ui-btn ui-shadow ui-corner-all">{timelapse_button}</a> -->
 				<a id="send_email_button" href="#timelapse_right_panel" data-role="button" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-mail" style="display:none;">{send_email_button}</a>
-				<a id="send_yt_button" href="/printdetail/connect_google" data-ajax="false" data-role="button" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-mail" style="display:none;">{send_yt_button}</a>
+				<a id="send_yt_button" href="/printdetail/connect_google" data-ajax="false" data-role="button" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-myicon" style="display:none;">{send_yt_button}</a>
 			</div>
 			<div data-role="collapsible" data-collapsed="false" style="align: center;">
 				<h4>{timelapse_info_title}</h4>

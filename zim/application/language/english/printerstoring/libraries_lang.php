@@ -6,7 +6,7 @@ $lang['home']
 	= 'home';
 
 $lang['libraries_info']
-	= '<b>My Library</b> is your dedicated location to store models and prints.<br />But it will also enable you to print when you want from your PC, smartphone or tablet!';
+	= '<b>My Library</b> is your dedicated location to store models and prints.<br />Use it also to trigger a print from your mobile device!';
 
 $lang['stl_models']
 	= 'My models';

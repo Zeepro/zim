@@ -7,7 +7,14 @@ $lang['home']
 	= 'home';
 
 $lang['uploaded']
-	= 'Model added to your library';
+	= 'Model added to your library!';
+
+$lang['delete_popup_text']
+	= 'Are you sure you want to delete this model ?';
+$lang['delete_yes']
+	= 'Yes';
+$lang['delete_no']
+	= 'No';
 
 $lang['list_info']
 	= 'My models library';
