@@ -1,4 +1,4 @@
-<div data-role="page" data-url="/preset/listpreset">
+<div data-role="page" data-url="/preset/listpreset" style="overflow-y: hidden;">
 	<header data-role="header" class="page-header">
 		<a href="javascript:history.back();" data-icon="back" data-ajax="false">{back}</a>
 		<a href="/" data-icon="home" data-ajax="false">{home}</a>
