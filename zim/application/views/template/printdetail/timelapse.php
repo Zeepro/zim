@@ -1,4 +1,4 @@
-<div data-role="page" data-url="/printdetail/timelapse">
+<div data-role="page" data-url="/printdetail/timelapse" style="overflow-y:hidden;">
 	<style>
 		.ui-icon-myicon:after
 		{
