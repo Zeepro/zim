@@ -10,15 +10,19 @@
 		<p>{list_info}</p>
 		<div id="container">
 <!-- 			<h2>{title}</h2> -->
-			<ul data-role="listview" id="listview" class="shadowBox" data-inset="true" data-filter="true" data-filter-placeholder="" data-filter-theme="d">
+			<div id="delete_popup" data-role="popup" data-dismissible="false" class="ui-content" style="max-width: 250px; text-align: center;">
+				{delete_popup_text}
+				<a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-transition="flow" onclick="javascript: deletemodel();">{delete_yes}</a>
+				<a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back">{delete_no}</a>
+			</div>
+			<ul data-role="listview" id="listview" class="shadowBox" data-inset="true" data-filter="true" data-filter-placeholder="" data-filter-theme="d" data-split-icon="delete" data-split-theme="b">
 				{list}
 				<li>
-					<img src="{image}" style="vertical-align:middle">
-					<b style="position:absolute; top:39%;">{name}</b>
-					<span data-inline="true" id="buttons-{id}" style="position:absolute; right:0;">
-						<a data-inline="true" href='#' id="printmodel-{id}" data-role="button" onclick="printmodel(this.id);">{print-model}</a>
-						<a data-inline="true" href='#' id="deletemodel-{id}" data-role="button" onclick="deletemodel(this.id);">{delete-model}</a>
-					</span>
+					<a href='#' id="printmodel-{id}" onclick="printmodel('{id}');">
+						<img src="{image}" style="vertical-align:middle">
+						<h2>{name}</h2>
+					</a>
+					<a href='#delete_popup' data-rel="popup" id="deletemodel-{id}" onclick="javascript: pre_deletemodel('{id}');">{delete-model}</a>
 				</li>
 				{/list}
 			</ul>
@@ -27,10 +31,9 @@
 	</div>
 	
 <script type="text/javascript">
-function printmodel(clicked_id){
-//	console.log(clicked_id);
-	var tmp = clicked_id.split('-');
-	var id = tmp[1];
+var var_id_delete = 0;
+
+function printmodel(id){
 
 	$.ajax({
 			cache: false,
@@ -56,16 +59,27 @@ function printmodel(clicked_id){
 	});
 }
 
-function deletemodel(clicked_id){
-//	console.log(clicked_id);
-	var tmp = clicked_id.split('-');
-	var id = tmp[1];
+function pre_deletemodel(id) {
+	if (typeof id === 'undefined') {
+		console.log('undefined id');
+		return;
+	}
+	var_id_delete = id;
+	
+	return;
+}
 
+function deletemodel(){
+	if (var_id_delete <= 0) {
+		console.log('invalid delete action');
+		return;
+	}
+	
 	$.ajax({
 			cache: false,
 			type: "GET",
 			url: "/rest/libdeletestl",
-			data: { "id": id},
+			data: { "id": var_id_delete},
 //			dataType: "json",
 			beforeSend: function() {
 				$("#overlay").addClass("gray-overlay");

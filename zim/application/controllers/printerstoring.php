@@ -58,6 +58,7 @@ class Printerstoring extends MY_Controller {
 			else {
 				// treat error - missing gcode file
 				$error = t('fail_message');
+				//TODO get error detail by $this->upload->display_errors()
 			}
 
 			if ($f1 && ($name = $this->input->post('name'))) {
@@ -221,12 +222,15 @@ class Printerstoring extends MY_Controller {
 				'back'			=> t('back'),
 				'home'			=> t('home'),
 				'list_info'		=> t('list_info'),
-				'print-model'		=> t('print-model'),
+// 				'print-model'		=> t('print-model'),
 				'delete-model'		=> t('delete-model'),
 				'list'		=> (isset($display_printlist) ? $display_printlist : array()),
 				'uploaded'		=> ($uploaded ? t('uploaded') : NULL),
 				'print_error'		=> t('print_error'),
-				'delete_error'	=> t('delete_error')
+				'delete_error'	=> t('delete_error'),
+				'delete_popup_text'	=> t('delete_popup_text'),
+				'delete_yes'		=> t('delete_yes'),
+				'delete_no'			=> t('delete_no'),
 		);
 		$body_page = $this->parser->parse('template/printerstoring/liststl', $template_data, TRUE);
 		
@@ -306,7 +310,7 @@ class Printerstoring extends MY_Controller {
 					'modelname'	=> $model_data['name'],
 					'mid'	=> $model_data['id'],
 //					'image'	=> $model_data['imglink'],
-					'image'	=> "/printerstoring/getpicture?id=" . $model_data['id'] . "&type=gcode",
+// 					'image'	=> "/printerstoring/getpicture?id=" . $model_data['id'] . "&type=gcode",
 					'creation_date' => strtotime($model_data['creation_date']), //date('d-M-Y', strtotime($model_data['creation_date']))
 					'creation_datestr' => $model_data['creation_date'] //date('d-M-Y', strtotime($model_data['creation_date']))
 			);
@@ -388,10 +392,10 @@ class Printerstoring extends MY_Controller {
 // 				$array_need[$abb_filament] = 'true';
 			}
 			else if ($abb_filament == 'l') {
-				$state_f_l = t('filament_not_need');
+				$check_left = t('filament_not_need');
 			}
 			else { // $abb_filament == 'r'
-				$state_f_r = t('filament_not_need');
+				$check_right = t('filament_not_need');
 			}
 			
 			$tmp_ret = PrinterState_checkFilament($abb_filament, $volume_need, $data_cartridge);
