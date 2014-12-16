@@ -14,8 +14,7 @@
 					<option value="mostrecent" selected="selected">{select_mostrecent}</option>
 				</select>
 			</div>
-			<ul data-role="listview" id="listview" class="shadowBox" data-inset="true" data-filter="true" data-filter-placeholder="" data-filter-theme="d">
-			</ul>
+			<ul data-role="listview" id="listview-gcode" class="shadowBox" data-inset="true" data-filter="true" data-filter-placeholder="" data-filter-theme="d" data-split-icon="delete" data-split-theme="b"></ul>
 <!-- 			<h2>{title}</h2> -->
 			<img src="/assets/images/shadow2.png" class="shadow" alt="shadow">
 		</div>
@@ -24,38 +23,36 @@
 <script type="text/javascript">
 var modellist = {encoded_list};
 modellist = $.map(modellist, function(value, index) {
-    return [value];
+	return [value];
 });
+
 function compare_date(a,b) {
-  if (a.creation_date < b.creation_date)
-     return 1;
-  if (a.creation_date > b.creation_date)
-    return -1;
-  return 0;
+	if (a.creation_date < b.creation_date)
+		return 1;
+	else if (a.creation_date > b.creation_date)
+		return -1;
+	else
+		return 0;
 }
 
 function compare_name(a,b) {
-  if (a.modelname < b.modelname)
-     return -1;
-  if (a.modelname > b.modelname)
-    return 1;
-  return 0;
+	if (a.modelname < b.modelname)
+		return -1;
+	else if (a.modelname > b.modelname)
+		return 1;
+	else
+		return 0;
 }
 
 function displaylist() {
-	var listelement = $('#listview');
+	var listelement = $('#listview-gcode');
 	listelement.empty();
-
-//	modellist.sort(compare_date);
-
+	
 	for(k in modellist) {
 		var model = modellist[k];
-		listelement.append("<li><img src=\""+ model.image +"\"> \
-					<span style=\"position:absolute; top:39%;\">[" + model.creation_datestr +"] <b>"+ model.modelname +"</b></span> \
-					<span data-inline=\"true\" id=\"buttons-" + model.mid + "\" style=\"position:absolute; right:0;\"> \
-						<a data-inline=\"true\" href='#' id=\"printmodel-" + model.mid + "\" class=\"ui-link ui-btn ui-btn-inline ui-shadow ui-corner-all\" data-role=\"button\" onclick=\"printgcode(this.id);\">{print-model}</a> \
-						<a data-inline=\"true\" href='#' id=\"deletemodel-" + model.mid + "\" class=\"ui-link ui-btn ui-btn-inline ui-shadow ui-corner-all\" data-role=\"button\" onclick=\"deletegcode(this.id);\">{delete-model}</a> \
-					</span></li>");
+		listelement.append('<li id="gcodemodel-' + model.mid + '"><a href="/printerstoring/gcodedetail?id=' + model.mid + '">'
+				+ '<img src="/printerstoring/getpicture?type=gcode&id=' + model.mid + '" style="margin-top: 10px;"><h2>' + model.modelname + '</h2><p>' + model.creation_datestr + '</p></a>'
+				+ '<a href="#" onclick=\'javascript: deletegcode("' + model.mid + '");\'>Delete</a></li>');
 	}
 	listelement.listview("refresh");
 }
@@ -74,44 +71,26 @@ $(document).ready(function() {
 			modellist.sort(compare_date);
 			displaylist();
 		}
-  })
-  .change();
+	}).change();
 });
 
-function printgcode(clicked_id){
-//	console.log(clicked_id);
-	var tmp = clicked_id.split('-');
-	var id = tmp[1];
-
-	$.ajax({
-			cache: false,
-			type: "GET",
-			url: "/rest/libprintgcode",
-			data: { "id": id},
-//			dataType: "json",
-			success: function (data, textStatus, xhr) {
-				window.location.href = "/printdetail/status?id=" + id;
-			},
-			error: function (data, textStatus, xhr) {
-				alert("{print_error}");
-				console.log(data);
-			},
-	});
-}
-
-function deletegcode(clicked_id){
-//	console.log(clicked_id);
-	var tmp = clicked_id.split('-');
-	var id = tmp[1];
-
+function deletegcode(id){
 	$.ajax({
 			cache: false,
 			type: "GET",
 			url: "/rest/libdeletegcode",
-			data: { "id": id},
+			data: { "id": id },
+			beforeSend: function() {
+				$("#overlay").addClass("gray-overlay");
+				$(".ui-loader").css("display", "block");
+			},
+			complete: function() {
+				$(".ui-loader").css("display", "none");
+				$("#overlay").removeClass("gray-overlay");
+			},
 //			dataType: "json",
 			success: function (data, textStatus, xhr) {
-				$('#' + clicked_id).closest('li').remove();
+				$('#gcodemodel-' + id).remove();
 			},
 			error: function (data, textStatus, xhr) {
 				alert('{delete_error}');

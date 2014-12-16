@@ -250,19 +250,21 @@ function PrinterStoring_deleteStl($id) {
 	global $CFG;
 	$CI = &get_instance();
 	$model_folder = $CFG->config['stl_library'] . sprintf('%06d', $id) . '/';
-
+	
 	// check if library folder exist
 	if (@is_dir($model_folder) == false) {
 		$CI->load->helper('printerlog');
 		PrinterLog_logError('stl model id not found', __FILE__, __LINE__);
 		return ERROR_UNKNOWN_MODEL;
 	}
-	if (($t = system("rm -rf " . escapeshellarg($model_folder))) === false || !empty($t)) {
+	
+	$CI->load->helper('file');
+	delete_files($model_folder, TRUE); //there are no folders inside normally, but we delete all
+	if (!rmdir($model_folder)) {
 		$CI->load->helper('printerlog');
 		PrinterLog_logError('could not delete the stl model', __FILE__, __LINE__);
 		return ERROR_INTERNAL;
 	}
-
 	return ERROR_OK;
 }
 
@@ -323,17 +325,20 @@ function PrinterStoring_deleteGcode($id) {
 	global $CFG;
 	$CI = &get_instance();
 	$model_folder = $CFG->config['gcode_library'] . sprintf('%06d', $id) . '/';
-
+	
 	// check if library folder exist
 	if (@is_dir($model_folder) == false) {
 		$CI->load->helper('printerlog');
 		PrinterLog_logError('gcode model id not found', __FILE__, __LINE__);
 		return ERROR_UNKNOWN_MODEL;
 	}
-	if (($t = system("rm -rf " . escapeshellarg($model_folder))) === false || !empty($t)) {
+	
+	$CI->load->helper('file');
+	delete_files($model_folder, TRUE); //there are no folders inside normally, but we delete all
+	if (!rmdir($model_folder)) {
 		$CI->load->helper('printerlog');
 		PrinterLog_logError('could not delete the gcode model', __FILE__, __LINE__);
-		return ERROR_UNKNOWN_MODEL;
+		return ERROR_INTERNAL;
 	}
 	return ERROR_OK;
 }
@@ -439,7 +444,7 @@ function PrinterStoring__generateFilename($raw_name) {
 	$CI->load->helper('security');
 	// remove unsecurity chars and non ascii chars
 	$return_name = filter_var(sanitize_filename($raw_name), FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
-	// replace space
+	// replace space and some chars
 	$return_name = str_replace(array(' ', '`', '|', ':', '*', '%', ',', '^'), '_', $return_name);
 	//TODO check if we need to filter '(' and ')' for interface or not
 	

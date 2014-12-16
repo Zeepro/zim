@@ -116,6 +116,7 @@ class Printdetail extends MY_Controller {
 // 	}
 	
 	public function printprime() {
+		//TODO it's better to stock callback model in json file
 		$abb_cartridge = NULL;
 		$first_run = FALSE;
 		$cr = 0;
@@ -379,11 +380,9 @@ class Printdetail extends MY_Controller {
 		
 		if ($id == CORESTATUS_VALUE_MID_SLICE) {
 			$print_slice = TRUE;
-// 			$callback = CORESTATUS_VALUE_MID_SLICE;
 		}
 		else if ($id == CORESTATUS_VALUE_MID_CALIBRATION) {
 			$print_calibration = TRUE;
-// 			$callback = CORESTATUS_VALUE_MID_CALIBRATION;
 		}
 		
 		// parse the main body
@@ -445,20 +444,15 @@ class Printdetail extends MY_Controller {
 			$template_data['cancel_confirm'] = t('cancel_confirm_prime');
 // 			$template_data['finish_info'] = t('finish_info_prime');
 			$template_data['wait_info'] = t('wait_info_prime');
-		}
-		
-// 		if ($callback)
-		if ($callback && !in_array($callback, array(CORESTATUS_VALUE_MID_CALIBRATION, CORESTATUS_VALUE_MID_SLICE))) {
-// 			if ($callback == 'slice') {
-// 				$template_data['return_url']	= '/sliceupload/slice?callback';
-// 			}
-// 			else if ($callback == 'calibration') {
-// 				$template_data['return_url']	= '/printerstate/offset_setting';
-// 				$template_data['return_button']	= t('button_set_offset');
-// 			}
-// 			else {
-				$template_data['return_url']	= '/printmodel/detail?id=' . $callback;
-// 			}
+			
+			if ($callback) {
+				if ($callback == 'slice') {
+					$template_data['return_url']	= '/sliceupload/slice?callback';
+				}
+				else {
+					$template_data['return_url']	= '/printmodel/detail?id=' . $callback;
+				}
+			}
 		}
 		
 		$body_page = $this->parser->parse('template/printdetail/status', $template_data, TRUE);
@@ -695,12 +689,32 @@ class Printdetail extends MY_Controller {
 			}
 			
 			if (array_key_exists(CORESTATUS_TITLE_P_TEMPER_L, $array_status)
-					&& array_key_exists(CORESTATUS_TITLE_P_TEMPER_R, $array_status)) {
+					&& $array_status[CORESTATUS_TITLE_P_TEMPER_L] > 0
+					&& array_key_exists(CORESTATUS_TITLE_P_TEMPER_R, $array_status)
+					&& $array_status[CORESTATUS_TITLE_P_TEMPER_R] > 0) {
 				$array_info[] = array(
 						'title'	=> t('timelapse_info_temperature_title'),
-						'value'	=> t('timelapse_info_temperature_value', array(
+						'value'	=> t('timelapse_info_temperature_values', array(
 								$array_status[CORESTATUS_TITLE_P_TEMPER_L],
 								$array_status[CORESTATUS_TITLE_P_TEMPER_R],
+						)),
+				);
+			}
+			else if (array_key_exists(CORESTATUS_TITLE_P_TEMPER_R, $array_status)
+					&& $array_status[CORESTATUS_TITLE_P_TEMPER_R] > 0) {
+				$array_info[] = array(
+						'title'	=> t('timelapse_info_temperature_title'),
+						'value'	=> t('timelapse_info_temperature_value_r', array(
+								$array_status[CORESTATUS_TITLE_P_TEMPER_R],
+						)),
+				);
+			}
+			else if (array_key_exists(CORESTATUS_TITLE_P_TEMPER_L, $array_status)
+					&& $array_status[CORESTATUS_TITLE_P_TEMPER_L] > 0) {
+				$array_info[] = array(
+						'title'	=> t('timelapse_info_temperature_title'),
+						'value'	=> t('timelapse_info_temperature_value_l', array(
+								$array_status[CORESTATUS_TITLE_P_TEMPER_L],
 						)),
 				);
 			}
@@ -800,7 +814,7 @@ class Printdetail extends MY_Controller {
 					$data_status['print_remain'], t('Time remaining: '), t('under calculating'));
 		}
 		else {
-			$time_remain = t('Time remaining: ') . t('unknown');
+			$time_remain = t('Time remaining: ') . t('in_progress');
 		}
 		$time_passed = TimeDisplay__convertsecond($data_status['print_tpassed'], t('time_elapsed'));
 		

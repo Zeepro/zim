@@ -16,7 +16,11 @@
 					<a href="/preset/delete?id={preset_id}" data-role="button" data-icon="delete" data-ajax="false" data-inline="true">Delete</a> <!-- class="ui-disabled" -->
 				</div>
 			</div>
-			<form action="/preset/detail?id={preset_id}{preset_newurl}" method="post">
+			<form action="/preset/detail?id={preset_id}{preset_newurl}" method="post" data-ajax="false">
+			<div id="save_as_container" style="{hide_submit}">
+				<h3><label for="save_as">{save_as_title}</label></h3>
+				<input type="text" data-clear-btn="true" name="save_as" value="{save_as_value}" id="save_as" required>
+			</div>
 			<div data-role="collapsible">
 				<h4>{layer_perimeter_title}</h4>
 				<div data-role="collapsible" data-collapsed="false" data-theme="d">
@@ -703,11 +707,7 @@
 					</div>
 				</div>
 			</div> <!-- advanced -->
-			<div id="save_as_container" style="{hide_save_as}">
-				<h3><label for="save_as">{save_as_title}</label></h3>
-				<input type="text" data-clear-btn="true" name="save_as" value="{save_as_value}" id="save_as" required>
-			</div>
-			<div id="submit_container" style="{hide_submit}"><input type="submit" value="{submit_button}" data-ajax="false"></div>
+			<div id="submit_container" style="{hide_submit}"><input type="submit" value="{submit_button}"></div>
 			</form>
 			<div class="zim-error">{error}</div>
 		</div>

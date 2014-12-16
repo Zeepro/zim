@@ -34,7 +34,7 @@ $lang['tromboning']
 $lang['remote_control']
 	= 'Allow remote support';
 $lang['set_preset']
-	= 'Printing presets';
+	= 'My printing presets';
 $lang['nozzles_adjustments']
 	= 'Nozzles offset adjustments';
 $lang['support']

@@ -7,14 +7,6 @@
 	<div data-role="content">
 		<div id="container">
 <!-- 			<h2>{title}</h2> -->
-			<ul data-role="listview" id="listview" class="shadowBox" data-inset="true" data-filter="true" data-filter-placeholder="{search_hint}" data-filter-theme="d">
-				{model_lists}
-				<li>
-					<a href="{baseurl_detail}?id={id}"><h2>{name}</h2></a>
-				</li>
-				{/model_lists}
-			</ul>
-			<div style="height:50px;"></div>
 			<form action="/preset/detail" method="get">
 				<div data-role="fieldcontain">
 <!-- 					<legend>Vertical controlgroup:</legend> -->
@@ -28,6 +20,44 @@
 				<input type="hidden" name="new" id="new_preset_hidden">
 				<div id="submit_container"><input type="submit" value="{submit_button}" data-ajax="false"></div>
 			</form>
+			<div style="height:50px;"></div>
+			<div id="delete_popup" data-role="popup" data-dismissible="false" class="ui-content" style="max-width: 250px; text-align: center;">
+				{delete_popup_text}
+				<a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-transition="flow" onclick="javascript: delete_preset();">{delete_yes}</a>
+				<a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back">{delete_no}</a>
+			</div>
+			<ul data-role="listview" id="listview" class="shadowBox" data-inset="true" data-filter="true" data-filter-placeholder="{search_hint}" data-filter-theme="d" data-filter-theme="d" data-split-icon="delete" data-split-theme="b">
+				{model_lists}
+				<li>
+					<a href="/preset/detail?id={id}"><h2>{name}</h2></a>
+					<a id="preset_del_{id}" data-rel="popup" data-transition="pop" href="#delete_popup" onclick="javascript: confirm_delete_preset('{id}');">Delete</a>
+				</li>
+				{/model_lists}
+			</ul>
+			<img src="/assets/images/shadow2.png" class="shadow" alt="shadow">
 		</div>
 	</div>
+
+<script type="text/javascript">
+<!--
+var var_preset_id = 0;
+
+function confirm_delete_preset(id) {
+	if(typeof id === 'undefined') {
+		return;
+	}
+	else {
+		var_preset_id = id;
+	}
+	
+	return;
+}
+
+function delete_preset() {
+	window.location.href = "/preset/delete?id=" + var_preset_id;
+	
+	return;
+}
+-->
+</script>
 </div>

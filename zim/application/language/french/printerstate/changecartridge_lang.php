@@ -41,7 +41,7 @@ $lang['No model']
 $lang['Error']
 	= 'Erreur';
 $lang['unload_error']
-	= 'Potentielle erreur de déchargement, veuillez essayer de retirer la cartouche';
+	= 'Le rembobinage est presque fini - retirez la cartouche et tirez le filament avec soin';
 $lang['Remove the cartridge above']
 	= 'Retirez la cartouche';
 $lang['Insert the cartridge above']

@@ -41,7 +41,7 @@ $lang['No model']
 $lang['Error']
 	= 'Error';
 $lang['unload_error']
-	= 'Potential unloading error, please try to remove the cartridge';
+	= 'Unload almost completed - Remove cartridge and pull out filament carefully';
 $lang['Remove the cartridge above']
 	= 'Remove the cartridge';
 $lang['Insert the cartridge above']

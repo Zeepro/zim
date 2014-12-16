@@ -34,7 +34,7 @@ $lang['remote_control']
 $lang['lighting']
 	= 'Éclairage du plateau';
 $lang['set_preset']
-	= 'Présélections d\'impression';
+	= 'Mes présélections d\'impression';
 $lang['nozzles_adjustments']
 	= 'Ajustement du décalage des buses';
 $lang['support']

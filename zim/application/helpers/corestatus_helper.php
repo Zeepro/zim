@@ -661,8 +661,8 @@ function CoreStatus_setInPrinting($model_id, $exchange_extruder = FALSE, $array_
 						CORESTATUS_TITLE_STARTTIME		=> time(),
 						CORESTATUS_TITLE_ELAPSED_TIME	=> 0,
 						CORESTATUS_TITLE_PRINTMODEL		=> $model_id,
-						CORESTATUS_TITLE_P_TEMPER_L		=> array_key_exists('l', $array_temper) ? $array_temper['l'] : 0,
-						CORESTATUS_TITLE_P_TEMPER_R		=> array_key_exists('r', $array_temper) ? $array_temper['r'] : 0,
+						CORESTATUS_TITLE_P_TEMPER_L		=> array_key_exists('l', $array_temper) ? $array_temper['l'] : NULL,
+						CORESTATUS_TITLE_P_TEMPER_R		=> array_key_exists('r', $array_temper) ? $array_temper['r'] : NULL,
 						CORESTATUS_TITLE_P_EXCH_BUS		=> $exchange_extruder ? 1 : 0,
 				)
 		);

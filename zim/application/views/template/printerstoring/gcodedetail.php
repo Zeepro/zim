@@ -10,7 +10,7 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
-		<form action="/printdetail/printmodel_temp?id={model_id}" method="POST" data-ajax="false">
+		<form action="/printdetail/printgcode_temp?id={id}" method="POST" data-ajax="false">
 			<h2 style="text-align: center;">{title}</h2>
 			<div data-role="collapsible" data-collapsed="false" style="text-align: center;">
 				<h4>{photo_title}</h4>

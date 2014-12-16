@@ -6,8 +6,8 @@ $lang['Time remaining: ']
 	= 'Time remaining: ';
 $lang['time_elapsed']
 	= 'Elapsed time: ';
-$lang['unknown']
-	= 'unknown';
+$lang['in_progress']
+	= 'in progress';
 $lang['under calculating']
 	= 'Calculating...';
 $lang['Control your printing']
@@ -43,7 +43,7 @@ $lang['timelapse_error']
 $lang['timelapse_ok']
 	= 'You can now download your timelapse';
 $lang['timelapse_info']
-	= 'Please wait few seconds so we can give you the link to your timelapse';
+	= 'Loading zim-motion time-lapse video...';
 $lang['timelapse_button']
 	= 'Download';
 
@@ -137,7 +137,11 @@ $lang['send_email_multi']
 	= 'Note: For every other email address, add a comma.';
 $lang['timelapse_info_temperature_title']
 	= 'Print temperature';
-$lang['timelapse_info_temperature_value']
+$lang['timelapse_info_temperature_values']
 	= 'Left: %d °C, Right: %d °C';
+$lang['timelapse_info_temperature_value_r']
+	= 'Right: %d °C';
+$lang['timelapse_info_temperature_value_l']
+	= 'Left: %d °C';
 
 ?>

@@ -57,6 +57,7 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_FILEPATH_UPGRADE',	'/config/conf/profile.json');
 	define('ZIMAPI_FILENAME_TIMELAPSE',	'timelapse.mp4');
 	define('ZIMAPI_FILEPATH_TIMELAPSE',	'/var/www/tmp/timelapse.mp4');
+// 	define('ZIMAPI_FILEPATH_TIMELAPSE',	'C:/wamp/sites/zim/tmp/timelapse.mp4');
 	define('ZIMAPI_FILEPATH_TL_TMPIMG',	'/var/www/tmp/img001.jpg');
 	define('ZIMAPI_FILEPATH_ENDPRINT',	'/var/www/bin/timelapse_end_print.sh');
 	define('ZIMAPI_FILEPATH_ENDCANCEL',	'/var/www/bin/timelapse_end_cancel.sh');
@@ -1155,15 +1156,24 @@ function ZimAPI_getPresetList($set_localization = TRUE) {
 	return json_encode_unicode($array_data);
 }
 
-function ZimAPI_getPresetListAsArray($set_localization = TRUE) {
+function ZimAPI_getPresetListAsArray($set_localization = TRUE, $user_only = FALSE) {
 	$json_data = array();
+	$array_path = array();
 	$tmp_array = NULL;
 	
 	$CI = &get_instance();
 	$CI->load->helper(array('file', 'directory', 'json'));
-	foreach (array(
-					$CI->config->item('systempreset'), $CI->config->item('presetlist')
-			) as $presetlist_basepath) {
+	
+	if ($user_only) {
+		$array_path = array($CI->config->item('presetlist'));
+	}
+	else {
+		$array_path = array(
+				$CI->config->item('systempreset'),
+				$CI->config->item('presetlist'),
+		);
+	}
+	foreach ($array_path as $presetlist_basepath) {
 		$preset_array = directory_map($presetlist_basepath, 1);
 		
 		foreach ($preset_array as $preset_id) {
@@ -1231,7 +1241,7 @@ function ZimAPI_setPreset($id_preset) {
 	$CI = &get_instance();
 	$json_fullpath = $CI->config->item('conf') . ZIMAPI_FILENAME_SOFTWARE;
 	
-	if (!ZimAPI__checkPreset($id_preset, $preset_basepath)) {
+	if (!ZimAPI_checkPreset($id_preset, $preset_basepath)) {
 		return ERROR_WRONG_PRM;
 	}
 	
@@ -1296,7 +1306,7 @@ function ZimAPI_deletePreset($id_preset) {
 	$CI->load->helper('file');
 	
 	if ($id_preset) {
-		$ret_val = ZimAPI__checkPreset($id_preset, $preset_basepath, $system_preset);
+		$ret_val = ZimAPI_checkPreset($id_preset, $preset_basepath, $system_preset);
 		if ($ret_val == TRUE) {
 			if ($system_preset == TRUE) {
 				$cr = ERROR_WRONG_PRM;
@@ -1752,7 +1762,7 @@ function ZimAPI_getPresetInfoAsArray($preset_id, &$array_info, &$system_preset =
 	$CI = &get_instance();
 	$CI->load->helper(array('file', 'json'));
 	
-	if (!ZimAPI__checkPreset($preset_id, $presetlist_basepath, $system_preset)) {
+	if (!ZimAPI_checkPreset($preset_id, $presetlist_basepath, $system_preset)) {
 		return ERROR_WRONG_PRM;
 	}
 // 	$presetlist_basepath = $CI->config->item('presetlist');
@@ -1785,7 +1795,7 @@ function ZimAPI_getPresetSettingAsArray($id_preset, &$array_setting) {
 	$preset_basepath = '';
 	
 	// check if preset exists
-	if (!ZimAPI__checkPreset($id_preset, $preset_basepath)) {
+	if (!ZimAPI_checkPreset($id_preset, $preset_basepath)) {
 		return ERROR_WRONG_PRM;
 	}
 	$array_setting = @parse_ini_file($preset_basepath . $id_preset . '/' . ZIMAPI_FILE_PRESET_INI);
@@ -1798,6 +1808,18 @@ function ZimAPI_getPresetSettingAsArray($id_preset, &$array_setting) {
 	}
 	
 	return ERROR_OK;
+}
+
+function ZimAPI_codePresetHash($raw_name) {
+	$CI = &get_instance();
+	$CI->load->helper(array('detectos'));
+
+	if (DectectOS_checkWindows()) {
+		return md5(utf8_encode($raw_name));
+	}
+	else {
+		return md5($raw_name);
+	}
 }
 
 function ZimAPI_setPresetSetting($id_preset, $array_input, $name_preset = NULL) {
@@ -1813,18 +1835,18 @@ function ZimAPI_setPresetSetting($id_preset, $array_input, $name_preset = NULL) 
 	
 	// check if we have same name, and define preset path
 	if ($name_preset != NULL) {
-		$ret_val = ZimAPI__checkPreset(ZimAPI__codePresetHash($name_preset));
+		$ret_val = ZimAPI_checkPreset(ZimAPI_codePresetHash($name_preset));
 		if ($ret_val == TRUE) {
 			$CI->load->helper('printerlog');
 			PrinterLog_logMessage('system has already the same preset name: ' . $name_preset);
 			return ERROR_FULL_PRTLST; // just use another error code
 		}
 		
-		$preset_path = $CI->config->item('presetlist') . ZimAPI__codePresetHash($name_preset) . '/';
+		$preset_path = $CI->config->item('presetlist') . ZimAPI_codePresetHash($name_preset) . '/';
 	}
 	else {
 		$system_preset = FALSE;
-		$ret_val = ZimAPI__checkPreset($id_preset, $preset_path, $system_preset);
+		$ret_val = ZimAPI_checkPreset($id_preset, $preset_path, $system_preset);
 		if ($ret_val == FALSE) {
 			$CI->load->helper('printerlog');
 			PrinterLog_logError('system can not find preset: ' . $id_preset);
@@ -1867,7 +1889,7 @@ function ZimAPI_setPresetSetting($id_preset, $array_input, $name_preset = NULL) 
 	}
 	if ($name_preset != NULL) {
 		$json_data = array(
-				ZIMAPI_TITLE_PRESET_ID		=> ZimAPI__codePresetHash($name_preset),
+				ZIMAPI_TITLE_PRESET_ID		=> ZimAPI_codePresetHash($name_preset),
 				ZIMAPI_TITLE_PRESET_NAME	=> $name_preset,
 				ZIMAPI_TITLE_PRESET_INFILL	=> $array_setting[ZIMAPI_TITLE_PRESET_INFILL],
 				ZIMAPI_TITLE_PRESET_SKIRT	=> (int) $array_setting[ZIMAPI_TITLE_PRESET_SKIRT],
@@ -1928,6 +1950,32 @@ function ZimAPI_fixPresetSetting(&$array_setting) {
 	}
 	
 	return TRUE;
+}
+
+function ZimAPI_checkPreset($id_preset, &$preset_basepath = NULL, &$system_preset = FALSE) {
+	$CI = &get_instance();
+	$CI->load->helper('directory');
+	
+	$system_preset = FALSE;
+	
+	foreach (array(
+					$CI->config->item('systempreset'), $CI->config->item('presetlist')
+			) as $presetlist_basepath) {
+		$preset_array = directory_map($presetlist_basepath, 1);
+		
+		foreach ($preset_array as $check_id) {
+			if ($check_id == $id_preset) {
+				$preset_basepath = $presetlist_basepath;
+				if ($CI->config->item('systempreset') == $preset_basepath) {
+					$system_preset = TRUE;
+				}
+				return TRUE;
+				break; // never reach here
+			}
+		}
+	}
+	
+	return FALSE;
 }
 
 function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
@@ -2420,46 +2468,10 @@ function ZimAPI__getModebyParameter($parameter) {
 	return ZIMAPI_VALUE_MODE_OFF; // never reach here
 }
 
-function ZimAPI__checkPreset($id_preset, &$preset_basepath = NULL, &$system_preset = NULL) {
-	$CI = &get_instance();
-	$CI->load->helper('directory');
-	
-	foreach (array(
-					$CI->config->item('systempreset'), $CI->config->item('presetlist')
-			) as $presetlist_basepath) {
-		$preset_array = directory_map($presetlist_basepath, 1);
-		
-		foreach ($preset_array as $check_id) {
-			if ($check_id == $id_preset) {
-				$preset_basepath = $presetlist_basepath;
-				if ($CI->config->item('systempreset') == $preset_basepath) {
-					$system_preset = TRUE;
-				}
-				return TRUE;
-				break; // never reach here
-			}
-		}
-	}
-	
-	return FALSE;
-}
-
 function ZimAPI__filterCharacter($raw) {
 	$filtered = "'" . str_replace("'", "'\"'\"'", $raw) . "'";
 	
 	return $filtered;
-}
-
-function ZimAPI__codePresetHash($raw_name) {
-	$CI = &get_instance();
-	$CI->load->helper(array('detectos'));
-
-	if (DectectOS_checkWindows()) {
-		return md5(utf8_encode($raw_name));
-	}
-	else {
-		return md5($raw_name);
-	}
 }
 
 function ZimAPI__setPresetLocalization(&$array_json) {

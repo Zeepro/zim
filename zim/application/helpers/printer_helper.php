@@ -293,6 +293,7 @@ function Printer_printFromFile($gcode_path, $model_id, $need_prime = TRUE, $exch
 	global $CFG;
 	$command = '';
 	$output = array();
+	$temper_json = array();
 	$ret_val = 0;
 	
 	$CI = &get_instance();
@@ -354,7 +355,15 @@ function Printer_printFromFile($gcode_path, $model_id, $need_prime = TRUE, $exch
 		}
 	
 		// change status json file
-		$ret_val = CoreStatus_setInPrinting($model_id, $exchange_extruder, $array_temper);
+		foreach($array_temper as $abb_filament => $tmp_temper) {
+			if (!array_key_exists($abb_filament, $array_filament) || $array_filament[$abb_filament] <= 0) {
+				$temper_json[$abb_filament] = NULL;
+			}
+			else {
+				$temper_json[$abb_filament] = $array_temper[$abb_filament];
+			}
+		}
+		$ret_val = CoreStatus_setInPrinting($model_id, $exchange_extruder, $temper_json);
 // 	}
 // 	else {
 // 		$ret_val = CoreStatus_setInCanceling();
@@ -801,7 +810,7 @@ function Printer__changeGcode(&$gcode_path, $array_filament = array(), $exchange
 	
 	// temporary change - make it possible to change temperature not according to cartridge
 	//TODO remove me when it is necessary
-	if (array_key_exists('r', $array_temper)) {
+	if (array_key_exists('r', $array_temper) && $array_temper['r'] > 0) {
 		$temp_r = $array_temper['r'];
 		$temp_rs = $temp_r + 10;
 // 		if ($temp_r > $temp_rs) {
@@ -865,7 +874,7 @@ function Printer__changeGcode(&$gcode_path, $array_filament = array(), $exchange
 	if (PrinterState_getNbExtruder() >= 2) {
 		// temporary change - make it possible to change temperature not according to cartridge
 		//TODO remove me when it is necessary
-		if (array_key_exists('l', $array_temper)) {
+		if (array_key_exists('l', $array_temper) && $array_temper['l'] > 0) {
 			$temp_l = $array_temper['l'];
 			$temp_ls = $temp_l + 10;
 // 			if ($temp_l > $temp_ls) {

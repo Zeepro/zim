@@ -27,33 +27,48 @@ class Preset extends MY_Controller {
 	
 	public function listpreset() {
 		$display_presetlist = array();
+		$display_all_list = array();
 		$template_data = array();
 		$body_page = NULL;
 		
 		$this->load->library('parser');
 		$this->lang->load('preset/listpreset', $this->config->item('language'));
 		
-		$json_data = ZimAPI_getPresetListAsArray();
-		
 		// prepare display data
+		$json_data = ZimAPI_getPresetListAsArray();
 		foreach ($json_data as $preset) {
-			$display_presetlist[] = array(
+			$preset_basepath = NULL;
+			$system_preset = FALSE;
+			
+			ZimAPI_checkPreset($preset[ZIMAPI_TITLE_PRESET_ID], $preset_basepath, $system_preset);
+			
+			$display_all_list[] = array(
 					'name'	=> $preset[ZIMAPI_TITLE_PRESET_NAME],
 					'id'	=> $preset[ZIMAPI_TITLE_PRESET_ID],
 			);
+			if (!$system_preset) {
+				$display_presetlist[] = array(
+						'name'	=> $preset[ZIMAPI_TITLE_PRESET_NAME],
+						'id'	=> $preset[ZIMAPI_TITLE_PRESET_ID],
+				);
+			}
 		}
 		sort($display_presetlist);
+		sort($display_all_list);
 		
 		// parse the main body
 		$template_data = array(
 				'home'				=> t('Home'),
 				'back'				=> t('back'),
 				'search_hint'		=> t('search_hint'),
-				'baseurl_detail'	=> '/preset/detail',
+// 				'baseurl_detail'	=> '/preset/detail',
 				'model_lists'		=> $display_presetlist,
-				'newmodel_lists'	=> $display_presetlist,
+				'newmodel_lists'	=> $display_all_list,
 				'new_preset_label'	=> t('new_preset_label'),
 				'submit_button'		=> t('submit_button'),
+				'delete_popup_text'	=> t('delete_popup_text'),
+				'delete_yes'		=> t('delete_yes'),
+				'delete_no'			=> t('delete_no'),
 		);
 		
 		$body_page = $this->parser->parse('template/preset/listpreset', $template_data, TRUE);
@@ -286,14 +301,30 @@ class Preset extends MY_Controller {
 						'bridge_flow_ratio'						=> $this->input->post('bridge_flow_ratio'),
 						'resolution'							=> $this->input->post('resolution'),
 				);
+				$name_preset = $this->input->post('save_as');
 				
 				if ($new_preset) {
 					if ($this->input->post('save_as')) {
-						$name_preset = $this->input->post('save_as');
 						$ret_val = ZimAPI_setPresetSetting($id_preset, $array_input, $name_preset);
 					}
 					else {
 						$ret_val = ERROR_MISS_PRM;
+					}
+				}
+				else if ($array_info[ZIMAPI_TITLE_PRESET_NAME] != $new_preset) {
+					$new_info = array();
+					$new_system_preset = FALSE;
+					
+					$ret_val = ZimAPI_getPresetInfoAsArray(ZimAPI_codePresetHash($name_preset), $new_info, $new_system_preset);
+					if ($new_system_preset) {
+						$ret_val = ERROR_WRONG_PRM;
+					}
+					else if ($ret_val == ERROR_WRONG_PRM || $ret_val == ERROR_OK) {
+						$ret_val = ZimAPI_setPresetSetting($id_preset, $array_input, $name_preset);
+						
+						if ($ret_val == ERROR_OK && $system_preset == FALSE) { // system_preset will never be true normally
+							$ret_val = ZimAPI_deletePreset($id_preset);
+						}
 					}
 				}
 				else {
@@ -327,7 +358,7 @@ class Preset extends MY_Controller {
 				'bottom_solid_layers'					=> t('bottom_solid_layers'),
 				'extra_perimeters'						=> t('extra_perimeters'),
 				'avoid_crossing_perimeters'				=> t('avoid_crossing_perimeters'),
-
+				
 				'thin_walls'							=> t('thin_walls'),
 				'overhangs'								=> t('overhangs'),
 // 				'randomize_start'						=> t('randomize_start'), // old for 1.0
@@ -562,7 +593,7 @@ class Preset extends MY_Controller {
 				'bridge_flow_ratio_value'						=> $array_setting['bridge_flow_ratio'],
 				'resolution_value'								=> $array_setting['resolution'],
 				// interface value
-				'preset_title'	=> $new_preset ? t('new_preset_title') : $array_info['name'], //'Name',
+				'preset_title'	=> $new_preset ? t('new_preset_title') : $array_info[ZIMAPI_TITLE_PRESET_NAME], //'Name',
 				'submit_button'	=> t('submit_button'),
 				'preset_id'		=> $id_preset,
 				'preset_newurl'	=> $new_preset ? '&new' : NULL,
