@@ -13,8 +13,8 @@
 					<h2>{upload}</h2></a>
 				</li>
 			</ul>
-			<ul data-role="listview" id="listview_library" class="shadowBox" data-inset="true" style="display: {library_visible};">
-				<li>
+			<ul data-role="listview" id="listview_library" class="shadowBox" data-inset="true">
+				<li style="display: {library_visible};">
 					<a href="/printerstoring/libraries"><h2>{my_library}</h2></a>
 				</li>
 				<li>
