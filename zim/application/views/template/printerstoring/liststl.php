@@ -12,12 +12,12 @@
 <!-- 			<h2>{title}</h2> -->
 			<div id="delete_popup" data-role="popup" data-dismissible="false" class="ui-content" style="max-width: 250px; text-align: center;">
 				{delete_popup_text}
-				<a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-transition="flow" onclick="javascript: deletemodel();">{delete_yes}</a>
+				<a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back" data-transition="flow" onclick="javascript: deletemodel();">{delete_yes}</a>
 				<a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back">{delete_no}</a>
 			</div>
 			<ul data-role="listview" id="listview" class="shadowBox" data-inset="true" data-filter="true" data-filter-placeholder="" data-filter-theme="d" data-split-icon="delete" data-split-theme="b">
 				{list}
-				<li>
+				<li id="stlmodel_{id}">
 					<a href='#' id="printmodel-{id}" onclick="printmodel('{id}');">
 						<img src="{image}" style="vertical-align:middle">
 						<h2>{name}</h2>
@@ -90,7 +90,7 @@ function deletemodel(){
 				$(".ui-loader").css("display", "none");
 			},
 			success: function (data, textStatus, xhr) {
-				$('#' + clicked_id).closest('li').remove();
+				$('#stlmodel_' + var_id_delete).remove();
 			},
 			error: function (data, textStatus, xhr) {
 				console.log(data);
