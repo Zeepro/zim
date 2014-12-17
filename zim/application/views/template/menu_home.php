@@ -15,7 +15,8 @@
 			</ul>
 			<ul data-role="listview" id="listview_library" class="shadowBox" data-inset="true">
 				<li style="display: {library_visible};">
-					<a href="/printerstoring/libraries"><h2>{my_library}</h2></a>
+<!-- 					<a href="/printerstoring/libraries"><h2>{my_library}</h2></a> -->
+					<a href="/printerstoring/stllibrary"><h2>{my_library}</h2></a>
 				</li>
 				<li>
 					<a id="zim_shop" href="http://zeepro.com/collections/all"><h2>{my_zim_shop}</h2></a>

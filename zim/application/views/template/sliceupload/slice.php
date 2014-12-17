@@ -141,7 +141,7 @@ function getPreview(var_control) {
 			+ '<button id="preview_far_button" data-inline="true" data-icon="minus" data-iconpos="left"'
 			+ ' onclick="javascript: getPreviewFar(' + var_control + ');" class="ui-btn-hidden" data-disabled="false">{far_button}</button>'
 			+ '</div>';
-		var_html = var_html + '<img src="' + html + '"><br>';
+		var_html = var_html + '<img src="' + html + '" style="max-width: 100%;"><br>';
 		if (var_control == true) {
 			var_html = var_html + '<div>'
 				+ '<button id="model_big_button" data-inline="true" data-icon="plus" data-iconpos="left"'
