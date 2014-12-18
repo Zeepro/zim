@@ -108,6 +108,8 @@ $lang['send_email_button']
 	= 'Partager par mail';
 $lang['send_yt_button']
 	= 'Partager sur Youtube';
+$lang['uploading']
+	= 'La vidéo est en cours de chargement...';
 $lang['send_email_hint']
 	= 'Envoyer votre zim-motion à :';
 $lang['send_email_action']

@@ -5,7 +5,7 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container" style="text-align: center;">
-			<p>The video is uploading...</p>
+			<p>{uploading}</p>
 			<div class="ui-loader ui-corner-all ui-body-a ui-loader-default" style="display:block">
 				<span class="ui-icon-loading"></span>
 			</div>
@@ -13,7 +13,7 @@
 	</div>
 	<script>
 		$.get('/printdetail/connect_google/true?state={state}&code={code}')
-		.done(function( data )
+		.done(function(data)
 		{
 			window.location.href = "/printdetails/timelapse";
 		});

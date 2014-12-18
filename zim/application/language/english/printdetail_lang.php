@@ -109,6 +109,8 @@ $lang['send_email_button']
 	= 'Share via email';
 $lang['send_yt_button']
 	= 'Share via Youtube';
+$lang['uploading']
+	= 'Your video is being uploaded';
 $lang['send_email_hint']
 	= 'Email your zim-motion to:';
 $lang['send_email_action']
@@ -143,5 +145,4 @@ $lang['timelapse_info_temperature_value_r']
 	= 'Right: %d °C';
 $lang['timelapse_info_temperature_value_l']
 	= 'Left: %d °C';
-
 ?>

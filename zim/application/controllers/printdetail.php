@@ -1071,7 +1071,12 @@ class Printdetail extends MY_Controller {
 		$state = $_GET['state'];
 		$code = $_GET['code'];
 		$this->load->library('parser');
-		$data = array('state' => $state, 'code' => $code);
+		$this->lang->load('printdetail', $this->config->item('language'));
+		$data = array(
+				'state'		=> $state,
+				'code'		=> $code,
+				'uploading'	=> t('uploading')
+		);
 		$body_page = $this->parser->parse('template/printdetail/video_upload', $data, TRUE);
 		
 		// parse all page
@@ -1134,15 +1139,9 @@ class Printdetail extends MY_Controller {
 		}
 		if ($client->getAccessToken() && $in_upload_state != "")
 		{
-			// load helper to get video path
-			$this->load->helper('zimapi');
-			
-			// 			if ($in_upload_state != "")
-				// 			{
+			$this->load->helper('zimapi');	
 			try
 			{
-				//AFF THE VIEW
-	
 				//REPLACE this value with the path to the file you are uploading.
 				$videoPath = ZIMAPI_FILEPATH_TIMELAPSE;
 	
