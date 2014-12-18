@@ -1067,6 +1067,44 @@ class Printdetail extends MY_Controller {
 		
 		return;
 	}
+
+	public function youtube_form()
+	{
+		$this->load->library('parser');
+		$this->lang->load('printdetail', $this->config->item('language'));
+		
+		if ($this->input->server('REQUEST_METHOD') == 'POST')
+		{
+			$this->load->library("session");
+			
+			$title = isset($_POST['yt_title']) ? $_POST['yt_title'] : '3D printing by zim';
+			$description = isset($_POST['yt_description']) ? $_POST['yt_description'] : 'Time-lapse video powered by zim 3D printer, the reference in personal 3D printing. Visit zeepro.com to join the zim experience !';
+			
+			$tags = explode(',', $_POST['yt_tags'] ? $_POST['yt_tags'] : 'zim, zeepro');
+			$tags = array_map('trim', $tags);
+			$video_infos = array(
+				'yt_title'		=> $title,
+				'yt_tags'		=> $tags,
+				'yt_desc'		=> $description,
+				'yt_privacy'	=> $_POST["yt_privacy"]
+			);
+			$this->session->set_userdata($video_infos);
+			var_dump($this->session->all_userdata());
+			$this->output->set_header("Location: /printdetail/connect_google");
+		}
+		
+		$data = array();
+		$body_page = $this->parser->parse('template/printdetail/youtube_form', $data, TRUE);
+		
+		$template_data = array(
+				'lang'			=> $this->config->item('language_abbr'),
+				'headers'		=> '<title>' . 'Zim - Zim-motion' . '</title>',
+				'contents'		=> $body_page
+		);
+		$this->parser->parse('template/basetemplate', $template_data);
+		return;
+	}
+
 	public function video_upload()
 	{
 		$state = $_GET['state'];
@@ -1083,7 +1121,7 @@ class Printdetail extends MY_Controller {
 		// parse all page
 		$template_data = array(
 				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Home') . '</title>',
+				'headers'		=> '<title>' . 'Zim - Zim-motion' . '</title>',
 				'contents'		=> $body_page
 		);
 		$this->parser->parse('template/basetemplate', $template_data);
@@ -1151,16 +1189,16 @@ class Printdetail extends MY_Controller {
 				// This example sets the video's title, description, keyword tags, and
 				// video category.
 				$snippet = new Google_Service_YouTube_VideoSnippet();
-				$snippet->setTitle("3D printing by zim");
-				$snippet->setDescription("Time-lapse video powered by zim 3D printer, the reference in personal 3D printing. Visit zeepro.com to join the zim experience!");
-				$snippet->setTags(array("Zim", "Zeepro"));
+				$snippet->setTitle($this->session->userdata('yt_title'));
+				$snippet->setDescription($this->session->userdata("yt_desc"));
+				$snippet->setTags($this->sesssion->userdata("yt_tags"));
 					
 				// Numeric video category. See https://developers.google.com/youtube/v3/docs/videoCategories/list
 				$snippet->setCategoryId("22");
 					
 				// Set the video's status to "public". Valid statuses are "public", "private" and "unlisted".
 				$status = new Google_Service_YouTube_VideoStatus();
-				$status->privacyStatus = "unlisted";
+				$status->privacyStatus = $this->session->userdata('yt_privacy');
 					
 				// Associate the snippet and status objects with a new video resource.
 				$video = new Google_Service_YouTube_Video();
@@ -1197,6 +1235,7 @@ class Printdetail extends MY_Controller {
 				$client->setDefer(false);
 				//$client->revokeToken($this->session->userdata('token'));
 				//$this->session->unset_userdata('token');
+				$this->session->unset_userdata(array('yt_title', 'yt_desc', 'yt_tags', 'yt_privacy'));
 				echo "<h3>Video Uploaded</h3><ul>";
 				echo sprintf('<li>%s (%s)</li>', $status['snippet']['title'], $status['id']);
 				echo '</ul>';
