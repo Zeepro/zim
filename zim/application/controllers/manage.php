@@ -11,16 +11,6 @@ class Manage extends MY_Controller {
 		) );
 	}
 	
-	public function connect_facebook()
-	{
-		
-		
-		FaceBook\FacebookSession::setDefaultApplication('406644606152497', 'adc295f31a84a0fb8999ff0d59769118');
-		$helper = new Facebook\FacebookRedirectLoginHelper('/');
-		$loginUrl = $helper->getLoginUrl();
-		echo '<a href="' . $loginUrl . '">Click</a>';
-	}
-
 	public function index() {
 		$template_data = array();
 		$body_page = NULL;
