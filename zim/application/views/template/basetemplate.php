@@ -73,7 +73,8 @@
 		<script type="text/javascript">
 			$(document).on("pageinit", function()
 			{
-				if (typeof timelapse == 'undefined')
+// 				if (typeof timelapse == 'undefined')
+				if (typeof var_disable_logo_link == 'undefined' || var_disable_logo_link == false)
 					$('div#link_logo').click(function(){window.location.href='/'; return false;});
 			});
 		</script>
@@ -88,5 +89,6 @@
 	</body>
 	<script>
 		$("#page_body").css("display", "block");
+		var var_disable_logo_link = false;
 	</script>
 </html>

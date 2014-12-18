@@ -23,7 +23,7 @@
 				<script type="text/javascript" src="/assets/jwplayer/jwplayer.js"></script>
 	 			<script type="text/javascript">jwplayer.key="Jh6aqwb1m2vKLCoBtS7BJxRWHnF/Qs3LMjnt13P9D6A=";</script>
 	 			<style type="text/css">div#myVideo_wrapper {margin: 0 auto;}</style>
-				<div id="myVideo">{loading_player}<span id="load_video_animation"></span></div>
+				<div id="myVideo">{loading_player}<span id="load_video_animation">&nbsp;&nbsp;&nbsp;</span></div>
 <!-- 				<a href="#" id="timelapse_button" data-ajax="false" data-role="button" class="ui-link ui-btn ui-shadow ui-corner-all">{timelapse_button}</a> -->
 				<a id="send_email_button" href="#timelapse_right_panel" data-role="button" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-mail" style="display:none;">{send_email_button}</a>
 				<a id="send_yt_button" href="/printdetail/youtube_form" data-ajax="false" data-role="button" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-myicon" style="display:none;">{send_yt_button}</a>
@@ -68,6 +68,7 @@ $("div#link_logo").on('click', function()
 });
 
 var var_interval_video_check;
+var var_interval_load_animation;
 var var_ajax_video_check;
 var var_ajax_timelapse_end;
 var var_ajax_send_email;
@@ -178,6 +179,35 @@ function send_email() {
 	});
 }
 
+var_interval_load_animation = setInterval(function() {
+	var anime_b = $('span#load_video_animation').html();
+	
+	if (typeof anime_b !== 'undefined') {
+		var anime_a;
+		
+		switch (anime_b) {
+			case '&nbsp;&nbsp;&nbsp;':
+				anime_a = '.&nbsp;&nbsp;';
+				break;
+				
+			case '.&nbsp;&nbsp;':
+				anime_a = '..&nbsp;';
+				break;
+				
+			case '..&nbsp;':
+				anime_a = '...';
+				break;
+				
+			case '...':
+			default:
+				anime_a = '&nbsp;&nbsp;&nbsp;';
+				break;
+		}
+		
+		$('span#load_video_animation').html(anime_a);
+	}
+}, 1000);
+
 // start of script
 var_interval_video_check = setInterval(function() {
 	var_ajax_video_check = $.ajax({
@@ -189,7 +219,9 @@ var_interval_video_check = setInterval(function() {
 			$('a#timelapse_button').attr('href', "{video_url}");
 			load_jwplayer_video();
 			clearInterval(var_interval_video_check);
+			clearInterval(var_interval_load_animation);
 			var_interval_video_check = 0;
+			var_interval_load_animation = 0;
 			if (var_internet_ok) {
 				$('a#send_email_button').show();
 				$('a#send_yt_button').show();
@@ -198,7 +230,13 @@ var_interval_video_check = setInterval(function() {
 		// do nothing when status code is 200 (except animation)
 		else if (var_ajax_video_check.status == 200) {
 			var anime_b = $('span#load_video_animation').html();
-			//TODO finish me
+			
+// 			if (anime_b.length == 3) {
+// 				$('span#load_video_animation').html('');
+// 			}
+// 			else {
+// 				$('span#load_video_animation').html(anime_b + '.');
+// 			}
 		}
 	})
 	.fail(function() {
