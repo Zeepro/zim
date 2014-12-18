@@ -1512,7 +1512,7 @@ function PrinterState_checkSlicedCondition(&$data_json) {
 }
 
 //TODO union printing status into PrinterState_checkBusyStatus()
-function PrinterState_checkStatusAsArray() {
+function PrinterState_checkStatusAsArray($extra_info = TRUE) {
 	global $CFG;
 	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
 	$command = '';
@@ -1637,7 +1637,7 @@ function PrinterState_checkStatusAsArray() {
 			// we can calculate duration by mid(to get total duration) and percentage
 			
 			// add temperature
-			if ($data_json[PRINTERSTATE_TITLE_PERCENT] != 100) {
+			if ($data_json[PRINTERSTATE_TITLE_PERCENT] != 100 && $extra_info == TRUE) {
 				$data_temperature = PrinterState_getExtruderTemperaturesAsArray();
 				if (!is_array($data_temperature)) {
 					// log internal error

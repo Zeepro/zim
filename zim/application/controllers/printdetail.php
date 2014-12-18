@@ -306,16 +306,31 @@ class Printdetail extends MY_Controller {
 		$status_head = FALSE;
 		$ret_val = 0;
 		$option_selected = 'selected="selected"';
+		$status_current = NULL;
 		
 		$this->load->library('parser');
 		$this->lang->load('printdetail', $this->config->item('language'));
 		$this->lang->load('printerstate/index', $this->config->item('language'));
 		
-		$this->load->helper(array('zimapi', 'printerstate'));
+		$this->load->helper(array('zimapi', 'printerstate', 'corestatus'));
 		
 		$id = $this->input->get('id');
 		$callback = $this->input->get('cb');
 		$abb_cartridge = $this->input->get('v');
+		
+		// check if we are in printing or not to continue, do redirection if not
+		$data_status = PrinterState_checkStatusAsArray(FALSE);
+		if ($data_status[PRINTERSTATE_TITLE_STATUS] != CORESTATUS_VALUE_PRINT) {
+			if (in_array($data_status[PRINTERSTATE_TITLE_STATUS], array(CORESTATUS_VALUE_IDLE, CORESTATUS_VALUE_SLICED))
+					&& file_exists(ZIMAPI_FILEPATH_TIMELAPSE)) {
+				$this->output->set_header('Location: /printdetail/timelapse');
+			}
+			else {
+				$this->output->set_header('Location: /');
+			}
+			
+			return;
+		}
 		
 		if ($abb_cartridge || $id == CORESTATUS_VALUE_MID_CALIBRATION) {
 			// do not launch timelapse image generation for priming and calibration model
