@@ -16,7 +16,7 @@ $lang['yt_privacy_public']
 $lang['yt_privacy_unlisted']
 	= "Non listé";
 $lang['upload_to_yt']
-	= "Chager ma vidéo sur YouTube";
+	= "Charger ma vidéo sur YouTube";
 $lang['title_label']
 	= "Titre de la vidéo";
 $lang['desc_label']
