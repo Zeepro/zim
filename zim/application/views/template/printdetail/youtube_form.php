@@ -8,35 +8,35 @@
 			<form action="/printdetail/youtube_form" method="POST" id="yt_form" data-ajax="false">
 				<div class="ui-grid-a">
 					<div class="ui-block-a" style="width:20%">
-						Title
+						{title_label}
 					</div>
 					<div class="ui-block-b" style="width:80%">
-						<input name="yt_title" value="3D printing by zim" />
+						<input name="yt_title" value="{yt_title}" />
 					</div>
 					<div class="ui-block-a" style="width:20%">
-						Description
+						{desc_label}
 					</div>
 					<div class="ui-block-b" style="width:80%">
-						<textarea name="yt_description" form="yt_form" placeholder="Enter description here">Time-lapse video powered by zim 3D printer, the reference in personal 3D printing. Visit zeepro.com to join the zim experience !</textarea>
+						<textarea name="yt_description" form="yt_form" placeholder="Enter description here">{yt_desc}</textarea>
 					</div>
 					<div class="ui-block-a" style="width:20%">
-						Tags
+						{tags_label}
 					</div>
 					<div class="ui-block-b" style="width:80%">
-						<input name="yt_tags" value="zim, zeepro" />
+						<input name="yt_tags" value="{yt_tags}" />
 					</div>
 					<div class="ui-block-a" style="width:20%">
-						Privacy
+						{privacy_label}
 					</div>
 					<div class="ui-block-b" style="width:80%">
 						<select name="yt_privacy">
-							<option value="public">Public</option>
-							<option value="unlisted">Unlisted</option>
-							<option value="private">Private</option>
+							<option value="public">{yt_privacy_public}</option>
+							<option value="unlisted">{yt_privacy_unlisted}</option>
+							<option value="private">{yt_privacy_private}</option>
 						</select>
 					</div>
 				</div>
-				<input type="submit" value="Upload my video to Youtube" />
+				<input type="submit" value="{upload_to_yt}" />
 			</form>
 		</div>
 	</div>

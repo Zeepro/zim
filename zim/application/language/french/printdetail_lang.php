@@ -42,7 +42,7 @@ $lang['timelapse_error']
 $lang['timelapse_ok']
 	= 'Vous pouvez maintenant t&eacute;l&eacute;charger votre timelapse';
 $lang['timelapse_info']
-	= 'Chargement de vidéo zim-motion time-lapse...';
+	= 'Chargement de vidéo zim-motion time-lapse';
 $lang['timelapse_button']
 	= 'T&eacutel&eacutecharger';
 
