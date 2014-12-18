@@ -377,6 +377,7 @@ function CoreStatus_checkCallEndPrinting(&$url_redirect = '') {
 			'/printdetail/sendemail_ajax'		=> NULL,
 			'/printdetail/connect_google'		=> NULL,
 			'/printdetail/connect_google/true'	=> NULL,
+			'/printdetail/youtube_form'			=> NULL,
 			'/printdetail/video_upload'			=> NULL,
 	));
 }
