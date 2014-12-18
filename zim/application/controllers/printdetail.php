@@ -729,6 +729,7 @@ class Printdetail extends MY_Controller {
 		
 		// parse the main body
 		$template_data = array(
+				'internet_ok'			=> (@file_get_contents("https://sso.zeepro.com/login.ashx") === FALSE) ? 'false' : 'true',
 				'loading_player'		=> t('timelapse_info'),
 				'finish_info'			=> t('Congratulation, your printing is complete!'),
 				'home_button'			=> t('Home'),

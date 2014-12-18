@@ -23,10 +23,10 @@
 				<script type="text/javascript" src="/assets/jwplayer/jwplayer.js"></script>
 	 			<script type="text/javascript">jwplayer.key="Jh6aqwb1m2vKLCoBtS7BJxRWHnF/Qs3LMjnt13P9D6A=";</script>
 	 			<style type="text/css">div#myVideo_wrapper {margin: 0 auto;}</style>
-				<div id="myVideo">{loading_player}</div>
+				<div id="myVideo">{loading_player}<span id="load_video_animation"></span></div>
 <!-- 				<a href="#" id="timelapse_button" data-ajax="false" data-role="button" class="ui-link ui-btn ui-shadow ui-corner-all">{timelapse_button}</a> -->
 				<a id="send_email_button" href="#timelapse_right_panel" data-role="button" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-mail" style="display:none;">{send_email_button}</a>
-				<a id="send_yt_button" href="/printdetail/connect_google" data-ajax="false" data-role="button" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-myicon" style="display:none;">{send_yt_button}</a>
+				<a id="send_yt_button" href="/printdetail/youtube_form" data-ajax="false" data-role="button" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-myicon" style="display:none;">{send_yt_button}</a>
 			</div>
 			<div data-role="collapsible" data-collapsed="false" style="align: center;">
 				<h4>{timelapse_info_title}</h4>
@@ -59,7 +59,8 @@
 
 <script>
 
-var timelapse = "timelapse";
+// var timelapse = "timelapse";
+var var_disable_logo_link = true; // trigger with basetemplate document ready function
 
 $("div#link_logo").on('click', function()
 {
@@ -70,6 +71,7 @@ var var_interval_video_check;
 var var_ajax_video_check;
 var var_ajax_timelapse_end;
 var var_ajax_send_email;
+var var_internet_ok = {internet_ok};
 
 function load_jwplayer_video() {
 	var player = jwplayer("myVideo").setup({
@@ -186,12 +188,18 @@ var_interval_video_check = setInterval(function() {
 		if (var_ajax_video_check.status == 202) {
 			$('a#timelapse_button').attr('href', "{video_url}");
 			load_jwplayer_video();
-			$('a#send_email_button').show();
-			$('a#send_yt_button').show();
 			clearInterval(var_interval_video_check);
 			var_interval_video_check = 0;
+			if (var_internet_ok) {
+				$('a#send_email_button').show();
+				$('a#send_yt_button').show();
+			}
 		}
-		// do nothing when status code is 200
+		// do nothing when status code is 200 (except animation)
+		else if (var_ajax_video_check.status == 200) {
+			var anime_b = $('span#load_video_animation').html();
+			//TODO finish me
+		}
 	})
 	.fail(function() {
 		console.log('check video failed');
