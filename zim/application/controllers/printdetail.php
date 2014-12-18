@@ -1086,16 +1086,16 @@ class Printdetail extends MY_Controller {
 	public function youtube_form()
 	{
 		$this->load->library('parser');
-		$this->lang->load('printdetail', $this->config->item('language'));
+		$this->lang->load('youtube_form', $this->config->item('language'));
 		
 		if ($this->input->server('REQUEST_METHOD') == 'POST')
 		{
 			$this->load->library("session");
 			
-			$title = isset($_POST['yt_title']) ? $_POST['yt_title'] : '3D printing by zim';
-			$description = isset($_POST['yt_description']) ? $_POST['yt_description'] : 'Time-lapse video powered by zim 3D printer, the reference in personal 3D printing. Visit zeepro.com to join the zim experience !';
+			$title = isset($_POST['yt_title']) ? $_POST['yt_title'] : t('yt_title');
+			$description = isset($_POST['yt_description']) ? $_POST['yt_description'] : t('yt_desc');
 			
-			$tags = explode(',', $_POST['yt_tags'] ? $_POST['yt_tags'] : 'zim, zeepro');
+			$tags = explode(',', $_POST['yt_tags'] ? $_POST['yt_tags'] : t('yt_tags'));
 			$tags = array_map('trim', $tags);
 			$video_infos = array(
 				'yt_title'		=> $title,
@@ -1104,16 +1104,27 @@ class Printdetail extends MY_Controller {
 				'yt_privacy'	=> $_POST["yt_privacy"]
 			);
 			$this->session->set_userdata($video_infos);
-			var_dump($this->session->all_userdata());
 			$this->output->set_header("Location: /printdetail/connect_google");
 		}
 		
-		$data = array();
+		$data = array(
+				'yt_title'				=> t('yt_title'),
+				'yt_tags'				=> t('yt_tags'),
+				'yt_desc'				=> t('yt_desc'),
+				'yt_privacy_public'		=> t('yt_privacy_public'),
+				'yt_privacy_private'	=> t('yt_privacy_private'),
+				'yt_privacy_unlisted'	=> t('yt_privacy_unlisted'),
+				'upload_to_yt'			=> t('upload_to_yt'),
+				'title_label'			=> t('title_label'),
+				'desc_label'			=> t('desc_label'),
+				'tags_label'			=> t('tags_label'),
+				'privacy_label'			=> t('privacy_label')
+				);
 		$body_page = $this->parser->parse('template/printdetail/youtube_form', $data, TRUE);
 		
 		$template_data = array(
 				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . 'Zim - Zim-motion' . '</title>',
+				'headers'		=> '<title>' . t('youtube_title') . '</title>',
 				'contents'		=> $body_page
 		);
 		$this->parser->parse('template/basetemplate', $template_data);
