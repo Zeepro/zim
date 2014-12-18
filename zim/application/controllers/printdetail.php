@@ -1217,7 +1217,7 @@ class Printdetail extends MY_Controller {
 				$snippet = new Google_Service_YouTube_VideoSnippet();
 				$snippet->setTitle($this->session->userdata('yt_title'));
 				$snippet->setDescription($this->session->userdata("yt_desc"));
-				$snippet->setTags($this->sesssion->userdata("yt_tags"));
+				$snippet->setTags($this->session->userdata("yt_tags"));
 					
 				// Numeric video category. See https://developers.google.com/youtube/v3/docs/videoCategories/list
 				$snippet->setCategoryId("22");
