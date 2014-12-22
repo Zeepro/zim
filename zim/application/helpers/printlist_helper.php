@@ -40,6 +40,10 @@ if (!defined('PRINTLIST_MAX_PIC_SIZE')) {
 	define('PRINTLIST_MODEL_PRIME_R',		'_prime_right');
 	define('PRINTLIST_MODEL_REPRIME_L',		'_reprime_left');
 	define('PRINTLIST_MODEL_REPRIME_R',		'_reprime_right');
+	define('PRINTLIST_MODEL_PRIME_L_PVA',	'_prime_left_pva');
+	define('PRINTLIST_MODEL_PRIME_R_PVA',	'_prime_right_pva');
+	define('PRINTLIST_MODEL_REPRIME_L_PVA',	'_reprime_left_pva');
+	define('PRINTLIST_MODEL_REPRIME_R_PVA',	'_reprime_right_pva');
 	define('PRINTLIST_MODEL_PRINTPRIME_L',	'_print_prime_left');
 	define('PRINTLIST_MODEL_PRINTPRIME_R',	'_print_prime_right');
 // 	define('PRINTLIST_MODEL_CHARGE',		'_charge');

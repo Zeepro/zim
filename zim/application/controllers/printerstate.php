@@ -360,7 +360,14 @@ class Printerstate extends MY_Controller {
 		return;
 	}
 	
-	private function _deal_with_unloading_wait_time($abb_cartridge) {
+	private function _deal_with_unloading_wait_time($abb_cartridge, $array_status) {
+		$offset_check = PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD;
+		
+		if (array_key_exists(CORESTATUS_TITLE_FILA_MAT, $array_status)
+				&& $array_status[CORESTATUS_TITLE_FILA_MAT] == PRINTERSTATE_DESP_MATERIAL_PVA) {
+			$offset_check = PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD_PVA;
+		}
+		
 		if (file_exists(PRINTERSTATE_FILE_UNLOAD_HEAT)) {
 			$time_start = @file_get_contents(PRINTERSTATE_FILE_UNLOAD_HEAT);
 // 			PrinterLog_logDebug('start time: ' . $time_start, __FILE__, __LINE__);
@@ -392,21 +399,8 @@ class Printerstate extends MY_Controller {
 		
 		// wait the time for arduino before checking filament when unloading filament
 		// we return TRUE only when finishing action or passing max wait time (Arduino is avaliable for command)
-		if (CoreStatus_checkInWaitTime(PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD)) {
-// 			// check if we have finished action within max wait time
-// 			$cr = PrinterState_checkAsynchronousResponse();
-// 			if ($cr == ERROR_INTERNAL) {
-// 				$this->load->helper('printerlog');
-// 				PrinterLog_logError('check asynchronous response error', __FILE__, __LINE__);
-// 				return FALSE;
-// 			}
-// 			else if ($cr != ERROR_OK) { // do not break if we have finished (ERROR_OK)
-				return FALSE;
-// 			}
-// 			else {
-// 				$this->load->helper('printerlog');
-// 				PrinterLog_logDebug('finished asynchronous unloading within max wait time', __FILE__, __LINE__);
-// 			}
+		if (CoreStatus_checkInWaitTime($offset_check)) {
+			return FALSE;
 		}
 		
 		return TRUE;
@@ -694,19 +688,17 @@ class Printerstate extends MY_Controller {
 			case PRINTERSTATE_CHANGECART_UNLOAD_F:
 				// we call the page: wait unload filament, need checking status (first status page)
 				$status_current = '';
+				$array_status = array();
 				
 				// block any sending command to arduino when in unloading wait time
-				//TODO test me
-				if (CoreStatus_checkInIdle($status_current) == FALSE) {
-					if ($status_current == CORESTATUS_VALUE_UNLOAD_FILA_L
-								|| $status_current == CORESTATUS_VALUE_UNLOAD_FILA_R) {
-						if (!$this->_deal_with_unloading_wait_time($abb_cartridge)) {
+				if (CoreStatus_checkInIdle($status_current, $array_status) == FALSE) {
+					if (in_array($status_current, array(CORESTATUS_VALUE_UNLOAD_FILA_L, CORESTATUS_VALUE_UNLOAD_FILA_R))) {
+						if (!$this->_deal_with_unloading_wait_time($abb_cartridge, $array_status)) {
 							$this->_display_changecartridge_in_unload_filament($abb_cartridge);
 							break;
 						}
 					}
-					else if ($status_current == CORESTATUS_VALUE_LOAD_FILA_L
-								|| $status_current == CORESTATUS_VALUE_LOAD_FILA_R) {
+					else if (in_array($status_current, array(CORESTATUS_VALUE_LOAD_FILA_L, CORESTATUS_VALUE_LOAD_FILA_R))) {
 						$this->_display_changecartridge_in_load_filament();
 						break;
 					}
@@ -717,7 +709,7 @@ class Printerstate extends MY_Controller {
 					$status_correct = ($abb_cartridge == 'r') ? CORESTATUS_VALUE_UNLOAD_FILA_R : CORESTATUS_VALUE_UNLOAD_FILA_L;
 					$status_changed = ($abb_cartridge == 'r') ? CORESTATUS_VALUE_LOAD_FILA_R : CORESTATUS_VALUE_LOAD_FILA_L;
 					
-					if (CoreStatus_checkInIdle($status_current)) {
+					if (CoreStatus_checkInIdle($status_current, $array_status)) {
 						// in idle
 						$ret_val = PrinterState_getTemperature($temp_data, 'e', $abb_cartridge);
 						if ($ret_val != ERROR_OK) {
@@ -732,7 +724,14 @@ class Printerstate extends MY_Controller {
 					}
 					else if ($status_current == $status_correct) {
 						// in busy (normally only unloading is possible)
-						if (!CoreStatus_checkInWaitTime(PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_UNLOAD)) {
+						$timeout_check = PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_UNLOAD;
+						
+						if (array_key_exists(CORESTATUS_TITLE_FILA_MAT, $array_status)
+								&& $array_status[CORESTATUS_TITLE_FILA_MAT] == PRINTERSTATE_DESP_MATERIAL_PVA) {
+							$timeout_check = PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_UNLOAD_PVA;
+						}
+						
+						if (!CoreStatus_checkInWaitTime($timeout_check)) {
 							//TODO test me
 							// already passed the timeout of changement
 							// change status into idle
@@ -769,7 +768,7 @@ class Printerstate extends MY_Controller {
 					$status_correct = ($abb_cartridge == 'r') ? CORESTATUS_VALUE_LOAD_FILA_R : CORESTATUS_VALUE_LOAD_FILA_L;
 					$status_changed = ($abb_cartridge == 'r') ? CORESTATUS_VALUE_UNLOAD_FILA_R : CORESTATUS_VALUE_UNLOAD_FILA_L;
 					
-					if (CoreStatus_checkInIdle($status_current)) {
+					if (CoreStatus_checkInIdle($status_current, $array_status)) {
 						$ret_val = PrinterState_checkFilament($abb_cartridge, $need_filament);
 						if ($ret_val == $code_miss_filament) {
 							// have cartridge, enough filament
@@ -797,10 +796,15 @@ class Printerstate extends MY_Controller {
 						}
 					}
 					else if ($status_current == $status_correct) {
+						$timeout_check = PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_LOAD;
+						
+						if (array_key_exists(CORESTATUS_TITLE_FILA_MAT, $array_status)
+								&& $array_status[CORESTATUS_TITLE_FILA_MAT] == PRINTERSTATE_DESP_MATERIAL_PVA) {
+							$timeout_check = PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_LOAD_PVA;
+						}
+						
 						// in busy (normally only loading is possible)
-						//FIXME check timeout
-						if (!CoreStatus_checkInWaitTime(PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_LOAD)) {
-							//TODO test me
+						if (!CoreStatus_checkInWaitTime($timeout_check)) {
 							// already passed the timeout of changement
 							// change status into idle
 							$ret_val = CoreStatus_setInIdle();
@@ -836,28 +840,38 @@ class Printerstate extends MY_Controller {
 				
 			case PRINTERSTATE_CHANGECART_REMOVE_C:
 				// we call the page: in unload filament
-				//TODO test me
-				if (!$this->_deal_with_unloading_wait_time($abb_cartridge)) {
+				$status_current = NULL;
+				$array_status = array();
+				
+				CoreStatus_checkInIdle($status_current, $array_status);
+				
+				if (!$this->_deal_with_unloading_wait_time($abb_cartridge, $array_status)) {
 					$this->_display_changecartridge_in_unload_filament($abb_cartridge);
 					break;
 				}
 				
 				if (PrinterState_getFilamentStatus($abb_cartridge)) {
 					// have filament
-					//FIXME check timeout
-						if (!CoreStatus_checkInWaitTime(PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_UNLOAD)) {
-							//TODO test me
-							// already passed the timeout of changement
-							// change status into idle
-							$ret_val = CoreStatus_setInIdle();
-							if ($ret_val == FALSE) {
-								$this->load->helper('printerlog');
-								PrinterLog_logError('can not set idle after unloading filament', __FILE__, __LINE__);
-								$this->output->set_status_header(202); // disable checking
-							}
-							$this->_display_changecartridge_error_unloading();
-							break;
+					$timeout_check = PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_UNLOAD;
+					
+					if (array_key_exists(CORESTATUS_TITLE_FILA_MAT, $array_status)
+							&& $array_status[CORESTATUS_TITLE_FILA_MAT] == PRINTERSTATE_DESP_MATERIAL_PVA) {
+						$timeout_check = PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_UNLOAD_PVA;
+					}
+					
+					if (!CoreStatus_checkInWaitTime($timeout_check)) {
+						// already passed the timeout of changement
+						// change status into idle
+						$ret_val = CoreStatus_setInIdle();
+						if ($ret_val == FALSE) {
+							$this->load->helper('printerlog');
+							PrinterLog_logError('can not set idle after unloading filament', __FILE__, __LINE__);
+							$this->output->set_status_header(202); // disable checking
 						}
+						$this->_display_changecartridge_error_unloading();
+						break;
+					}
+					
 					$this->_display_changecartridge_in_unload_filament($abb_cartridge);
 				}
 				else {
@@ -958,17 +972,21 @@ class Printerstate extends MY_Controller {
 				
 			case PRINTERSTATE_CHANGECART_NEED_P:
 				// we call the page: in load filament
+				$status_current = NULL;
+				$array_status = array();
+				$offset_check = PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD;
+				
+				CoreStatus_checkInIdle($status_current, $array_status);
+				if (array_key_exists(CORESTATUS_TITLE_FILA_MAT, $array_status)
+						&& $array_status[CORESTATUS_TITLE_FILA_MAT] == PRINTERSTATE_DESP_MATERIAL_PVA) {
+					$offset_check = PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD_PVA;
+				}
 				
 				// wait the time for arduino before checking filament when loading filament
-				if (CoreStatus_checkInWaitTime(PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD)) {
+				if (CoreStatus_checkInWaitTime($offset_check)) {
 					$this->_display_changecartridge_in_load_filament();
 					break;
 				}
-// 				else if (!CoreStatus_checkInWaitTime(PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_LOAD)) {
-// 					// already passed the timeout of changement
-// 					$this->_display_changecartridge_error_loading();
-// 					break;
-// 				}
 				
 				if (PrinterState_getFilamentStatus($abb_cartridge)) {
 					// have filament
@@ -982,7 +1000,14 @@ class Printerstate extends MY_Controller {
 				}
 				else {
 					// no filament
-					if (!CoreStatus_checkInWaitTime(PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_LOAD)) {
+					$timeout_check = PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_LOAD;
+					
+					if (array_key_exists(CORESTATUS_TITLE_FILA_MAT, $array_status)
+							&& $array_status[CORESTATUS_TITLE_FILA_MAT] == PRINTERSTATE_DESP_MATERIAL_PVA) {
+						$timeout_check = PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_LOAD_PVA;
+					}
+					
+					if (!CoreStatus_checkInWaitTime($timeout_check)) {
 						// already passed the timeout of changement
 						CoreStatus_setInIdle(); //TODO need test and error control here
 						$this->_display_changecartridge_error_loading();

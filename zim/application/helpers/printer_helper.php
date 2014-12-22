@@ -95,38 +95,75 @@ function Printer_preparePrint($model_id, $need_prime = TRUE) {
 }
 
 function Printer_printFromPrime($abb_extruder, $first_run = TRUE) {
-	$name_prime = '';
+	$name_prime = NULL;
 	$gcode_path = NULL;
 	$model_id = NULL;
 	$ret_val = 0;
 	$id_model = '';
 	$array_info = array();
+	$array_cartridge = array();
+	$is_pva = 0;
 	
 	$CI = &get_instance();
-	$CI->load->helper(array('printlist', 'corestatus'));
+	$CI->load->helper(array('printlist', 'corestatus', 'printerstate'));
 	
-	switch ($abb_extruder) {
-		case 'l':
-			$model_id = CORESTATUS_VALUE_MID_PRIME_L;
-			if ($first_run == TRUE)
+	$ret_val = PrinterState_getCartridgeAsArray($array_cartridge, $abb_extruder);
+	if ($ret_val != ERROR_OK) {
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('read cartridge material error in printing prime: ' . $ret_val, __FILE__, __LINE__);
+		
+		return $ret_val;
+	}
+	else if ($array_cartridge[PRINTERSTATE_TITLE_MATERIAL] == PRINTERSTATE_DESP_MATERIAL_PVA) {
+		$is_pva = 1;
+	}
+	
+	switch ($abb_extruder . $is_pva) {
+		case 'l0':
+			if ($first_run == TRUE) {
 				$name_prime = PRINTLIST_MODEL_PRIME_L;
-			else
+			}
+			else {
 				$name_prime = PRINTLIST_MODEL_REPRIME_L;
+			}
+			
+		case 'l1':
+			$model_id = CORESTATUS_VALUE_MID_PRIME_L;
+			if (!is_null($name_prime)) {
+				break;
+			}
+			if ($first_run == TRUE) {
+				$name_prime = PRINTLIST_MODEL_PRIME_L_PVA;
+			}
+			else {
+				$name_prime = PRINTLIST_MODEL_REPRIME_L_PVA;
+			}
 			break;
 			
-		case 'r':
-			$model_id = CORESTATUS_VALUE_MID_PRIME_R;
-			if ($first_run == TRUE)
+		case 'r0':
+			if ($first_run == TRUE) {
 				$name_prime = PRINTLIST_MODEL_PRIME_R;
-			else
+			}
+			else {
 				$name_prime = PRINTLIST_MODEL_REPRIME_R;
+			}
+			
+		case 'r1':
+			$model_id = CORESTATUS_VALUE_MID_PRIME_R;
+			if (!is_null($name_prime)) {
+				break;
+			}
+			if ($first_run == TRUE) {
+				$name_prime = PRINTLIST_MODEL_PRIME_R_PVA;
+			}
+			else {
+				$name_prime = PRINTLIST_MODEL_REPRIME_R_PVA;
+			}
 			break;
 			
 		default:
-			$CI->load->helper('printerlog');
-			PrinterLog_logError('extruder type error in printing prime', __FILE__, __LINE__);
 			return ERROR_WRONG_PRM;
-			break;
+			break; //never reach here
 	}
 	$id_model = ModelList_codeModelHash($name_prime);
 	
@@ -140,7 +177,6 @@ function Printer_printFromPrime($abb_extruder, $first_run = TRUE) {
 		}
 		
 		// modify the temperature of gcode file according to cartridge info
-		//TODO test me
 		$ret_val = Printer__changeGcode($gcode_path, $array_filament, FALSE, $array_temper, TRUE);
 		if ($ret_val != ERROR_OK) {
 			return $ret_val;
@@ -184,19 +220,12 @@ function Printer_printFromModel($id_model, $model_calibration, $exchange_extrude
 			return ERROR_INTERNAL; // $ret_val = ERROR_INTERNAL;
 		}
 		
-		// temporary change - modify the temperature of gcode file according to cartridge info
-		//TODO test me and remove me if it is necessary
-// 		$ret_val = Printer__changeGcode($gcode_path);
+		// modify the temperature of gcode file according to cartridge info
 		$ret_val = Printer__changeGcode($gcode_path, $array_filament, $exchange_extruder, $array_temper);
 		if ($ret_val != ERROR_OK) {
 			return $ret_val;
 		}
-// 		if (file_exists($gcode_path . '.new')) {
-// 			$gcode_path .= '.new';
-// 		}
-		// temporary change end
 		
-// 		$ret_val = Printer_printFromFile($gcode_path, TRUE, $stop_printing);
 		$ret_val = Printer_printFromFile($gcode_path, $id_model, TRUE, $exchange_extruder,
 				$array_filament, $array_temper);
 	}
@@ -218,8 +247,6 @@ function Printer_printFromSlice($exchange_extruder = FALSE, $array_temper = arra
 		return ERROR_NO_SLICED;
 	}
 	
-	// check filaments
-	//TODO test me
 	$CI->load->helper(array('printerstate', 'corestatus'));
 	
 	if (ERROR_OK != PrinterState_getSlicedJson($data_json)) {
@@ -237,13 +264,11 @@ function Printer_printFromSlice($exchange_extruder = FALSE, $array_temper = arra
 		}
 	}
 	
-	// temporary change
-	//TODO remove me if it is necessary
+	// modify the temperature of gcode file according to cartridge info
 	$ret_val = Printer__changeGcode($gcode_path, $array_filament, $exchange_extruder, $array_temper);
 	if ($ret_val != ERROR_OK) {
 		return $ret_val;
 	}
-	// temporary change end
 	
 	$ret_val = Printer_printFromFile($gcode_path, CORESTATUS_VALUE_MID_SLICE, TRUE, $exchange_extruder,
 			$array_filament, $array_temper);
@@ -271,13 +296,11 @@ function Printer_printFromLibrary($id_gcode, $exchange_extruder = FALSE, $array_
 			return ERROR_INTERNAL; // $ret_val = ERROR_INTERNAL;
 		}
 		
-		// temporary change - modify the temperature of gcode file according to cartridge info
-		//TODO test me and remove me if it is necessary
+		// modify the temperature of gcode file according to cartridge info
 		$ret_val = Printer__changeGcode($gcode_path, $array_filament, $exchange_extruder, $array_temper);
 		if ($ret_val != ERROR_OK) {
 			return $ret_val;
 		}
-		// temporary change end
 		
 		$CI->load->helper('corestatus');
 		$ret_val = Printer_printFromFile($gcode_path, CORESTATUS_VALUE_MID_PREFIXGCODE . $id_gcode, TRUE,
@@ -872,16 +895,11 @@ function Printer__changeGcode(&$gcode_path, $array_filament = array(), $exchange
 	}
 	
 	if (PrinterState_getNbExtruder() >= 2) {
-		// temporary change - make it possible to change temperature not according to cartridge
-		//TODO remove me when it is necessary
+		// make it possible to change temperature not according to cartridge
 		if (array_key_exists('l', $array_temper) && $array_temper['l'] > 0) {
 			$temp_l = $array_temper['l'];
 			$temp_ls = $temp_l + 10;
-// 			if ($temp_l > $temp_ls) {
-// 				$temp_ls = $temp_l;
-// 			}
 		}
-		// temporary change end
 		else if (!array_key_exists('l', $array_filament) || $array_filament['l'] <= 0) {
 			// ignore the cartridge which we do not need
 			$CI->load->helper('slicer');
@@ -923,7 +941,6 @@ function Printer__changeGcode(&$gcode_path, $array_filament = array(), $exchange
 				$CI->load->helper('slicer');
 				$temp_l = SLICER_VALUE_DEFAULT_TEMPER;
 				$temp_ls = SLICER_VALUE_DEFAULT_FIRST_TEMPER;
-// 				$temp_l = $temp_ls = PRINTER_VALUE_DEFAULT_TEMPER;
 			}
 		}
 		

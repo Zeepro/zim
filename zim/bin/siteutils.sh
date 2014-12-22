@@ -2,6 +2,8 @@
 
 RETVAL=0
 TIMEOUT_HEAT_UNLOAD=600
+UNLOAD_SPEED_DEFAULT=150
+UNLOAD_SPEED_PVA=50
 STATUS_FILE_UNLOAD_HEAT=/tmp/printer_unload_heat
 
 force_reco() {
@@ -63,6 +65,23 @@ unload_filament() {
 			exit 2
 	esac
 	
+	case "$2" in
+		pva)
+			gcode_unload="$gcode_unload P";
+			prime_speed=150
+			unload_offset=16
+			;;
+			
+		default)
+			prime_speed=50
+			unload_offset=48
+			;;
+		*)
+			echo "unknown material";
+			exit 4
+			;;
+	esac
+	
 	# time management
 	timeout_check=`date +%s`;
 	timeout_check=`expr $timeout_check + $TIMEOUT_HEAT_UNLOAD`;
@@ -72,11 +91,11 @@ unload_filament() {
 #	chown www-data $STATUS_FILE_UNLOAD_HEAT
 #	chgrp www-data $STATUS_FILE_UNLOAD_HEAT
 	
-	arcontrol_cli "M104 S$2 $gcode_extruder"
+	arcontrol_cli "M104 S$3 $gcode_extruder"
 	arcontrol_cli M1905;
 	temper_current=`arcontrol_cli -q $gcode_temper`;
 	temper_current=`awk 'BEGIN {printf "%d\n", '$temper_current' }'`;
-	while [ $temper_current -lt $2 ]
+	while [ $temper_current -lt $3 ]
 	do
 		if [ ! -e $STATUS_FILE_UNLOAD_HEAT ]
 		then
@@ -101,9 +120,9 @@ unload_filament() {
 	done
 	rm $STATUS_FILE_UNLOAD_HEAT
 	
-	arcontrol_cli G90 M83 $gcode_extruder $gcode_charge "G1 E40 F150";
-	sleep 10; # wait charging and extruding
-	arcontrol_cli $gcode_unload;
+	arcontrol_cli G90 M83 $gcode_extruder $gcode_charge "G1 E40 F$prime_speed";
+	sleep $unload_offset; # wait charging and extruding
+	arcontrol_cli "$gcode_unload";
 	arcontrol_cli "M104 S0 $gcode_extruder";
 }
 
@@ -136,7 +155,11 @@ case "$1" in
 		;;
 		
 	unload)
-		unload_filament $2 $3
+		unload_filament $2 default $3
+		;;
+		
+	unload_pva)
+		unload_filament $2 pva $3
 		;;
 		
 	reboot)

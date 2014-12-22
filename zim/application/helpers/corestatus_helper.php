@@ -29,6 +29,7 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_TITLE_P_TEMPER_L',	'PrintTemperatureL');
 	define('CORESTATUS_TITLE_P_TEMPER_R',	'PrintTemperatureR');
 	define('CORESTATUS_TITLE_P_EXCH_BUS',	'PrintExchangeBus');
+	define('CORESTATUS_TITLE_FILA_MAT',		'FilamentMaterial');
 	
 	define('CORESTATUS_VALUE_IDLE',				'idle');
 	define('CORESTATUS_VALUE_PRINT',			'printing');
@@ -716,24 +717,34 @@ function CoreStatus_setInPause($value = TRUE) {
 	return TRUE;
 }
 
-function CoreStatus_setInLoading($abb_filament) {
+function CoreStatus_setInLoading($abb_filament, $material = NULL) {
+	$array_set = array(CORESTATUS_TITLE_STARTTIME => time());
+	
 	if (!in_array($abb_filament, array('l', 'r'))) {
 		return FALSE;
 	}
 	$value_status = ($abb_filament == 'r')
 			? CORESTATUS_VALUE_LOAD_FILA_R : CORESTATUS_VALUE_LOAD_FILA_L;
+	if (!is_null($material)) {
+		$array_set[CORESTATUS_TITLE_FILA_MAT] = $material;
+	}
 	
-	return CoreStatus__setInStatus($value_status, array(CORESTATUS_TITLE_STARTTIME => time()));
+	return CoreStatus__setInStatus($value_status, $array_set);
 }
 
-function CoreStatus_setInUnloading($abb_filament) {
+function CoreStatus_setInUnloading($abb_filament, $material = NULL) {
+	$array_set = array(CORESTATUS_TITLE_STARTTIME => time());
+	
 	if (!in_array($abb_filament, array('l', 'r'))) {
 		return FALSE;
 	}
 	$value_status = ($abb_filament == 'r')
 			? CORESTATUS_VALUE_UNLOAD_FILA_R : CORESTATUS_VALUE_UNLOAD_FILA_L;
+	if (!is_null($material)) {
+		$array_set[CORESTATUS_TITLE_FILA_MAT] = $material;
+	}
 	
-	return CoreStatus__setInStatus($value_status, array(CORESTATUS_TITLE_STARTTIME => time()));
+	return CoreStatus__setInStatus($value_status, $array_set);
 }
 
 function CoreStatus_setInSlicing() {

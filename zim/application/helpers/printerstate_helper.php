@@ -25,9 +25,11 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_GET_CARTRIDGEL',	' M1603');
 	define('PRINTERSTATE_LOAD_FILAMENT_R',	' M1604');
 	define('PRINTERSTATE_LOAD_FILAMENT_L',	' M1605');
-	define('PRINTERSTATE_UNIN_FILAMENT_R',	' M1606');
-	define('PRINTERSTATE_UNIN_FILAMENT_L',	' M1607');
+// 	define('PRINTERSTATE_UNIN_FILAMENT_R',	' M1606');
+// 	define('PRINTERSTATE_UNIN_FILAMENT_L',	' M1607');
+	define('PRINTERSTATE_LOAD_PVA_CODE',	'\ P');
 	define('PRINTERSTATE_UNLOAD_FILAMENT',	' unload ');
+	define('PRINTERSTATE_UNLOAD_FILA_PVA',	' unload_pva ');
 	define('PRINTERSTATE_GET_FILAMENT_R',	' M1608');
 	define('PRINTERSTATE_GET_FILAMENT_L',	' M1609');
 	define('PRINTERSTATE_PRINT_FILE',		' -f '); // add space in the last
@@ -152,7 +154,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	
 	define('PRINTERSTATE_JSON_PRINTER', 		'Printer.json');
 	define('PRINTERSTATE_TITLE_JSON_NB_EXTRUD', 'ExtrudersNumber');
-	define('PRINTERSTATE_JSON_REFILL_TEMPER',	'RefillTemperature.json');
+// 	define('PRINTERSTATE_JSON_REFILL_TEMPER',	'RefillTemperature.json');
 	define('PRINTERSTATE_FILE_UPDATE_RFID',		'CartridgeUpdate.json');
 	
 	define('PRINTERSTATE_MAGIC_NUMBER_V1',			23567); //v1.0
@@ -180,22 +182,22 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_CARTRIDGE_ERR_FILA',		4);
 	
 	define('PRINTERSTATE_VALUE_DEFAULT_EXTRUD',				5);
-	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD',		90);
-	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD',		10);
-	define('PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_LOAD',		180);
-	define('PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_UNLOAD',	180);
-	define('PRINTERSTATE_VALUE_TIMEOUT_UNLOAD_HEAT',		600);
 	define('PRINTERSTATE_VALUE_ENDSTOP_OPEN',				'open');
 	define('PRINTERSTATE_VALUE_MAXTEMPER_BEFORE_UNLOAD',	50);
 	define('PRINTERSTATE_VALUE_FACTOR_NOZZLE_OFFSET',		10);
 	define('PRINTERSTATE_VALUE_FILAMENT_PLA_LOAD_TEMPER',	220);
 	define('PRINTERSTATE_VALUE_FILAMENT_ABS_LOAD_TEMPER',	250);
 	define('PRINTERSTATE_VALUE_FILAMENT_PVA_LOAD_TEMPER',	200);
-	
+
+	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD',			92);
+	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD',			71);
+	define('PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_LOAD',			107);
+	define('PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_UNLOAD',		127);
 	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD_PVA',		202);
-	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD_PVA',		15);
-	define('PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_LOAD_PVA',		240);
-	define('PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_UNLOAD_PVA',	360);
+	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD_PVA',		148);
+	define('PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_LOAD_PVA',		217);
+	define('PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_UNLOAD_PVA',	247);
+	define('PRINTERSTATE_VALUE_TIMEOUT_UNLOAD_HEAT',			600);
 	
 	define('PRINTERSTATE_PRM_EXTRUDER',			'extruder');
 	define('PRINTERSTATE_PRM_TEMPER',			'temp');
@@ -228,48 +230,37 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 
 function PrinterState_getExtruder(&$abb_extruder) {
 	global $CFG;
-	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
-	$command = '';
+	$command = $CFG->config['arcontrol_c'] . PRINTERSTATE_GET_EXTRUD;
 	$output = array();
 	$last_output = NULL;
 	$ret_val = 0;
 	
 	$abb_extruder = NULL;
 	
-	// check if we are in printing
-	$ret_val = FALSE; // PrinterState_checkInPrint();
-	if ($ret_val == FALSE) {
-		$command = $arcontrol_fullpath . PRINTERSTATE_GET_EXTRUD;
-// 		$last_output = system($command, $ret_val);
-		exec($command, $output, $ret_val);
-		if (!PrinterState_filterOutput($output, $command)) {
-			PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
-			return ERROR_INTERNAL;
-		}
-		PrinterLog_logArduino($command, $output);
-		if ($ret_val == ERROR_NORMAL_RC_OK) {
-			$last_output = $output[0];
-			switch ($last_output) {
-				case PRINTERSTATE_LEFT_EXTRUD:
-					$abb_extruder = 'l';
-					break;
-					
-				case PRINTERSTATE_RIGHT_EXTRUD:
-					$abb_extruder = 'r';
-					break;
-					
-				default:
-					return ERROR_INTERNAL;
-					break;
-			}
-		} else {
-			PrinterLog_logError('get extruder command error', __FILE__, __LINE__);
-			return ERROR_INTERNAL;
+	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output, $command)) {
+		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	PrinterLog_logArduino($command, $output);
+	if ($ret_val == ERROR_NORMAL_RC_OK) {
+		$last_output = $output[0];
+		switch ($last_output) {
+			case PRINTERSTATE_LEFT_EXTRUD:
+				$abb_extruder = 'l';
+				break;
+				
+			case PRINTERSTATE_RIGHT_EXTRUD:
+				$abb_extruder = 'r';
+				break;
+				
+			default:
+				return ERROR_INTERNAL;
+				break;
 		}
 	} else {
-// 		return ERROR_IN_PRINT;
-		PrinterLog_logError('can not get extruder in printing', __FILE__, __LINE__);
-		return ERROR_BUSY_PRINTER;
+		PrinterLog_logError('get extruder command error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
 	}
 	
 	return ERROR_OK;
@@ -277,18 +268,17 @@ function PrinterState_getExtruder(&$abb_extruder) {
 
 function PrinterState_setExtruder($abb_extruder = 'r') {
 	global $CFG;
-	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
 	$output = array();
-	$command = '';
+	$command = $CFG->config['arcontrol_c'];
 	$ret_val = 0;
 	
 	switch ($abb_extruder) {
 		case 'l':
-			$command = $arcontrol_fullpath . PRINTERSTATE_SET_EXTRUDL;
+			$command .= PRINTERSTATE_SET_EXTRUDL;
 			break;
 			
 		case 'r':
-			$command = $arcontrol_fullpath . PRINTERSTATE_SET_EXTRUDR;
+			$command .= PRINTERSTATE_SET_EXTRUDR;
 			break;
 			
 		default:
@@ -297,23 +287,15 @@ function PrinterState_setExtruder($abb_extruder = 'r') {
 			break;
 	}
 	
-	// check if we are in printing
-	$ret_val = FALSE; //PrinterState_checkInPrint();
-	if ($ret_val == FALSE) {
-		exec($command, $output, $ret_val);
-		if (!PrinterState_filterOutput($output, $command)) {
-			PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
-			return ERROR_INTERNAL;
-		}
-		PrinterLog_logArduino($command, $output);
-		if ($ret_val != ERROR_NORMAL_RC_OK) {
-			PrinterLog_logError('set extruder command error', __FILE__, __LINE__);
-			return ERROR_INTERNAL;
-		}
-	} else {
-// 		return ERROR_IN_PRINT;
-		PrinterLog_logError('can not set extruder in printing', __FILE__, __LINE__);
-		return ERROR_BUSY_PRINTER;
+	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output, $command)) {
+		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	PrinterLog_logArduino($command, $output);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		PrinterLog_logError('set extruder command error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
 	}
 	
 	return ERROR_OK;
@@ -383,14 +365,13 @@ function PrinterState_getTemperature(&$val_temperature, $type = 'e', $abb_extrud
 }
 
 function PrinterState_setTemperature($val_temperature, $type = 'e', $abb_extruder = NULL) {
-	global $CFG;
-	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$CI = &get_instance();
 	$output = array();
-	$command = '';
+	$command = $CI->config->item('arcontrol_c');
 	$ret_val = 0;
 	
 	if ($type == 'e' && $val_temperature >= PRINTERSTATE_TEMPER_MIN_E && $val_temperature <= PRINTERSTATE_TEMPER_MAX_E) {
-		$command = $arcontrol_fullpath . PRINTERSTATE_SET_TEMPEREXT . 'S' . $val_temperature;
+		$command .= PRINTERSTATE_SET_TEMPEREXT . 'S' . $val_temperature;
 		switch ($abb_extruder) {
 			case 'l':
 				$command .= '\\' . PRINTERSTATE_SET_EXTRUDL;
@@ -410,34 +391,25 @@ function PrinterState_setTemperature($val_temperature, $type = 'e', $abb_extrude
 		return ERROR_WRONG_PRM;
 	}
 	
-	// check if we are in printing
-	$ret_val = FALSE; //PrinterState_checkInPrint();
-	if ($ret_val == FALSE) {
-		$CI = &get_instance();
-		$CI->load->helper('detectos');
+	$CI->load->helper('detectos');
+	
+	if ($CI->config->item('simulator') && DectectOS_checkWindows()) {
+		// remove the symbol "\" for simulator
+		$command = str_replace('\ ', ' ', $command);
 		
-		if ($CFG->config['simulator'] && DectectOS_checkWindows()) {
-			// remove the symbol "\" for simulator
-			$command = str_replace('\ ', ' ', $command);
-			
-			pclose(popen($command, 'r')); // only for windows arcontrol client
-			PrinterLog_logArduino($command);
+		pclose(popen($command, 'r')); // only for windows arcontrol client
+		PrinterLog_logArduino($command);
+	}
+	else {
+		exec($command, $output, $ret_val);
+		if (!PrinterState_filterOutput($output, $command)) {
+			PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
+			return ERROR_INTERNAL;
 		}
-		else {
-			exec($command, $output, $ret_val);
-			if (!PrinterState_filterOutput($output, $command)) {
-				PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
-				return ERROR_INTERNAL;
-			}
-			PrinterLog_logArduino($command, $output);
-			if ($ret_val != ERROR_NORMAL_RC_OK) {
-				return ERROR_INTERNAL;
-			}
+		PrinterLog_logArduino($command, $output);
+		if ($ret_val != ERROR_NORMAL_RC_OK) {
+			return ERROR_INTERNAL;
 		}
-	} else {
-// 		return ERROR_IN_PRINT;
-		PrinterLog_logError('can not set temperature in printing', __FILE__, __LINE__);
-		return ERROR_BUSY_PRINTER;
 	}
 	
 	return ERROR_OK;
@@ -514,48 +486,29 @@ function PrinterState_getExtruderTemperaturesAsArray() {
 
 function PrinterState_checkInPrint() {
 	global $CFG;
-	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
-	$command = '';
-	$output = array();
-	$ret_val = 0;
-
-	$command = $arcontrol_fullpath . PRINTERSTATE_CHECK_STATE;
-//	exec($command, $output, $ret_val);
-//	if (!PrinterState_filterOutput($output, $command)) {
-//		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
-//		return ERROR_INTERNAL;
-//	}
-	PrinterLog_logArduino($command, $output);
-//	if ($ret_val == ERROR_NORMAL_RC_OK && $output && (int)$output[0] == 0) {
-//		return FALSE;
-//	} else {
-//		return TRUE;
-//	}
+	
 	if(file_exists($CFG->config['printstatus'])) {
 		return TRUE;
 	} else {
 		return FALSE;
 	}
-
+	
 	return FALSE;
 }
 
 function PrinterState_setCartridgeCode($code_cartridge, $abb_cartridge, $power_off = TRUE) {
-	global $CFG;
-	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
-	$command = '';
+	$CI = &get_instance();
+	$command = $CI->config->item('arcontrol_c');
 	$output = array();
 	$ret_val = 0;
-	$CI = &get_instance();
-	$CI->load->helper('detectos');
 	
 	switch ($abb_cartridge) {
 		case 'l':
-			$command = $arcontrol_fullpath . PRINTERSTATE_SET_CARTRIDGEL;
+			$command .= PRINTERSTATE_SET_CARTRIDGEL;
 			break;
 			
 		case 'r':
-			$command = $arcontrol_fullpath . PRINTERSTATE_SET_CARTRIDGER;
+			$command .= PRINTERSTATE_SET_CARTRIDGER;
 			break;
 			
 		default:
@@ -565,14 +518,55 @@ function PrinterState_setCartridgeCode($code_cartridge, $abb_cartridge, $power_o
 	}
 	$command .= $code_cartridge;
 	
-	if ($CFG->config['simulator']) {
+	if ($CI->config->item('simulator')) {
 		// remove the symbol "\" for simulator
 		$command = str_replace('\ ', ' ', $command);
 	}
 	
-	// check if we are in printing
-	$ret_val = FALSE; //PrinterState_checkInPrint();
-	if ($ret_val == FALSE) {
+	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output, $command)) {
+		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	PrinterLog_logArduino($command, $output);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		return ERROR_INTERNAL;
+	}
+	
+	return ERROR_OK;
+}
+
+function PrinterState_getCartridgeCode(&$code_cartridge, $abb_cartridge, $power_off = TRUE) {
+	global $CFG;
+	global $PRINTER;
+	$command = $CFG->config['arcontrol_c'];
+	$output = array();
+	$ret_val = 0;
+	
+	switch ($abb_cartridge) {
+		case 'l':
+			$command .= PRINTERSTATE_GET_CARTRIDGEL;
+			break;
+			
+		case 'r':
+			$command .= PRINTERSTATE_GET_CARTRIDGER;
+			break;
+			
+		default:
+			PrinterLog_logError('input parameter error, $abb_cartridge: "' . $abb_cartridge . '"', __FILE__, __LINE__);
+			return ERROR_WRONG_PRM;
+			break;
+	}
+	
+	// check already read or not
+	if (!is_array($PRINTER)) {
+		$PRINTER = array();
+	}
+	if (array_key_exists($abb_cartridge, $PRINTER)
+			&& array_key_exists(PRINTERSTATE_PRM_CARTRIDGE, $PRINTER[$abb_cartridge])) {
+		$code_cartridge = $PRINTER[$abb_cartridge][PRINTERSTATE_PRM_CARTRIDGE];
+	}
+	else {
 		exec($command, $output, $ret_val);
 		if (!PrinterState_filterOutput($output, $command)) {
 			PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
@@ -582,74 +576,16 @@ function PrinterState_setCartridgeCode($code_cartridge, $abb_cartridge, $power_o
 		if ($ret_val != ERROR_NORMAL_RC_OK) {
 			return ERROR_INTERNAL;
 		}
-	} else {
-// 		return ERROR_IN_PRINT;
-		PrinterLog_logError('can not get info in printing', __FILE__, __LINE__);
-		return ERROR_BUSY_PRINTER;
-	}
-	
-	return ERROR_OK;
-}
-
-function PrinterState_getCartridgeCode(&$code_cartridge, $abb_cartridge, $power_off = TRUE) {
-	global $CFG;
-	global $PRINTER;
-	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
-	$command = '';
-	$output = array();
-	$ret_val = 0;
-	
-	switch ($abb_cartridge) {
-		case 'l':
-			$command = $arcontrol_fullpath . PRINTERSTATE_GET_CARTRIDGEL;
-			break;
-			
-		case 'r':
-			$command = $arcontrol_fullpath . PRINTERSTATE_GET_CARTRIDGER;
-			break;
-			
-		default:
-			PrinterLog_logError('input parameter error, $abb_cartridge: "' . $abb_cartridge . '"', __FILE__, __LINE__);
-			return ERROR_WRONG_PRM;
-			break;
-	}
-	
-	// check if we are in printing
-	$ret_val = FALSE; //PrinterState_checkInPrint();
-	if ($ret_val == FALSE) {
-		// check already read or not
-		if (!is_array($PRINTER)) {
-			$PRINTER = array();
-		}
-		if (array_key_exists($abb_cartridge, $PRINTER)
-				&& array_key_exists(PRINTERSTATE_PRM_CARTRIDGE, $PRINTER[$abb_cartridge])) {
-			$code_cartridge = $PRINTER[$abb_cartridge][PRINTERSTATE_PRM_CARTRIDGE];
-		}
 		else {
-			exec($command, $output, $ret_val);
-			if (!PrinterState_filterOutput($output, $command)) {
-				PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
-				return ERROR_INTERNAL;
+			$code_cartridge = $output ? $output[0] : NULL;
+			
+			// rewrite cartridge when necessary
+			if (strlen($code_cartridge) == 32) {
+				PrinterState__updateCartridge($code_cartridge, $abb_cartridge);
 			}
-			PrinterLog_logArduino($command, $output);
-			if ($ret_val != ERROR_NORMAL_RC_OK) {
-				return ERROR_INTERNAL;
-			}
-			else {
-				$code_cartridge = $output ? $output[0] : NULL;
-				
-				// rewrite cartridge when necessary
-				if (strlen($code_cartridge) == 32) {
-					PrinterState__updateCartridge($code_cartridge, $abb_cartridge);
-				}
-				
-				$PRINTER[$abb_cartridge][PRINTERSTATE_PRM_CARTRIDGE] = $code_cartridge;
-			}
+			
+			$PRINTER[$abb_cartridge][PRINTERSTATE_PRM_CARTRIDGE] = $code_cartridge;
 		}
-	} else {
-// 		return ERROR_IN_PRINT;
-		PrinterLog_logError('can not get info in printing', __FILE__, __LINE__);
-		return ERROR_BUSY_PRINTER;
 	}
 	
 	if ($power_off == TRUE) {
@@ -856,7 +792,7 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge, $pow
 		}
 		
 		// packing date
-		//TODO argument max acceptable date (Unix timestamp, 2038-01-19)
+		//FIXME argument max acceptable date (Unix timestamp, 2038-01-19)
 		$string_tmp = substr($last_output, $offset_pack, $length_pack);
 		$hex_tmp = hexdec($string_tmp);
 		$time_start = gmmktime(0, 0, 0, 1, 1, PRINTERSTATE_OFFSET_YEAR_SETUP_DATE);
@@ -864,31 +800,30 @@ function PrinterState_getCartridgeAsArray(&$json_cartridge, $abb_cartridge, $pow
 		// $data_json[PRINTERSTATE_TITLE_SETUP_DATE] = date("Y-m-d\TH:i:sO", $time_pack);
 		$data_json[PRINTERSTATE_TITLE_SETUP_DATE] = date("Y-m-d\TH:i:s\Z", $time_pack);
 		
-		// change temperature values to user settings if cartridge is refillable
-		//TODO test me
-		if ($data_json[PRINTERSTATE_TITLE_TYPE] == PRINTERSTATE_DESP_CARTRIDGE_REFILL) {
-			$CI = &get_instance();
-			$tmp_array = array();
-			$temper_filepath = $CI->config->item('conf') . PRINTERSTATE_JSON_REFILL_TEMPER;
+// 		// change temperature values to user settings if cartridge is refillable
+// 		if ($data_json[PRINTERSTATE_TITLE_TYPE] == PRINTERSTATE_DESP_CARTRIDGE_REFILL) {
+// 			$CI = &get_instance();
+// 			$tmp_array = array();
+// 			$temper_filepath = $CI->config->item('conf') . PRINTERSTATE_JSON_REFILL_TEMPER;
 			
-			$CI->load->helper('json');
-			try {
-				$tmp_array = json_read($temper_filepath, TRUE);
-				if ($tmp_array['error']) {
-					throw new Exception('read json error');
-				}
-			} catch (Exception $e) {
-				$CI->load->helper('printerlog');
-				PrinterLog_logMessage('read refillable cartridge user temperature json error', __FILE__, __LINE__);
+// 			$CI->load->helper('json');
+// 			try {
+// 				$tmp_array = json_read($temper_filepath, TRUE);
+// 				if ($tmp_array['error']) {
+// 					throw new Exception('read json error');
+// 				}
+// 			} catch (Exception $e) {
+// 				$CI->load->helper('printerlog');
+// 				PrinterLog_logMessage('read refillable cartridge user temperature json error', __FILE__, __LINE__);
 				
-				// log error message and use the default temperature in RFID
-				$json_cartridge = $data_json;
-				return ERROR_OK;
-			}
+// 				// log error message and use the default temperature in RFID
+// 				$json_cartridge = $data_json;
+// 				return ERROR_OK;
+// 			}
 			
-			$data_json[PRINTERSTATE_TITLE_EXT_TEMPER] = $tmp_array['json'][$abb_cartridge][PRINTERSTATE_TITLE_EXT_TEMPER];
-			$data_json[PRINTERSTATE_TITLE_EXT_TEMP_1] = $tmp_array['json'][$abb_cartridge][PRINTERSTATE_TITLE_EXT_TEMP_1];
-		}
+// 			$data_json[PRINTERSTATE_TITLE_EXT_TEMPER] = $tmp_array['json'][$abb_cartridge][PRINTERSTATE_TITLE_EXT_TEMPER];
+// 			$data_json[PRINTERSTATE_TITLE_EXT_TEMP_1] = $tmp_array['json'][$abb_cartridge][PRINTERSTATE_TITLE_EXT_TEMP_1];
+// 		}
 		
 		$json_cartridge = $data_json;
 	} else {
@@ -1195,7 +1130,6 @@ function PrinterState__setSlicedJson($array_slicer, &$array_ret = array()) {
 		}
 		
 		//TODO use the exact fail code in parameter error_type of PrinterState_getCartridgeAsArray to decide whether we break and return error or not
-		
 		$array_ret[$abb_filament] = $tmp_ret;
 		if ($tmp_ret != ERROR_OK) {
 			$CI->load->helper('printerlog');
@@ -1259,8 +1193,12 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) 
 	$ret_val = 0;
 	$time_wait = NULL;
 	$time_max = NULL;
+	$temp_status = NULL;
+	$temp_array = array();
+	$CI = &get_instance();
 	
-	//FIXME add timeout for checking loading / unloading
+	$CI->load->helper('corestatus');
+	
 	switch ($status_current) {
 		case CORESTATUS_VALUE_WAIT_CONNECT:
 			$ret_val = CoreStatus_checkInConnection();
@@ -1271,8 +1209,6 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) 
 			break;
 			
 		case CORESTATUS_VALUE_CANCEL:
-			$CI = &get_instance();
-			
 			// jump out if it's a simulator
 			if ($CI->config->item('simulator')) {
 				CoreStatus_setInIdle();
@@ -1287,7 +1223,6 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) 
 			
 		case CORESTATUS_VALUE_SLICE:
 			// get percentage and check finished or not
-			$CI = &get_instance();
 			$progress = 0;
 			$array_slicer = array();
 			
@@ -1351,17 +1286,27 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) 
 			
 		case CORESTATUS_VALUE_LOAD_FILA_L:
 		case CORESTATUS_VALUE_LOAD_FILA_R:
-			$time_wait = PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD;
-			$time_max = PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_LOAD;
+			CoreStatus_checkInIdle($temp_status, $temp_array);
+			if (array_key_exists(CORESTATUS_TITLE_FILA_MAT, $temp_array)
+					&& $temp_array[CORESTATUS_TITLE_FILA_MAT] == PRINTERSTATE_DESP_MATERIAL_PVA) {
+				$time_wait = PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD_PVA;
+				$time_max = PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_LOAD_PVA;
+			}
+			else {
+				$time_wait = PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD;
+				$time_max = PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_LOAD;
+			}
 			
 		case CORESTATUS_VALUE_UNLOAD_FILA_L:
 		case CORESTATUS_VALUE_UNLOAD_FILA_R:
-			$abb_filament =
-					(($status_current == CORESTATUS_VALUE_LOAD_FILA_L)
-							|| ($status_current == CORESTATUS_VALUE_UNLOAD_FILA_L))
-					? 'l' : 'r';
-// 			$time_wait = $time_wait ? $time_wait : PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD;
-// 			$time_max = $time_max ? $time_max : PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_UNLOAD;
+			$abb_filament = 'r';
+			$status_fin_filament = FALSE;
+			
+			if (in_array($status_current, array(CORESTATUS_VALUE_LOAD_FILA_L, CORESTATUS_VALUE_UNLOAD_FILA_L))) {
+				$abb_filament = 'l';
+				$status_fin_filament = TRUE;
+			}
+			
 			if (is_null($time_wait) || is_null($time_max)) {
 				if (file_exists(PRINTERSTATE_FILE_UNLOAD_HEAT)) {
 					$time_start = @file_get_contents(PRINTERSTATE_FILE_UNLOAD_HEAT);
@@ -1381,47 +1326,37 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) 
 						$ret_val = CoreStatus_setInIdle();
 						if ($ret_val == TRUE) {
 							$status_current = CORESTATUS_VALUE_IDLE;
+							
 							return TRUE;
 						}
-						$CI = &get_instance();
 						$CI->load->helper('printerlog');
 						PrinterLog_logError('can not set status into idle', __FILE__, __LINE__);
 						break;
 					}
 				}
 				
-				$time_wait = PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD;
-				$time_max = PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_UNLOAD;
+				CoreStatus_checkInIdle($temp_status, $temp_array);
+				if (array_key_exists(CORESTATUS_TITLE_FILA_MAT, $temp_array)
+						&& $temp_array[CORESTATUS_TITLE_FILA_MAT] == PRINTERSTATE_DESP_MATERIAL_PVA) {
+					$time_wait = PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD_PVA;
+					$time_max = PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_UNLOAD_PVA;
+				}
+				else {
+					$time_wait = PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD;
+					$time_max = PRINTERSTATE_VALUE_TIMEOUT_TO_CHECK_UNLOAD;
+				}
 			}
 			
 			// wait the time for arduino before checking filament when loading / unloading filament
 			if (CoreStatus_checkInWaitTime($time_wait)) {
-// 				if ($time_wait == PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD) {
-// 					// check if we have finished action within max wait time only for unloading
-// 					$cr = PrinterState_checkAsynchronousResponse();
-// 					if ($cr == ERROR_INTERNAL) {
-// 						PrinterLog_logError('check asynchronous response error', __FILE__, __LINE__);
-// 						break;
-// 					}
-// 					else if ($cr != ERROR_OK) { // do not break if we have finished (ERROR_OK)
-// 						break;
-// 					}
-// 				}
-// 				else { // the loading filament case, we always wait the fixed time
-					break;
-// 				}
+				break;
 			}
 			
 			// generate parameters by different status
-			$status_fin_filament =
-					($status_current == CORESTATUS_VALUE_LOAD_FILA_L || $status_current == CORESTATUS_VALUE_LOAD_FILA_R)
-					? TRUE : FALSE;
-			
 			$ret_val = PrinterState_getFilamentStatus($abb_filament);
 			if ($ret_val == $status_fin_filament
 					|| !CoreStatus_checkInWaitTime($time_max)) {
 				if ($ret_val != $status_fin_filament) {
-					$CI = &get_instance();
 					$CI->load->helper('printerlog');
 					PrinterLog_logError('we pass timeout when we are in changing catridge, status: ' . $status_current, __FILE__, __LINE__);
 				}
@@ -1430,7 +1365,6 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) 
 					$status_current = CORESTATUS_VALUE_IDLE;
 					return TRUE; // continue to generate if we are now in idle
 				}
-				$CI = &get_instance();
 				$CI->load->helper('printerlog');
 				PrinterLog_logError('can not set status into idle', __FILE__, __LINE__);
 			}
@@ -1438,7 +1372,6 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) 
 			
 		default:
 			// log internal API error
-			$CI = &get_instance();
 			$CI->load->helper('printerlog');
 			PrinterLog_logError('unknown status in work json', __FILE__, __LINE__);
 			break;
@@ -1766,229 +1699,102 @@ function PrinterState_getFilamentStatus($abb_filament) {
 }
 
 function PrinterState_loadFilament($abb_filament) {
-	global $CFG;
-	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$CI = &get_instance();
 	$output = array();
-	$command = '';
+	$array_cartridge = array();
+	$command = $CI->config->item('arcontrol_c');
 	$ret_val = 0;
+	$temper_load = PRINTERSTATE_TEMPER_CHANGE_MIN;
+	$is_pva = FALSE;
+	
+	$ret_val = PrinterState_getCartridgeAsArray($array_cartridge, $abb_filament);
+	if ($ret_val != ERROR_OK) {
+		PrinterLog_logError('read cartridge error when loading', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
 	
 	switch ($abb_filament) {
 		case 'l':
-			$command = $arcontrol_fullpath . PRINTERSTATE_LOAD_FILAMENT_L;
+			$command .= PRINTERSTATE_LOAD_FILAMENT_L;
 			break;
-				
+			
 		case 'r':
-			$command = $arcontrol_fullpath . PRINTERSTATE_LOAD_FILAMENT_R;
+			$command .= PRINTERSTATE_LOAD_FILAMENT_R;
 			break;
-				
+			
 		default:
 			PrinterLog_logError('input filament type error', __FILE__, __LINE__);
 			return ERROR_WRONG_PRM;
 			break; // never reach here
 	}
 	
-	// check if we are in printing
-	$ret_val = FALSE; //PrinterState_checkInPrint();
+	// check already loaded
+	if (PrinterState_getFilamentStatus($abb_filament) == TRUE) {
+		return ERROR_LOADED_UNLOAD;
+	}
+	
+	// fix temperature according to filament type
+	switch ($array_cartridge[PRINTERSTATE_TITLE_MATERIAL]) {
+		case PRINTERSTATE_DESP_MATERIAL_PLA:
+			$temper_load = PRINTERSTATE_VALUE_FILAMENT_PLA_LOAD_TEMPER;
+			break;
+			
+		case PRINTERSTATE_DESP_MATERIAL_ABS:
+			$temper_load = PRINTERSTATE_VALUE_FILAMENT_ABS_LOAD_TEMPER;
+			break;
+			
+		case PRINTERSTATE_DESP_MATERIAL_PVA:
+			$temper_load = PRINTERSTATE_VALUE_FILAMENT_PVA_LOAD_TEMPER;
+			$command .= PRINTERSTATE_LOAD_PVA_CODE;
+			$is_pva = TRUE;
+			break;
+			
+		default:
+			PrinterLog_logError('unknown filament type in loading', __FILE__, __LINE__);
+			return ERROR_INTERNAL;
+			break; // never reach here
+	}
+	
+	// change status json file
+	$ret_val = CoreStatus_setInLoading($abb_filament, $array_cartridge[PRINTERSTATE_TITLE_MATERIAL]);
 	if ($ret_val == FALSE) {
-// 		exec($command, $output, $ret_val);
-// 		PrinterLog_logArduino($command, $output);
-// 		if ($ret_val != ERROR_NORMAL_RC_OK) {
-// 			return ERROR_INTERNAL;
-// 		}
-		
-		// check already loaded
-		if (PrinterState_getFilamentStatus($abb_filament) == TRUE) {
-			return ERROR_LOADED_UNLOAD;
+		return ERROR_INTERNAL;
+	}
+	
+	$CI->load->helper('detectos');
+	
+	if ($CI->config->item('simulator') && DectectOS_checkWindows()) {
+		$command = str_replace('\ ', ' ', $command);
+		pclose(popen($command, 'r')); // only for windows arcontrol client
+		PrinterLog_logArduino($command); // we can't check return output when using simulator
+	}
+	else {
+		exec($command, $output, $ret_val);
+		if (!PrinterState_filterOutput($output, $command)) {
+			PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
+			return ERROR_INTERNAL;
 		}
-		
-		// change status json file
-		$ret_val = CoreStatus_setInLoading($abb_filament);
-		if ($ret_val == FALSE) {
+		PrinterLog_logArduino($command, $output);
+		if ($ret_val != ERROR_NORMAL_RC_OK) {
 			return ERROR_INTERNAL;
 		}
 		
-		$CI = &get_instance();
-		$CI->load->helper('detectos');
-		
-		if ($CFG->config['simulator'] && DectectOS_checkWindows()) {
-			pclose(popen($command, 'r')); // only for windows arcontrol client
-			PrinterLog_logArduino($command); // we can't check return output when using simulator
-		}
-		else {
-			$array_cartridge = array();
-			
-			exec($command, $output, $ret_val);
-			if (!PrinterState_filterOutput($output, $command)) {
-				PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
-				return ERROR_INTERNAL;
-			}
-			PrinterLog_logArduino($command, $output);
-			if ($ret_val != ERROR_NORMAL_RC_OK) {
-				return ERROR_INTERNAL;
-			}
-			
-			// pre-heat nozzle
-			$ret_val = PrinterState_getCartridgeAsArray($array_cartridge, $abb_filament);
-			if ($ret_val == ERROR_OK) {
-				// we let unknown type pass because we have already launched loading, and we heat nozzle to minimum extrusion temperature
-				$temper_load = PRINTERSTATE_TEMPER_CHANGE_MIN;
-				
-				switch ($array_cartridge[PRINTERSTATE_TITLE_MATERIAL]) {
-					case PRINTERSTATE_DESP_MATERIAL_PLA:
-						$temper_load = PRINTERSTATE_VALUE_FILAMENT_PLA_LOAD_TEMPER;
-						break;
-						
-					case PRINTERSTATE_DESP_MATERIAL_ABS:
-						$temper_load = PRINTERSTATE_VALUE_FILAMENT_ABS_LOAD_TEMPER;
-						break;
-						
-					case PRINTERSTATE_DESP_MATERIAL_PVA:
-						$temper_load = PRINTERSTATE_VALUE_FILAMENT_PVA_LOAD_TEMPER;
-						break;
-						
-					default:
-						PrinterLog_logError('unknown filament type in loading', __FILE__, __LINE__);
-// 						return ERROR_INTERNAL;
-						break;
-				}
-				
-// 				PrinterState_setTemperature($array_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1], 'e', $abb_filament);
-				PrinterState_setTemperature($temper_load, 'e', $abb_filament);
-			}
-			else {
-				PrinterLog_logError('set temperature after loading error (reading cartridge)', __FILE__, __LINE__);
-			}
-		}
-	} else {
-// 		return ERROR_IN_PRINT;
-		PrinterLog_logError('can not load filament in printing', __FILE__, __LINE__);
-		return ERROR_BUSY_PRINTER;
+		// pre-heat nozzle
+		PrinterState_setTemperature($temper_load, 'e', $abb_filament);
 	}
 	
 	return ERROR_OK;
 }
 
-// function PrinterState_unloadFilament($abb_filament) {
-// 	global $CFG;
-// 	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
-// 	$output = array();
-// 	$command = '';
-// 	$ret_val = 0;
-	
-// 	// start temporary solution
-// 	//TO_DO find another solution for unloading
-// 	if ($CFG->config['simulator'] == TRUE) {
-// 		switch ($abb_filament) {
-// 			case 'l':
-// 				$command = $arcontrol_fullpath . PRINTERSTATE_UNIN_FILAMENT_L;
-// 				break;
-					
-// 			case 'r':
-// 				$command = $arcontrol_fullpath . PRINTERSTATE_UNIN_FILAMENT_R;
-// 				break;
-					
-// 			default:
-// 				PrinterLog_logError('input filament type error', __FILE__, __LINE__);
-// 				return ERROR_WRONG_PRM;
-// 				break; // never reach here
-// 		}
-// 	}
-// 	else {
-// 		switch ($abb_filament) {
-// 			case 'l':
-// 				$command = $arcontrol_fullpath . PRINTERSTATE_SET_EXTRUDL;
-// 				break;
-					
-// 			case 'r':
-// 				$command = $arcontrol_fullpath . PRINTERSTATE_SET_EXTRUDR;
-// 				break;
-					
-// 			default:
-// 				PrinterLog_logError('input filament type error', __FILE__, __LINE__);
-// 				return ERROR_WRONG_PRM;
-// 				break; // never reach here
-// 		}
-// 		// M302 allow cold extrusion
-// 		// G91 relative movement
-// 		// G1 E-3000 F2000 unload filament until endstop
-// 		$command .= '; ' . $arcontrol_fullpath . PRINTERSTATE_COLDEXTRUDE_E . '; '
-// 				. $arcontrol_fullpath . PRINTERSTATE_POSITION_RELAT . '; '
-// 				. $arcontrol_fullpath . ' "G1 E-3000 F2000"';
-// 	}
-	
-// 	// check if we are in printing
-// 	$ret_val = FALSE; //PrinterState_checkInPrint();
-// 	if ($ret_val == FALSE) {
-// // 		exec($command, $output, $ret_val);
-// // 		PrinterLog_logArduino($command, $output);
-// // 		if ($ret_val != ERROR_NORMAL_RC_OK) {
-// // 			return ERROR_INTERNAL;
-// // 		}
-		
-// 		// check already unloaded
-// 		if (PrinterState_getFilamentStatus($abb_filament) == FALSE) {
-// 			return ERROR_LOADED_UNLOAD;
-// 		}
-		
-// 		// change status json file
-// 		$ret_val = CoreStatus_setInUnloading($abb_filament);
-// 		if ($ret_val == FALSE) {
-// 			return ERROR_INTERNAL;
-// 		}
-		
-// 		$CI = &get_instance();
-// 		$CI->load->helper('detectos');
-		
-// 		if ($CFG->config['simulator'] || DectectOS_checkWindows()) {
-// 			pclose(popen($command, 'r')); // only for windows arcontrol client
-// 			PrinterLog_logArduino($command); //FIX_ME we can't check return output when using simulator
-// 		}
-// 		else {
-// 			exec($command, $output, $ret_val);
-// 			if (!PrinterState_filterOutput($output, $command)) {
-// 				PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
-// 				return ERROR_INTERNAL;
-// 			}
-// 			PrinterLog_logArduino($command, $output);
-// 			if ($ret_val != ERROR_NORMAL_RC_OK) {
-// 				PrinterLog_logError('unload filament error', __FILE__, __LINE__);
-// 				return ERROR_INTERNAL;
-// 			}
-// 		}
-// 	} else {
-// // 		return ERROR_IN_PRINT;
-// 		PrinterLog_logError('can not unload filament in printing', __FILE__, __LINE__);
-// 		return ERROR_BUSY_PRINTER;
-// 	}
-	
-// 	return ERROR_OK;
-// }
-
 function PrinterState_unloadFilament($abb_filament) {
 	$CI = &get_instance();
-// 	$arcontrol_fullpath = $CI->config->item('arcontrol_c');
-	$arcontrol_fullpath = $CI->config->item('siteutil');
 	$output = array();
 	$array_cartridge = array();
-	$command = '';
+	$command = $CI->config->item('siteutil');
 	$ret_val = 0;
 	$temper_unload = PRINTERSTATE_TEMPER_MAX_E;
+	$is_pva = FALSE;
 	
-	// start alter temporary solution
-// 	switch ($abb_filament) {
-// 		case 'l':
-// 			$command = $arcontrol_fullpath . PRINTERSTATE_UNIN_FILAMENT_L;
-// 			break;
-				
-// 		case 'r':
-// 			$command = $arcontrol_fullpath . PRINTERSTATE_UNIN_FILAMENT_R;
-// 			break;
-				
-// 		default:
-// 			PrinterLog_logError('input filament type error', __FILE__, __LINE__);
-// 			return ERROR_WRONG_PRM;
-// 			break; // never reach here
-// 	}
 	$ret_val = PrinterState_getCartridgeAsArray($array_cartridge, $abb_filament);
 	if ($ret_val != ERROR_OK) {
 		PrinterLog_logError('read cartridge error when unloading', __FILE__, __LINE__);
@@ -2007,6 +1813,7 @@ function PrinterState_unloadFilament($abb_filament) {
 			
 		case PRINTERSTATE_DESP_MATERIAL_PVA:
 			$temper_unload = PRINTERSTATE_VALUE_FILAMENT_PVA_LOAD_TEMPER;
+			$is_pva = TRUE;
 			break;
 			
 		default:
@@ -2014,8 +1821,14 @@ function PrinterState_unloadFilament($abb_filament) {
 			return ERROR_INTERNAL;
 			break; // never reach here
 	}
-// 	$command = $arcontrol_fullpath . PRINTERSTATE_UNLOAD_FILAMENT . $abb_filament . ' ' . $array_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1];
-	$command = $arcontrol_fullpath . PRINTERSTATE_UNLOAD_FILAMENT . $abb_filament . ' ' . $temper_unload;
+	
+	if ($is_pva) {
+		$command .= PRINTERSTATE_UNLOAD_FILA_PVA;
+	}
+	else {
+		$command .= PRINTERSTATE_UNLOAD_FILAMENT;
+	}
+	$command .= $abb_filament . ' ' . $temper_unload;
 	
 	$CI->load->helper('detectos');
 	if ($CI->config->item('simulator') == FALSE && !DectectOS_checkWindows()) {
@@ -2026,28 +1839,19 @@ function PrinterState_unloadFilament($abb_filament) {
 		$command = 'start /B ' . $command;
 	}
 	
-	// check if we are in printing
-	$ret_val = FALSE; //PrinterState_checkInPrint();
-	if ($ret_val == FALSE) {
-		
-		// check already unloaded
-		if (PrinterState_getFilamentStatus($abb_filament) == FALSE) {
-			return ERROR_LOADED_UNLOAD;
-		}
-		
-		// change status json file
-		$ret_val = CoreStatus_setInUnloading($abb_filament);
-		if ($ret_val == FALSE) {
-			return ERROR_INTERNAL;
-		}
-		
-		pclose(popen($command, 'r')); // only for windows arcontrol client
-		PrinterLog_logArduino($command); // we can't log return output when using this solution
-	} else {
-// 		return ERROR_IN_PRINT;
-		PrinterLog_logError('can not unload filament in printing', __FILE__, __LINE__);
-		return ERROR_BUSY_PRINTER;
+	// check already unloaded
+	if (PrinterState_getFilamentStatus($abb_filament) == FALSE) {
+		return ERROR_LOADED_UNLOAD;
 	}
+	
+	// change status json file
+	$ret_val = CoreStatus_setInUnloading($abb_filament, $array_cartridge[PRINTERSTATE_TITLE_MATERIAL]);
+	if ($ret_val == FALSE) {
+		return ERROR_INTERNAL;
+	}
+	
+	pclose(popen($command, 'r')); // only for windows arcontrol client
+	PrinterLog_logArduino($command); // we can't log return output when using this solution
 	
 	return ERROR_OK;
 }
@@ -2764,8 +2568,6 @@ function PrinterState_pausePrinting() {
 		if ($ret_val != ERROR_NORMAL_RC_OK) {
 			return ERROR_INTERNAL;
 		}
-		
-		//TODO print special gcode model to reset printer's temperatures and position
 	} else {
 		PrinterLog_logMessage('we are not in printing when calling pause printing', __FILE__, __LINE__);
 		return ERROR_NO_PRINT;
@@ -2795,8 +2597,6 @@ function PrinterState_resumePrinting() {
 		if ($ret_val != ERROR_NORMAL_RC_OK) {
 			return ERROR_INTERNAL;
 		}
-		
-		//TODO print special gcode model to reset printer's temperatures and position
 	} else {
 		PrinterLog_logMessage('we are not in printing when calling resume printing', __FILE__, __LINE__);
 		return ERROR_NO_PRINT;
@@ -2807,7 +2607,6 @@ function PrinterState_resumePrinting() {
 
 function PrinterState_getEndstop($abb_endstop, &$status) {
 	global $CFG;
-	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
 	$output = array();
 	$command = '';
 	$ret_val = 0;
@@ -2817,43 +2616,36 @@ function PrinterState_getEndstop($abb_endstop, &$status) {
 		return ERROR_WRONG_PRM;
 	}
 	
-	// check if we are in printing
-	$ret_val = FALSE; //PrinterState_checkInPrint();
-	if ($ret_val == FALSE) {
-		$command = $arcontrol_fullpath . PRINTERSTATE_GET_ENDSTOPS;
-		exec($command, $output, $ret_val);
-		if (!PrinterState_filterOutput($output, $command)) {
-			PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
-			return ERROR_INTERNAL;
-		}
-		PrinterLog_logArduino($command, $output);
-		if ($ret_val != ERROR_NORMAL_RC_OK) {
-			return ERROR_INTERNAL;
-		}
-		
-		// treat return of arduino
-		if (count($output) > 1) {
-			$status = NULL;
-			foreach ($output as $line) {
-				if (strpos($line, ':') === FALSE) {
-					continue;
-				}
-				$tmp_array = explode(':', $line);
-				$endstop_line = str_replace('_', '', trim($tmp_array[0]));
-				if ($endstop_line == $abb_endstop) {
-					$status = (strtolower(trim($tmp_array[1])) == PRINTERSTATE_VALUE_ENDSTOP_OPEN) ? FALSE : TRUE;
-					return ERROR_OK;
-					break;
-				}
+	$command = $CFG->config['arcontrol_c'] . PRINTERSTATE_GET_ENDSTOPS;
+	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output, $command)) {
+		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	PrinterLog_logArduino($command, $output);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		return ERROR_INTERNAL;
+	}
+	
+	// treat return of arduino
+	if (count($output) > 1) {
+		$status = NULL;
+		foreach ($output as $line) {
+			if (strpos($line, ':') === FALSE) {
+				continue;
+			}
+			$tmp_array = explode(':', $line);
+			$endstop_line = str_replace('_', '', trim($tmp_array[0]));
+			if ($endstop_line == $abb_endstop) {
+				$status = (strtolower(trim($tmp_array[1])) == PRINTERSTATE_VALUE_ENDSTOP_OPEN) ? FALSE : TRUE;
+				return ERROR_OK;
+				break;
 			}
 		}
-		else {
-			// no usful return
-			PrinterLog_logError('no arduino return', __FILE__, __LINE__);
-		}
-	} else {
-		PrinterLog_logMessage('call getting end stop in printing', __FILE__, __LINE__);
-		return ERROR_BUSY_PRINTER;
+	}
+	else {
+		// no usful return
+		PrinterLog_logError('no arduino return', __FILE__, __LINE__);
 	}
 	
 	return ERROR_INTERNAL;
@@ -2861,47 +2653,39 @@ function PrinterState_getEndstop($abb_endstop, &$status) {
 
 function PrinterState_getEndstopList(&$array_status = array()) {
 	global $CFG;
-	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
 	$output = array();
 	$command = '';
 	$ret_val = 0;
 	
-	// check if we are in printing
-	$ret_val = FALSE; //PrinterState_checkInPrint();
-	if ($ret_val == FALSE) {
-		$command = $arcontrol_fullpath . PRINTERSTATE_GET_ENDSTOPS;
-		exec($command, $output, $ret_val);
-		if (!PrinterState_filterOutput($output, $command)) {
-			PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
-			return ERROR_INTERNAL;
-		}
-		PrinterLog_logArduino($command, $output);
-		if ($ret_val != ERROR_NORMAL_RC_OK) {
-			return ERROR_INTERNAL;
+	$command = $CFG->config['arcontrol_c'] . PRINTERSTATE_GET_ENDSTOPS;
+	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output, $command)) {
+		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	PrinterLog_logArduino($command, $output);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		return ERROR_INTERNAL;
+	}
+	
+	// treat return of arduino
+	if (count($output) > 1) {
+		$status = NULL;
+		foreach ($output as $line) {
+			if (strpos($line, ':') === FALSE) {
+				continue;
+			}
+			$tmp_array = explode(':', $line);
+			$endstop_line = str_replace('_', '', trim($tmp_array[0]));
+			$array_status[$endstop_line] = (strtolower(trim($tmp_array[1])) == PRINTERSTATE_VALUE_ENDSTOP_OPEN)
+					? FALSE : TRUE;
 		}
 		
-		// treat return of arduino
-		if (count($output) > 1) {
-			$status = NULL;
-			foreach ($output as $line) {
-				if (strpos($line, ':') === FALSE) {
-					continue;
-				}
-				$tmp_array = explode(':', $line);
-				$endstop_line = str_replace('_', '', trim($tmp_array[0]));
-				$array_status[$endstop_line] = (strtolower(trim($tmp_array[1])) == PRINTERSTATE_VALUE_ENDSTOP_OPEN)
-						? FALSE : TRUE;
-			}
-			
-			return ERROR_OK;
-		}
-		else {
-			// no usful return
-			PrinterLog_logError('no arduino return', __FILE__, __LINE__);
-		}
-	} else {
-		PrinterLog_logMessage('call getting end stop in printing', __FILE__, __LINE__);
-		return ERROR_BUSY_PRINTER;
+		return ERROR_OK;
+	}
+	else {
+		// no usful return
+		PrinterLog_logError('no arduino return', __FILE__, __LINE__);
 	}
 	
 	return ERROR_INTERNAL;
@@ -3207,7 +2991,6 @@ function PrinterState_getOffset($axis, &$value) {
 }
 
 function PrinterState_setOffset($array_data = array()) {
-	//TODO finish me
 	$CI = &get_instance();
 	$arcontrol_fullpath = $CI->config->item('arcontrol_c');
 	$command = $arcontrol_fullpath . PRINTERSTATE_SET_OFFSET;
