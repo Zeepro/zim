@@ -32,7 +32,7 @@ $lang['print_button']
 $lang['reslice_button']
 	= 'Reslice';
 $lang['exchange_extruder']
-	= 'Color inversion';
+	= 'Switch colors';
 $lang['exchange_straight']
 	= 'Straight';
 $lang['exchange_crossover']

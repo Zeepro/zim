@@ -49,7 +49,7 @@ $lang['Home']
 $lang['filament_not_need']
 	= 'N/A';
 $lang['exchange_extruder']
-	= 'Color inversion';
+	= 'Switch colors';
 $lang['exchange_straight']
 	= 'Straight';
 $lang['exchange_crossover']
