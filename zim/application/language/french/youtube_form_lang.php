@@ -6,9 +6,9 @@ $lang["youtube_title"]
 $lang['yt_desc']
 	= "Vidéo en time-lapse par l'imprimante 3D zim, la référence en impression 3D personnelle. Visitez zeepro.com pour rejoindre la \"zim experience\" !";
 $lang['yt_title']
-	= "Impression 3D par zim";
+	= "Impression 3D par zim - ";
 $lang['yt_tags']
-	= "zim, zeepro";
+	= "Zim, zeepro, 3D printing, 3D printer, personal 3D printer, 3D print, 3D print demo, time-lapse, zim-motion";
 $lang['yt_privacy_private']
 	= "Privé";
 $lang['yt_privacy_public']
@@ -22,6 +22,6 @@ $lang['title_label']
 $lang['desc_label']
 	= "Description de la vidéo";
 $lang['tags_label']
-	= "Tags";
+	= "Tags (séparés par une virgule)";
 $lang['privacy_label']
 	= "Confidentialité";

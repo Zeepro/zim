@@ -1088,6 +1088,54 @@ class Printdetail extends MY_Controller {
 		$this->load->library('parser');
 		$this->lang->load('youtube_form', $this->config->item('language'));
 		
+		$this->load->helper('zimapi');
+		$array_status = array();
+		$model_displayname = NULL;
+		if (CoreStatus_checkInIdle($status_current, $array_status) && array_key_exists(CORESTATUS_TITLE_PRINTMODEL, $array_status))
+		{
+				$model_id = NULL;
+			$abb_cartridge = NULL;
+			
+			switch ($array_status[CORESTATUS_TITLE_PRINTMODEL])
+			{
+				case CORESTATUS_VALUE_MID_SLICE:
+					$preset_id = NULL;
+					$model_filename = array();
+					$this->load->helper('slicer');
+					if (ERROR_OK == Slicer_getModelFile(0, $model_filename, TRUE))
+					{
+						foreach($model_filename as $model_basename)
+						{
+							if (strlen($model_displayname))
+								$model_displayname .= ' + ' . $model_basename;
+							else
+								$model_displayname = $model_basename;
+						}
+					}
+					else
+						$model_displayname = t('timelapse_info_modelname_slice');
+					$array_info[] = array(
+							'title'	=> t('timelapse_info_modelname_title'),
+							'value'	=> $model_displayname,
+					);
+
+					break;
+				default:
+						// treat as pre-sliced model
+					$model_data = array();
+					$model_displayname = "";
+					if (is_null($model_id))
+					{
+						$this->load->helper('printlist');
+						$model_id = $array_status[CORESTATUS_TITLE_PRINTMODEL];
+					}
+					if (ERROR_OK == ModelList__getDetailAsArray($model_id, $model_data, TRUE))
+					{
+						$model_displayname = $model_data[PRINTLIST_TITLE_NAME];
+					}	
+					break;
+			}
+		}
 		if ($this->input->server('REQUEST_METHOD') == 'POST')
 		{
 			$this->load->library("session");
@@ -1108,7 +1156,7 @@ class Printdetail extends MY_Controller {
 		}
 		
 		$data = array(
-				'yt_title'				=> t('yt_title'),
+				'yt_title'				=> t('yt_title') . $model_displayname,
 				'yt_tags'				=> t('yt_tags'),
 				'yt_desc'				=> t('yt_desc'),
 				'yt_privacy_public'		=> t('yt_privacy_public'),
