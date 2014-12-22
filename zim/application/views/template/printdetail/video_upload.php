@@ -15,7 +15,7 @@
 		$.get('/printdetail/connect_google/true?state={state}&code={code}')
 		.done(function(data)
 		{
-			window.location.href = "/printdetails/timelapse";
+			window.location.href = "/printdetails/timelapse?yt_upload=done";
 		});
 	</script>
 </div>	
