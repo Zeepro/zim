@@ -111,6 +111,10 @@ $lang['send_yt_button']
 	= 'Share via Youtube';
 $lang['uploading']
 	= 'Your video is being uploaded';
+$lang['yt_upload_popup_text']
+	= 'Upload on YouTube done!';
+$lang['yt_callback_ok']
+	= 'Ok';
 $lang['send_email_hint']
 	= 'Email your zim-motion to:';
 $lang['send_email_action']

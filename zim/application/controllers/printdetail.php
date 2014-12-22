@@ -1186,9 +1186,11 @@ class Printdetail extends MY_Controller {
 		$this->load->library('parser');
 		$this->lang->load('printdetail', $this->config->item('language'));
 		$data = array(
-				'state'		=> $state,
-				'code'		=> $code,
-				'uploading'	=> t('uploading')
+				'state'					=> $state,
+				'code'					=> $code,
+				'uploading'				=> t('uploading'),
+				'yt_upload_popup_text'	=> t('yt_upload_popup_text'),
+				'yt_callback_ok'		=> t('yt_callback_ok'),
 		);
 		$body_page = $this->parser->parse('template/printdetail/video_upload', $data, TRUE);
 		
