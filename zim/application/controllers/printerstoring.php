@@ -133,12 +133,14 @@ class Printerstoring extends MY_Controller {
 		$this->load->library('parser');
 
 		$this->lang->load('printerstoring/stllibrary', $this->config->item('language'));
+		$this->lang->load('printerstoring/libraries', $this->config->item('language'));
 
 		$template_data = array(
-				'back'			=> t('back'),
-				'home'			=> t('home'),
+				'back'				=> t('back'),
+				'home'				=> t('home'),
+				'libraries_info'	=> t('libraries_info'),
 				'browse_models'		=> t('browse_models'),
-				'add_model'		=> t('add_model')
+				'add_model'			=> t('add_model')
 		);
 		$body_page = $this->parser->parse('template/printerstoring/stllibrary', $template_data, TRUE);
 		

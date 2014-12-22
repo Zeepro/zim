@@ -6,12 +6,13 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
-		<a href="/printerstoring/liststl/" data-ajax="false" data-role="button">
-			{browse_models}
-		</a>
-		<a href="/printerstoring/storestl/" data-ajax="false" data-role="button" id="add_model">
-			{add_model}
-		</a>
+			<p>{libraries_info}</p>
+			<a href="/printerstoring/liststl/" data-ajax="false" data-role="button">
+				{browse_models}
+			</a>
+			<a href="/printerstoring/storestl/" data-ajax="false" data-role="button" id="add_model">
+				{add_model}
+			</a>
 		</div>
 	</div>
 	<script>
