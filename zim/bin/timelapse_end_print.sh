@@ -60,7 +60,7 @@ fi
 if [ -e $TIMELAPSE ]
 then
 	ffmpeg -r 10 -loop 1 -i $last_image -t 1 -y -vcodec libx264 -crf 23 -pix_fmt yuv420p $TEMPVIDEO
-	ffmpeg -r 10 -f image2 -i $IMAGESPAT -i $TEMPVIDEO -i $WATERMARK -i $POWEREDVD -y -filter_complex "[0:v][1:v]concat=n=2:v=1[bg];[bg][2:v]overlay=380:5[pt];[pt]fade=t=out:$fadeptr:10:color=white[tl];[tl][3:v]concat=n=2:v=1" -vcodec libx264 -crf 29 -pix_fmt yuv420p $TIMELAPSE
+	ffmpeg -r 10 -f image2 -i $IMAGESPAT -i $TEMPVIDEO -i $WATERMARK -i $POWEREDVD -y -filter_complex "[0:v][1:v]concat=n=2:v=1[bg];[bg][2:v]overlay=main_w-overlay_w:0[pt];[pt]fade=t=out:$fadeptr:10:color=white[tl];[tl][3:v]concat=n=2:v=1" -vcodec libx264 -crf 29 -pix_fmt yuv420p $TIMELAPSE
 	rm -fv $TEMPVIDEO
 	
 	chown www-data $TIMELAPSE
