@@ -102,6 +102,7 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_VALUE_TL_VIDEO_NAME',		'zimmotion.mp4');
 	define('ZIMAPI_VALUE_TL_MANDRILL_API',		'https://mandrillapp.com/api/1.0/messages/send.json');
 	define('ZIMAPI_VALUE_RELEASENOTE_URL',		'http://zimsupport.zeepro.com/support/solutions/articles/5000050231-release-notes');
+	define('ZIMAPI_VALUE_PRESETS_CS_NAME',		'cs_presets.tar.bz2');
 	
 	define('ZIMAPI_PRM_CAPTURE',	'picture');
 	define('ZIMAPI_PRM_VIDEO_MODE',	'video');
@@ -1141,10 +1142,18 @@ function ZimAPI_sendTimelapse($emails, $model_name = NULL) {
 	return ZimAPI_sendMandrillEmail($array_senddata);
 }
 
-//TODO finish me
-function ZimAPI_backupPresets() {
-	// in principle, we backup only user presets, but not system preset
-	// the system will decide which folder it takes (/config/conf/presetlist/ or /sdcard/conf/presetlist)
+function ZimAPI_packUpPresets() {
+	$output = array();
+	$ret_val = 0;
+	$CI = &get_instance();
+	$command = 'tar cjf ' . $CI->config->item('temp') . ZIMAPI_VALUE_PRESETS_CS_NAME . ' ' . $CI->config->item('presetlist');
+	
+	exec($command, $output, $ret_val);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		return NULL;
+	}
+	
+	return $CI->config->item('temp') . ZIMAPI_VALUE_PRESETS_CS_NAME;
 }
 
 function ZimAPI_getPresetList($set_localization = TRUE) {
@@ -1791,7 +1800,6 @@ function ZimAPI_getPresetInfoAsArray($preset_id, &$array_info, &$system_preset =
 }
 
 function ZimAPI_getPresetSettingAsArray($id_preset, &$array_setting) {
-	//TODO finish me, the following function is only for test
 	$preset_basepath = '';
 	
 	// check if preset exists

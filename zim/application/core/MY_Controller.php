@@ -36,6 +36,22 @@ class MY_Controller extends CI_Controller {
 		exit;
 	}
 	
+	public function _exitWithError500($display = NULL) {
+		if (is_null($display)) {
+			$display = 'throw system internal error';
+		}
+		
+		$this->output->set_status_header(500);
+		
+		// optional
+		$this->load->library('parser');
+		$this->output->set_content_type('Content-type: text/plain; charset=UTF-8');
+		$this->parser->parse('template/plaintxt', array('display' => $display));
+		$this->output->_display();
+		
+		exit;
+	}
+	
 	public function __construct() {
 		global $CFG;
 		
@@ -52,27 +68,16 @@ class MY_Controller extends CI_Controller {
 			PrinterLog_logError('status files initialisation error when MY_Controller started', __FILE__, __LINE__);
 			
 			// let request failed
-			$protocol = (isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0');
-			header($protocol . ' 500');
-			header('Content-type: text/plain; charset=UTF-8');
-			echo 'file initialisation error';
-			exit;
+			$this->_exitWithError500('file initialisation error');
 		}
 		
 		// check tromboning autorisation
 		if (CoreStatus_checkTromboning(FALSE)) {
-			$status_text = ERROR_REMOTE_REFUSE . ' ' . MyERRMSG(ERROR_REMOTE_REFUSE);
-			
 			$this->load->helper(array('printerlog', 'errorcode'));
 			PrinterLog_logMessage('detected and refused tromboning connection', __FILE__, __LINE__);
 			
 			// let request failed
-			$protocol = (isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0');
-			
-			header($protocol . ' ' . $status_text);
-			header('Content-type: text/plain; charset=UTF-8');
-			echo $status_text; //'connection refused';
-			exit;
+			$this->_exitWithError500(ERROR_REMOTE_REFUSE . ' ' . MyERRMSG(ERROR_REMOTE_REFUSE));
 		}
 		
 		// Workflow management

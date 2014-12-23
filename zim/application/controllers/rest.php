@@ -29,13 +29,7 @@ class Rest extends MY_Controller {
 			}
 			
 			// we haven't finished initialization or connection yet
-			$cr = ERROR_BUSY_PRINTER;
-			$display = $cr . " " . t(MyERRMSG($cr));
-			$this->output->set_status_header($cr, $display);
-// 			$this->output->set_content_type(RETURN_CONTENT_TYPE);
-			header('Content-type: ' . RETURN_CONTENT_TYPE);
-			echo $display; //optional
-			exit;
+			$this->_exitWithError500(ERROR_BUSY_PRINTER . ' ' . t(MyERRMSG(ERROR_BUSY_PRINTER)));
 		}
 		else if (!CoreStatus_checkInIdle($status_current)) {
 			// check if the status is changed
@@ -102,17 +96,8 @@ class Rest extends MY_Controller {
 			}
 			
 			// return that printer is busy
-			$cr = ERROR_BUSY_PRINTER;
-			$display = $cr . " " . t(MyERRMSG($cr));
-			$this->output->set_status_header($cr, $display);
-// 			$this->output->set_content_type(RETURN_CONTENT_TYPE);
-			header('Content-type: ' . RETURN_CONTENT_TYPE);
-			echo $display; //optional
-			exit;
+			$this->_exitWithError500(ERROR_BUSY_PRINTER . ' ' . t(MyERRMSG(ERROR_BUSY_PRINTER)));
 		}
-// 		else {
-// 			$this->finish_config = TRUE;
-// 		}
 	}
 	
 	private function _return_cr($cr) {
@@ -127,12 +112,7 @@ class Rest extends MY_Controller {
 	}
 	
 	private function _return_under_construction() {
-		$display = 499 . " UNDER CONSTRUCTION";
-		$this->output->set_status_header(499, $display);
-// 		http_response_code($cr);
-		$this->output->set_content_type(RETURN_CONTENT_TYPE);
-		$this->load->library('parser');
-		$this->parser->parse('template/plaintxt', array('display' => $display)); //optional
+		$this->_return_cr(ERROR_UNDER_CONSTRUCT);
 		
 		return;
 	}
@@ -140,9 +120,7 @@ class Rest extends MY_Controller {
 	//==========================================================
 	//index for status
 	//==========================================================
-	public function index()
-	{
-// 		$this->status();
+	public function index() { //TODO add an index of all services
 		$this->output->set_header('Location: /rest/status');
 		return;
 	}
@@ -187,7 +165,8 @@ class Rest extends MY_Controller {
 			$this->output->set_status_header($cr, $json_data);
 			// 		http_response_code($cr);
 			$this->output->set_content_type(RETURN_CONTENT_TYPE_JSON);
-			echo $json_data;
+			$this->load->library('parser');
+			$this->parser->parse('template/plaintxt', array('display' => $json_data));
 		}
 		
 		return;
@@ -215,7 +194,8 @@ class Rest extends MY_Controller {
 			$this->output->set_status_header($cr, $json_data);
 			// 		http_response_code($cr);
 			$this->output->set_content_type(RETURN_CONTENT_TYPE_JSON);
-			echo $json_data;
+			$this->load->library('parser');
+			$this->parser->parse('template/plaintxt', array('display' => $json_data));
 		}
 		
 		return;
@@ -235,7 +215,8 @@ class Rest extends MY_Controller {
 			$this->output->set_status_header($cr, $json_data);
 			// 		http_response_code($cr);
 			$this->output->set_content_type(RETURN_CONTENT_TYPE_JSON);
-			echo $json_data;
+			$this->load->library('parser');
+			$this->parser->parse('template/plaintxt', array('display' => $json_data));
 		}
 		
 		return;
@@ -1305,6 +1286,22 @@ class Rest extends MY_Controller {
 		return;
 	}
 	
+	public function cspresets() {
+		$filepath = NULL;
+		
+		$this->load->helper(array('zimapi', 'download'));
+		
+		$filepath = ZimAPI_packUpPresets();
+		if ($filepath && file_exists($filepath)) {
+			force_download(ZIMAPI_VALUE_PRESETS_CS_NAME, @file_get_contents($filepath));
+		}
+		else {
+			$this->_return_cr(ERROR_INTERNAL);
+		}
+		
+		return;
+	}
+	
 	//==========================================================
 	//platform web service
 	//==========================================================
@@ -1354,7 +1351,7 @@ class Rest extends MY_Controller {
 		else {
 			$this->load->library('parser');
 			$this->output->set_status_header($cr, $display);
-			$this->output->set_content_type(RETURN_CONTENT_TYPE);
+			$this->output->set_content_type(RETURN_CONTENT_TYPE_JSON);
 			$this->parser->parse('template/plaintxt', array('display' => $display));
 		}
 		
@@ -1830,7 +1827,8 @@ class Rest extends MY_Controller {
 	
 		$display = PrinterStoring_listStl();
 		$this->output->set_content_type(RETURN_CONTENT_TYPE_JSON);
-		echo $display;
+		$this->load->library('parser');
+		$this->parser->parse('template/plaintxt', array('display' => $display));
 	
 		return;
 	}
@@ -1842,7 +1840,8 @@ class Rest extends MY_Controller {
 	
 		$display = PrinterStoring_listGcode();
 		$this->output->set_content_type(RETURN_CONTENT_TYPE_JSON);
-		echo $display;
+		$this->load->library('parser');
+		$this->parser->parse('template/plaintxt', array('display' => $display));
 	
 		return;
 	}

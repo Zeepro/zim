@@ -36,6 +36,7 @@ if (!defined('ERROR_OK')) {
 	define('ERROR_GCODE_NOTFOUND',	457);
 	define('ERROR_IMG_NOTFOUND',	458);
 	
+	define('ERROR_UNDER_CONSTRUCT',	499);
 	define('ERROR_INTERNAL',		500);
 	
 	// normal program return code
@@ -73,6 +74,7 @@ if (!defined('ERROR_OK')) {
 			ERROR_IMG_NOTFOUND		=> 'Image file not found',
 			
 			ERROR_INTERNAL			=> 'Internal API error',
+			ERROR_UNDER_CONSTRUCT	=> 'UNDER CONSTRUCTION',
 			404						=> 'Not found',
 			403						=> 'Forbidden',
 	);
