@@ -311,7 +311,7 @@ class Preset extends MY_Controller {
 						$ret_val = ERROR_MISS_PRM;
 					}
 				}
-				else if ($array_info[ZIMAPI_TITLE_PRESET_NAME] != $new_preset) {
+				else if ($array_info[ZIMAPI_TITLE_PRESET_NAME] != $name_preset) {
 					$new_info = array();
 					$new_system_preset = FALSE;
 					
