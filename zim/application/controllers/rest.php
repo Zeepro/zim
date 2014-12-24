@@ -1287,17 +1287,7 @@ class Rest extends MY_Controller {
 	}
 	
 	public function cspresets() {
-		$filepath = NULL;
-		
-		$this->load->helper(array('zimapi', 'download'));
-		
-		$filepath = ZimAPI_packUpPresets();
-		if ($filepath && file_exists($filepath)) {
-			force_download(ZIMAPI_VALUE_PRESETS_CS_NAME, @file_get_contents($filepath));
-		}
-		else {
-			$this->_return_cr(ERROR_INTERNAL);
-		}
+		$this->output->set_header('Location: /test_presets');
 		
 		return;
 	}
