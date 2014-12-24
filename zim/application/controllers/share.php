@@ -82,7 +82,8 @@ class Share extends MY_Controller
 	
 	private function upload($video_title, $video_desc)
 	{
-		$file_url = BASEPATH . "../assets/images/timelapse.mp4";
+		$this->load->helper('zimapi');
+		$file_url = ZIMAPI_FILEPATH_TIMELAPSE;
 		$file = fopen($file_url, "rb");
 		$video = fread($file, filesize($file_url));
 		fclose($file);
