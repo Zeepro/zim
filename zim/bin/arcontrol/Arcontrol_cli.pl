@@ -164,6 +164,14 @@ sub start_print {
 		$print_on = STATUS_ON;
 	}
 
+	# initialize status file
+	{
+		my $fp;
+		open( $fp, '>', $mypath . FILENAME_PRINT );
+		print $fp '1';
+		close($fp);
+	}
+
 	# _start_print();
 	if ( $is_windows == TRUE ) {
 		system( 'start /B "" "perl" ' . $myself . ' -sp' );
