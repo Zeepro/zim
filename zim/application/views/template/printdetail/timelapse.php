@@ -42,6 +42,15 @@
 					</tbody>
 				</table>
 			</div>
+<!-- 			<div id="storegcode_collapsible" data-role="collapsible" data-collapsed="true" style="display: {display_storegocde};"> -->
+			<div id="storegcode_container" style="display: {display_storegocde};">
+<!-- 				<h4>{storegcode_title}</h4> -->
+				<form>
+					<input type="checkbox" id="storegcode_checkbox" data-mini="true">
+					<label for="storegcode_checkbox">{storegcode_checkbox}</label>
+					<input id="storegcode_name" type="text" data-clear-btn="true" placeholder="{storegcode_hint}">
+				</form>
+			</div>
 			<a href="#home_popup" data-rel="popup" data-role="button" class="ui-btn ui-icon-home ui-btn-icon-left ui-corner-all ui-shadow" data-transition="pop">{home_button}</a>
 			<!--<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-home" id="print_action" onclick='javascript: finish_timelapse();'>{home_button}</button>-->
 			<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh" id="print_action" onclick='javascript: restart_print();'>{again_button}</button>
@@ -62,8 +71,7 @@
 // var timelapse = "timelapse";
 var var_disable_logo_link = true; // trigger with basetemplate document ready function
 
-$("div#link_logo").on('click', function()
-{
+$("div#link_logo").on('click', function() {
 	$("div#home_popup").popup("open");
 });
 
@@ -88,7 +96,57 @@ function load_jwplayer_video() {
 	});
 }
 
-function finish_timelapse() {
+function storegcode() {
+	var_return = false;
+	
+	$.ajax({
+		cache: false,
+		type: "POST",
+		async: false,
+		url: "/rest/libstoregcode",
+		data: { "name": $('#storegcode_name').val()},
+		beforeSend: function() {
+			$("#overlay").addClass("gray-overlay");
+			$(".ui-loader").css("display", "block");
+		},
+		complete: function() {
+			$("#overlay").removeClass("gray-overlay");
+			$(".ui-loader").css("display", "none");
+		},
+		success: function (data, textStatus, xhr) {
+			console.log("stored");
+			var_return = true;
+		},
+		error: function (data, textStatus, xhr) {
+			var exit = confirm("{storegcode_error_confirm}");
+			
+			console.log(data);
+			if (exit == true) {
+				var_return = true;
+			}
+		},
+	});
+	
+	return var_return;
+}
+
+function finish_timelapse(storegcode) {
+	if (typeof storegcode === 'undefined' || storegcode !== false) {
+		storegcode = true;
+	}
+	
+// 	if (storegcode && $("#storegcode_collapsible").css("display") != "none"
+// 			&& !$("#storegcode_collapsible").collapsible("option", "collapsed")) {
+	if (storegcode && $("#storegcode_container").css("display") != "none"
+			&& $("#storegcode_checkbox").is(":checked")) {
+		var rc_store = true;
+		
+		rc_store = storegcode();
+		if (rc_store == false) {
+			return;
+		}
+	}
+	
 	var_ajax_timelapse_end = $.ajax({
 		url: "/printdetail/timelapse_end_ajax",
 		cache: false,

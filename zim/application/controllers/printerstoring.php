@@ -333,7 +333,10 @@ class Printerstoring extends MY_Controller {
 				'select_alphabetical'		=> t('select_alphabetical'),
 				'select_mostrecent'		=> t('select_mostrecent'),
 				'print_error'		=> t('print_error'),
-				'delete_error'	=> t('delete_error')
+				'delete_error'	=> t('delete_error'),
+				'delete_popup_text'	=> t('delete_popup_text'),
+				'delete_yes'		=> t('delete_yes'),
+				'delete_no'			=> t('delete_no'),
 		);
 		$body_page = $this->parser->parse('template/printerstoring/listgcode', $template_data, TRUE);
 		
@@ -421,7 +424,7 @@ class Printerstoring extends MY_Controller {
 				);
 			}
 			
-			if ($volume_need > 0 && $data_json[$key_material] != $data_cartridge[PRINTERSTATE_TITLE_MATERIAL]) {
+			if ($volume_need > 0 && $data_json[$key_material] != $array_data[$abb_filament][PRINTERSTATE_TITLE_MATERIAL]) {
 				$required_material = t('require_' . $data_json[$key_material]);
 				
 				if ($abb_filament == 'l') {

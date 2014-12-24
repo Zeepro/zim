@@ -427,6 +427,7 @@ class Printdetail extends MY_Controller {
 				'video_error'		=> t('video_error'),
 				'loading_player'	=> t('loading_player'),
 				// storegcode + timelapse
+				//TODO check if we can remove this part or not
 				'storegcode_info'	=> t('storegcode_info'),
 				'storegcode_name'	=> t('storegcode_name'),
 				'timelapse_error'	=> t('timelapse_error'),
@@ -592,6 +593,7 @@ class Printdetail extends MY_Controller {
 		$array_status = array();
 		$restart_url = NULL;
 		$model_displayname = NULL;
+		$show_storegcode = FALSE;
 		
 		$this->load->library('parser');
 		$this->load->helper('zimapi');
@@ -640,6 +642,7 @@ class Printdetail extends MY_Controller {
 					);
 					
 					$restart_url = '/printdetail/printslice';
+					$show_storegcode = TRUE;
 					break;
 					
 				case CORESTATUS_VALUE_MID_PRIME_R:
@@ -767,6 +770,10 @@ class Printdetail extends MY_Controller {
 				'again_button'			=> t('Print again'),
 				'restart_url'			=> $restart_url ? $restart_url : '/',
 				'send_email_modelname'	=> $model_displayname,
+				//TODO use the comment block to activate store gcode display
+				'display_storegocde'	=> 'none', //$show_storegcode ? 'block' : 'none',
+				'storegcode_checkbox'	=> t('storegcode_info'),
+				'storegcode_hint'		=> t('storegcode_name'),
 		);
 		
 		$body_page = $this->parser->parse('template/printdetail/timelapse', $template_data, TRUE);
