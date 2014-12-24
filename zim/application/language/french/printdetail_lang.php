@@ -108,6 +108,8 @@ $lang['send_email_button']
 	= 'Partager par mail';
 $lang['send_yt_button']
 	= 'Partager sur Youtube';
+$lang['send_fb_button']
+	= 'Partager sur Facebook';
 $lang['uploading']
 	= 'La vidéo est en cours de chargement...';
 $lang['yt_upload_popup_text']

@@ -109,6 +109,8 @@ $lang['send_email_button']
 	= 'Share via email';
 $lang['send_yt_button']
 	= 'Share via Youtube';
+$lang['send_fb_button']
+	= 'Share via Facebook';
 $lang['uploading']
 	= 'Your video is being uploaded';
 $lang['yt_upload_popup_text']

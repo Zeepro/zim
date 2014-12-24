@@ -376,11 +376,13 @@ function CoreStatus_checkCallEndPrinting(&$url_redirect = '') {
 			'/printdetail/timelapse_ready_ajax'	=> NULL,
 			'/printdetail/timelapse_end_ajax'	=> NULL,
 			'/printdetail/sendemail_ajax'		=> NULL,
-			'/printdetail/connect_google'		=> NULL,
-			'/printdetail/connect_google/true'	=> NULL,
-			'/printdetail/youtube_form'			=> NULL,
-			'/printdetail/video_upload'			=> NULL,
-	));
+// 			'/share/connect_google'				=> NULL,
+// 			'/share/connect_google/true'		=> NULL,
+// 			'/share/youtube_form'				=> NULL,
+// 			'/share/video_upload'				=> NULL,
+// 			'/share/index'						=> NULL,
+// 			'/share/'						=> NULL,
+	)) || CoreStatus__checkCallController('share');
 }
 
 function CoreStatus_checkCallEndPrintingPlus() {

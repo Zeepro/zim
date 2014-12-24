@@ -1,4 +1,4 @@
-<div data-role="page" data-url="/printdetail/video_upload">
+<div data-role="page" data-url="/share/video_upload">
 	<div id="overlay"></div>
 	<header data-role="header" class="page-header">
 	</header>
@@ -16,7 +16,7 @@
 		</div>
 	</div>
 	<script>
-		$.get('/printdetail/connect_google/true?state={state}&code={code}')
+		$.get('/share/connect_google/true?state={state}&code={code}')
 		.done(function(data)
 		{
 			$("div#yt_upload_loading").hide();

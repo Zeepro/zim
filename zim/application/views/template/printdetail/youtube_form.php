@@ -1,11 +1,11 @@
-<div data-role="page" data-url="/printdetail/youtube_form">
+<div data-role="page" data-url="/share/youtube_form">
 	<div id="overlay"></div>
 	<header data-role="header" class="page-header">
 	</header>
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container" style="text-align: center;">
-			<form action="/printdetail/youtube_form" method="POST" id="yt_form" data-ajax="false">
+			<form action="/share/youtube_form" method="POST" id="yt_form" data-ajax="false">
 				<div class="ui-field-contain">
 				    <label for="yt_title" style="margin-top: 1.7em">{title_label}</label>
 				    <input type="text" name="yt_title" id="yt_title" value="{yt_title}" />
