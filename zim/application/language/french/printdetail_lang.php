@@ -113,7 +113,7 @@ $lang['send_fb_button']
 $lang['uploading']
 	= 'La vidéo est en cours de chargement...';
 $lang['yt_upload_popup_text']
-	= 'Chargement sur YouTube est fini !';
+	= 'Chargement sur YouTube est terminé !';
 $lang['yt_callback_ok']
 	= 'Ok';
 $lang['send_email_hint']

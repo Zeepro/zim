@@ -8,3 +8,4 @@ $lang['fb_desc'] = "Time-lapse video powered by zim 3D printer, the reference in
 
 $lang['title_label'] = "Title";
 $lang['desc_label'] = "Description";
+$lang['back'] = "Back";

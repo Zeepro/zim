@@ -25,3 +25,5 @@ $lang['tags_label']
 	= "Tags (séparés par une virgule)";
 $lang['privacy_label']
 	= "Confidentialité";
+$lang['back']
+	= "Retour";

@@ -114,7 +114,7 @@ $lang['send_fb_button']
 $lang['uploading']
 	= 'Your video is being uploaded';
 $lang['yt_upload_popup_text']
-	= 'Upload on YouTube done!';
+	= 'Upload on YouTube finished!';
 $lang['yt_callback_ok']
 	= 'Ok';
 $lang['send_email_hint']

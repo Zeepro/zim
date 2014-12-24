@@ -177,9 +177,10 @@ class Share extends MY_Controller
 		
 		$data = array(
 				'fb_title'				=> t('fb_title') . $model_displayname,
-				'fb_desc'				=> t('fb_desc'),
+				'fb_desc'				=> htmlspecialchars(t('fb_desc')),
 				'title_label'			=> t('title_label'),
 				'desc_label'			=> t('desc_label'),
+				'back'					=> t('back'),
 				'upload_to_fb'			=> t('upload_to_fb')
 		);
 		
@@ -272,7 +273,8 @@ class Share extends MY_Controller
 				'title_label'			=> t('title_label'),
 				'desc_label'			=> t('desc_label'),
 				'tags_label'			=> t('tags_label'),
-				'privacy_label'			=> t('privacy_label')
+				'privacy_label'			=> t('privacy_label'),
+				'back'					=> t('back')
 		);
 		$body_page = $this->parser->parse('template/share/youtube_form', $data, TRUE);
 	
