@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="{lang}">
 	<head>
-		<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE9" />
-		<meta http-equiv="X-UA-Compatible" content="IE=9" />
 		<meta charset="utf-8" />
+<!-- 		<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE9" /> -->
+		<meta http-equiv="X-UA-Compatible" content="IE=10; IE=9" />
 		<meta http-equiv="cache-control" content="max-age=0" />
 		<meta http-equiv="cache-control" content="no-cache" />
 		<meta http-equiv="expires" content="0" />

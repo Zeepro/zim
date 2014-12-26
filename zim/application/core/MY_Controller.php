@@ -62,6 +62,10 @@ class MY_Controller extends CI_Controller {
 		// set proper error handler
 		set_error_handler(array($this, 'errorToSSO'));
 		
+		// add header to disable cache (IE need these headers)
+		$this->output->set_header('Pragma: no-cache');
+		$this->output->set_header('Cache-Control: no-cache');
+		
 		// initialisation status files
 		if (!CoreStatus_initialFile()) {
 			$this->load->helper('printerlog');
