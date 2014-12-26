@@ -6,7 +6,7 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container" style="text-align: center;">
-			<form action="/share/facebook_share" method="POST" id="fb_form" data-ajax="false">
+			<form action="/share/facebook_upload" method="POST" id="fb_form" data-ajax="false">
 				<div class="ui-field-contain">
 					<label for="fb_title" style="margin-top: 1.7em">{title_label}</label>
 				    <input type="text" name="fb_title" id="fb_title" value="{fb_title}" />

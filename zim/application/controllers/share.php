@@ -15,10 +15,23 @@ use Facebook\GraphObject;
 
 class Share extends MY_Controller
 {	
-	public function index($fb_title = "", $fb_desc = "")
+	public function index()
 	{
+		if (isset($_POST['fb_title']) && isset($_POST['fb_desc']))
+		{
+			$fb_title = $_POST['fb_title'];
+			$fb_desc = $_POST['fb_desc'];
+			$_SESSION['fb_title'] = $fb_title;
+			$_SESSION['fb_desc'] = $fb_desc;
+		}
+		else
+		{
+			$fb_title = $_SESSION['fb_title'];
+			$fb_desc = $_SESSION['fb_desc'];
+		}
 		FacebookSession::setDefaultApplication('406644606152497', 'adc295f31a84a0fb8999ff0d59769118');
-		$helper = new FacebookRedirectLoginHelper('http://localhost:81/share');
+		$helper = new FacebookRedirectLoginHelper("https://sso.zeepro.com/redirectfb.ashx?sn=" . ZimAPI_getSerial());
+		$this->load->helper(array('zimapi', 'corestatus', 'printerlog'));
 		if (isset($_SESSION) && isset($_SESSION['fb_token']))
 		{
 			// create new session from the existing PHP sesson
@@ -55,8 +68,9 @@ class Share extends MY_Controller
 				echo 'Other (session) request error: '.$e->getMessage();
 			}
 		}
-		if (isset( $session ))
+		if (isset($session))
 		{
+			PrinterLog_logDebug('Facebook upload with session');
 			// store the session token into a PHP session
 			$_SESSION['fb_token'] = $session->getToken();
 			// and create a new Facebook session using the cururent token
@@ -64,25 +78,38 @@ class Share extends MY_Controller
 			$session = new FacebookSession($session->getToken());
 			try
 			{ 
-				$this->lang->load('share/facebook_share', $this->config->item('language'));
-				$this->upload($fb_title == "" ? t('fb_title') : $fb_title, $fb_desc == "" ? t('fb_desc') : $fb_desc);
+				$this->lang->load('share/facebook_form', $this->config->item('language'));
+				$this->upload(($fb_title == "" ? t('fb_title') : $fb_title), ($fb_desc == "" ? t('fb_desc') : $fb_desc));
+				$this->facebook_upload('true');
 			}
 			catch (FacebookRequestException $e)
 			{
 				// show any error for this facebook request
 				echo 'Facebook (post) request error: '.$e->getMessage();
+				PrinterLog_logDebug('Facebook (post) request error: '.$e->getMessage());
 			}
 		}
 		else 
 		{
 			$loginUrl = $helper->getLoginUrl(array('publish_actions'));
-			echo '<a href="' . $loginUrl . '">Click</a>';
+			$prefix = CoreStatus_checkTromboning() ? 'https://' : 'http://';
+			$data = array('printersn' => ZimAPI_getSerial(), 'URL' => $prefix . $_SERVER['HTTP_HOST'] . '/share/index');
+			
+			$options = array('http' => array('header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+					'method'  => 'POST',
+					'content' => http_build_query($data)));
+			$context = stream_context_create($options);
+			@file_get_contents('https://sso.zeepro.com/url.ashx', false, $context);
+			$result = substr($http_response_header[0], 9, 3);
+			echo "$loginUrl";
+			PrinterLog_logDebug('Facebook login url: '.$loginUrl);
+			$this->output->set_status_header(202);
 		}
 	}
 	
 	private function upload($video_title, $video_desc)
 	{
-		$this->load->helper('zimapi');
+		$this->load->helper(array('zimapi', 'printerlog'));
 		$file_url = ZIMAPI_FILEPATH_TIMELAPSE;
 		$file = fopen($file_url, "rb");
 		$video = fread($file, filesize($file_url));
@@ -118,19 +145,15 @@ class Share extends MY_Controller
 		
 		$ctx = stream_context_create($params);
 		$response = @file_get_contents($destination, FILE_TEXT, $ctx);
-		$this->output->set_header("Location: /printdetail/timelapse");
+		PrinterLog_logDebug('facebook upload response: ' . $response);
+		return;
 	}
 
 	public function facebook_form()
 	{
 		$this->load->library('parser');
-		$this->lang->load('share/facebook_share', $this->config->item('language'));
-
-		if ($this->input->server('REQUEST_METHOD') == 'POST')
-		{
-			$this->index($_POST['fb_title'], $_POST['fb_desc']);
-			return;
-		}
+		$this->lang->load('share/facebook_form', $this->config->item('language'));
+		
 		$this->load->helper('zimapi');
 		$array_status = array();
 		$model_displayname = NULL;
@@ -184,11 +207,47 @@ class Share extends MY_Controller
 				'upload_to_fb'			=> t('upload_to_fb')
 		);
 		
-		$body_page = $this->parser->parse('template/share/facebook_share', $data, TRUE);
+		$body_page = $this->parser->parse('template/share/facebook_form', $data, TRUE);
 		
 		$template_data = array(
 				'lang'			=> $this->config->item('language_abbr'),
 				'headers'		=> '<title>' . t('facebook_title') . '</title>',
+				'contents'		=> $body_page
+		);
+		$this->parser->parse('template/basetemplate', $template_data);
+		return;
+	}
+
+	public function facebook_upload($done = 'false')
+	{
+		$this->load->library('parser');
+		if (isset($_POST['fb_title']) && isset($_POST['fb_desc']))
+		{
+			$fb_title = $_POST['fb_title'];
+			$fb_desc = $_POST['fb_desc'];
+			$_SESSION['fb_title'] = $fb_title;
+			$_SESSION['fb_desc'] = $fb_desc;
+		}
+		else
+		{
+			$fb_title = $_SESSION['fb_title'];
+			$fb_desc = $_SESSION['fb_desc'];
+		}
+		$this->lang->load('share/facebook_upload', $this->config->item('language'));
+		$data = array(
+				'done'					=> $done,
+				'fb_title'				=> rawurlencode($fb_title),
+				'fb_desc'				=> rawurlencode($fb_desc),
+				'uploading'				=> t('uploading'),
+				'fb_upload_popup_text'	=> "test",
+				'fb_callback_ok'		=> "test2"
+		);
+		$body_page = $this->parser->parse('template/share/facebook_upload', $data, TRUE);
+		
+		// parse all page
+		$template_data = array(
+				'lang'			=> $this->config->item('language_abbr'),
+				'headers'		=> '<title>' . 'Zim - Zim-motion' . '</title>',
 				'contents'		=> $body_page
 		);
 		$this->parser->parse('template/basetemplate', $template_data);

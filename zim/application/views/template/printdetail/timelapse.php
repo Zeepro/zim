@@ -31,7 +31,7 @@
 <!-- 				<a href="#" id="timelapse_button" data-ajax="false" data-role="button" class="ui-link ui-btn ui-shadow ui-corner-all">{timelapse_button}</a> -->
 				<a id="send_email_button" href="#timelapse_right_panel" data-role="button" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-mail" style="display:none;">{send_email_button}</a>
 				<a id="send_yt_button" href="/share/youtube_form" data-ajax="false" data-role="button" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-yt-icon" style="display:none;">{send_yt_button}</a>
-				<a id="send_fb_button" href="/share/facebook_share" data-ajax="false" data-role="button" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-fb-icon" style="display:none;">{send_fb_button}</a>
+				<a id="send_fb_button" href="/share/facebook_form" data-ajax="false" data-role="button" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-fb-icon" style="display:none;">{send_fb_button}</a>
 			</div>
 			<div data-role="collapsible" data-collapsed="false" style="align: center;">
 				<h4>{timelapse_info_title}</h4>
