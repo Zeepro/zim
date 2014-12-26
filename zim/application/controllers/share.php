@@ -121,7 +121,7 @@ class Share extends MY_Controller
 		$this->output->set_header("Location: /printdetail/timelapse");
 	}
 
-	public function facebook_share()
+	public function facebook_form()
 	{
 		$this->load->library('parser');
 		$this->lang->load('share/facebook_share', $this->config->item('language'));
