@@ -6,7 +6,7 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=10; IE=9" />
 		<meta http-equiv="cache-control" content="max-age=0" />
 		<meta http-equiv="cache-control" content="no-cache" />
-		<meta http-equiv="expires" content="0" />
+		<meta http-equiv="expires" content="-1" /> <!-- use -1 instead of 0, http://support.microsoft.com/kb/234067 vs http://stackoverflow.com/questions/11357430 -->
 		<meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
 		<meta http-equiv="pragma" content="no-cache" />
 		{headers}
@@ -91,4 +91,5 @@
 		$("#page_body").css("display", "block");
 		var var_disable_logo_link = false;
 	</script>
+	<head><meta http-equiv="pragma" content="no-cache"></head> <!-- for old IE, http://support.microsoft.com/kb/222064 -->
 </html>
