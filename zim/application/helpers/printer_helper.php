@@ -566,42 +566,38 @@ function Printer_resumePrint() {
 function Printer_checkPrintStatus(&$return_data) {
 	global $CFG;
 	$data_status = array();
-	$temper_status = array();
+	$temper_l = 0;
+	$temper_r = 0;
 	
 	$CI = &get_instance();
 	$CI->load->helper(array('printerstate', 'corestatus'));
 	
-// 	// check if we are in printing phase in printing json status file
-// 	$ret_val = Printer_getStatus($printing_status);
-// 	if ($ret_val == FALSE) {
-// 		return FALSE;
-// 	}
-// 	if ($printing_status != PRINTER_VALUE_STATUS_PRINT) {
-// 		return FALSE;
-// 	}
-	
 	// check status if we are not in printing
 	$data_status = PrinterState_checkStatusAsArray();
 	if ($data_status[PRINTERSTATE_TITLE_STATUS] != CORESTATUS_VALUE_PRINT) {
-		// delete printing status json file when we are not in printing
-// 		unlink($CFG->config ['conf'] . PRINTER_PRINTING_JSON);
-// 		echo 'finish'; // test
 		return FALSE;
 	}
 	
 	// get temperatures of extruders
-	$temper_status = PrinterState_getExtruderTemperaturesAsArray();
-	if (!is_array($temper_status)) {
+	if (array_key_exists(PRINTERSTATE_TITLE_EXTEND_PRM, $data_status)) {
+		if (array_key_exists(PRINTERSTATE_TITLE_EXT_TEMP_L, $data_status[PRINTERSTATE_TITLE_EXTEND_PRM])) {
+			$temper_l = $data_status[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_EXT_TEMP_L];
+		}
+		if (array_key_exists(PRINTERSTATE_TITLE_EXT_TEMP_R, $data_status[PRINTERSTATE_TITLE_EXTEND_PRM])) {
+			$temper_r = $data_status[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_EXT_TEMP_R];
+		}
+	}
+	else {
 		// log internal error
 		$CI->load->helper('printerlog');
-		PrinterLog_logError('API error when getting temperatures in printing', __FILE__, __LINE__);
+		PrinterLog_logMessage('getting temperatures in printing returns no tempers', __FILE__, __LINE__);
 // 		return FALSE;
 	}
 	
 	$return_data = array(
 			'print_percent'	=> $data_status[PRINTERSTATE_TITLE_PERCENT],
-			'print_temperL'	=> count($temper_status) ? $temper_status[PRINTERSTATE_LEFT_EXTRUD] : 0,
-			'print_temperR'	=> count($temper_status) ? $temper_status[PRINTERSTATE_RIGHT_EXTRUD] : 0,
+			'print_temperL'	=> $temper_l,
+			'print_temperR'	=> $temper_r,
 			'print_tpassed'	=> $data_status[PRINTERSTATE_TITLE_PASSTIME],
 	);
 	
