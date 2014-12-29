@@ -175,7 +175,8 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_OFFSET_TEMPER_V2',			150);
 	define('PRINTERSTATE_OFFSET_YEAR_SETUP_DATE',	2014);
 	define('PRINTERSTATE_VALUE_DEFAULT_COLOR',		'transparent');
-	define('PRINTERSTATE_VALUE_OFFSET_TO_CAL_TIME',	300); // 5mins
+	define('PRINTERSTATE_VALUE_OFST_TO_CAL_TIME',	300); // 5mins
+	define('PRINTERSTATE_VALUE_OFST_TO_CAL_PCT',	10); // 10%
 	define('PRINTERSTATE_CARTRIDGE_ERR_MAGIC',		1);
 	define('PRINTERSTATE_CARTRIDGE_ERR_CRC',		2);
 	define('PRINTERSTATE_CARTRIDGE_ERR_CART',		3);
@@ -1599,7 +1600,8 @@ function PrinterState_checkStatusAsArray($extra_info = TRUE) {
 		$data_json[PRINTERSTATE_TITLE_PASSTIME] = $time_pass;
 		
 		if (isset($data_json[PRINTERSTATE_TITLE_PERCENT]) &&
-				$time_pass >= PRINTERSTATE_VALUE_OFFSET_TO_CAL_TIME) {
+				($time_pass >= PRINTERSTATE_VALUE_OFST_TO_CAL_TIME
+						|| $data_json[PRINTERSTATE_TITLE_PERCENT] >= PRINTERSTATE_VALUE_OFST_TO_CAL_PCT)) {
 			$percentage_finish = $data_json[PRINTERSTATE_TITLE_PERCENT];
 			
 			$data_json[PRINTERSTATE_TITLE_DURATION] = (int)($time_pass / $percentage_finish * (100 - $percentage_finish));
