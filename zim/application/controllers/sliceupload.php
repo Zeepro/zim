@@ -23,7 +23,7 @@ class Sliceupload extends MY_Controller {
 		foreach($upload_dir as $file) {
 			$fileinfo = pathinfo($file['server_path']);
 			if (is_array($fileinfo) && array_key_exists('extension', $fileinfo)
-					&& in_array($fileinfo['extension'], array('stl', 'amf', 'obj'))) {
+					&& in_array(strtolower($fileinfo['extension']), array('stl', 'amf', 'obj'))) {
 				$alive_time = $file['date'] + 172800; // 48 hours alive duration (3600*48)
 				
 				if ($alive_time <= $current_time) {
