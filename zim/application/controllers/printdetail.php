@@ -363,7 +363,7 @@ class Printdetail extends MY_Controller {
 				$gcode_info = array();
 				
 				$this->load->helper('printerstoring');
-				$id = (int) substr($id, strlen(CORESTATUS_VALUE_MID_PREFIXGCODE) - 1);
+				$id = (int) substr($id, strlen(CORESTATUS_VALUE_MID_PREFIXGCODE));
 				
 				$gcode_info = PrinterStoring_getInfo("gcode", $id);
 				if (!is_null($gcode_info) && array_key_exists(PRINTERSTORING_TITLE_LENG_R, $gcode_info)
@@ -604,95 +604,114 @@ class Printdetail extends MY_Controller {
 			$model_id = NULL;
 			$abb_cartridge = NULL;
 			
-			switch ($array_status[CORESTATUS_TITLE_PRINTMODEL]) {
-				case CORESTATUS_VALUE_MID_SLICE:
-					$preset_id = NULL;
-					$model_filename = array();
-					$preset_name = t('timelapse_info_presetname_unknown');
-					
-					$this->load->helper('slicer');
-					if (ERROR_OK == Slicer_getModelFile(0, $model_filename, TRUE)) {
-						foreach($model_filename as $model_basename) {
-							if (strlen($model_displayname)) {
-								$model_displayname .= ' + ' . $model_basename;
-							}
-							else {
-								$model_displayname = $model_basename;
-							}
-						}
-					}
-					else {
-						$model_displayname = t('timelapse_info_modelname_slice');
-					}
-					$array_info[] = array(
-							'title'	=> t('timelapse_info_modelname_title'),
-							'value'	=> $model_displayname,
-					);
-					
-					$this->load->helper('zimapi');
-					if (ZimAPI_getPreset($preset_id)) {
-						$array_json = array();
+			if (strpos($array_status[CORESTATUS_TITLE_PRINTMODEL], CORESTATUS_VALUE_MID_PREFIXGCODE) === 0) {
+				// gcode library model
+				$gcode_info = array();
+				$gid = (int) substr($array_status[CORESTATUS_TITLE_PRINTMODEL], strlen(CORESTATUS_VALUE_MID_PREFIXGCODE));
+				$model_displayname = t('timelapse_info_modelname_unknown');
+				
+				$this->load->helper('printerstoring');
+				
+				$gcode_info = PrinterStoring_getInfo("gcode", $gid);
+				if (!is_null($gcode_info) && array_key_exists("name", $gcode_info)) {
+					$model_displayname = $gcode_info["name"];
+				}
+				$array_info[] = array(
+						'title'	=> t('timelapse_info_modelname_title'),
+						'value'	=> $model_displayname,
+				);
+			}
+			else {
+				switch ($array_status[CORESTATUS_TITLE_PRINTMODEL]) {
+					case CORESTATUS_VALUE_MID_SLICE:
+						$preset_id = NULL;
+						$model_filename = array();
+						$preset_name = t('timelapse_info_presetname_unknown');
 						
-						if (ERROR_OK == ZimAPI_getPresetInfoAsArray($preset_id, $array_json)) {
-							$preset_name = $array_json[ZIMAPI_TITLE_PRESET_NAME];
+						$this->load->helper('slicer');
+						if (ERROR_OK == Slicer_getModelFile(0, $model_filename, TRUE)) {
+							foreach($model_filename as $model_basename) {
+								if (strlen($model_displayname)) {
+									$model_displayname .= ' + ' . $model_basename;
+								}
+								else {
+									$model_displayname = $model_basename;
+								}
+							}
 						}
-					}
-					$array_info[] = array(
-							'title'	=> t('timelapse_info_presetname_title'),
-							'value'	=> $preset_name,
-					);
-					
-					$restart_url = '/printdetail/printslice';
-					$show_storegcode = TRUE;
-					break;
-					
-				case CORESTATUS_VALUE_MID_PRIME_R:
-					$abb_cartridge = 'r';
-					// treat priming in the same way
-					
-				case CORESTATUS_VALUE_MID_PRIME_L:
-					// never reach here normally (no timelapse for priming in principe, just for safety)
-					$array_info[] = array(
-							'title'	=> t('timelapse_info_modelname_title'),
-							'value'	=> t('timelapse_info_modelname_prime'),
-					);
-					
-					if (is_null($abb_cartridge)) {
-						$abb_cartridge = 'l';
-					}
-					$restart_url = '/printdetail/printprime?r&v=' . $abb_cartridge;
-					//TODO we lose callback info here
-					break;
-					
-				case CORESTATUS_VALUE_MID_CALIBRATION:
-					// never reach here normally (no timelapse for calibration model, just for safety)
-					$this->load->helper('printlist');
-					$model_id = ModelList_codeModelHash(PRINTLIST_MODEL_CALIBRATION);
-					$restart_url = '/printmodel/detail?id=calibration';
-					// treat as a normal pre-sliced model
-					
-				default:
-					// treat as pre-sliced model
-					$model_data = array();
-					$model_displayname = t('timelapse_info_modelname_unknown');
-					
-					if (is_null($model_id)) {
+						else {
+							$model_displayname = t('timelapse_info_modelname_slice');
+						}
+						$array_info[] = array(
+								'title'	=> t('timelapse_info_modelname_title'),
+								'value'	=> $model_displayname,
+						);
+						
+						$this->load->helper('zimapi');
+						if (ZimAPI_getPreset($preset_id)) {
+							$array_json = array();
+							
+							if (ERROR_OK == ZimAPI_getPresetInfoAsArray($preset_id, $array_json)) {
+								$preset_name = $array_json[ZIMAPI_TITLE_PRESET_NAME];
+							}
+						}
+						$array_info[] = array(
+								'title'	=> t('timelapse_info_presetname_title'),
+								'value'	=> $preset_name,
+						);
+						
+						$restart_url = '/printdetail/printslice';
+						$show_storegcode = TRUE;
+						break;
+						
+					case CORESTATUS_VALUE_MID_PRIME_R:
+						$abb_cartridge = 'r';
+						// treat priming in the same way
+						
+					case CORESTATUS_VALUE_MID_PRIME_L:
+						// never reach here normally (no timelapse for priming in principe, just for safety)
+						$array_info[] = array(
+								'title'	=> t('timelapse_info_modelname_title'),
+								'value'	=> t('timelapse_info_modelname_prime'),
+						);
+						
+						if (is_null($abb_cartridge)) {
+							$abb_cartridge = 'l';
+						}
+						$restart_url = '/printdetail/printprime?r&v=' . $abb_cartridge;
+						//TODO we lose callback info here
+						break;
+						
+					case CORESTATUS_VALUE_MID_CALIBRATION:
+						// never reach here normally (no timelapse for calibration model, just for safety)
 						$this->load->helper('printlist');
-						$model_id = $array_status[CORESTATUS_TITLE_PRINTMODEL];
-					}
-					
-					if (ERROR_OK == ModelList__getDetailAsArray($model_id, $model_data, TRUE)) {
-						$model_displayname = $model_data[PRINTLIST_TITLE_NAME];
-					}
-					$array_info[] = array(
-							'title'	=> t('timelapse_info_modelname_title'),
-							'value'	=> $model_displayname,
-					);
-					
-					if (is_null($restart_url)) {
-						$restart_url = '/printdetail/printmodel?id=' . $model_id;
-					}
-					break;
+						$model_id = ModelList_codeModelHash(PRINTLIST_MODEL_CALIBRATION);
+						$restart_url = '/printmodel/detail?id=calibration';
+						// treat as a normal pre-sliced model
+						
+					default:
+						// treat as pre-sliced model
+						$model_data = array();
+						$model_displayname = t('timelapse_info_modelname_unknown');
+						
+						if (is_null($model_id)) {
+							$this->load->helper('printlist');
+							$model_id = $array_status[CORESTATUS_TITLE_PRINTMODEL];
+						}
+						
+						if (ERROR_OK == ModelList__getDetailAsArray($model_id, $model_data, TRUE)) {
+							$model_displayname = $model_data[PRINTLIST_TITLE_NAME];
+						}
+						$array_info[] = array(
+								'title'	=> t('timelapse_info_modelname_title'),
+								'value'	=> $model_displayname,
+						);
+						
+						if (is_null($restart_url)) {
+							$restart_url = '/printdetail/printmodel?id=' . $model_id;
+						}
+						break;
+				}
 			}
 			
 			if (array_key_exists(CORESTATUS_TITLE_ELAPSED_TIME, $array_status)) {
