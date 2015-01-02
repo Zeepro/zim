@@ -151,4 +151,5 @@ $lang['timelapse_info_temperature_value_r']
 	= 'Right: %d °C';
 $lang['timelapse_info_temperature_value_l']
 	= 'Left: %d °C';
-?>
+$lang['storegcode_err_cfm']
+	= 'Save print failed, do you still want to go to the homepage?';

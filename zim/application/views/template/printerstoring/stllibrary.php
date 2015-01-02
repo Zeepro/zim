@@ -6,7 +6,6 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
-			<p>{libraries_info}</p>
 			<a href="/printerstoring/liststl/" data-ajax="false" data-role="button">
 				{browse_models}
 			</a>

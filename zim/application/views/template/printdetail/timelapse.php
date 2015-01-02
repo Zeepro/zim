@@ -48,7 +48,7 @@
 				</table>
 			</div>
 <!-- 			<div id="storegcode_collapsible" data-role="collapsible" data-collapsed="true" style="display: {display_storegocde};"> -->
-			<div id="storegcode_container" style="display: {display_storegocde};">
+			<div id="storegcode_container" style="display: none;">
 <!-- 				<h4>{storegcode_title}</h4> -->
 				<form>
 					<input type="checkbox" id="storegcode_checkbox" data-mini="true">
@@ -86,6 +86,7 @@ var var_ajax_video_check;
 var var_ajax_timelapse_end;
 var var_ajax_send_email;
 var var_internet_ok = {internet_ok};
+var var_display_storegocde = {display_storegocde};
 
 function load_jwplayer_video() {
 	var player = jwplayer("myVideo").setup({
@@ -101,7 +102,7 @@ function load_jwplayer_video() {
 	});
 }
 
-function storegcode() {
+function store_gcode() {
 	var_return = false;
 	
 	$.ajax({
@@ -123,7 +124,7 @@ function storegcode() {
 			var_return = true;
 		},
 		error: function (data, textStatus, xhr) {
-			var exit = confirm("{storegcode_error_confirm}");
+			var exit = confirm("{storegcode_err_cfm}");
 			
 			console.log(data);
 			if (exit == true) {
@@ -146,7 +147,7 @@ function finish_timelapse(storegcode) {
 			&& $("#storegcode_checkbox").is(":checked")) {
 		var rc_store = true;
 		
-		rc_store = storegcode();
+		rc_store = store_gcode();
 		if (rc_store == false) {
 			return;
 		}
@@ -165,34 +166,12 @@ function finish_timelapse(storegcode) {
 		},
 	})
 	.done(function(html) {
-// 		window.location.replace="/";
-		window.location.href="/";
+		window.location.replace("/");
 	})
 	.fail(function() {
 		alert('end timelapse failed');
 	});
 }
-
-// function restart_print() {
-// 	var_ajax_timelapse_end = $.ajax({
-// 		url: "/printdetail/timelapse_end_ajax",
-// 		cache: false,
-// 		beforeSend: function() {
-// 			$("#overlay").addClass("gray-overlay");
-// 			$(".ui-loader").css("display", "block");
-// 		},
-// // 		complete: function() {
-// // 			$("#overlay").removeClass("gray-overlay");
-// // 			$(".ui-loader").css("display", "none");
-// // 		},
-// 	})
-// 	.done(function(html) {
-// 		window.location.replace="{restart_url}";
-// 	})
-// 	.fail(function() {
-// 		alert('end timelapse failed');
-// 	});
-// }
 
 function restart_print() {
 	$("#overlay").addClass("gray-overlay");
@@ -290,18 +269,14 @@ var_interval_video_check = setInterval(function() {
 				$('a#send_yt_button').show();
 				$('a#send_fb_button').show();
 			}
+			if (var_display_storegocde) {
+				$('div#storegcode_container').show();
+			}
 		}
 		// do nothing when status code is 200 (except animation)
-		else if (var_ajax_video_check.status == 200) {
-			var anime_b = $('span#load_video_animation').html();
-			
-// 			if (anime_b.length == 3) {
-// 				$('span#load_video_animation').html('');
-// 			}
-// 			else {
-// 				$('span#load_video_animation').html(anime_b + '.');
-// 			}
-		}
+// 		else if (var_ajax_video_check.status == 200) {
+// 			var anime_b = $('span#load_video_animation').html();
+// 		}
 	})
 	.fail(function() {
 		console.log('check video failed');
@@ -326,16 +301,6 @@ $('a#send_email_button').click(function(event) {
 // 	event.preventDefault();
 // 	event.stopPropagation();
 // 	window.open(this.href, '_blank');
-// });
-
-// $.ajax({
-// 	type:"POST",
-// 	dataType: "json",
-// 	contentType: "application/json",
-// 	url:"https://mandrillapp.com/api/1.0/messages/send.json",
-// 	data:JSON.stringify({"key":"2Zgc9PkAhAoJH8oNBt2q8A","message":{"html":"Example HTML content","subject":"Your zim-motion ajax","from_email":"zim-motion@zeepro.com","from_name":"Zim","to":[{"email":"peng.ni@zeepro.fr"}],"important":false,"track_opens":null,"track_clicks":null,"auto_text":null,"auto_html":null,"inline_css":null,"url_strip_qs":null,"preserve_recipients":null,"view_content_link":null,"tracking_domain":null,"signing_domain":null,"return_path_domain":null,"merge":false},"async":false,"ip_pool":"Main Pool"}),
-// }).done(function(response) {
-// 	console.log(response);
 // });
 
 </script>

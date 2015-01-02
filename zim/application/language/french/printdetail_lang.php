@@ -150,5 +150,5 @@ $lang['timelapse_info_temperature_value_r']
 	= 'Droite : %d °C';
 $lang['timelapse_info_temperature_value_l']
 	= 'Gauche : %d °C';
-
-?>
+$lang['storegcode_err_cfm']
+	= 'Sauvegarde du modèle échouée, voulez-vous toujours aller à l\'accueil ?';

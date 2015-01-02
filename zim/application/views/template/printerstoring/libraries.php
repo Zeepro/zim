@@ -10,7 +10,7 @@
 		<a href="/printerstoring/stllibrary/" data-ajax="false" data-role="button">
 			{stl_models}
 		</a>
-		<a href="/printerstoring/listgcode/" data-ajax="false" data-role="button" style="display:none;">
+		<a href="/printerstoring/listgcode/" data-ajax="false" data-role="button">
 			{gcode_models}
 		</a>
 		</div>

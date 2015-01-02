@@ -20,6 +20,8 @@ if (!defined('PRINTERSTORING_FILE_STL1_BZ2')) {
 	define('PRINTERSTORING_TITLE_LENG_L',	'l2');
 	define('PRINTERSTORING_TITLE_MATER_R',	'm1');
 	define('PRINTERSTORING_TITLE_MATER_L',	'm2');
+	
+	define('PRINTERSTORING_VALUE_MIN_FREESPACE',	209715200); // 200MB
 }
 
 function PrinterStoring_initialFile() {
@@ -138,7 +140,7 @@ function PrinterStoring__generateRendering($f1, $f2) {
 }
 
 // internal function
-function 	PrinterStoring__storeRendering($f1, $f2, $image_storing_path) {
+function PrinterStoring__storeRendering($f1, $f2, $image_storing_path) {
 	global $CFG;
 	$CI = &get_instance();
 	$CI->load->helper('slicer');
@@ -156,6 +158,19 @@ function 	PrinterStoring__storeRendering($f1, $f2, $image_storing_path) {
 	return true;
 }
 
+// internal function
+function PrinterStoring__checkFreeSpace() {
+	$CI = &get_instance();
+	
+	if (disk_free_space($CI->config->item('base_library')) < PRINTERSTORING_VALUE_MIN_FREESPACE) {
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('overpass user library minimum free space limit', __FILE__, __LINE__);
+		
+		return FALSE;
+	}
+	
+	return TRUE;
+}
 
 function PrinterStoring_storeStl($name, $f1, $f2) {
 	global $CFG;
@@ -217,6 +232,13 @@ function PrinterStoring_storeStl($name, $f1, $f2) {
 		PrinterLog_logError('could not store the file(s)', __FILE__, __LINE__);
 		return ERROR_DISK_FULL;
 	}
+	
+	// check disk free space
+	if (!PrinterStoring__checkFreeSpace()) {
+		PrinterStoring_deleteStl($model_id);
+		return ERROR_DISK_FULL;
+	}
+	
 	return ERROR_OK;
 }
 
@@ -607,12 +629,19 @@ function PrinterStoring_storeGcode($name) {
 		PrinterLog_logError('disk full, could not store the gcode file', __FILE__, __LINE__);
 		return ERROR_DISK_FULL;
 	}
-
+	
+	// check disk free space
+	if (!PrinterStoring__checkFreeSpace()) {
+		PrinterStoring_deleteGcode($model_id);
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('overpass user library minimum free space limit', __FILE__, __LINE__);
+		return ERROR_DISK_FULL;
+	}
+	
 	return ERROR_OK;
 }
 
-//FIXME this function doesn't verify any conditions before launching (filament, temperature, etc.)
-//TODO transfer this function to proper helper: printer_helper.php with adaption with corestatus_helper.php
+// just leave an entrance for printing gcode library, we call generally printer helper instead
 function PrinterStoring_printGcode($id_gcode, $exchange_extruder = FALSE, $array_temper = array()) {
 	$CI = &get_instance();
 	$CI->load->helper('printer');

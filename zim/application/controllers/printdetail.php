@@ -171,11 +171,12 @@ class Printdetail extends MY_Controller {
 		if ($gid) {
 			$gcode_info = array();
 			
-			$this->load->helper(array('printerstoring', 'corestatus'));
+			$this->load->helper(array('printerstoring', 'printer', 'corestatus'));
 			
 			$gcode_info = PrinterStoring_getInfo("gcode", $gid);
 			if (!is_null($gcode_info)) {
-				$cr = PrinterStoring_printGcode($gid);
+				$this->set_led();
+				$cr = Printer_printFromLibrary($gid, $exchange_extruder, $array_temper);
 				
 				if ($cr == ERROR_OK) {
 					$this->output->set_header('Location: /printdetail/status?id=' . CORESTATUS_VALUE_MID_PREFIXGCODE . $gid);
@@ -771,10 +772,10 @@ class Printdetail extends MY_Controller {
 				'again_button'			=> t('Print again'),
 				'restart_url'			=> $restart_url ? $restart_url : '/',
 				'send_email_modelname'	=> $model_displayname,
-				//TODO use the comment block to activate store gcode display
-				'display_storegocde'	=> 'none', //$show_storegcode ? 'block' : 'none',
+				'display_storegocde'	=> $show_storegcode ? 'true' : 'false',
 				'storegcode_checkbox'	=> t('storegcode_info'),
 				'storegcode_hint'		=> t('storegcode_name'),
+				'storegcode_err_cfm'	=> t('storegcode_err_cfm'),
 		);
 		
 		$body_page = $this->parser->parse('template/printdetail/timelapse', $template_data, TRUE);

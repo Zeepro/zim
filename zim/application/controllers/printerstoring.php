@@ -133,12 +133,10 @@ class Printerstoring extends MY_Controller {
 		$this->load->library('parser');
 
 		$this->lang->load('printerstoring/stllibrary', $this->config->item('language'));
-		$this->lang->load('printerstoring/libraries', $this->config->item('language'));
 
 		$template_data = array(
 				'back'				=> t('back'),
 				'home'				=> t('home'),
-				'libraries_info'	=> t('libraries_info'),
 				'browse_models'		=> t('browse_models'),
 				'add_model'			=> t('add_model')
 		);
@@ -371,7 +369,7 @@ class Printerstoring extends MY_Controller {
 		}
 		
 		$this->load->library('parser');
-// 		$this->lang->load('printerstoring/gcodedetail', $this->config->item('language'));
+		$this->lang->load('printerstoring/gcodedetail', $this->config->item('language'));
 		
 		$check_left = $check_right = t('filament_ok');
 		$change_left = $change_right = t('change_filament');

@@ -17,7 +17,7 @@ $lang['Time estimation: ']
 $lang['temp_adjustments_l']
 	= "Température gauche : ";
 $lang['temp_adjustments_r']
-	= "Température gauche : ";
+	= "Température droite : ";
 $lang['color_suggestion']
 	= "Suggestion de couleur :";
 $lang['unknown']
