@@ -51,16 +51,26 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_VALUE_P2P',		'p2p');
 	define('ZIMAPI_MODE_CETH',		'cEth');
 	
+	if (DectectOS_checkWindows()) {
+		define('ZIMAPI_FILEPATH_TIMELAPSE',	$CI->config->item('temp') . 'timelapse.mp4');
+		define('ZIMAPI_FILEPATH_TL_TMPIMG',	$CI->config->item('temp') . 'img001.jpg');
+		define('ZIMAPI_FILEPATH_CAPTURE',	$CI->config->item('bin') . 'capture.jpg');
+		define('ZIMAPI_FILEPATH_ENDPRINT',	$CI->config->item('bin') . 'timelapse_end_print.sh');
+		define('ZIMAPI_FILEPATH_ENDCANCEL',	$CI->config->item('bin') . 'timelapse_end_cancel.sh');
+		define('ZIMAPI_FILEPATH_UPGRADE',	$CI->config->item('conf') . 'profile.json');
+	}
+	else {
+		define('ZIMAPI_FILEPATH_TIMELAPSE',	'/var/www/tmp/timelapse.mp4');
+		define('ZIMAPI_FILEPATH_TL_TMPIMG',	'/var/www/tmp/img001.jpg');
+		define('ZIMAPI_FILEPATH_CAPTURE',	'/var/www/tmp/image.jpg');
+		define('ZIMAPI_FILEPATH_ENDPRINT',	'/var/www/bin/timelapse_end_print.sh');
+		define('ZIMAPI_FILEPATH_ENDCANCEL',	'/var/www/bin/timelapse_end_cancel.sh');
+		define('ZIMAPI_FILEPATH_UPGRADE',	'/config/conf/profile.json');
+	}
+	
 	define('ZIMAPI_FILENAME_CAMERA',	'Camera.json');
 	define('ZIMAPI_FILENAME_SOFTWARE',	'Software.json');
-	define('ZIMAPI_FILEPATH_CAPTURE',	'/var/www/tmp/image.jpg');
-	define('ZIMAPI_FILEPATH_UPGRADE',	'/config/conf/profile.json');
 	define('ZIMAPI_FILENAME_TIMELAPSE',	'timelapse.mp4');
-	define('ZIMAPI_FILEPATH_TIMELAPSE',	'/var/www/tmp/timelapse.mp4');
-// 	define('ZIMAPI_FILEPATH_TIMELAPSE',	'C:/wamp/sites/zim/tmp/timelapse.mp4');
-	define('ZIMAPI_FILEPATH_TL_TMPIMG',	'/var/www/tmp/img001.jpg');
-	define('ZIMAPI_FILEPATH_ENDPRINT',	'/var/www/bin/timelapse_end_print.sh');
-	define('ZIMAPI_FILEPATH_ENDCANCEL',	'/var/www/bin/timelapse_end_cancel.sh');
 	define('ZIMAPI_CMD_GENERATION_TIMELAPSE', // abandoned
 			'nice -n 19 ffmpeg -v quiet -r 10 -f image2 -s 640x360 -i /var/www/tmp/img%03d.jpg -i /var/www/images/logo_calque_60.png -y -filter_complex "[0:v][1:v]overlay=380:5" -vcodec libx264 -crf 35 /var/www/tmp/timelapse.mp4');
 	define('ZIMAPI_PRM_CAMERA_PRINTSTART',
@@ -799,10 +809,10 @@ function ZimAPI_setCameraPassword($password = '') {
 }
 
 function ZimAPI_cameraCapture(&$path_capture) {
-	global $CFG;
 	$output = NULL;
 	$ret_val = 0;
 	$info_camera = '';
+	$CI = &get_instance();
 	
 	if (!ZimAPI_checkCamera($info_camera)) {
 		return FALSE;
@@ -814,24 +824,16 @@ function ZimAPI_cameraCapture(&$path_capture) {
 		return FALSE;
 	}
 	
-	$command = $CFG->config['capture'] . ZIMAPI_PRM_CAMERA_CAPTURE;
+	$command = $CI->config->item('capture') . ZIMAPI_PRM_CAMERA_CAPTURE;
 	
 	exec($command, $output, $ret_val);
 	if ($ret_val != ERROR_NORMAL_RC_OK) {
-		$CI = &get_instance();
 		$CI->load->helper('printerlog');
 		PrinterLog_logError('capture camera command error', __FILE__, __LINE__);
 		return FALSE;
 	}
 	
-	$CI = &get_instance();
-	$CI->load->helper('detectos');
-	if (DectectOS_checkWindows()) {
-		$path_capture = $CFG->config['bin'] . 'capture.jpg';
-	}
-	else {
-		$path_capture = ZIMAPI_FILEPATH_CAPTURE;
-	}
+	$path_capture = ZIMAPI_FILEPATH_CAPTURE;
 	
 	return TRUE;
 }
@@ -1489,20 +1491,12 @@ function ZimAPI_checkUSB() {
 
 function ZimAPI_getUpgradeMode(&$mode, &$profile = NULL) {
 	$tmp_array = array();
-	$json_file = NULL;
 	$CI = &get_instance();
 	
-	if (DectectOS_checkWindows()) {
-		$json_file = $CI->config->item('conf') . 'profile.json';
-	}
-	else {
-		$json_file = ZIMAPI_FILEPATH_UPGRADE;
-	}
-	
 	$CI->load->helper('json');
-	if (file_exists($json_file)) {
+	if (file_exists(ZIMAPI_FILEPATH_UPGRADE)) {
 		try {
-			$tmp_array = json_read($json_file, TRUE);
+			$tmp_array = json_read(ZIMAPI_FILEPATH_UPGRADE, TRUE);
 			if ($tmp_array['error']) {
 				throw new Exception('read json error');
 			}
@@ -1529,7 +1523,6 @@ function ZimAPI_getUpgradeMode(&$mode, &$profile = NULL) {
 
 function ZimAPI_setUpgradeMode($mode, $profile = NULL) {
 	$json_data = array();
-	$json_file = NULL;
 	$CI = &get_instance();
 	
 	$mode = strtolower($mode);
@@ -1554,16 +1547,9 @@ function ZimAPI_setUpgradeMode($mode, $profile = NULL) {
 			break;
 	}
 	
-	if (DectectOS_checkWindows()) {
-		$json_file = $CI->config->item('conf') . 'profile.json';
-	}
-	else {
-		$json_file = ZIMAPI_FILEPATH_UPGRADE;
-	}
-	
 	//write model json info
 	try {
-		$fp = fopen($json_file, 'w');
+		$fp = fopen(ZIMAPI_FILEPATH_UPGRADE, 'w');
 		if ($fp) {
 			fwrite($fp, json_encode_unicode($json_data));
 			fclose($fp);
@@ -1572,7 +1558,6 @@ function ZimAPI_setUpgradeMode($mode, $profile = NULL) {
 			throw new Exception('write json error');
 		}
 	} catch (Exception $e) {
-		$CI = &get_instance();
 		$CI->load->helper('printerlog');
 		PrinterLog_logError('write upgrade json file error', __FILE__, __LINE__);
 		return ERROR_INTERNAL;

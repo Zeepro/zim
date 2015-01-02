@@ -152,21 +152,18 @@ class Printdetail extends MY_Controller {
 		return;
 	}
 	
-	public function printgcode($gid = NULL) {
-		$this->printgcode_temp($gid);
+	public function printgcode() {
+		$this->printgcode_temp();
 		
 		return;
 	}
 	
-	public function printgcode_temp($gid = NULL) {
+	public function printgcode_temp() {
 		$exchange_extruder = 0;
 		$array_temper = array();
+		$gid = (int) $this->input->get('id');
 		
 		$this->get_extra_info($array_temper, $exchange_extruder);
-		
-		if (is_null($gid)) {
-			$gid = (int) $this->input->get('id');
-		}
 		
 		if ($gid) {
 			$gcode_info = array();
@@ -616,10 +613,12 @@ class Printdetail extends MY_Controller {
 				if (!is_null($gcode_info) && array_key_exists("name", $gcode_info)) {
 					$model_displayname = $gcode_info["name"];
 				}
+				
 				$array_info[] = array(
 						'title'	=> t('timelapse_info_modelname_title'),
 						'value'	=> $model_displayname,
 				);
+				$restart_url = '/printdetail/printgcode?id=' . $gid;
 			}
 			else {
 				switch ($array_status[CORESTATUS_TITLE_PRINTMODEL]) {
