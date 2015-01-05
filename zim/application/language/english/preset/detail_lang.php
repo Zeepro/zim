@@ -17,7 +17,7 @@ $lang['submit_button']
 $lang['miss_input']
 	= 'Missing parameter detected';
 $lang['overwrite_system_preset']
-	= 'Cannot overwrite system preset';
+	= 'Invalid name';
 
 $lang['fill_pattern1']
 	= 'rectilinear';

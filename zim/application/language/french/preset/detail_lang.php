@@ -15,9 +15,9 @@ $lang['new_preset_title']
 $lang['submit_button']
 	= 'Enregistrer';
 $lang['miss_input']
-	= 'Absent de paramètre';
+	= 'Absence de paramètre';
 $lang['overwrite_system_preset']
-	= 'Remplacement de la préselection du système interdit';
+	= 'Nom de pré-selection non valide';
 
 $lang['support_material_interface_speed']
 	= 'Interface des matériaux de support (mm/s or %%)';
