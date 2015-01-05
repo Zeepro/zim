@@ -127,6 +127,8 @@ class Preset extends MY_Controller {
 			return;
 		}
 		
+		$this->lang->load('preset/detail', $this->config->item('language'));
+		
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			//TODO try to treat the infos here
 			$this->load->library('form_validation');
@@ -318,6 +320,7 @@ class Preset extends MY_Controller {
 					$ret_val = ZimAPI_getPresetInfoAsArray(ZimAPI_codePresetHash($name_preset), $new_info, $new_system_preset);
 					if ($new_system_preset) {
 						$ret_val = ERROR_WRONG_PRM;
+						$error = t('overwrite_system_preset');
 					}
 					else if ($ret_val == ERROR_WRONG_PRM || $ret_val == ERROR_OK) {
 						$ret_val = ZimAPI_setPresetSetting($id_preset, $array_input, $name_preset);
@@ -335,12 +338,13 @@ class Preset extends MY_Controller {
 					$this->output->set_header('Location: /preset/listpreset');
 					return;
 				}
-				$error = t('errorcode' . $ret_val); // test
+				else if (strlen($error) == 0) {
+					$error = t('errorcode' . $ret_val); // test
+				}
 			}
 		}
 		
 		$this->load->library('parser');
-		$this->lang->load('preset/detail', $this->config->item('language'));
 		
 		// parse the main body
 		$template_data = array(

@@ -14,6 +14,10 @@ $lang['new_preset_title']
 	= 'Nouveau jeu de paramètres';
 $lang['submit_button']
 	= 'Enregistrer';
+$lang['miss_input']
+	= 'Absent de paramètre';
+$lang['overwrite_system_preset']
+	= 'Remplacement de la préselection du système interdit';
 
 $lang['support_material_interface_speed']
 	= 'Interface des matériaux de support (mm/s or %%)';
