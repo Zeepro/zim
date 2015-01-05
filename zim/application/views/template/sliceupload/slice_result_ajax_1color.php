@@ -40,7 +40,19 @@
 <!-- 						<div class="ui-block-b"> -->
 <!-- 						</div> -->
 						<input type="hidden" name="exchange" id="exchange_extruder_hidden" value="0">
-						<input type="submit" id="print_slice" value="{print_button}">
+						<div data-role="collapsible">
+							<h4>{advanced}</h4>
+							<div class="ui-grid-a">
+								<div class="ui-block-a">
+									<a data-role="button" href="/sliceupload/gcode/display">{G-Code}</a>
+								</div>
+								<div class="ui-block-b">
+									<a data-role="button" href="sliceupload/gcode/render">{Layer by Layer}</a>
+								</div>
+							</div>
+						</div>
+						<br />
+						<input type="submit" id="print_slice" value="{print_button}" />
 					</div>
 				</form>
 

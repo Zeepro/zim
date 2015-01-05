@@ -412,6 +412,21 @@ class Sliceupload extends MY_Controller {
 		return;
 	}
 	
+	function gcode($mode = "display")
+	{
+		$this->load->library('parser');
+		$view_data = array(
+				'home'		=> t('back')
+		);
+		$body_page = $this->parser->parse('/template/sliceupload/gcode.php', $view_data, TRUE);
+		$template_data = array(
+				'headers'		=> '<title>Zim - G-code</title>',
+				'contents'		=> $body_page
+		);
+		$this->parser->parse('template/basetemplate', $template_data);
+		return;
+	}
+	
 	function add_model_ajax() {
 		$cr = ERROR_OK;
 		$display = NULL;

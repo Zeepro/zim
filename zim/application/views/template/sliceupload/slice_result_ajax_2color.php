@@ -42,6 +42,13 @@
 						<input type="submit" id="print_slice" value="{print_button}">
 					</div>
 				</form>
+				<div data-role="collapsible">
+					<h4>{advanced}</h4>
+					<div class="ui-bar">
+						<a data-role="button">{G-Code}</a>
+						<a data-role="button">{Layer by Layer}</a>
+					</div>
+				</div>
 
 <script type="text/javascript">
 var var_enable_print = {enable_print};
