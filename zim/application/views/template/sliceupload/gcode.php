@@ -8,16 +8,16 @@
 
     <script type="text/javascript" src="/assets/gcode/lib/codemirror.js"></script>
     <script type="text/javascript" src="/assets/gcode/lib/mode_gcode/gcode_mode.js"></script>
-    <script type="text/javascript" src="/assets/gcode/lib/three.js"></script>
+<!--     <script type="text/javascript" src="/assets/gcode/lib/three.js"></script> -->
     <script type="text/javascript" src="/assets/gcode/lib/bootstrap.js"></script>
     <script type="text/javascript" src="/assets/gcode/lib/modernizr.custom.09684.js"></script>
-    <script type="text/javascript" src="/assets/gcode/lib/TrackballControls.js"></script>
+<!--     <script type="text/javascript" src="/assets/gcode/lib/TrackballControls.js"></script> -->
     <script type="text/javascript" src="/assets/gcode/lib/zlib.min.js"></script>
     <script type="text/javascript" src="/assets/gcode/js/ui.js"></script>
     <script type="text/javascript" src="/assets/gcode/js/gCodeReader.js"></script>
     <script type="text/javascript" src="/assets/gcode/js/renderer.js"></script>
     <script type="text/javascript" src="/assets/gcode/js/analyzer.js"></script>
-    <script type="text/javascript" src="/assets/gcode/js/renderer3d.js"></script>
+<!--     <script type="text/javascript" src="/assets/gcode/js/renderer3d.js"></script> -->
     
     <style> #slider-horizontal { position: relative !important; } </style>
     
