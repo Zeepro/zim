@@ -18,6 +18,10 @@ $lang['miss_input']
 	= 'Missing parameter detected';
 $lang['overwrite_system_preset']
 	= 'Invalid name';
+$lang['same_user_preset']
+	= 'Another old preset with the same name detected when changing preset name, please check the overwrite box to confirm it during the modification';
+$lang['save_overwrite']
+	= 'Overwrite another old preset if you change preset name';
 
 $lang['fill_pattern1']
 	= 'rectilinear';

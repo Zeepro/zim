@@ -219,6 +219,15 @@ class Preset extends MY_Controller {
 				$error = t('miss_input');
 			}
 			else {
+				$overwrite_confirm = $this->input->post('save_overwrite');
+				
+				if ((int)$overwrite_confirm == 1) {
+					$overwrite_confirm = TRUE;
+				}
+				else {
+					$overwrite_confirm = FALSE;
+				}
+				
 				//TODO try to modify or new config if true
 				$array_input = array(
 						'layer_height'							=> $this->input->post('layer_height'),
@@ -307,7 +316,7 @@ class Preset extends MY_Controller {
 				
 				if ($new_preset) {
 					if ($this->input->post('save_as')) {
-						$ret_val = ZimAPI_setPresetSetting($id_preset, $array_input, $name_preset);
+						$ret_val = ZimAPI_setPresetSetting($id_preset, $array_input, $name_preset, $overwrite_confirm);
 					}
 					else {
 						$ret_val = ERROR_MISS_PRM;
@@ -323,7 +332,7 @@ class Preset extends MY_Controller {
 						$error = t('overwrite_system_preset');
 					}
 					else if ($ret_val == ERROR_WRONG_PRM || $ret_val == ERROR_OK) {
-						$ret_val = ZimAPI_setPresetSetting($id_preset, $array_input, $name_preset);
+						$ret_val = ZimAPI_setPresetSetting($id_preset, $array_input, $name_preset, $overwrite_confirm);
 						
 						if ($ret_val == ERROR_OK && $system_preset == FALSE) { // system_preset will never be true normally
 							$ret_val = ZimAPI_deletePreset($id_preset);
@@ -332,6 +341,10 @@ class Preset extends MY_Controller {
 				}
 				else {
 					$ret_val = ZimAPI_setPresetSetting($id_preset, $array_input);
+				}
+				
+				if ($ret_val == ERROR_FULL_PRTLST) {
+					$error = t('same_user_preset');
 				}
 				
 				if ($ret_val == ERROR_OK) {
@@ -597,16 +610,17 @@ class Preset extends MY_Controller {
 				'bridge_flow_ratio_value'						=> $array_setting['bridge_flow_ratio'],
 				'resolution_value'								=> $array_setting['resolution'],
 				// interface value
-				'preset_title'	=> $new_preset ? t('new_preset_title') : $array_info[ZIMAPI_TITLE_PRESET_NAME], //'Name',
-				'submit_button'	=> t('submit_button'),
-				'preset_id'		=> $id_preset,
-				'preset_newurl'	=> $new_preset ? '&new' : NULL,
-				'hide_save_as'	=> $new_preset ? NULL : $display_hide,
-				'hide_submit'	=> ($system_preset && $new_preset == NULL) ? $display_hide : NULL,
-				'hide_delete'	=> ($system_preset || $new_preset) ? $display_hide : NULL,
-				'error'			=> $error,
-				'disable_all'	=> ($system_preset && $new_preset == NULL) ? 'true' : 'false',
-				'save_as_value'	=> $new_preset ? NULL : $array_info['name'],
+				'preset_title'		=> $new_preset ? t('new_preset_title') : $array_info[ZIMAPI_TITLE_PRESET_NAME], //'Name',
+				'submit_button'		=> t('submit_button'),
+				'preset_id'			=> $id_preset,
+				'preset_newurl'		=> $new_preset ? '&new' : NULL,
+				'hide_save_as'		=> $new_preset ? NULL : $display_hide,
+				'hide_submit'		=> ($system_preset && $new_preset == NULL) ? $display_hide : NULL,
+				'hide_delete'		=> ($system_preset || $new_preset) ? $display_hide : NULL,
+				'error'				=> $error,
+				'disable_all'		=> ($system_preset && $new_preset == NULL) ? 'true' : 'false',
+				'save_overwrite'	=> t('save_overwrite'),
+				'save_as_value'		=> $new_preset ? NULL : $array_info['name'],
 				// hint for select option of extruder
 				'extruder_left'			=> t('extruder_left'),
 				'extruder_right'		=> t('extruder_right'),

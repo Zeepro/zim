@@ -20,6 +20,8 @@
 			<div id="save_as_container" style="{hide_submit}">
 				<h3><label for="save_as">{save_as_title}</label></h3>
 				<input type="text" data-clear-btn="true" name="save_as" value="{save_as_value}" id="save_as" required>
+				<input type="checkbox" id="save_overwrite" name="save_overwrite" data-mini="true" value="1">
+				<label for="save_overwrite">{save_overwrite}</label>
 			</div>
 			<div data-role="collapsible">
 				<h4>{layer_perimeter_title}</h4>

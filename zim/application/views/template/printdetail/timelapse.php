@@ -1,5 +1,5 @@
 <div data-role="page" data-url="/printdetail/timelapse" style="overflow-y:hidden;">
-	<style>
+	<style type="text/css">
 		.ui-icon-yt-icon:after
 		{
 			background-image: url("/images/yt_icon.png");

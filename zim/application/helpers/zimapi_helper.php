@@ -1815,11 +1815,12 @@ function ZimAPI_codePresetHash($raw_name) {
 	}
 }
 
-function ZimAPI_setPresetSetting($id_preset, $array_input, $name_preset = NULL) {
+function ZimAPI_setPresetSetting($id_preset, $array_input, $name_preset = NULL, $overwrite = FALSE) {
 	// $name_preset is NULL when creating preset from an old id
 	$ret_val = 0;
 	$array_setting = array();
 	$preset_path = NULL;
+	$system_preset = FALSE;
 	$CI = &get_instance();
 	
 	if (!is_array($array_input)) {
@@ -1828,17 +1829,28 @@ function ZimAPI_setPresetSetting($id_preset, $array_input, $name_preset = NULL) 
 	
 	// check if we have same name, and define preset path
 	if ($name_preset != NULL) {
-		$ret_val = ZimAPI_checkPreset(ZimAPI_codePresetHash($name_preset));
+		$old_path = NULL;
+		
+		$ret_val = ZimAPI_checkPreset(ZimAPI_codePresetHash($name_preset), $old_path, $system_preset);
 		if ($ret_val == TRUE) {
 			$CI->load->helper('printerlog');
-			PrinterLog_logMessage('system has already the same preset name: ' . $name_preset);
-			return ERROR_FULL_PRTLST; // just use another error code
+			
+			if ($system_preset == TRUE) {
+				PrinterLog_logMessage('system can not modify default preset');
+				return ERROR_WRONG_PRM;
+			}
+			else if ($overwrite == FALSE) {
+				PrinterLog_logMessage('system has already the same preset name: ' . $name_preset);
+				return ERROR_FULL_PRTLST; // just use another error code
+			}
+			else {
+				PrinterLog_logMessage('system detects a same preset name, and will overwrite it: ' . $name_preset);
+			}
 		}
 		
 		$preset_path = $CI->config->item('presetlist') . ZimAPI_codePresetHash($name_preset) . '/';
 	}
 	else {
-		$system_preset = FALSE;
 		$ret_val = ZimAPI_checkPreset($id_preset, $preset_path, $system_preset);
 		if ($ret_val == FALSE) {
 			$CI->load->helper('printerlog');

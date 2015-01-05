@@ -20,60 +20,11 @@
 		</script>
 		<script src="/scripts/jquery.mobile-1.4.0.min.js"></script>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, target-densitydpi=medium-dpi, user-scalable=0" />
-		<!-- <link rel="stylesheet" href="/assets/css/4.css"> -->
-		<!-- <link rel="stylesheet" href="/assets/css/style.css"> -->
-		<!-- <link rel="stylesheet" href="/styles/flag.css" /> -->
-		<style type="text/css">
-			div.logo {
-				width:100%; 
-				height:110px;
-				background:url("/assets/images/logo-white.png") top center no-repeat;
-				background-size: 212px 59px;
-			}
-			div#link_logo {
-				margin: 0 auto;
-				width: 248px;
-				height: 72px;
-				cursor: pointer;
-			}
-			.ui-page-theme-a{
-				color:#575749;
-				background:url("/assets/images/page-backgrounds/back-4.jpg") 0 -100px repeat-x  #f9f7f3;
-				background-size: 79px 245px; 
-			}
-			.page-header { 
-				background:url("/assets/images/headerBack.png") bottom repeat-x !important;
-				border:0px;!important
-				color:#333;
-				height:38px;
-				text-shadow: 0 -1px 1px #fff;
-			}
-			.shadow {
-				width: 100%;
-				position: relative;
-				top: -17px;
-				z-index: 5;
-			}
-			.zim-error
-			{
-				color:red;
-				font-weight: bold;
-			}
-			.ui-grid-a .ui-block-b .ui-slider-switch,
-			.switch-larger .ui-slider-switch {
-				width: 12em;
-				max-width: 100%;
-			}
-			.ui-grid-a .ui-block-a .ui-slider-switch,
-			.switch-larger .ui-slider-switch {
-				width: 12em;
-				max-width: 100%;
-			}
-		</style>
+		<link rel="stylesheet" href="/styles/Printer-zim.css" />
 		<script type="text/javascript">
-			$(document).on("pageinit", function()
-			{
-// 				if (typeof timelapse == 'undefined')
+			var var_disable_logo_link = false;
+			
+			$(document).on("pageinit", function() {
 				if (typeof var_disable_logo_link == 'undefined' || var_disable_logo_link == false)
 					$('div#link_logo').click(function(){window.location.href='/'; return false;});
 			});
@@ -89,7 +40,6 @@
 	</body>
 	<script>
 		$("#page_body").css("display", "block");
-		var var_disable_logo_link = false;
 	</script>
 	<head><meta http-equiv="pragma" content="no-cache"></head> <!-- for old IE, http://support.microsoft.com/kb/222064 -->
 </html>
