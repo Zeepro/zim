@@ -7,7 +7,7 @@
 	<div data-role="content">
 		<div id="container">
 <!-- 			<h2>{title}</h2> -->
-			<form action="/preset/detail" method="get">
+			<form action="/preset/detail" method="get" data-ajax="false">
 				<div data-role="fieldcontain">
 <!-- 					<legend>Vertical controlgroup:</legend> -->
 					<label for="new_preset_select">{new_preset_label}</label>
@@ -18,7 +18,7 @@
 					</select>
 				</div>
 				<input type="hidden" name="new" id="new_preset_hidden">
-				<div id="submit_container"><input type="submit" value="{submit_button}" data-ajax="false"></div>
+				<div id="submit_container"><input type="submit" value="{submit_button}"></div>
 			</form>
 			<div style="height:50px;"></div>
 			<div id="delete_popup" data-role="popup" data-dismissible="false" class="ui-content" style="max-width: 250px; text-align: center;">
