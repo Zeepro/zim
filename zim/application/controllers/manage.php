@@ -297,6 +297,8 @@ class Manage extends MY_Controller {
 					'action'		=> t('insert_action')  . "<br /><br /><br /><br />");
 			$this->parser->parse('template/manage/manage_filament_ajax', $template_data);
 		}
+		
+		$this->output->set_status_header(202);
 		return;
 	}
 }

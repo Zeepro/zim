@@ -20,4 +20,6 @@ if (var_in_heating == true) {
 	.button().button('refresh');
 }
 
+$("a#home_button").css("display", "none");
+
 </script>

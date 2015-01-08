@@ -23,4 +23,6 @@ function cancel_auto_prime() {
 	$("p#in_loading_hint").html("{cancel_info}");
 }
 
+$("a#home_button").css("display", "none");
+
 </script>

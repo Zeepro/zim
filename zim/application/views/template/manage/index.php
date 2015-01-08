@@ -236,7 +236,7 @@
 //	CARTRIDGE JS
 //**************
 
-$.ajax(
+var var_manage_filament_l = $.ajax(
 {
 	url: "/manage/filament_ajax/l",
 	cache: false,
@@ -245,15 +245,17 @@ $.ajax(
 })
 .done(function(html)
 {
-	$("#cartridge_ajax").html(html);
-	$("#cartridge_ajax").css('cursor', 'pointer');
-	$("#cartridge_ajax").on('click', function()
-	{
-		window.location.href = '/printerstate/changecartridge?v=l&f=0';
-	});
+	if (var_manage_filament_l.status == 202) {
+		$("#cartridge_ajax").html(html);
+		$("#cartridge_ajax").css('cursor', 'pointer');
+		$("#cartridge_ajax").on('click', function()
+		{
+			window.location.href = '/printerstate/changecartridge?v=l&f=0';
+		});
+	}
 });
 
-$.ajax(
+var var_manage_filament_r = $.ajax(
 {
 	url: "/manage/filament_ajax/r",
 	cache: false,
@@ -262,12 +264,14 @@ $.ajax(
 })
 .done(function(html)
 {
-	$("#cartridge_ajax2").html(html);
-	$("#cartridge_ajax2").css('cursor', 'pointer');
-	$("#cartridge_ajax2").on('click', function()
-	{
-		window.location.href = '/printerstate/changecartridge?v=r&f=0';
-	});
+	if (var_manage_filament_r.status == 202) {
+		$("#cartridge_ajax2").html(html);
+		$("#cartridge_ajax2").css('cursor', 'pointer');
+		$("#cartridge_ajax2").on('click', function()
+		{
+			window.location.href = '/printerstate/changecartridge?v=r&f=0';
+		});
+	}
 });
 
 $(document).ready(function()
