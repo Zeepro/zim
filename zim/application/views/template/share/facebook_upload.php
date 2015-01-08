@@ -1,4 +1,4 @@
-<div data-role="page" data-url="/share/facebook_upload">
+<div data-role="page" data-url="/share/facebook_upload" style="overflow-y:hidden;">
 	<div id="overlay"></div>
 	<header data-role="header" class="page-header">
 	</header>
@@ -16,36 +16,38 @@
 		</div>
 	</div>
 	<script>
-	if ("{done}" == "false")
-	{
-		var title = decodeURIComponent("{fb_title}");
-		var desc = decodeURIComponent("{fb_desc}");
-
-		var trace = $.ajax(
-		{
-			url:'/share/index/',
-			type: 'POST',
-			data: {fb_title: title, fb_desc: desc},
-			cache: false,
-		})
-		.done(function(data)
-		{
-			if (trace.status == 202)
+	$(document).on("pageinit", function() {
+// 		if ("{done}" == "false")
+// 		{
+			var title = decodeURIComponent("{fb_title}");
+			var desc = decodeURIComponent("{fb_desc}");
+	
+			var trace = $.ajax(
 			{
-				window.location.href = data;
-			}
-			else
+				url:'/share/connect_facebook/upload',
+				type: 'POST',
+				data: {fb_title: title, fb_desc: desc},
+				cache: false,
+			})
+			.done(function(data)
 			{
-				$("div#yt_upload_loading").hide();
-				$("div#youtube_popup").popup("open");
-			}
-		});
-	}
-	else
-	{
-		$("div#yt_upload_loading").hide();
-		$("div#youtube_popup").popup("open");
-	}
+				if (trace.status == 202)
+				{
+					window.location.href = data;
+				}
+				else
+				{
+					$("div#yt_upload_loading").hide();
+					$("div#youtube_popup").popup("open");
+				}
+			});
+// 		}
+// 		else
+// 		{
+// 			$("div#yt_upload_loading").hide();
+// 			$("div#youtube_popup").popup("open");
+// 		}
+	});
 		function finish_yt_upload() {
 			window.location.href = "/printdetail/timelapse";
 		}

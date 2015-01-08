@@ -15,10 +15,10 @@
 					<label for="yt_title" style="margin-top: 2em">{desc_label}</label>
 				    <textarea name="yt_description" form="yt_form" placeholder="Enter description here">{yt_desc}</textarea>
 				</div>
-				<div class="ui-field-contain">
-					<label for="yt_title" style="margin-top: 1.7em">{tags_label}</label>
-				    <input name="yt_tags" value="{yt_tags}" />
-				</div>
+<!-- 				<div class="ui-field-contain"> -->
+<!-- 					<label for="yt_title" style="margin-top: 1.7em">{tags_label}</label> -->
+<!-- 				    <input name="yt_tags" value="{yt_tags}" /> -->
+<!-- 				</div> -->
 				<div class="ui-field-contain">
 					<label for="yt_title" style="margin-top: 2em">{privacy_label}</label>
 				    <select name="yt_privacy">

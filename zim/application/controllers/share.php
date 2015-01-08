@@ -3,7 +3,6 @@
 if (! defined ( 'BASEPATH' ))
 	exit ( 'No direct script access allowed' );
 
-session_start();
 set_include_path(get_include_path() . PATH_SEPARATOR . BASEPATH . '../assets/facebook_api/src');
 require_once BASEPATH . '../assets/facebook_api/autoload.php';
 use Facebook\FacebookSession;
@@ -14,100 +13,32 @@ use Facebook\FacebookSDKException;
 use Facebook\GraphObject;
 
 class Share extends MY_Controller
-{	
-	public function index()
-	{
-		if (isset($_POST['fb_title']) && isset($_POST['fb_desc']))
-		{
-			$fb_title = $_POST['fb_title'];
-			$fb_desc = $_POST['fb_desc'];
-			$_SESSION['fb_title'] = $fb_title;
-			$_SESSION['fb_desc'] = $fb_desc;
+{ //TODO pass php native session to codeigniter session
+	function __construct() {
+		parent::__construct();
+		
+		$session_path = $this->config->item('temp') . 'php_session';
+		
+		$this->load->helper(array(
+				'errorcode',
+		));
+		
+		// change session folder
+		if (!is_dir($session_path)) {
+			if (file_exists($session_path)) {
+				unlink($session_path);
+			}
+			mkdir($session_path);
+			chmod($session_path, 0777);
 		}
-		else
-		{
-			$fb_title = $_SESSION['fb_title'];
-			$fb_desc = $_SESSION['fb_desc'];
-		}
-		FacebookSession::setDefaultApplication('406644606152497', 'adc295f31a84a0fb8999ff0d59769118');
-		$helper = new FacebookRedirectLoginHelper("https://sso.zeepro.com/redirectfb.ashx?sn=" . ZimAPI_getSerial());
-		$this->load->helper(array('zimapi', 'corestatus', 'printerlog'));
-		if (isset($_SESSION) && isset($_SESSION['fb_token']))
-		{
-			// create new session from the existing PHP sesson
-			$session = new FacebookSession($_SESSION['fb_token']);
-			try
-			{
-				// validate the access_token to make sure it's still valid
-				if (!$session->validate())
-					$session = null;
-			}
-			catch (Exception $e)
-			{
-				// catch any exceptions and set the sesson null
-				$session = null;
-				echo 'No session: '.$e->getMessage();
-			}
-		}
-		else if (empty($session))
-		{
-			// the session is empty, we create a new one
-			try
-			{
-				// the visitor is redirected from the login, let's pickup the session
-				$session = $helper->getSessionFromRedirect();
-			}
-			catch( FacebookRequestException $e )
-			{
-				// Facebook has returned an error
-				echo 'Facebook (session) request error: '.$e->getMessage();
-			}
-			catch( Exception $e )
-			{
-				// Any other error
-				echo 'Other (session) request error: '.$e->getMessage();
-			}
-		}
-		if (isset($session))
-		{
-			PrinterLog_logDebug('Facebook upload with session');
-			// store the session token into a PHP session
-			$_SESSION['fb_token'] = $session->getToken();
-			// and create a new Facebook session using the cururent token
-			// or from the new token we got after login
-			$session = new FacebookSession($session->getToken());
-			try
-			{ 
-				$this->lang->load('share/facebook_form', $this->config->item('language'));
-				$this->upload(($fb_title == "" ? t('fb_title') : $fb_title), ($fb_desc == "" ? t('fb_desc') : $fb_desc));
-				$this->facebook_upload('true');
-			}
-			catch (FacebookRequestException $e)
-			{
-				// show any error for this facebook request
-				echo 'Facebook (post) request error: '.$e->getMessage();
-				PrinterLog_logDebug('Facebook (post) request error: '.$e->getMessage());
-			}
-		}
-		else 
-		{
-			$loginUrl = $helper->getLoginUrl(array('publish_actions'));
-			$prefix = CoreStatus_checkTromboning() ? 'https://' : 'http://';
-			$data = array('printersn' => ZimAPI_getSerial(), 'URL' => $prefix . $_SERVER['HTTP_HOST'] . '/share/index');
-			
-			$options = array('http' => array('header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-					'method'  => 'POST',
-					'content' => http_build_query($data)));
-			$context = stream_context_create($options);
-			@file_get_contents('https://sso.zeepro.com/url.ashx', false, $context);
-			$result = substr($http_response_header[0], 9, 3);
-			echo "$loginUrl";
-			PrinterLog_logDebug('Facebook login url: '.$loginUrl);
-			$this->output->set_status_header(202);
-		}
+		session_save_path($session_path);
+		ini_set('session.gc_probability', 1); // for debian
+		session_start();
+		
+		return;
 	}
 	
-	private function upload($video_title, $video_desc)
+	private function upload_facebookVideo($video_title, $video_desc)
 	{
 		$this->load->helper(array('zimapi', 'printerlog'));
 		$file_url = ZIMAPI_FILEPATH_TIMELAPSE;
@@ -148,59 +79,163 @@ class Share extends MY_Controller
 		PrinterLog_logDebug('facebook upload response: ' . $response);
 		return;
 	}
+	
+	public function connect_facebook($in_upload = NULL)
+	{
+		if (isset($_POST['fb_title']) && isset($_POST['fb_desc']))
+		{
+			$fb_title = $_POST['fb_title'];
+			$fb_desc = $_POST['fb_desc'];
+			$_SESSION['fb_title'] = $fb_title;
+			$_SESSION['fb_desc'] = $fb_desc;
+		}
+		else
+		{
+			$fb_title = $_SESSION['fb_title'];
+			$fb_desc = $_SESSION['fb_desc'];
+		}
+		FacebookSession::setDefaultApplication('406642542819370', 'da80c93b500711ba60c79cf943e776e5');
+		$helper = new FacebookRedirectLoginHelper("https://sso.zeepro.com/redirectfb.ashx?sn=" . ZimAPI_getSerial());
+		$this->load->helper(array('zimapi', 'corestatus', 'printerlog'));
+		if (isset($_SESSION) && isset($_SESSION['fb_token']))
+		{
+			// create new session from the existing PHP sesson
+			$session = new FacebookSession($_SESSION['fb_token']);
+			try
+			{
+				// validate the access_token to make sure it's still valid
+				if (!$session->validate()) {
+					// try to pick session from redirection if session is invalid or expired, it returns null if it's not a valid redirect
+					// that avoid when we have set session value, but we need re-authenticate from redirection - Peng
+// 					$session = null;
+					$session = $helper->getSessionFromRedirect();
+				}
+			}
+			catch (Exception $e)
+			{
+				// catch any exceptions and set the sesson null
+				$session = null;
+				echo 'No session: '.$e->getMessage();
+			}
+		}
+// 		else if (empty($session))
+		else // no session set before, it equals a pure else segment (inpossible to arrive here from the if segment above which sets session) - Peng
+		{
+			// the session is empty, we create a new one
+			try
+			{
+				// the visitor is redirected from the login, let's pickup the session
+				$session = $helper->getSessionFromRedirect();
+			}
+			catch( FacebookRequestException $e )
+			{
+				// Facebook has returned an error
+				echo 'Facebook (session) request error: '.$e->getMessage();
+			}
+			catch( Exception $e )
+			{
+				// Any other error
+				echo 'Other (session) request error: '.$e->getMessage();
+			}
+		}
+		if (isset($session))
+		{
+			PrinterLog_logDebug('Facebook upload with session');
+			// store the session token into a PHP session
+			$_SESSION['fb_token'] = $session->getToken();
+// 			// and create a new Facebook session using the cururent token
+// 			// or from the new token we got after login
+// 			$session = new FacebookSession($session->getToken());
+			// connect succeeded, check if we are in uploading call or not (redirection doesn't have in_upload variable in extra path) - Peng
+			if ($in_upload == NULL) {
+				PrinterLog_logDebug('Facebook connect by getting session from redirection');
+				$this->facebook_upload();
+				return;
+			}
+			else {
+				try
+				{ 
+					$this->lang->load('share/facebook_form', $this->config->item('language'));
+					$this->upload_facebookVideo(($fb_title == "" ? t('fb_title') : $fb_title), ($fb_desc == "" ? t('fb_desc') : $fb_desc));
+				}
+				catch (FacebookRequestException $e)
+				{
+					// show any error for this facebook request
+					echo 'Facebook (post) request error: '.$e->getMessage();
+					PrinterLog_logDebug('Facebook (post) request error: '.$e->getMessage());
+				}
+			}
+		}
+		else 
+		{
+			$loginUrl = $helper->getLoginUrl(array('publish_actions'));
+			$prefix = CoreStatus_checkTromboning() ? 'https://' : 'http://';
+			$data = array('printersn' => ZimAPI_getSerial(), 'URL' => $prefix . $_SERVER['HTTP_HOST'] . '/share/connect_facebook');
+			
+			$options = array('http' => array('header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+					'method'  => 'POST',
+					'content' => http_build_query($data)));
+			$context = stream_context_create($options);
+			@file_get_contents('https://sso.zeepro.com/url.ashx', false, $context);
+			$result = substr($http_response_header[0], 9, 3);
+			echo "$loginUrl";
+			PrinterLog_logDebug('Facebook login url: '.$loginUrl);
+			$this->output->set_status_header(202);
+		}
+	}
 
 	public function facebook_form()
 	{
 		$this->load->library('parser');
 		$this->lang->load('share/facebook_form', $this->config->item('language'));
 		
-		$this->load->helper('zimapi');
-		$array_status = array();
-		$model_displayname = NULL;
-		if (CoreStatus_checkInIdle($status_current, $array_status) && array_key_exists(CORESTATUS_TITLE_PRINTMODEL, $array_status))
-		{
-			$model_id = NULL;
-			$abb_cartridge = NULL;
+// 		$this->load->helper('zimapi');
+// 		$array_status = array();
+// 		$model_displayname = NULL;
+// 		if (CoreStatus_checkInIdle($status_current, $array_status) && array_key_exists(CORESTATUS_TITLE_PRINTMODEL, $array_status))
+// 		{
+// 			$model_id = NULL;
+// 			$abb_cartridge = NULL;
 				
-			switch ($array_status[CORESTATUS_TITLE_PRINTMODEL])
-			{
-				case CORESTATUS_VALUE_MID_SLICE:
-					$preset_id = NULL;
-					$model_filename = array();
-					$this->load->helper('slicer');
-					if (ERROR_OK == Slicer_getModelFile(0, $model_filename, TRUE))
-					{
-						foreach($model_filename as $model_basename)
-						{
-							if (strlen($model_displayname))
-								$model_displayname .= ' + ' . $model_basename;
-							else
-								$model_displayname = $model_basename;
-						}
-					}
-					else
-						$model_displayname = t('timelapse_info_modelname_slice');
-					break;
-				default:
-					// treat as pre-sliced model
-					$model_data = array();
-					$model_displayname = "";
-					if (is_null($model_id))
-					{
-						$this->load->helper('printlist');
-						$model_id = $array_status[CORESTATUS_TITLE_PRINTMODEL];
-					}
-					if (ERROR_OK == ModelList__getDetailAsArray($model_id, $model_data, TRUE))
-					{
-						$model_displayname = $model_data[PRINTLIST_TITLE_NAME];
-					}
-					break;
-			}
-		}
+// 			switch ($array_status[CORESTATUS_TITLE_PRINTMODEL])
+// 			{
+// 				case CORESTATUS_VALUE_MID_SLICE:
+// 					$preset_id = NULL;
+// 					$model_filename = array();
+// 					$this->load->helper('slicer');
+// 					if (ERROR_OK == Slicer_getModelFile(0, $model_filename, TRUE))
+// 					{
+// 						foreach($model_filename as $model_basename)
+// 						{
+// 							if (strlen($model_displayname))
+// 								$model_displayname .= ' + ' . $model_basename;
+// 							else
+// 								$model_displayname = $model_basename;
+// 						}
+// 					}
+// 					else
+// 						$model_displayname = t('timelapse_info_modelname_slice');
+// 					break;
+// 				default:
+// 					// treat as pre-sliced model
+// 					$model_data = array();
+// 					$model_displayname = "";
+// 					if (is_null($model_id))
+// 					{
+// 						$this->load->helper('printlist');
+// 						$model_id = $array_status[CORESTATUS_TITLE_PRINTMODEL];
+// 					}
+// 					if (ERROR_OK == ModelList__getDetailAsArray($model_id, $model_data, TRUE))
+// 					{
+// 						$model_displayname = $model_data[PRINTLIST_TITLE_NAME];
+// 					}
+// 					break;
+// 			}
+// 		}
 		
 		$data = array(
-				'fb_title'				=> t('fb_title') . $model_displayname,
-				'fb_desc'				=> htmlspecialchars(t('fb_desc')),
+// 				'fb_title'				=> '', //t('fb_title') . $model_displayname,
+// 				'fb_desc'				=> '', //htmlspecialchars(t('fb_desc')),
 				'title_label'			=> t('title_label'),
 				'desc_label'			=> t('desc_label'),
 				'back'					=> t('back'),
@@ -218,7 +253,8 @@ class Share extends MY_Controller
 		return;
 	}
 
-	public function facebook_upload($done = 'false')
+// 	public function facebook_upload($done = 'false')
+	public function facebook_upload()
 	{
 		$this->load->library('parser');
 		if (isset($_POST['fb_title']) && isset($_POST['fb_desc']))
@@ -235,12 +271,12 @@ class Share extends MY_Controller
 		}
 		$this->lang->load('share/facebook_upload', $this->config->item('language'));
 		$data = array(
-				'done'					=> $done,
+// 				'done'					=> $done,
 				'fb_title'				=> rawurlencode($fb_title),
 				'fb_desc'				=> rawurlencode($fb_desc),
 				'uploading'				=> t('uploading'),
-				'fb_upload_popup_text'	=> "test",
-				'fb_callback_ok'		=> "test2"
+				'fb_upload_popup_text'	=> t('fb_upload_popup_text'),
+				'fb_callback_ok'		=> t('fb_callback_ok'),
 		);
 		$body_page = $this->parser->parse('template/share/facebook_upload', $data, TRUE);
 		
@@ -256,60 +292,80 @@ class Share extends MY_Controller
 
 	public function youtube_form()
 	{
-		$this->load->library('parser');
-		$this->lang->load('youtube_form', $this->config->item('language'));
-	
-		$this->load->helper('zimapi');
 		$array_status = array();
 		$model_displayname = NULL;
+		
+		$this->load->library('parser');
+		$this->lang->load('youtube_form', $this->config->item('language'));
+		$this->lang->load('printdetail', $this->config->item('language')); // timelapse default model name
+		$this->load->helper('corestatus');
+		
 		if (CoreStatus_checkInIdle($status_current, $array_status) && array_key_exists(CORESTATUS_TITLE_PRINTMODEL, $array_status))
 		{
 			$model_id = NULL;
-			$abb_cartridge = NULL;
-				
-			switch ($array_status[CORESTATUS_TITLE_PRINTMODEL])
+			
+			if (strpos($array_status[CORESTATUS_TITLE_PRINTMODEL], CORESTATUS_VALUE_MID_PREFIXGCODE) === 0)
 			{
-				case CORESTATUS_VALUE_MID_SLICE:
-					$preset_id = NULL;
-					$model_filename = array();
-					$this->load->helper('slicer');
-					if (ERROR_OK == Slicer_getModelFile(0, $model_filename, TRUE))
-					{
-						foreach($model_filename as $model_basename)
+				// gcode library model
+				$gcode_info = array();
+				$gid = (int) substr($array_status[CORESTATUS_TITLE_PRINTMODEL], strlen(CORESTATUS_VALUE_MID_PREFIXGCODE));
+				$model_displayname = t('timelapse_info_modelname_unknown');
+				
+				$this->load->helper('printerstoring');
+				
+				$gcode_info = PrinterStoring_getInfo("gcode", $gid);
+				if (!is_null($gcode_info) && array_key_exists("name", $gcode_info)) {
+					$model_displayname = $gcode_info["name"];
+				}
+			}
+			else
+			{
+				switch ($array_status[CORESTATUS_TITLE_PRINTMODEL])
+				{
+					case CORESTATUS_VALUE_MID_SLICE:
+						$preset_id = NULL;
+						$model_filename = array();
+						$this->load->helper('slicer');
+						if (ERROR_OK == Slicer_getModelFile(0, $model_filename, TRUE))
 						{
-							if (strlen($model_displayname))
-								$model_displayname .= ' + ' . $model_basename;
-							else
-								$model_displayname = $model_basename;
+							foreach($model_filename as $model_basename)
+							{
+								if (strlen($model_displayname))
+									$model_displayname .= ' + ' . $model_basename;
+								else
+									$model_displayname = $model_basename;
+							}
 						}
-					}
-					else
-						$model_displayname = t('timelapse_info_modelname_slice');
-					break;
-				default:
-					// treat as pre-sliced model
-					$model_data = array();
-					$model_displayname = "";
-					if (is_null($model_id))
-					{
-						$this->load->helper('printlist');
-						$model_id = $array_status[CORESTATUS_TITLE_PRINTMODEL];
-					}
-					if (ERROR_OK == ModelList__getDetailAsArray($model_id, $model_data, TRUE))
-					{
-						$model_displayname = $model_data[PRINTLIST_TITLE_NAME];
-					}
-					break;
+						else
+							$model_displayname = t('timelapse_info_modelname_slice');
+						break;
+					default:
+						// treat as pre-sliced model
+						$model_data = array();
+						$model_displayname = "";
+						if (is_null($model_id))
+						{
+							$this->load->helper('printlist');
+							$model_id = $array_status[CORESTATUS_TITLE_PRINTMODEL];
+						}
+						if (ERROR_OK == ModelList__getDetailAsArray($model_id, $model_data, TRUE))
+						{
+							$model_displayname = $model_data[PRINTLIST_TITLE_NAME];
+						}
+						break;
+				}
 			}
 		}
+		
 		if ($this->input->server('REQUEST_METHOD') == 'POST')
 		{
 			$this->load->library("session");
 				
-			$title = isset($_POST['yt_title']) ? $_POST['yt_title'] : t('yt_title');
+			$title = isset($_POST['yt_title']) ? $_POST['yt_title'] : t('yt_title') . $model_displayname;
 			$description = isset($_POST['yt_description']) ? $_POST['yt_description'] : t('yt_desc');
 				
-			$tags = explode(',', $_POST['yt_tags'] ? $_POST['yt_tags'] : t('yt_tags'));
+// 			$tags = explode(',', $_POST['yt_tags'] ? $_POST['yt_tags'] : t('yt_tags'));
+			$tags = explode(',', t('yt_tags'));
 			$tags = array_map('trim', $tags);
 			$video_infos = array(
 					'yt_title'		=> $title,
@@ -319,11 +375,13 @@ class Share extends MY_Controller
 			);
 			$this->session->set_userdata($video_infos);
 			$this->output->set_header("Location: /share/connect_google");
+			
+			return;
 		}
-	
+		
 		$data = array(
 				'yt_title'				=> t('yt_title') . $model_displayname,
-				'yt_tags'				=> t('yt_tags'),
+// 				'yt_tags'				=> t('yt_tags'),
 				'yt_desc'				=> t('yt_desc'),
 				'yt_privacy_public'		=> t('yt_privacy_public'),
 				'yt_privacy_private'	=> t('yt_privacy_private'),
