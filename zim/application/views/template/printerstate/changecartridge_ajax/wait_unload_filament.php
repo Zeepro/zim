@@ -7,7 +7,7 @@
 var_next_phase = '{next_phase}';
 // var_enable_unload = {enable_unload};
 
-$("a#back_button").css("display", "block");
+// $("a#back_button").css("display", "block");
 $("a#home_button").css("display", "block");
 
 function prime() {
