@@ -412,16 +412,27 @@ class Sliceupload extends MY_Controller {
 		return;
 	}
 	
-	function gcode($mode = "display")
-	{
+	function gcode($mode = 'display') {
+		$body_page = NULL;
+		$template_data = array();
+		
 		$this->load->library('parser');
-		$view_data = array(
-				'home'		=> t('back')
-		);
-		$body_page = $this->parser->parse('/template/sliceupload/gcode.php', $view_data, TRUE);
+		$this->lang->load('sliceupload/gcode', $this->config->item('language'));
+		
 		$template_data = array(
-				'headers'		=> '<title>Zim - G-code</title>',
-				'contents'		=> $body_page
+				'home'			=> t('home'),
+				'back'			=> t('back'),
+				'js_render'		=> ($mode == 'display') ? 'false' : 'true',
+				'tab_render'	=> t('tab_render'),
+				'tab_gcode'		=> t('tab_gcode'),
+				'layer_start'	=> t('layer_start'),
+				'layer_end'		=> t('layer_end'),
+				'layer_prefix'	=> t('layer_prefix'),
+		);
+		$body_page = $this->parser->parse('/template/sliceupload/gcode.php', $template_data, TRUE);
+		$template_data = array(
+				'headers'		=> '<title>'. t('sliceupload_gcode_pagetitle') . '</title>',
+				'contents'		=> $body_page,
 		);
 		$this->parser->parse('template/basetemplate', $template_data);
 		return;
@@ -841,6 +852,9 @@ class Sliceupload extends MY_Controller {
 				'exchange_o2_sel'	=> NULL,
 				'exchange_o1'		=> t('exchange_straight'),
 				'exchange_o2'		=> t('exchange_crossover'),
+				'advanced'			=> t('advanced'),
+				'gcode_link'		=> t('gcode_link'),
+				'2drender_link'		=> t('2drender_link'),
 				'bicolor_model'		=> 'false',
 				'needprint_right'	=> $array_need['r'],
 				'needprint_left'	=> $array_need['l'],
@@ -1030,6 +1044,42 @@ class Sliceupload extends MY_Controller {
 		$this->output->set_status_header($ret_val, $display);
 		$this->output->set_content_type('text/plain; charset=UTF-8');
 		$this->parser->parse('template/plaintxt', array('display' => $display));
+		
+		return;
+	}
+	
+	function gcode_ajax() {
+		$cr = 0;
+		$display = NULL;
+		$status_array = array();
+		
+		$this->load->helper(array('printerstate', 'slicer'));
+		
+		$status_array = PrinterState_checkStatusAsArray();
+		if ($status_array[PRINTERSTATE_TITLE_STATUS] == CORESTATUS_VALUE_SLICED) {
+			$gcode_path = $this->config->item('temp') . SLICER_FILE_MODEL;
+			
+			if (file_exists($gcode_path)) {
+				$this->load->helper('file');
+				
+				$this->output->set_content_type(get_mime_by_extension($gcode_path))->set_output(@file_get_contents($gcode_path));
+				
+				return;
+			}
+			else {
+				$cr = ERROR_INTERNAL;
+			}
+		}
+		else {
+			$cr = ERROR_EMPTY_PLATFORM;
+		}
+		
+		$display = $cr . " " . t(MyERRMSG($cr));
+		$this->output->set_status_header($cr, $display);
+		// 		http_response_code($cr);
+		$this->output->set_content_type('text/plain; charset=UTF-8');
+		$this->load->library('parser');
+		$this->parser->parse('template/plaintxt', array('display' => $display)); //optional
 		
 		return;
 	}

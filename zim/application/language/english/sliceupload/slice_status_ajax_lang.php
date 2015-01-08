@@ -41,3 +41,9 @@ $lang['exchange_right']
 	= 'Right cartridge';
 $lang['exchange_left']
 	= 'Left cartridge';
+$lang['advanced']
+	= 'Advanced';
+$lang['gcode_link']
+	= 'G-code';
+$lang['2drender_link']
+	= '2D Rendering';

@@ -41,3 +41,9 @@ $lang['exchange_right']
 	= 'Cartouche droite';
 $lang['exchange_left']
 	= 'Cartouche gauche';
+$lang['advanced']
+	= 'Avancé';
+$lang['gcode_link']
+	= 'G-code';
+$lang['2drender_link']
+	= '2D Rendering';

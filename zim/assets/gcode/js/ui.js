@@ -204,7 +204,8 @@ GCODE.ui = (function(){
     var initSliders = function(){
 //        var prevX=0;
 //        var prevY=0;
-        var handle;
+/*        var handle;
+
         sliderVer =  $( "#slider-vertical" );
         sliderHor = $( "#slider-horizontal" );
 
@@ -215,7 +216,10 @@ GCODE.ui = (function(){
             setLinesColor(false); //clear current selection
             gCodeLines = GCODE.gCodeReader.getGCodeLines(val, sliderHor.slider("values",0), sliderHor.slider("values",1));
             setLinesColor(true); // highlight lines
-        //    printLayerInfo(val);
+//            printLayerInfo(val);
+			if (typeof(rendering_change_layerNb_display) == 'function') {
+				rendering_change_layerNb_display(val);
+			}
         };
 
         sliderVer.slider({
@@ -228,7 +232,7 @@ GCODE.ui = (function(){
                 onLayerChange(ui.value);
             }
         });
-
+        
         //this stops slider reacting to arrow keys, since we do it below manually
         $( "#slider-vertical").find(".ui-slider-handle" ).unbind('keydown');
 
@@ -240,6 +244,8 @@ GCODE.ui = (function(){
             values: [0,GCODE.renderer.getLayerNumSegments(0)-1],
             slide: function( event, ui ) {
                 setLinesColor(false); //clear current selection
+				console.log('v1: ' + ui.values[0]);
+				console.log('v2: ' + ui.values[1]);
                 gCodeLines = GCODE.gCodeReader.getGCodeLines(sliderVer.slider("value"),ui.values[0], ui.values[1]);
                 setLinesColor(true); // highlight lines
                 GCODE.renderer.render(sliderVer.slider("value"), ui.values[0], ui.values[1]);
@@ -258,8 +264,62 @@ GCODE.ui = (function(){
                     onLayerChange(sliderVer.slider('value'));
                 }
             }
-            event.stopPropagation()
+            event.stopPropagation();
         }
+*/
+		
+		var init_progress = GCODE.renderer.getLayerNumSegments(0) - 1;
+		var max_layerNb = GCODE.renderer.getModelNumLayers();
+		
+		var sliderRangeStart = $('input#rendering_rangeslider_start');
+		var sliderRangeEnd = $('input#rendering_rangeslider_end');
+		var sliderRange = $('div#rendering_rangeslider');
+		var sliderLayer = $('input#rendering_layerslider');
+		
+		var onRangeChange = function() {
+			var currentLayerNb = parseInt(sliderLayer.val()) - 1;
+			var currentRangeStart = parseInt(sliderRangeStart.val());
+			var currentRangeEnd = parseInt(sliderRangeEnd.val());
+			if (var_rendering_done == true) {
+				setLinesColor(false); //clear current selection
+				gCodeLines = GCODE.gCodeReader.getGCodeLines(currentLayerNb, currentRangeStart, currentRangeEnd);
+				setLinesColor(true); // highlight lines
+				GCODE.renderer.render(currentLayerNb, currentRangeStart, currentRangeEnd);
+				
+				if (typeof(rendering_change_layerNb_display) == 'function') {
+					rendering_change_layerNb_display(currentLayerNb);
+				}
+			}
+		};
+		
+		sliderRangeStart.attr('max', init_progress);
+		sliderRangeEnd.attr('max', init_progress);
+		sliderRangeEnd.val(init_progress);
+		sliderLayer.attr('max', max_layerNb);
+		sliderRangeStart.slider('refresh');
+		sliderRangeEnd.slider('refresh');
+		sliderLayer.slider('refresh');
+		
+//		sliderRangeStart.on('change', onRangeChange);
+//		sliderRangeEnd.on('change', onRangeChange);
+		sliderRange.on('change', onRangeChange);
+		sliderLayer.on('change', function() {
+			var newLayerNb = sliderLayer.val() - 1;
+			var progress = GCODE.renderer.getLayerNumSegments(newLayerNb) - 1;
+			
+			GCODE.renderer.render(newLayerNb, 0, progress);
+			
+			sliderRangeStart.attr('max', progress);
+			sliderRangeEnd.attr('max', progress);
+			sliderRangeStart.val(0);
+			sliderRangeEnd.val(progress);
+			sliderRangeStart.slider('refresh');
+			sliderRangeEnd.slider('refresh');
+			
+			setLinesColor(false); //clear current selection
+			gCodeLines = GCODE.gCodeReader.getGCodeLines(newLayerNb, 0, progress);
+			setLinesColor(true); // highlight lines
+		});
     };
 
     var processMessage = function(e){
@@ -281,12 +341,15 @@ GCODE.ui = (function(){
                 GCODE.gCodeReader.processAnalyzeModelDone(data.msg);
                 GCODE.gCodeReader.passDataToRenderer();
                 initSliders();
-            //    printModelInfo();
-            //    printLayerInfo(0);
-                chooseAccordion('infoAccordionTab');
+//                printModelInfo();
+//                printLayerInfo(0);
+//                chooseAccordion('infoAccordionTab');
                 GCODE.ui.updateOptions();
-                $('#myTab').find('a[href="#tab2d"]').tab('show');
-                $('#runAnalysisButton').removeClass('disabled');
+//                $('#myTab').find('a[href="#tab2d"]').tab('show');
+//                $('#runAnalysisButton').removeClass('disabled');
+				if (typeof(gcode_hide_wait_spinner) == 'function') {
+					gcode_hide_wait_spinner();
+				}
                 break;
             case 'returnLayer':
                 GCODE.gCodeReader.processLayerFromWorker(data.msg);
@@ -339,17 +402,40 @@ GCODE.ui = (function(){
 
     return {
         worker: undefined,
-        functest: function(data)
-        {
-        	GCODE.gCodeReader.loadFile(data);
-    		myCodeMirror.setValue(data);	
-        },
+		customLoadData: function(data) {
+			GCODE.gCodeReader.loadFile(data);
+			myCodeMirror.setValue(data);
+//			gCodeLines = GCODE.gCodeReader.getGCodeLines(0, 0, GCODE.renderer.getLayerNumSegments(0)-1);
+//			myCodeMirror.refresh();
+		},
+		tabGCode_click: function() {
+			console.log("Switching to GCode preview mode");
+			myCodeMirror.refresh();
+			console.log(gCodeLines);
+			myCodeMirror.setCursor(Number(gCodeLines.first),0);
+			myCodeMirror.setSelection({line:Number(gCodeLines.first),ch:0},{line:Number(gCodeLines.last),ch:0});
+			myCodeMirror.focus();
+		},
+		changeCodeMirrorWidth: function(newWidth) {
+			myCodeMirror.setSize(newWidth,"640");
+		},
+//		changeLayerRegion: function(layerNb, regionStart, regionEnd) {
+//			setLinesColor(false); //clear current selection
+//			gCodeLines = GCODE.gCodeReader.getGCodeLines(layerNb, regionStart, regionEnd);
+//			setLinesColor(true); // highlight lines
+//			GCODE.renderer.render(layerNb, regionStart, regionEnd);
+//		},
+//		changeLayerNb: function(layerNb) {
+//			var progress = GCODE.renderer.getLayerNumSegments(val)-1;
+//			GCODE.renderer.render(layerNb, 0, progress);
+//			//TO/DO finish me
+//		},
         initHandlers: function(){
             var capabilitiesResult = checkCapabilities();
             if(!capabilitiesResult){
                 return;
             }
-            var dropZone = document.getElementById('drop_zone');
+//            var dropZone = document.getElementById('drop_zone');
 //            dropZone.addEventListener('dragover', handleDragOver, false);
 //            dropZone.addEventListener('drop', handleFileSelect, false);
 
@@ -359,7 +445,7 @@ GCODE.ui = (function(){
             setProgress('analyzeProgress', 0);
 
             $(".collapse").collapse({parent: '#accordion2'});
-
+/*
             $('#myTab').find('a[href="#tab3d"]').click(function (e) {
                 e.preventDefault();
                 console.log("Switching to 3d mode");
@@ -374,10 +460,10 @@ GCODE.ui = (function(){
                 myCodeMirror.refresh();
                 console.log(gCodeLines);
                 myCodeMirror.setCursor(Number(gCodeLines.first),0);
-//                myCodeMirror.setSelection({line:Number(gCodeLines.first),ch:0},{line:Number(gCodeLines.last),ch:0});
+                myCodeMirror.setSelection({line:Number(gCodeLines.first),ch:0},{line:Number(gCodeLines.last),ch:0});
                 myCodeMirror.focus();
             });
-
+*/
             this.worker = new Worker('/assets/gcode/js/Worker.js');
 
             this.worker.addEventListener('message', processMessage, false);
@@ -393,7 +479,7 @@ GCODE.ui = (function(){
             });
             myCodeMirror.setSize("680","640");
 //            console.log(myCodeMirror);
-            chooseAccordion('fileAccordionTab');
+//            chooseAccordion('fileAccordionTab');
 
             (function() {
                 var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
@@ -414,7 +500,7 @@ GCODE.ui = (function(){
             /*if(document.getElementById('purgeEmptyLayersCheckbox').checked)GCODE.gCodeReader.setOption({purgeEmptyLayers: true});
             else*/ GCODE.gCodeReader.setOption({purgeEmptyLayers: true});
 
-            showGCode = true;//document.getElementById('showGCodeCheckbox').checked;
+            showGCode = false;//document.getElementById('showGCodeCheckbox').checked;
 
             /*if(document.getElementById('moveModelCheckbox').checked)GCODE.renderer.setOption({moveModel: true});
             else*/ GCODE.renderer.setOption({moveModel: false});

@@ -39,16 +39,20 @@
 <!-- 						<div class="ui-block-b"> -->
 <!-- 						</div> -->
 						<input type="hidden" name="exchange" id="exchange_extruder_hidden" value="0">
+						<div data-role="collapsible" style="clear: both;">
+							<h4>{advanced}</h4>
+							<div class="ui-grid-a">
+								<div class="ui-block-a">
+									<a data-role="button" onclick='javascript: window.location.href="/sliceupload/gcode/display"'>{gcode_link}</a>
+								</div>
+								<div class="ui-block-b">
+									<a data-role="button" onclick='javascript: window.location.href="/sliceupload/gcode/render"'>{2drender_link}</a>
+								</div>
+							</div>
+						</div>
 						<input type="submit" id="print_slice" value="{print_button}">
 					</div>
 				</form>
-				<div data-role="collapsible">
-					<h4>{advanced}</h4>
-					<div class="ui-bar">
-						<a data-role="button">{G-Code}</a>
-						<a data-role="button">{Layer by Layer}</a>
-					</div>
-				</div>
 
 <script type="text/javascript">
 var var_enable_print = {enable_print};

@@ -25,13 +25,13 @@
 						<div class="ui-block-a"><div id="left_cartridge" class="ui-bar ui-bar-f">
 							<label>{left_temperature}:<span id="temperature_text_1">{temper_l}</span>°C</label>
 							<div id="temper_l">
-								<input type="range" id="slider_left" name="l" value="{temper_l}" min="160" max="260" />
+								<input type="range" id="slider_left" name="l" value="{temper_l}" min="160" max="260" data-show-value="true" />
 							</div>
 						</div></div>
 						<div class="ui-block-b"><div id="right_cartridge" class="ui-bar ui-bar-f">
 							<label>{right_temperature}:<span id="temperature_text_2">{temper_r}</span>°C</label>
 							<div id="temper_r">
-								<input type="range" id="slider_right" name="r" value="{temper_r}" min="160" max="260" />
+								<input type="range" id="slider_right" name="r" value="{temper_r}" min="160" max="260" data-show-value="true" />
 							</div>
 						</div></div>
 <!-- 						<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;"> -->
@@ -40,18 +40,17 @@
 <!-- 						<div class="ui-block-b"> -->
 <!-- 						</div> -->
 						<input type="hidden" name="exchange" id="exchange_extruder_hidden" value="0">
-						<div data-role="collapsible">
+						<div data-role="collapsible" style="clear: both;">
 							<h4>{advanced}</h4>
 							<div class="ui-grid-a">
 								<div class="ui-block-a">
-									<a data-role="button" href="/sliceupload/gcode/display">{G-Code}</a>
+									<a data-role="button" onclick='javascript: window.location.href="/sliceupload/gcode/display"'>{gcode_link}</a>
 								</div>
 								<div class="ui-block-b">
-									<a data-role="button" href="sliceupload/gcode/render">{Layer by Layer}</a>
+									<a data-role="button" onclick='javascript: window.location.href="/sliceupload/gcode/render"'>{2drender_link}</a>
 								</div>
 							</div>
 						</div>
-						<br />
 						<input type="submit" id="print_slice" value="{print_button}" />
 					</div>
 				</form>
