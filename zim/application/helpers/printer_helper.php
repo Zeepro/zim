@@ -617,7 +617,7 @@ function Printer_checkCancelStatus() {
 	$CI->load->helper(array('printerstate', 'corestatus'));
 
 	// check status if we are not in canceling
-	$data_status = PrinterState_checkStatusAsArray();
+	$data_status = PrinterState_checkStatusAsArray(FALSE);
 	if ($data_status[PRINTERSTATE_TITLE_STATUS] != CORESTATUS_VALUE_CANCEL) {
 		$CI->load->helper('printerlog');
 		PrinterLog_logMessage('not in canceling when checking cancel status', __FILE__, __LINE__);

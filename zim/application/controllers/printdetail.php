@@ -504,19 +504,26 @@ class Printdetail extends MY_Controller {
 			$this->lang->load('printdetail', $this->config->item('language'));
 			
 			$this->load->helper('zimapi');
-			if (!ZimAPI_cameraOn(ZIMAPI_PRM_CAMERA_PRINTSTART)) {
-				$this->load->helper('printerlog');
-				PrinterLog_logError('can not set camera', __FILE__, __LINE__);
+			if (Printer_checkCancelStatus() || !file_exists(ZIMAPI_FILEPATH_VIDEO_TS)) {
+				if (ZimAPI_checkCamera($mode_current) && $mode_current == ZIMAPI_VALUE_MODE_HLS_IMG) {
+					$this->load->helper('printerlog');
+					PrinterLog_logMessage('detected in hls image timelapse mode, do not set camera', __FILE__, __LINE__);
+				}
+				else if (!ZimAPI_cameraOn(ZIMAPI_PRM_CAMERA_PRINTSTART)) {
+					$this->load->helper('printerlog');
+					PrinterLog_logError('can not set camera', __FILE__, __LINE__);
+				}
 			}
 			
 			// parse the main body
 			$template_data = array(
-					'title'			=> t('Control your printing'),
-					'wait_info'		=> t('wait_hint_cancel'),
-					'finish_info'	=> t('finish_hint_cancel'),
-					'return_button'	=> t('Home'),
-					'return_url'	=> '/',
-					'video_url'		=> $this->config->item('video_url'),
+					'title'				=> t('Control your printing'),
+					'loading_player'	=> t('loading_player'),
+					'wait_info'			=> t('wait_hint_cancel'),
+					'finish_info'		=> t('finish_hint_cancel'),
+					'return_button'		=> t('Home'),
+					'return_url'		=> '/',
+					'video_url'			=> $this->config->item('video_url'),
 			);
 			
 			CoreStatus_checkInIdle($status_current, $array_status);
@@ -646,7 +653,6 @@ class Printdetail extends MY_Controller {
 								'value'	=> $model_displayname,
 						);
 						
-						$this->load->helper('zimapi');
 						if (ZimAPI_getPreset($preset_id)) {
 							$array_json = array();
 							

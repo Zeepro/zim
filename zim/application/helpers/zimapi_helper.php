@@ -58,6 +58,8 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 		define('ZIMAPI_FILEPATH_ENDPRINT',	$CI->config->item('bin') . 'timelapse_end_print.sh');
 		define('ZIMAPI_FILEPATH_ENDCANCEL',	$CI->config->item('bin') . 'timelapse_end_cancel.sh');
 		define('ZIMAPI_FILEPATH_UPGRADE',	$CI->config->item('conf') . 'profile.json');
+		define('ZIMAPI_FILEPATH_VIDEO_TS',	$CI->config->item('temp') . 'zim0.ts');
+		define('ZIMAPI_FILEPATH_UPGD_NOTE',	$CI->config->item('nandconf') . 'release_note.xml');
 	}
 	else {
 		define('ZIMAPI_FILEPATH_TIMELAPSE',	'/var/www/tmp/timelapse.mp4');
@@ -66,6 +68,8 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 		define('ZIMAPI_FILEPATH_ENDPRINT',	'/var/www/bin/timelapse_end_print.sh');
 		define('ZIMAPI_FILEPATH_ENDCANCEL',	'/var/www/bin/timelapse_end_cancel.sh');
 		define('ZIMAPI_FILEPATH_UPGRADE',	'/config/conf/profile.json');
+		define('ZIMAPI_FILEPATH_VIDEO_TS',	'/var/www/tmp/zim0.ts');
+		define('ZIMAPI_FILEPATH_UPGD_NOTE',	'/config/release_note.xml');
 	}
 	
 	define('ZIMAPI_FILENAME_CAMERA',	'Camera.json');
@@ -95,6 +99,11 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_TITLE_PRESET_SKIRT',		'skirts');
 	define('ZIMAPI_TITLE_PRESET_RAFT',		'raft_layers');
 	define('ZIMAPI_TITLE_PRESET_SUPPORT',	'support_material');
+	
+	define('ZIMAPI_TITLE_RELEASENOTE_VERSION',		'version');
+	define('ZIMAPI_TITLE_RELEASENOTE_PART',			'part');
+	define('ZIMAPI_TITLE_RELEASENOTE_PART_TITLE',	'title');
+	define('ZIMAPI_TITLE_RELEASENOTE_PART_NOTE',	'note');
 	
 	define('ZIMAPI_VALUE_DEFAULT_RHO',			800);
 	define('ZIMAPI_VALUE_DEFAULT_DELTA',		45);
@@ -1566,6 +1575,7 @@ function ZimAPI_setUpgradeMode($mode, $profile = NULL) {
 	return ERROR_OK;
 }
 
+// abandoned function
 function ZimAPI_getUpgradeNote(&$note_html = '') {
 	$count = 0;
 	$html = NULL;
@@ -1598,6 +1608,55 @@ function ZimAPI_getUpgradeNote(&$note_html = '') {
 		$CI = &get_instance();
 		$CI->load->helper('printerlog');
 		PrinterLog_logError('get upgrade release note error', __FILE__, __LINE__);
+		
+		return FALSE;
+	}
+	
+	return TRUE;
+}
+
+function ZimAPI_getUpgradeNoteArray(&$array_upgrade) {
+	$array_upgrade = array(); // initialization of array
+	
+	try {
+		if (file_exists(ZIMAPI_FILEPATH_UPGD_NOTE)) {
+			$key_version = ZIMAPI_TITLE_RELEASENOTE_VERSION;
+			$key_part = ZIMAPI_TITLE_RELEASENOTE_PART;
+			$key_part_title = ZIMAPI_TITLE_RELEASENOTE_PART_TITLE;
+			$key_part_note = ZIMAPI_TITLE_RELEASENOTE_PART_NOTE;
+			
+			$xml = simplexml_load_file(ZIMAPI_FILEPATH_UPGD_NOTE);
+			if (count($xml->$key_version) == 0) {
+				throw new Exception('upgrade version not found');
+			}
+			if (count($xml->$key_part)) {
+				$tmp_array = array();
+				foreach($xml->$key_part as $part) {
+					if (count($part->$key_part_title) != 1) {
+						throw new Exception('part with no title or several titles detected');
+					}
+					if (count($part->$key_part_note)) {
+						foreach($part->$key_part_note as $note) {
+							$tmp_array[(string) $part->$key_part_title][] = (string) $note;
+						}
+					}
+					else {
+						throw new Exception('part with no notes detected');
+					}
+				}
+				$array_upgrade[(string) $xml->$key_version] = $tmp_array;
+			}
+			else {
+				throw new Exception('upgrade with no parts detected');
+			}
+		}
+		else {
+			throw new Exception('file not found |' . ZIMAPI_FILEPATH_UPGD_NOTE . '|');
+		}
+	} catch (Exception $e) {
+		$CI = &get_instance();
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('read upgrade release note error, message: ' . $e->getMessage(), __FILE__, __LINE__);
 		
 		return FALSE;
 	}

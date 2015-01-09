@@ -13,7 +13,7 @@
 				<script type="text/javascript" src="/assets/jwplayer/jwplayer.js"></script>
 	 			<script type="text/javascript">jwplayer.key="Jh6aqwb1m2vKLCoBtS7BJxRWHnF/Qs3LMjnt13P9D6A=";</script>
 	 			<style type="text/css">div#myVideo_wrapper {margin: 0 auto;}</style>
-				<div id="myVideo">Loading the player...</div>
+				<div id="myVideo">{loading_player}</div>
 				<script type="text/javascript">
 					jwplayer("myVideo").setup({
 						file: "{video_url}",
@@ -33,7 +33,19 @@ var var_refreshCancelStatus;
 var var_refreshVideoURL;
 var var_ajax;
 var var_ajax_lock = false;
-$(document).ready(checkCancelStatus());
+
+function load_jwplayer_video() {
+	var player = jwplayer("myVideo").setup({
+		file: "{video_url}",
+		width: "100%",
+		autostart: true,
+		fallback: false,
+		androidhls: true
+	});
+	player.onSetupError(function() {
+		$("#myVideo").empty().append('<img src="/images/error.png" height="280" width="280" />' + "<p>{video_error}</p>");
+	});
+}
 
 function checkCancelStatus() {
 	refreshCancelStatus();
@@ -92,5 +104,16 @@ function finishAction() {
 
 	return;
 }
-</script>
 
+$(document).ready(checkCancelStatus());
+var var_video_check = setInterval(function() {
+	var req = $.ajax({
+		url: "{video_url}",
+		type: "HEAD",
+		success: function() {
+			load_jwplayer_video();
+			clearInterval(var_video_check);
+		}
+	});
+}, 1000);
+</script>

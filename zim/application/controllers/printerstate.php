@@ -574,17 +574,78 @@ class Printerstate extends MY_Controller {
 		$template_data = array();
 		$body_page = NULL;
 		$note_html = NULL;
+		$array_upgrade = array();
 		
 		$this->load->helper('zimapi');
 		$this->load->library('parser');
 		$this->lang->load('printerstate/upgradenote', $this->config->item('language'));
 		
-		ZimAPI_getUpgradeNote($note_html);
+// 		ZimAPI_getUpgradeNote($note_html);
+		if (ZimAPI_getUpgradeNoteArray($array_upgrade)) {
+			// convert API array to codeigniter display array
+// 			$api_array = array(
+// 					'upgrade vesrion number'	=> array(
+// 							'part title'			=> array(
+// 									'note line in this part',
+// 									'another note line',
+// 							),
+// 							'another part title'	=> array(
+// 									'note line in another part',
+// 							),
+// 					),
+// 					// possibility to add another version info here
+// 			);
+// 			$template_data = array(
+// 				'version'	=> 'upgrade version number',
+// 				'part_ele'	=> array(
+// 						array(
+// 								'part_title'	=> 'upgrade part title here',
+// 								'note_ele'		=> array(
+// 										array('note_line' => 'note line in this part'),
+// 										array('note_line' => 'another note line in this part'),
+// 								),
+// 						),
+// 						// another part here
+// 				),
+// 			);
+			foreach ($array_upgrade as $version => $parts) {
+				$tmp_array = array();
+				
+				foreach ($parts as $title => $notes) {
+					$tmp_note = array();
+					
+					foreach ($notes as $note) {
+						$tmp_note[] = array('note_line' => $note);
+					}
+					
+					$tmp_array[] = array(
+							'part_title'	=> $title,
+							'note_ele' 		=> $tmp_note,
+					);
+				}
+				
+				$template_data = array(
+						'version'	=> $version,
+						'part_ele'	=> $tmp_array,
+				);
+				
+				if ($this->input->get('ui') !== FALSE) {
+					$note_html .= $this->parser->parse('template/printerstate/upgradenote_xml', $template_data, TRUE);
+				}
+				else {
+					$note_html .= $this->parser->parse('template/printerstate/upgradenote_txt', $template_data, TRUE);
+				}
+			}
+		}
+		else {
+			$note_html = 'N/A';
+		}
 		
 		$template_data = array(
-				'note_title'	=> t('releasenote_title'),
-				'note_body'		=> $note_html,
-				'reboot_button'	=> t('releasenote_reboot'),
+				'note_title'		=> t('releasenote_title'),
+				'note_body'			=> $note_html,
+				'reboot_button'		=> t('releasenote_reboot'),
+				'reboot_display'	=> ($this->input->get('reboot') === FALSE) ? 'none' : 'block',
 		);
 		
 		$body_page = $this->parser->parse('template/printerstate/upgradenote', $template_data, TRUE);
@@ -1468,6 +1529,26 @@ class Printerstate extends MY_Controller {
 		);
 	
 		$this->parser->parse('template/basetemplate', $template_data);
+		return;
+	}
+	
+	public function checkupgrade() {
+		$ret_val = FALSE;
+		$this->load->helper('zimapi');
+		
+		$ret_val = !(ZimAPI_getVersion(TRUE) == ZimAPI_getVersion(FALSE));
+		
+		if ($ret_val == TRUE) {
+			$this->output->set_status_header(202); // send 202 code to indicate upgrade
+		}
+		else {
+			$this->output->set_status_header(200);
+		}
+		
+		$this->load->library('parser');
+		$this->output->set_content_type('txt_u');
+		$this->parser->parse('template/plaintxt', array('display' => ZimAPI_getVersion(TRUE))); //optional
+		
 		return;
 	}
 }

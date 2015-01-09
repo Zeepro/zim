@@ -1485,9 +1485,11 @@ function PrinterState_checkStatusAsArray($extra_info = TRUE) {
 					= $status_json[CORESTATUS_TITLE_LASTERROR] . ' ' . $status_json[CORESTATUS_TITLE_MESSAGE];
 		}
 		
-		// check if we need to change idle into sliced or not
-		PrinterState_checkSlicedCondition($data_json);
-		//TODO add timelapse checking
+		if ($extra_info == TRUE) {
+			// check if we need to change idle into sliced or not
+			PrinterState_checkSlicedCondition($data_json);
+			//TODO add timelapse checking
+		}
 		
 		return $data_json;
 	}
@@ -1512,8 +1514,8 @@ function PrinterState_checkStatusAsArray($extra_info = TRUE) {
 					= $temp_data[PRINTERSTATE_TITLE_LASTERROR] . ' ' . $temp_data[PRINTERSTATE_TITLE_DETAILMSG];
 		}
 		
-		// try to change idle into sliced if necessary
-		if ($status_current == CORESTATUS_VALUE_IDLE) {
+		if ($status_current == CORESTATUS_VALUE_IDLE && $extra_info == TRUE) {
+			// try to change idle into sliced if necessary
 			PrinterState_checkSlicedCondition($data_json);
 			//TODO add timelapse checking
 		}
@@ -1554,9 +1556,11 @@ function PrinterState_checkStatusAsArray($extra_info = TRUE) {
 				PrinterLog_logError('cannot set in idle - checkstatusasarray', __FILE__, __LINE__);
 			}
 			
-			// check if we need to change idle into sliced or not
-			PrinterState_checkSlicedCondition($data_json);
-			//TODO add timelapse checking
+			if ($extra_info == TRUE) {
+				// check if we need to change idle into sliced or not
+				PrinterState_checkSlicedCondition($data_json);
+				//TODO add timelapse checking
+			}
 			
 			return $data_json;
 		} else {
