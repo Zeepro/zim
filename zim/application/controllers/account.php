@@ -287,15 +287,16 @@ class Account extends MY_Controller
 		if (CoreStatus_checkInConnection())
 		{
 			$data['back_or_already'] = t('already');
-			$data['has_skip'] = "block"; 			
+// 			$data['has_skip'] = "block"; 			
 			$data['btn_url'] ='/account/signin';
 		}
 		else
 		{
 			$data['back_or_already'] = t('back');
-			$data['has_skip'] = "none";
+// 			$data['has_skip'] = "none";
 			$data['btn_url'] ='/activation/';
 		}
+		$data['has_skip'] = "none";
 		$data['confcode_hint'] = t('confcode_hint');
 		$data['signup_title'] = t('signup_title');
 		$data['signup_text'] = t('signup_text');
