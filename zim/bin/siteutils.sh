@@ -68,13 +68,13 @@ unload_filament() {
 	case "$2" in
 		pva)
 			gcode_unload="$gcode_unload P";
-			prime_speed=150
-			unload_offset=16
+			prime_speed=50
+			unload_offset=48
 			;;
 			
 		default)
-			prime_speed=50
-			unload_offset=48
+			prime_speed=150
+			unload_offset=16
 			;;
 		*)
 			echo "unknown material";
