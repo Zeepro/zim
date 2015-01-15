@@ -60,7 +60,8 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 		define('ZIMAPI_FILEPATH_POSTHEAT',	$CI->config->item('bin') . 'timelapse_post_heat.sh');
 		define('ZIMAPI_FILEPATH_UPGRADE',	$CI->config->item('conf') . 'profile.json');
 		define('ZIMAPI_FILEPATH_VIDEO_TS',	$CI->config->item('temp') . 'zim0.ts');
-		define('ZIMAPI_FILEPATH_UPGD_NOTE',	$CI->config->item('nandconf') . 'release_note.xml');
+		define('ZIMAPI_FILEPATH_UPGDNOTE1',	$CI->config->item('nandconf') . 'release_note.xml');
+		define('ZIMAPI_FILEPATH_UPGDNOTE2',	'./data/release_note.xml');
 	}
 	else {
 		define('ZIMAPI_FILEPATH_TIMELAPSE',	'/var/www/tmp/timelapse.mp4');
@@ -71,7 +72,8 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 		define('ZIMAPI_FILEPATH_POSTHEAT',	'/var/www/bin/timelapse_post_heat.sh');
 		define('ZIMAPI_FILEPATH_UPGRADE',	'/config/conf/profile.json');
 		define('ZIMAPI_FILEPATH_VIDEO_TS',	'/var/www/tmp/zim0.ts');
-		define('ZIMAPI_FILEPATH_UPGD_NOTE',	'/config/release_note.xml');
+		define('ZIMAPI_FILEPATH_UPGDNOTE1',	'/config/release_note.xml');
+		define('ZIMAPI_FILEPATH_UPGDNOTE2',	'/var/www/data/release_note.xml');
 	}
 	
 	define('ZIMAPI_FILENAME_CAMERA',	'Camera.json');
@@ -1609,7 +1611,7 @@ function ZimAPI_setStatistic($mode) {
 	return ERROR_INTERNAL;
 }
 
-// abandoned function
+// deprecated function
 function ZimAPI_getUpgradeNote(&$note_html = '') {
 	$count = 0;
 	$html = NULL;
@@ -1651,48 +1653,54 @@ function ZimAPI_getUpgradeNote(&$note_html = '') {
 
 function ZimAPI_getUpgradeNoteArray(&$array_upgrade) {
 	$array_upgrade = array(); // initialization of array
-	
-	try {
-		if (file_exists(ZIMAPI_FILEPATH_UPGD_NOTE)) {
-			$key_version = ZIMAPI_TITLE_RELEASENOTE_VERSION;
-			$key_part = ZIMAPI_TITLE_RELEASENOTE_PART;
-			$key_part_title = ZIMAPI_TITLE_RELEASENOTE_PART_TITLE;
-			$key_part_note = ZIMAPI_TITLE_RELEASENOTE_PART_NOTE;
-			
-			$xml = simplexml_load_file(ZIMAPI_FILEPATH_UPGD_NOTE);
-			if (count($xml->$key_version) == 0) {
-				throw new Exception('upgrade version not found');
-			}
-			if (count($xml->$key_part)) {
-				$tmp_array = array();
-				foreach($xml->$key_part as $part) {
-					if (count($part->$key_part_title) != 1) {
-						throw new Exception('part with no title or several titles detected');
-					}
-					if (count($part->$key_part_note)) {
-						foreach($part->$key_part_note as $note) {
-							$tmp_array[(string) $part->$key_part_title][] = (string) $note;
+
+	foreach (array(ZIMAPI_FILEPATH_UPGDNOTE1, ZIMAPI_FILEPATH_UPGDNOTE2) as $file_note) {
+		try {
+			if (file_exists($file_note)) {
+				$key_version = ZIMAPI_TITLE_RELEASENOTE_VERSION;
+				$key_part = ZIMAPI_TITLE_RELEASENOTE_PART;
+				$key_part_title = ZIMAPI_TITLE_RELEASENOTE_PART_TITLE;
+				$key_part_note = ZIMAPI_TITLE_RELEASENOTE_PART_NOTE;
+				
+				$xml = simplexml_load_file($file_note);
+				if (count($xml->$key_version) == 0) {
+					throw new Exception('upgrade version not found');
+				}
+				if (count($xml->$key_part)) {
+					$tmp_array = array();
+					foreach($xml->$key_part as $part) {
+						if (count($part->$key_part_title) != 1) {
+							throw new Exception('part with no title or several titles detected');
+						}
+						if (count($part->$key_part_note)) {
+							foreach($part->$key_part_note as $note) {
+								$tmp_array[(string) $part->$key_part_title][] = (string) $note;
+							}
+						}
+						else {
+							throw new Exception('part with no notes detected');
 						}
 					}
-					else {
-						throw new Exception('part with no notes detected');
-					}
+					$array_upgrade[(string) $xml->$key_version] = $tmp_array;
 				}
-				$array_upgrade[(string) $xml->$key_version] = $tmp_array;
+				else {
+					throw new Exception('upgrade with no parts detected');
+				}
 			}
 			else {
-				throw new Exception('upgrade with no parts detected');
+				throw new Exception('file not found');
 			}
+		} catch (Exception $e) {
+			$CI = &get_instance();
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('read upgrade release note error, file: ' . $file_note . ', message: ' . $e->getMessage(), __FILE__, __LINE__);
+			
+			if ($file_note != ZIMAPI_FILEPATH_UPGDNOTE2) {
+				continue;
+			}
+			
+			return FALSE;
 		}
-		else {
-			throw new Exception('file not found |' . ZIMAPI_FILEPATH_UPGD_NOTE . '|');
-		}
-	} catch (Exception $e) {
-		$CI = &get_instance();
-		$CI->load->helper('printerlog');
-		PrinterLog_logError('read upgrade release note error, message: ' . $e->getMessage(), __FILE__, __LINE__);
-		
-		return FALSE;
 	}
 	
 	return TRUE;

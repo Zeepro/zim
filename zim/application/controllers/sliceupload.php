@@ -200,13 +200,15 @@ class Sliceupload extends MY_Controller {
 			$list_preset = ZimAPI_getPresetListAsArray();
 			
 			foreach ($list_preset as $preset) {
+				//TODO add rollback function to get correct values here
+				
 				$list_display[] = array(
 						'name'		=> $preset[ZIMAPI_TITLE_PRESET_NAME],
 						'id'		=> $preset[ZIMAPI_TITLE_PRESET_ID],
-						'infill'	=> $preset[ZIMAPI_TITLE_PRESET_INFILL],
-						'skirt'		=> $preset[ZIMAPI_TITLE_PRESET_SKIRT],
-						'raft'		=> $preset[ZIMAPI_TITLE_PRESET_RAFT],
-						'support'	=> $preset[ZIMAPI_TITLE_PRESET_SUPPORT],
+						'infill'	=> isset($preset[ZIMAPI_TITLE_PRESET_INFILL]) ? $preset[ZIMAPI_TITLE_PRESET_INFILL] : '30%',
+						'skirt'		=> isset($preset[ZIMAPI_TITLE_PRESET_SKIRT]) ? $preset[ZIMAPI_TITLE_PRESET_SKIRT] : 0,
+						'raft'		=> isset($preset[ZIMAPI_TITLE_PRESET_RAFT]) ? $preset[ZIMAPI_TITLE_PRESET_RAFT] : 0,
+						'support'	=> isset($preset[ZIMAPI_TITLE_PRESET_SUPPORT]) ? $preset[ZIMAPI_TITLE_PRESET_SUPPORT] : 1,
 				);
 			}
 			sort($list_display);

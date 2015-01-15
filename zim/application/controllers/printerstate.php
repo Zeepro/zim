@@ -642,7 +642,10 @@ class Printerstate extends MY_Controller {
 			}
 		}
 		else {
-			$note_html = 'N/A';
+			// add internet fetch rollback if local file not found
+			if (!ZimAPI_getUpgradeNote($note_html)) {
+				$note_html = 'N/A';
+			}
 		}
 		
 		// stats info
