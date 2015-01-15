@@ -40,9 +40,9 @@ $lang['fan_subtitle2']
 $lang['fan_subtitle3']
 	= 'Seuil de refroidissement';
 $lang['min_fan_speed']
-	= 'Vitesse minimum des ventilateurs';
+	= 'Vitesse minimum des ventilateurs (Modulation de largeur d\'impulsion)';
 $lang['max_fan_speed']
-	= 'Vitesse maximum des ventilateurs';
+	= 'Vitesse maximum des ventilateurs (Modulation de largeur d\'impulsion)';
 $lang['fan_always_on']
 	= 'Garder les ventilateurs actifs';
 $lang['cooling']

@@ -5,10 +5,8 @@
 					<div id="print_progress"></div>
 					<p>{print_remain}</p>
 					<p>{print_passed}</p>
-					
-					
-<script type="text/javascript">
 
+<script>
 var value_percent = {value_percent};
 
 $('<input>').appendTo("div#print_progress")
@@ -24,7 +22,6 @@ $('<input>').appendTo("div#print_progress")
 	}
 });
 
-<!--
 var_temper_holder = {hold_temper};
 if (var_temper_holder == false) {
 	var_temper_l = {value_temperL};
@@ -71,5 +68,9 @@ else {
 	$("div#print_detail_info_temper_r").hide();
 }
 
-//-->
+var var_reloadPlayer = {reload_player};
+
+if (var_reloadPlayer == true) {
+	refreshVideoURL();
+}
 </script>

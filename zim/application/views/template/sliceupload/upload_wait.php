@@ -9,7 +9,6 @@
 </div>
 
 <script type="text/javascript">
-<!--
 var var_ajax;
 
 $(document).ready(add_model());
@@ -52,5 +51,4 @@ function add_model() {
 		.button().button('refresh');
 	});
 }
--->
 </script>

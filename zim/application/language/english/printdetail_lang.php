@@ -32,6 +32,8 @@ $lang['cancel_confirm_prime']
 	= 'Do you really want to stop the priming ?';
 $lang['wait_info_prime']
 	= 'Starting the priming...';
+$lang['reloading_player']
+	= 'Reloading the player to start zim-motion time-lapse...';
 
 $lang['storegcode_info']
 	= 'Save this print in <b>My Models Library</b>';

@@ -16,6 +16,7 @@ if (!defined('PRINTER_FN_CHARGE')) {
 	define('PRINTER_FN_PRINTPRIME_L',	'_print_prime_left.gcode');
 	define('PRINTER_FN_PRINTPRIME_R',	'_print_prime_right.gcode');
 	define('PRINTER_FN_END_PRINT',		'_print_endscript.sh');
+	define('PRINTER_FN_POST_HEAT',		'_print_postheat.sh');
 	define('PRINTER_PRM_TEMPER_L_N',	' -ll ');	// left temperature for other layer (if exist)
 	define('PRINTER_PRM_TEMPER_L_F',	' -l ');	// left temperature for first layer (or all layer)
 	define('PRINTER_PRM_TEMPER_R_N',	' -rr ');	// right temperature for other layer (if exist)
@@ -31,6 +32,7 @@ if (!defined('PRINTER_FN_CHARGE')) {
 
 function Printer_preparePrint($model_id, $need_prime = TRUE) {
 	$cr = 0;
+	$timelapse_length = 0;
 	$gcode_path = '';
 	
 	$CI = &get_instance();
@@ -42,9 +44,79 @@ function Printer_preparePrint($model_id, $need_prime = TRUE) {
 			CORESTATUS_VALUE_MID_PRIME_R))) {
 		$CI->load->helper('zimapi');
 		
+		// get printing length
+		// if just sliced model, get value from temporary json file
+		if ($model_id == CORESTATUS_VALUE_MID_SLICE) {
+			$temp_json = array();
+			
+			$CI->load->helper('printerstate');
+			
+			if (ERROR_OK == PrinterState_getSlicedJson($temp_json)) {
+				foreach($temp_json as $temp_filament) {
+					if (array_key_exists(PRINTERSTATE_TITLE_NEED_L, $temp_filament)) {
+						$timelapse_length += $temp_filament[PRINTERSTATE_TITLE_NEED_L];
+					}
+				}
+			}
+		}
+		// if gcode file from user library
+		else if (strpos($model_id, CORESTATUS_VALUE_MID_PREFIXGCODE) === 0) {
+			$gcode_info = array();
+			
+			$CI->load->helper('printerstoring');
+			$model_id = (int) substr($model_id, strlen(CORESTATUS_VALUE_MID_PREFIXGCODE));
+			
+			$gcode_info = PrinterStoring_getInfo("gcode", $model_id);
+			if (!is_null($gcode_info) && array_key_exists(PRINTERSTORING_TITLE_LENG_R, $gcode_info)
+			&& array_key_exists(PRINTERSTORING_TITLE_LENG_L, $gcode_info)) {
+				$timelapse_length = $gcode_info[PRINTERSTORING_TITLE_LENG_R] + $gcode_info[PRINTERSTORING_TITLE_LENG_L];
+			}
+		}
+		// if presliced model get from helper
+		else if (strlen($model_id) == 32) {
+			$model_info = array();
+			
+			if (ERROR_OK == ModelList__getDetailAsArray($model_id, $model_info) && !is_null($model_info)) {
+				foreach (array(PRINTLIST_TITLE_LENG_F1, PRINTLIST_TITLE_LENG_F2) as $key_length) {
+					if (array_key_exists($key_length, $model_info)) {
+						$timelapse_length += $model_info[$key_length];
+					}
+				}
+			}
+		}
+		if ($timelapse_length <= 0) {
+			$timelapse_length = ZIMAPI_VALUE_DEFAULT_LENGTH;
+		}
+		
+		// timelapse camera switch and prepare script, and write fps info into file
+		if (file_exists(ZIMAPI_FILEPATH_POSTHEAT)) {
+			$script_path = $CI->config->item('temp') . PRINTER_FN_POST_HEAT;
+			$parameter = str_replace('{fps}',
+					(ZIMAPI_VALUE_DEFAULT_TL_LENGTH * 10 / ($timelapse_length / ZIMAPI_VALUE_DEFAULT_SPEED + ZIMAPI_VALUE_DEFAULT_TL_OFFSET)),
+					ZIMAPI_PRM_CAMERA_PRINTSTART_TIMELAPSE);
+			$command_addon = "\n" . str_replace('sudo nice', 'nice', $CI->config->item('camera')) . $parameter . "\n";
+			
+			copy(ZIMAPI_FILEPATH_POSTHEAT, $script_path);
+			
+			$fp = fopen($script_path, 'a');
+			if ($fp) {
+				fwrite($fp, $command_addon);
+				fclose($fp);
+			}
+			chmod($script_path, 0775);
+			//TODO think if we block processing when getting an error
+		}
+		else {
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('prepare post heat script error', __FILE__, __LINE__);
+		}
+		
+		// timelapse generation script
 		if (file_exists(ZIMAPI_FILEPATH_ENDPRINT)) {
-			copy(ZIMAPI_FILEPATH_ENDPRINT, $CI->config->item('temp') . PRINTER_FN_END_PRINT);
-			chmod($CI->config->item('temp') . PRINTER_FN_END_PRINT, 0775);
+			$script_path = $CI->config->item('temp') . PRINTER_FN_END_PRINT;
+			
+			copy(ZIMAPI_FILEPATH_ENDPRINT, $script_path);
+			chmod($script_path, 0775);
 		}
 		else {
 			$CI->load->helper('printerlog');
@@ -53,6 +125,7 @@ function Printer_preparePrint($model_id, $need_prime = TRUE) {
 	}
 	else {
 		@unlink($CI->config->item('temp') . PRINTER_FN_END_PRINT);
+		@unlink($CI->config->item('temp') . PRINTER_FN_POST_HEAT);
 	}
 	
 	if ($need_prime == TRUE) {
@@ -282,7 +355,6 @@ function Printer_printFromLibrary($id_gcode, $exchange_extruder = FALSE, $array_
 	$array_filament = array();
 	$CI = &get_instance();
 	
-	//TODO finish me
 	$ret_val = Printer__getFileFromModel(PRINTER_TYPE_GCODELIB, $id_gcode, $gcode_path, NULL, $array_info);
 	if (($ret_val == ERROR_OK) && $gcode_path) {
 		$array_filament = array();
@@ -305,6 +377,10 @@ function Printer_printFromLibrary($id_gcode, $exchange_extruder = FALSE, $array_
 		$CI->load->helper('corestatus');
 		$ret_val = Printer_printFromFile($gcode_path, CORESTATUS_VALUE_MID_PREFIXGCODE . $id_gcode, TRUE,
 				$exchange_extruder, $array_filament, $array_temper);
+		
+		// stats info
+		$CI->load->helper('printerlog');
+		PrinterLog_statsLibraryGcode(PRINTERLOG_STATS_LABEL_PRINT, count($array_filament));
 	}
 	
 	return $ret_val;
@@ -318,6 +394,7 @@ function Printer_printFromFile($gcode_path, $model_id, $need_prime = TRUE, $exch
 	$output = array();
 	$temper_json = array();
 	$ret_val = 0;
+	$stats_info = array();
 	
 	$CI = &get_instance();
 	$CI->load->helper(array('printerstate', 'errorcode', 'corestatus', 'printerlog', 'detectos'));
@@ -376,7 +453,7 @@ function Printer_printFromFile($gcode_path, $model_id, $need_prime = TRUE, $exch
 			PrinterState_setTemperature(200);
 			PrinterState_setExtruder('r');
 		}
-	
+		
 		// change status json file
 		foreach($array_temper as $abb_filament => $tmp_temper) {
 			if (!array_key_exists($abb_filament, $array_filament) || $array_filament[$abb_filament] <= 0) {
@@ -394,17 +471,38 @@ function Printer_printFromFile($gcode_path, $model_id, $need_prime = TRUE, $exch
 	if ($ret_val == FALSE) {
 		return ERROR_INTERNAL;
 	}
-
+	
+	// stats info
+	$stats_info[PRINTERLOG_STATS_MODEL] = $model_id;
+	foreach($temper_json as $abb_filament => $tmp_temper) {
+		if (isset($tmp_temper)) {
+			$json_cartridge = array();
+			$arrkey_type = PRINTERLOG_STATS_FILA_TYPE_R;
+			$arrkey_color = PRINTERLOG_STATS_FILA_COLOR_R;
+			
+			if ($abb_filament == 'l') {
+				$arrkey_type = PRINTERLOG_STATS_FILA_TYPE_L;
+				$arrkey_color = PRINTERLOG_STATS_FILA_COLOR_L;
+			}
+			
+			if (ERROR_OK == PrinterState_getCartridgeAsArray($json_cartridge, $abb_filament)) {
+				$stats_info[$arrkey_type] = $json_cartridge[PRINTERSTATE_TITLE_MATERIAL];
+				$stats_info[$arrkey_color] = $json_cartridge[PRINTERSTATE_TITLE_COLOR];
+			}
+		}
+	}
+	PrinterLog_statsPrint(PRINTERLOG_STATS_ACTION_START, $stats_info);
+	
 	// pass gcode to printer
 //	if (!PrinterState_beforeFileCommand()) {
 //		return ERROR_INTERNAL;
 //	}
 	// use different command for priming
 	if ($need_prime == FALSE) {
-		$command = PrinterState_getPrintCommand(TRUE, TRUE) . $gcode_path;
+		$command = PrinterState_getPrintCommand($array_filament, TRUE, TRUE) . $gcode_path;
 	}
 	else {
-		$command = PrinterState_getPrintCommand() . $gcode_path;
+		$command = PrinterState_getPrintCommand($array_filament) . $gcode_path;
 	}
 	// 		exec($command, $output, $ret_val);
 	// 		if ($ret_val != ERROR_NORMAL_RC_OK) {
@@ -435,6 +533,7 @@ function Printer_printFromFile($gcode_path, $model_id, $need_prime = TRUE, $exch
 }
 
 function Printer_stopPrint() {
+	$stats_info = array();
 	$CI = &get_instance();
 	$CI->load->helper('corestatus');
 	
@@ -460,6 +559,10 @@ function Printer_stopPrint() {
 				copy(ZIMAPI_FILEPATH_ENDCANCEL, $CI->config->item('temp') . PRINTER_FN_END_PRINT);
 				chmod($CI->config->item('temp') . PRINTER_FN_END_PRINT, 0775);
 			}
+			
+			//stats info
+			$stats_info = PrinterState_prepareStatsPrintLabel();
+			PrinterLog_statsPrint(PRINTERLOG_STATS_ACTION_CANCEL, $stats_info);
 			
 			// call stop printing gcode status
 			$cr = PrinterState_stopPrinting();
@@ -599,6 +702,9 @@ function Printer_checkPrintStatus(&$return_data) {
 			'print_temperL'	=> $temper_l,
 			'print_temperR'	=> $temper_r,
 			'print_tpassed'	=> $data_status[PRINTERSTATE_TITLE_PASSTIME],
+			'print_heating'	=> (isset($data_status[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_EXT_OPER])
+					&& $data_status[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_EXT_OPER] == PRINTERSTATE_VALUE_PRINT_OPERATION_HEAT)
+					? TRUE : FALSE,
 	);
 	
 	// get time remaining if exists
@@ -812,7 +918,7 @@ function Printer__changeGcode(&$gcode_path, $array_filament = array(), $exchange
 		$command = $CI->config->item('gcdaemon')
 				. PRINTER_PRM_EXCHANGE_E . PRINTER_PRM_FILE . $gcode_path . ' > ' . $gcode_path . '.new';
 		
-		//TODO remove the debug message after test
+		// debug message for test
 		$CI->load->helper('printerlog');
 		PrinterLog_logDebug('change extruder: ' . $command, __FILE__, __LINE__);
 		
@@ -954,7 +1060,7 @@ function Printer__changeGcode(&$gcode_path, $array_filament = array(), $exchange
 			. PRINTER_PRM_TEMPER_L_F . $temp_ls . PRINTER_PRM_TEMPER_L_N . $temp_l
 			. PRINTER_PRM_FILE . $gcode_path . ' > ' . $gcode_path . '.new';
 	
-	//TODO remove the debug message after test
+	// debug message for test
 	$CI->load->helper('printerlog');
 	PrinterLog_logDebug('change temperature: ' . $command, __FILE__, __LINE__);
 	

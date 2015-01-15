@@ -85,6 +85,8 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_UNIN_FILA_PVA_R',	' M1627');
 	define('PRINTERSTATE_UNIN_FILA_PVA_L',	' M1628');
 	define('PRINTERSTATE_GET_POSITION',		' M114');
+	define('PRINTERSTATE_ASSIGN_FILA_L',	' -1 ');
+	define('PRINTERSTATE_ASSIGN_FILA_R',	' -0 ');
 	
 	global $CFG;
 	if ($CFG->config['simulator']) {
@@ -95,6 +97,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 		define('PRINTERSTATE_FILE_PAUSEFILE',	'./tmp/printer_pause');
 		define('PRINTERSTATE_FILE_RESUMEFILE',	'./tmp/printer_resume');
 		define('PRINTERSTATE_FILE_UNLOAD_HEAT',	'./tmp/printer_unload_heat');
+		define('PRINTERSTATE_FILE_PRINT_HEAT',	'./tmp/printer_inheating');
 	}
 	else {
 // 		define('PRINTERSTATE_TEMP_PRINT_FILENAME',	'/tmp/printer_percentage'); // fix the name on SD card
@@ -104,6 +107,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 		define('PRINTERSTATE_FILE_PAUSEFILE',	'/tmp/printer_pause');
 		define('PRINTERSTATE_FILE_RESUMEFILE',	'/tmp/printer_resume');
 		define('PRINTERSTATE_FILE_UNLOAD_HEAT',	'/tmp/printer_unload_heat');
+		define('PRINTERSTATE_FILE_PRINT_HEAT',	'/tmp/printer_inheating');
 	}
 	
 	define('PRINTERSTATE_RIGHT_EXTRUD',	0);
@@ -151,6 +155,8 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_TITLE_POSITION_X',	'x');
 	define('PRINTERSTATE_TITLE_POSITION_Y',	'y');
 	define('PRINTERSTATE_TITLE_POSITION_Z',	'z');
+	define('PRINTERSTATE_TITLE_EXT_OPER',	'operation');
+	define('PRINTERSTATE_TITLE_TIMELAPSE',	'time-lapse');
 	
 	define('PRINTERSTATE_JSON_PRINTER', 		'Printer.json');
 	define('PRINTERSTATE_TITLE_JSON_NB_EXTRUD', 'ExtrudersNumber');
@@ -189,6 +195,10 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_VALUE_FILAMENT_PLA_LOAD_TEMPER',	220);
 	define('PRINTERSTATE_VALUE_FILAMENT_ABS_LOAD_TEMPER',	250);
 	define('PRINTERSTATE_VALUE_FILAMENT_PVA_LOAD_TEMPER',	200);
+	define('PRINTERSTATE_VALUE_PRINT_OPERATION_HEAT',		'heating');
+	define('PRINTERSTATE_VALUE_PRINT_OPERATION_PRINT',		'printing');
+	define('PRINTERSTATE_VALUE_PRINT_OPERATION_END',		'lowering_platform');
+	define('PRINTERSTATE_VALUE_TIMELAPSE_GENERATION',		'generation');
 	
 	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD',			92);
 	define('PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD',			71);
@@ -1023,7 +1033,7 @@ function PrinterState_checkFilament($abb_cartridge, $need_filament = 0, &$data_j
 	return ERROR_OK;
 }
 
-function PrinterState_getPrintCommand($rewrite = TRUE, $is_prime = FALSE) {
+function PrinterState_getPrintCommand($array_filament, $rewrite = TRUE, $is_prime = FALSE) {
 	global $CFG;
 	$command = $CFG->config['arcontrol_p'];
 	
@@ -1033,6 +1043,25 @@ function PrinterState_getPrintCommand($rewrite = TRUE, $is_prime = FALSE) {
 	if ($is_prime == TRUE) {
 		$command .= PRINTERSTATE_PRIME_END;
 	}
+	
+	// assign filament type to arcontrol
+	if (is_array($array_filament)) {
+		foreach (array('r', 'l') as $abb_filament) {
+			$array_cartridge = array();
+			
+			if (array_key_exists($abb_filament, $array_filament) && $array_filament[$abb_filament] > 0
+					&& ERROR_OK == PrinterState_getCartridgeAsArray($array_cartridge, $abb_filament)) {
+				if ($abb_filament == 'l') {
+					$command .= PRINTERSTATE_ASSIGN_FILA_L;
+				}
+				else {
+					$command .= PRINTERSTATE_ASSIGN_FILA_R;
+				}
+				$command .= $array_cartridge[PRINTERSTATE_TITLE_MATERIAL];
+			}
+		}
+	}
+	
 	$command .= PRINTERSTATE_PRINT_FILE;
 	
 	return $command;
@@ -1206,19 +1235,18 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) 
 			if ($ret_val == FALSE) {
 				CoreStatus_setInIdle();
 				$status_current = CORESTATUS_VALUE_IDLE;
+				
+				return TRUE;
 			}
 			break;
 			
 		case CORESTATUS_VALUE_CANCEL:
-			// jump out if it's a simulator
-			if ($CI->config->item('simulator')) {
+			// jump out if it's a simulator or when cancelling is finished
+			if ($CI->config->item('simulator') || !file_exists(PRINTERSTATE_FILE_STOPFILE)) {
 				CoreStatus_setInIdle();
 				$status_current = CORESTATUS_VALUE_IDLE;
-				break;
-			}
-			if (!file_exists(PRINTERSTATE_FILE_STOPFILE)) {
-				CoreStatus_setInIdle();
-				$status_current = CORESTATUS_VALUE_IDLE;
+				
+				return TRUE;
 			}
 			break;
 			
@@ -1231,6 +1259,7 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) 
 			$ret_val = Slicer_checkSlice($progress, $array_slicer);
 			if ($ret_val != ERROR_OK) {
 				$error_message = NULL;
+				$stats_info = array();
 				
 				// handle error for slicing
 				$CI->load->helper('printerlog');
@@ -1263,9 +1292,16 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) 
 				CoreStatus_setInIdle($ret_val, $error_message);
 				$array_data[PRINTERSTATE_TITLE_DETAILMSG] = $error_message;
 				
+				// stats info
+				$stats_info = PrinterState_prepareStatsSliceLabel();
+				$stats_info[PRINTERLOG_STATS_SLICE_ERROR] = $error_message;
+				PrinterLog_statsSlice(PRINTERLOG_STATS_ACTION_ERROR, $stats_info);
+				
 				return TRUE;
 			}
 			elseif ($progress == 100) {
+				$stats_info = array();
+				
 				// set temp json file for every service
 				$ret_val = PrinterState__setSlicedJson($array_slicer);
 				$status_current = CORESTATUS_VALUE_IDLE;
@@ -1277,7 +1313,12 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) 
 				else {
 					CoreStatus_setInIdle();
 				}
-					
+				
+				// stats info
+				$CI->load->helper('printerlog');
+				$stats_info = PrinterState_prepareStatsSliceLabel(TRUE);
+				PrinterLog_statsSlice(PRINTERLOG_STATS_ACTION_END, $stats_info);
+				
 				return TRUE;
 			}
 			else { // still in slicing, so get percentage (estimated time is useless for now, slicer exports percentage badly)
@@ -1371,6 +1412,55 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) 
 			}
 			break;
 			
+		case CORESTATUS_VALUE_PRINT:
+			$output = array();
+			$command = $CI->config->item('arcontrol_c') . PRINTERSTATE_CHECK_STATE;
+			
+			if (file_exists($CI->config->item('printstatus'))) {
+				$output = @file($CI->config->item('printstatus'));
+				if (count($output) == 0) {
+					// case: read the percentage status file when arcontrol_cli is writing in it
+					// so we let the percentage as 1 to continue printing
+					$output = array('1');
+					
+					$CI->load->helper('printerlog');
+					PrinterLog_logDebug('read percentage file when arcontrol_cli wrinting in it', __FILE__, __LINE__);
+				}
+			} else {
+				$output = array('0');
+			}
+			PrinterLog_logArduino($command, $output);
+			
+// 			if (count($output)) {
+// 				// we have right return
+				if ((int)$output[0] == 0) {
+					$stats_info = array();
+					
+					// not in printing(?), now we consider it is just idle (no slicing)
+					$CI->load->helper('printerlog');
+					PrinterLog_logDebug('check in idle - checkstatusasarray', __FILE__, __LINE__);
+					
+					$status_current = CORESTATUS_VALUE_IDLE;
+					if (!CoreStatus_setInIdle()) {
+						PrinterLog_logError('cannot set in idle - checkstatusasarray', __FILE__, __LINE__);
+					}
+					
+					//stats info
+					$stats_info = PrinterState_prepareStatsPrintLabel();
+					PrinterLog_statsPrint(PRINTERLOG_STATS_ACTION_END, $stats_info);
+					
+					return TRUE;
+				} else {
+					$array_data[PRINTERSTATE_TITLE_PERCENT] = $output[0];
+				}
+// 			}
+// 			else {
+// 				$CI->load->helper('printerlog');
+// 				PrinterLog_logError('print check status command error', __FILE__, __LINE__);
+// 			}
+			
+			break;
+			
 		default:
 			// log internal API error
 			$CI->load->helper('printerlog');
@@ -1445,10 +1535,36 @@ function PrinterState_checkSlicedCondition(&$data_json) {
 	return ERROR_OK;
 }
 
+function PrinterState_checkTimelapseCondition(&$data_json) {
+	$timelapse_exist = FALSE;
+	$timelapse_done = FALSE;
+	$CI = &get_instance();
+	
+	$CI->load->helper('zimapi');
+	$timelapse_exist = ZimAPI_checkTimelapse($timelapse_done);
+	if ($timelapse_exist == TRUE) {
+		if ($timelapse_done == TRUE) {
+			$timelapse_url = $_SERVER['HTTP_HOST'] . '/tmp/' . ZIMAPI_FILENAME_TIMELAPSE;
+			
+			$CI->load->helper('corestatus');
+			if (CoreStatus_checkTromboning()) {
+				$timelapse_url = 'https://' . $timelapse_url;
+			}
+			else {
+				$timelapse_url = 'http://' . $timelapse_url;
+			}
+			$data_json[PRINTERSTATE_TITLE_TIMELAPSE] = $timelapse_url;
+		}
+		else {
+			$data_json[PRINTERSTATE_TITLE_TIMELAPSE] = PRINTERSTATE_VALUE_TIMELAPSE_GENERATION;
+		}
+	}
+	
+	return;
+}
+
 //TODO union printing status into PrinterState_checkBusyStatus()
 function PrinterState_checkStatusAsArray($extra_info = TRUE) {
-	global $CFG;
-	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
 	$command = '';
 	$output = array();
 	$ret_val = 0;
@@ -1484,23 +1600,15 @@ function PrinterState_checkStatusAsArray($extra_info = TRUE) {
 			$data_json[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_SLICE_ERR]
 					= $status_json[CORESTATUS_TITLE_LASTERROR] . ' ' . $status_json[CORESTATUS_TITLE_MESSAGE];
 		}
-		
-		if ($extra_info == TRUE) {
-			// check if we need to change idle into sliced or not
-			PrinterState_checkSlicedCondition($data_json);
-			//TODO add timelapse checking
-		}
-		
-		return $data_json;
 	}
-// 	else if ($ret_val == FALSE && !in_array($status_current, array(CORESTATUS_VALUE_PRINT, CORESTATUS_VALUE_CANCEL))) {
-	else if ($ret_val == FALSE && $status_current != CORESTATUS_VALUE_PRINT) {
+// 	else if ($ret_val == FALSE && $status_current != CORESTATUS_VALUE_PRINT) {
+	else if ($ret_val == FALSE) {
 		$temp_data = array();
 		$status_old = $status_current;
 		
-// 		PrinterState_checkBusyStatus($status_current, $data_json);
 		PrinterState_checkBusyStatus($status_current, $temp_data);
-		if ($status_current == CORESTATUS_VALUE_SLICE) {
+// 		if ($status_current == CORESTATUS_VALUE_SLICE) {
+		if (in_array($status_current, array(CORESTATUS_VALUE_SLICE, CORESTATUS_VALUE_PRINT))) {
 			$data_json[PRINTERSTATE_TITLE_PERCENT] = $temp_data[PRINTERSTATE_TITLE_PERCENT];
 		}
 		$data_json[PRINTERSTATE_TITLE_STATUS] = $status_current;
@@ -1513,69 +1621,11 @@ function PrinterState_checkStatusAsArray($extra_info = TRUE) {
 			$data_json[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_SLICE_ERR]
 					= $temp_data[PRINTERSTATE_TITLE_LASTERROR] . ' ' . $temp_data[PRINTERSTATE_TITLE_DETAILMSG];
 		}
-		
-		if ($status_current == CORESTATUS_VALUE_IDLE && $extra_info == TRUE) {
-			// try to change idle into sliced if necessary
-			PrinterState_checkSlicedCondition($data_json);
-			//TODO add timelapse checking
-		}
-		
-		return $data_json;
-	}
-	
-	$ret_val = ERROR_NORMAL_RC_OK;
-	$command = $arcontrol_fullpath . PRINTERSTATE_CHECK_STATE;
-//	exec($command, $output, $ret_val);
-//	if (!PrinterState_filterOutput($output, $command)) {
-//		$CI->load->helper('printerlog');
-//		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
-//		return ERROR_INTERNAL;
-//	}
-	if (file_exists($CFG->config['printstatus'])) {
-		$output = @file($CFG->config['printstatus']);
-		if (count($output) == 0) {
-			// case: read the percentage status file when arcontrol_cli is writing in it
-			// so we let the percentage as 1 to continue printing
-			$output = array('1');
-			
-			$CI->load->helper('printerlog');
-			PrinterLog_logDebug('read percentage file when arcontrol_cli wrinting in it', __FILE__, __LINE__);
-		}
-	} else {
-		$output = array('0');
-	}
-	PrinterLog_logArduino($command, $output);
-	if ($ret_val == ERROR_NORMAL_RC_OK && $output) {
-		// we have right return
-		if ((int)$output[0] == 0) {
-			// not in printing(?), now we consider it is just idle (no slicing)
-			$CI->load->helper('printerlog');
-			PrinterLog_logDebug('check in idle - checkstatusasarray', __FILE__, __LINE__);
-			$data_json[PRINTERSTATE_TITLE_STATUS] = CORESTATUS_VALUE_IDLE;
-			if (!CoreStatus_setInIdle()) {
-				PrinterLog_logError('cannot set in idle - checkstatusasarray', __FILE__, __LINE__);
-			}
-			
-			if ($extra_info == TRUE) {
-				// check if we need to change idle into sliced or not
-				PrinterState_checkSlicedCondition($data_json);
-				//TODO add timelapse checking
-			}
-			
-			return $data_json;
-		} else {
-// 			// in printing / canceling, then check their difference in json
-// 			CoreStatus_checkInIdle($status_current);
-// 			if ($status_current == CORESTATUS_VALUE_CANCEL) {
-// 				$data_json[PRINTERSTATE_TITLE_STATUS] = CORESTATUS_VALUE_CANCEL;
-// 				return $data_json;
-// 			}
-			$data_json[PRINTERSTATE_TITLE_STATUS] = CORESTATUS_VALUE_PRINT;
-			$data_json[PRINTERSTATE_TITLE_PERCENT] = $output[0];
-			// we can calculate duration by mid(to get total duration) and percentage
+		else if ($status_current == CORESTATUS_VALUE_PRINT) {
+			$print_operation = PRINTERSTATE_VALUE_PRINT_OPERATION_PRINT;
 			
 			// add temperature
-			if ($data_json[PRINTERSTATE_TITLE_PERCENT] != 100 && $extra_info == TRUE) {
+			if ($extra_info == TRUE && $data_json[PRINTERSTATE_TITLE_PERCENT] != 100) {
 				$data_temperature = PrinterState_getExtruderTemperaturesAsArray();
 				if (!is_array($data_temperature)) {
 					// log internal error
@@ -1589,27 +1639,38 @@ function PrinterState_checkStatusAsArray($extra_info = TRUE) {
 							= array_key_exists(PRINTERSTATE_RIGHT_EXTRUD, $data_temperature) ? $data_temperature[PRINTERSTATE_RIGHT_EXTRUD] : 0;
 				}
 			}
+			
+			// try to calculate time remained when percentage is passed offset
+			$ret_val = CoreStatus_getStartTime($time_start);
+			if ($ret_val == ERROR_NORMAL_RC_OK || $time_start) {
+				$time_pass = time() - $time_start;
+				$data_json[PRINTERSTATE_TITLE_PASSTIME] = $time_pass;
+				
+				if (isset($data_json[PRINTERSTATE_TITLE_PERCENT]) &&
+						($time_pass >= PRINTERSTATE_VALUE_OFST_TO_CAL_TIME
+								|| $data_json[PRINTERSTATE_TITLE_PERCENT] >= PRINTERSTATE_VALUE_OFST_TO_CAL_PCT)) {
+					$percentage_finish = $data_json[PRINTERSTATE_TITLE_PERCENT];
+					
+					$data_json[PRINTERSTATE_TITLE_DURATION] = (int)($time_pass / $percentage_finish * (100 - $percentage_finish));
+				}
+			}
+			
+			// check operation
+			if (file_exists(PRINTERSTATE_FILE_PRINT_HEAT)) {
+				$print_operation = PRINTERSTATE_VALUE_PRINT_OPERATION_HEAT;
+			}
+			else if ($data_json[PRINTERSTATE_TITLE_PERCENT] == 100) {
+				$print_operation = PRINTERSTATE_VALUE_PRINT_OPERATION_END;
+			}
+			$data_json[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_EXT_OPER] = $print_operation;
 		}
-	}
-	else {
-		$CI->load->helper('printerlog');
-		PrinterLog_logError('print check status command error', __FILE__, __LINE__);
-		return ERROR_INTERNAL;
 	}
 	
-	// try to calculate time remained when percentage is passed offset
-	$ret_val = CoreStatus_getStartTime($time_start);
-	if ($ret_val == ERROR_NORMAL_RC_OK || $time_start) {
-		$time_pass = time() - $time_start;
-		$data_json[PRINTERSTATE_TITLE_PASSTIME] = $time_pass;
-		
-		if (isset($data_json[PRINTERSTATE_TITLE_PERCENT]) &&
-				($time_pass >= PRINTERSTATE_VALUE_OFST_TO_CAL_TIME
-						|| $data_json[PRINTERSTATE_TITLE_PERCENT] >= PRINTERSTATE_VALUE_OFST_TO_CAL_PCT)) {
-			$percentage_finish = $data_json[PRINTERSTATE_TITLE_PERCENT];
-			
-			$data_json[PRINTERSTATE_TITLE_DURATION] = (int)($time_pass / $percentage_finish * (100 - $percentage_finish));
-		}
+	if ($extra_info == TRUE && $status_current == CORESTATUS_VALUE_IDLE) {
+		// check if we need to change idle into sliced or not
+		PrinterState_checkSlicedCondition($data_json);
+		//TODO add timelapse checking
+		PrinterState_checkTimelapseCondition($data_json);
 	}
 	
 	return $data_json;
@@ -1961,7 +2022,7 @@ function PrinterState_runGcodeFile($gcode_path, $rewrite = TRUE) {
 	if ($rewrite == TRUE) {
 		Printer_preparePrint();
 	}
-	$command = PrinterState_getPrintCommand($rewrite) . $gcode_path;
+	$command = PrinterState_getPrintCommand(array(), $rewrite) . $gcode_path;
 	
 	// we can't check return output
 	if ($CFG->config['simulator'] && DectectOS_checkWindows()) {
@@ -3061,6 +3122,10 @@ function PrinterState_powerOff() {
 		$command = 'start /B ' . $command;
 	}
 	
+	// stats info
+	$CI->load->helper('printerlog');
+	PrinterLog_statsPowerOff();
+	
 	exec($command, $output, $ret_val);
 	PrinterLog_logArduino($command, $output);
 	if ($ret_val != ERROR_NORMAL_RC_OK) {
@@ -3126,6 +3191,101 @@ function PrinterState_getPosition(&$json_position) {
 	return $cr;
 }
 
+function PrinterState_prepareStatsPrintLabel() {
+	$status_current = NULL;
+	$status_array = array();
+	$stats_info = array();
+	$CI = &get_instance();
+	
+	$CI->load->helper(array('printerlog', 'corestatus'));
+	CoreStatus_checkInIdle($status_current, $status_array);
+	
+	if (isset($status_array[CORESTATUS_TITLE_PRINTMODEL])) {
+		$stats_info[PRINTERLOG_STATS_MODEL] = $status_array[CORESTATUS_TITLE_PRINTMODEL];
+	}
+	foreach (array(
+			CORESTATUS_TITLE_P_TEMPER_L => array('l', PRINTERLOG_STATS_FILA_TYPE_L, PRINTERLOG_STATS_FILA_COLOR_L, PRINTERLOG_STATS_FILA_TEMPER_L),
+			CORESTATUS_TITLE_P_TEMPER_R => array('r', PRINTERLOG_STATS_FILA_TYPE_R, PRINTERLOG_STATS_FILA_COLOR_R, PRINTERLOG_STATS_FILA_TEMPER_R),
+	) as $check_key => $assign_key) {
+		$json_cartridge = array();
+		
+		if (isset($status_array[$check_key]) && ERROR_OK == PrinterState_getCartridgeAsArray($json_cartridge, $assign_key[0])) {
+			$stats_info[$assign_key[1]] = $json_cartridge[PRINTERSTATE_TITLE_MATERIAL];
+			$stats_info[$assign_key[2]] = $json_cartridge[PRINTERSTATE_TITLE_COLOR];
+			$stats_info[$assign_key[3]] = $status_array[$check_key];
+		}
+	}
+	
+	return $stats_info;
+}
+
+function PrinterState_prepareStatsSliceLabel($end_slice = FALSE) {
+	$stats_info = array();
+	$preset_id = NULL;
+	$model_filename = array();
+	$array_slice = array();
+	$array_check = array(
+			'l'	=> array(PRINTERLOG_STATS_FILA_TYPE_L, PRINTERLOG_STATS_FILA_COLOR_L, PRINTERLOG_STATS_FILA_USED_L),
+			'r'	=> array(PRINTERLOG_STATS_FILA_TYPE_R, PRINTERLOG_STATS_FILA_COLOR_R, PRINTERLOG_STATS_FILA_USED_R),
+	);
+	$CI = &get_instance();
+	
+	$CI->load->helper(array('slicer', 'zimapi'));
+	
+	// remove unused filament
+	if ($end_slice == TRUE) {
+		if (ERROR_OK == PrinterState_getSlicedJson($array_slice)) {
+			foreach (array('r', 'l') as $abb_filament) {
+				if (!isset($array_slice[$abb_filament])) {
+					unset($array_check[$abb_filament]);
+				}
+			}
+		}
+	}
+	
+	// filament info
+	foreach ($array_check as $abb_filament => $assign_key) {
+		$json_cartridge = array();
+		
+		if (ERROR_OK == PrinterState_getCartridgeAsArray($json_cartridge, $abb_filament)) {
+			$stats_info[$assign_key[0]] = $json_cartridge[PRINTERSTATE_TITLE_MATERIAL];
+			$stats_info[$assign_key[1]] = $json_cartridge[PRINTERSTATE_TITLE_COLOR];
+			if ($end_slice == TRUE) {
+				$stats_info[$assign_key[2]] = $array_slice[$abb_filament][PRINTERSTATE_TITLE_NEED_L];
+			}
+		}
+	}
+	
+	// model name
+	if (ERROR_OK == Slicer_getModelFile(0, $model_filename, TRUE)) {
+		$model_displayname = NULL;
+		
+		foreach($model_filename as $model_basename) {
+			if (strlen($model_displayname)) {
+				$model_displayname .= ' + ' . $model_basename;
+			}
+			else {
+				$model_displayname = $model_basename;
+			}
+		}
+		
+		if (strlen($model_displayname)) {
+			$stats_info[PRINTERLOG_STATS_MODEL] = $model_displayname;
+		}
+	}
+	
+	// preset name
+	if (ZimAPI_getPreset($preset_id)) {
+		$array_json = array();
+		
+		if (ERROR_OK == ZimAPI_getPresetInfoAsArray($preset_id, $array_json)) {
+			$stats_info[PRINTERLOG_STATS_PRESET] = $array_json[ZIMAPI_TITLE_PRESET_NAME];
+		}
+	}
+	
+	return $stats_info;
+}
+
 //internal function
 function PrinterState__updateCartridge(&$code_cartridge, $abb_cartridge) {
 	$CI = &get_instance();
@@ -3161,7 +3321,7 @@ function PrinterState__updateCartridge(&$code_cartridge, $abb_cartridge) {
 			$temp_code = $data_json[$temp_code] . substr($code_cartridge, 26, 4);
 			
 			// calculate checksum
-			for($i=0; $i<=14; $i++) {
+			for ($i=0; $i<=14; $i++) {
 				$string_tmp = substr($temp_code, $i*2, 2);
 				$hex_tmp = hexdec($string_tmp);
 				$temp_hex = $temp_hex ^ $hex_tmp;

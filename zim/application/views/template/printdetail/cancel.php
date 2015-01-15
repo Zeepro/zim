@@ -74,7 +74,7 @@ function checkCancelStatus() {
 		.fail(function() { // not in printing
 // 			window.location.replace("/");
 			finishAction();
-<!--	//	<?php //FIXME just disable redirection and do same as finished for simulation ?> -->
+<?php //FIXME just disable redirection and do same as finished for simulation ?>
 		})
 		.always(function() {
 			var_ajax_lock = false;

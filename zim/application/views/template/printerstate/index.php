@@ -26,6 +26,17 @@
 						</select>
 					</div>
 				</div>
+<!-- 				<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;"> -->
+<!-- 					<label for="slider"><h2>{statistic}</h2></label> -->
+<!-- 				</div></div> -->
+<!-- 				<div class="ui-block-b"> -->
+<!-- 					<div class="ui-bar ui-bar-f" style="height:3em;"> -->
+<!-- 						<select name="statistic" id="statistic" data-role="slider" data-track-theme="a" data-theme="a"> -->
+<!-- 							<option value="off">{function_off}</option> -->
+<!-- 							<option value="on" {statistic_on}>{function_on}</option> -->
+<!-- 						</select> -->
+<!-- 					</div> -->
+<!-- 				</div> -->
 				<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;">
 					<label for="slider"><h2>{remote_control}</h2></label>
 				</div></div>
@@ -47,7 +58,7 @@
 				</li>
 			</ul>
 			<ul data-role="listview" class="shadowBox" data-inset="true">
-				<li><a href="http://zimsupport.zeepro.com/support/home" target="_blank">
+				<li><a id="zim_support" href="http://zimsupport.zeepro.com/support/home" target="_blank">
 					<h2>{support}</h2></a>
 				</li>
 			</ul>
@@ -56,7 +67,6 @@
 	</div>
 	
 <script type="text/javascript">
-<!--
 var var_ajax;
 
 $("#upgrade").change(function() {
@@ -104,7 +114,25 @@ $("#remote_control").change(function() {
  		alert("failed");
  	});
 });
-//-->
+//$("#statistic").change(function() {
+//	var var_state = $("#statistic").val().toString();
+//	var_ajax = $.ajax({
+//		url: "/rest/set",
+//		cache: false,
+//		data: {
+//			p: "stats",
+//			v: var_state,
+//			},
+//		type: "GET",
+//	})
+//	.fail(function() {
+//		alert("failed");
+//	});
+//});
+
+$('a#zim_support').click(function(event) {
+	$.get('/printerstate/stats_support', function() { console.log('stats support call sent.'); });
+});
 </script>
 	
 </div>

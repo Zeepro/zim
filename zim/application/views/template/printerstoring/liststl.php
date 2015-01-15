@@ -109,7 +109,6 @@ function deletemodel(){
 	});
 }
 
-<!--
 function load_wait() {
 	$("#overlay").addClass("gray-overlay");
 	$(".ui-loader").css("display", "block");
@@ -119,7 +118,6 @@ $(document).on("pagebeforehide", function() {
 	$(".ui-loader").css("display", "none");
 	$("#overlay").removeClass("gray-overlay");
 });
--->
 </script>
 
 </div>

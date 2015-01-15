@@ -132,9 +132,9 @@ $lang['fan_subtitle2']
 $lang['fan_subtitle3']
 	= 'Cooling thresholds';
 $lang['min_fan_speed']
-	= 'Minimum fan speed';
+	= 'Minimum fan speed (Pulse Width Modulation)';
 $lang['max_fan_speed']
-	= 'Maximum fan speed';
+	= 'Maximum fan speed (Pulse Width Modulation)';
 $lang['fan_always_on']
 	= 'Keep fan always on';
 $lang['cooling']

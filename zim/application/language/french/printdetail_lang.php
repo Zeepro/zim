@@ -32,6 +32,8 @@ $lang['cancel_confirm_prime']
 	= "Voulez-vous vraiment arrêter l'amorçage ?";
 $lang['wait_info_prime']
 	= 'En attente de démarrage...';
+$lang['reloading_player']
+	= 'Rechargement du lecteur à démarrer zim-motion time-lapse...';
 
 $lang['storegcode_info']
 	= 'Sauvegarder ce mod&egrave;le dans Ma Biblioth&egrave;que';

@@ -132,6 +132,15 @@ class Rest extends MY_Controller {
 		return;
 	}
 	
+	public function test_reco() {
+		header('Content-type: ' . RETURN_CONTENT_TYPE);
+		
+		exec($this->config->item('siteutil') . ' force_reco');
+		print 'send: ok, return: unknown';
+		
+		return;
+	}
+	
 	
 	//==========================================================
 	//network web service
@@ -804,6 +813,16 @@ class Rest extends MY_Controller {
 					}
 					break;
 					
+				case ZIMAPI_PRM_STATS:
+					if (ZimAPI_getStatistic()) {
+						$display = 'on';
+					}
+					else {
+						$display = 'off';
+					}
+					$cr = ERROR_OK;
+					break;
+					
 				default:
 					$cr = ERROR_WRONG_PRM;
 					break;
@@ -1081,6 +1100,17 @@ class Rest extends MY_Controller {
 					
 					if ($status_set) {
 						$cr = ZimAPI_setSSH($status_set);
+					}
+					else {
+						$cr = ERROR_MISS_PRM;
+					}
+					break;
+					
+				case ZIMAPI_PRM_STATS:
+					$status_set = $this->input->get('v');
+					
+					if ($status_set) {
+						$cr = ZimAPI_setStatistic($status_set);
 					}
 					else {
 						$cr = ERROR_MISS_PRM;
@@ -1365,7 +1395,7 @@ class Rest extends MY_Controller {
 				SLICER_PRM_COLOR	=> $this->input->get('c'),
 		);
 		
-		// check missing parameter
+		// check missing parameter (do not allow any missings)
 		$cr = ERROR_OK;
 		foreach ($array_data as $value) {
 			if ($value === FALSE) {
@@ -1373,19 +1403,6 @@ class Rest extends MY_Controller {
 				break;
 			}
 		}
-		// if we pass to allow part of parameter
-// 		$cr = ERROR_MISS_PRM;
-// 		foreach ($array_data as $key => $value) {
-// 			if ($value === FALSE) {
-// 				if ($key == SLICER_PRM_ID) {
-// 					break;
-// 				}
-// 			}
-// 			else if ($key != SLICER_PRM_ID) {
-// 				$cr = ERROR_OK;
-// 				break;
-// 			}
-// 		}
 		
 		if ($cr != ERROR_MISS_PRM) {
 			$cr = Slicer_setModel($array_data);
@@ -1504,12 +1521,8 @@ class Rest extends MY_Controller {
 		$array_cartridge = array();
 		$this->load->helper('slicer');
 		
-// 		$cr = Slicer_reloadPreset();
-		
 		// check platform and filament present (do not check filament quantity)
-// 		if ($cr == ERROR_OK) {
-			$cr = Slicer_checkPlatformColor($array_cartridge);
-// 		}
+		$cr = Slicer_checkPlatformColor($array_cartridge);
 		
 		if ($cr == ERROR_OK) {
 			$cr = Slicer_changeTemperByCartridge($array_cartridge);
@@ -1533,6 +1546,99 @@ class Rest extends MY_Controller {
 		$exchange_extruder = ($exchange_extruder == 'crossover') ? TRUE : FALSE;
 		$cr = Printer_printFromSlice($exchange_extruder);
 		
+		$this->_return_cr($cr);
+		
+		return;
+	}
+	
+	//==========================================================
+	//client side rendering web service
+	//==========================================================
+	public function getamfv1() {
+		$cr = 0;
+		$path_amf = NULL;
+		$status_array = array();
+		$color_array = array('r' => NULL, 'l' => NULL);
+		
+		$this->load->helper(array('printerstate', 'slicer'));
+		
+		$status_array = PrinterState_checkStatusAsArray();
+		
+		// check if we are in sliced status, assign colors if so
+		if ($status_array[PRINTERSTATE_TITLE_STATUS] == CORESTATUS_VALUE_SLICED
+				&& array_key_exists(PRINTERSTATE_TITLE_EXTEND_PRM, $status_array)) {
+			// check all extruders
+			foreach (array('r' => PRINTERSTATE_TITLE_EXT_LENG_R, 'l' => PRINTERSTATE_TITLE_EXT_LENG_L)
+					as $abb_cartridge => $status_length) {
+				// check if we use selected extruder
+				if (array_key_exists($status_length, $status_array[PRINTERSTATE_TITLE_EXTEND_PRM])) {
+					$json_cartridge = array();
+					$ret_val = PrinterState_getCartridgeAsArray($json_cartridge, $abb_cartridge);
+					
+					// check if cartridge info is all right
+					if (in_array($ret_val, array(
+							ERROR_OK, ERROR_MISS_LEFT_FILA, ERROR_MISS_RIGT_FILA,
+							ERROR_LOW_LEFT_FILA, ERROR_LOW_RIGT_FILA,
+					))) {
+						$color_array[$abb_cartridge] = $json_cartridge[PRINTERSTATE_TITLE_COLOR];
+					}
+				}
+			}
+			
+			$cr = Slicer_exportAMF($path_amf, $color_array['r'], $color_array['l']);
+			if ($cr == ERROR_OK) {
+				if (file_exists($path_amf)) {
+					$this->load->helper('file');
+					
+					$this->output->set_content_type(get_mime_by_extension($path_amf))->set_output(@file_get_contents($path_amf));
+					
+					return;
+				}
+				else {
+					$cr = ERROR_INTERNAL;
+				}
+			}
+		}
+		else {
+			$cr = ERROR_EMPTY_PLATFORM;
+		}
+		
+		$this->_return_cr($cr);
+		
+		return;
+	}
+	
+	public function setmodelv1() {
+		$cr = 0;
+		$array_data = NULL;
+		
+		$this->load->helper('slicer');
+		$array_data = array(
+				SLICER_PRM_ID		=> 0,
+				SLICER_PRM_XROT		=> $this->input->get('xrot'),
+				SLICER_PRM_YROT		=> $this->input->get('yrot'),
+				SLICER_PRM_ZROT		=> $this->input->get('zrot'),
+				SLICER_PRM_SCALE	=> $this->input->get('s'),
+		);
+		
+		// we pass to allow part of parameter (at least one useful parameter)
+		$cr = ERROR_MISS_PRM;
+		foreach ($array_data as $key => $value) {
+			if ($value === FALSE) {
+				if ($key == SLICER_PRM_ID) {
+					$cr = ERROR_MISS_PRM;
+					break;
+				}
+			}
+			else if ($key != SLICER_PRM_ID) {
+				$cr = ERROR_OK;
+				break;
+			}
+		}
+		
+		if ($cr == ERROR_OK) {
+			$cr = Slicer_setModel($array_data);
+		}
 		$this->_return_cr($cr);
 		
 		return;

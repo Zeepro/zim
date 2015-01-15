@@ -17,7 +17,7 @@
 			<div id="detail_zone" style="clear: both; text-align: center;">
 				<h3><label for="preset_menu">{select_hint}</label></h3>
 				<div data-role="fieldcontain">
-					<select name="preset_menu" id="preset_menu">
+					<select name="preset_menu" id="preset_menu" onchange="javascript: syncParameter();">
 					{preset_list}
 						<option id="p{id}" value="{id}" data-infill="{infill}" data-skirt="{skirt}" data-raft="{raft}" data-support="{support}">{name}</option>
 					{/preset_list}
@@ -29,10 +29,8 @@
 			</div>
 		</div>
 	</div>
-</div>
 
 <script type="text/javascript">
-<!--
 var var_stage = "{current_stage}";
 var var_preview;
 var var_slice;
@@ -56,6 +54,11 @@ var var_interval_zrot = 30;
 var var_interval_xrot = 30;
 var var_interval_yrot = 30;
 var var_interval_rho = 100;
+
+var var_model_reset_scale = {model_scale};
+var var_model_reset_zrot = {model_zrot};
+var var_model_reset_xrot = {model_xrot};
+var var_model_reset_yrot = {model_yrot};
 
 var var_wait_preview = false;
 
@@ -492,5 +495,11 @@ function getSlice() {
 	});
 }
 
--->
+function syncParameter() {
+	var var_preset_id = $('select#preset_menu');
+	var var_preset_option = $('option#p' + var_preset_id.val());
+	var var_preset_infill = var_preset_option.data('infill');
+}
 </script>
+
+</div>

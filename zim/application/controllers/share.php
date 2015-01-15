@@ -77,6 +77,10 @@ class Share extends MY_Controller
 		$ctx = stream_context_create($params);
 		$response = @file_get_contents($destination, FILE_TEXT, $ctx);
 		PrinterLog_logDebug('facebook upload response: ' . $response);
+		
+		//stats info
+		PrinterLog_statsShareVideo(PRINTERLOG_STATS_LABEL_FACEBOOK);
+		
 		return;
 	}
 	
@@ -529,6 +533,10 @@ class Share extends MY_Controller
 				echo "<h3>Video Uploaded</h3><ul>";
 				echo sprintf('<li>%s (%s)</li>', $status['snippet']['title'], $status['id']);
 				echo '</ul>';
+				
+				//stats info
+				$this->load->helper('printerlog');
+				PrinterLog_statsShareVideo(PRINTERLOG_STATS_LABEL_YOUTUBE);
 			}
 			catch (Google_ServiceException $e)
 			{

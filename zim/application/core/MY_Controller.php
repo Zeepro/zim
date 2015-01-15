@@ -57,7 +57,7 @@ class MY_Controller extends CI_Controller {
 		
 		parent::__construct();
 // 		$this->load->helper(array('corestatus', 'url'));
-		$this->load->helper('corestatus');
+		$this->load->helper(array('corestatus', 'printerlog'));
 		
 		// set proper error handler
 		set_error_handler(array($this, 'errorToSSO'));
@@ -95,6 +95,13 @@ class MY_Controller extends CI_Controller {
 			$status_current = '';
 			$url_redirect = '';
 			$array_status = array();
+			
+			// stats info (do not stats rest, app can initialize cookies in each request)
+			$this->load->library('session');
+			if (FALSE === $this->session->userdata('stats_browserLog')) {
+				PrinterLog_statsWebAgent();
+				$this->session->set_userdata('stats_browserLog', 'ok');
+			}
 			
 			// check initialization issue
 			if (CoreStatus_checkInInitialization()) {

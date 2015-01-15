@@ -77,10 +77,10 @@
 							{temp_adjustments_r} <span id="temperature_text_2">{temper_filament_r}°C</span>
 						</div>
 						<div class="ui-block-a" id="div-slider1">
-							<input type="range" name="l" id="slider-1" value="{temper_filament_l}" min="160" max="260">
+							<input type="range" name="l" id="slider-1" value="{temper_filament_l}" min="160" max="260" data-show-value="true">
 						</div>
 						<div class="ui-block-b" id="div-slider2">
-							<input type="range" name="r" id="slider-2" value="{temper_filament_r}" min="160" max="260">
+							<input type="range" name="r" id="slider-2" value="{temper_filament_r}" min="160" max="260" data-show-value="true">
 						</div>
 					</div>
 				</div>

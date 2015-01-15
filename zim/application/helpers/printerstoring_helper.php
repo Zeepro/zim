@@ -16,10 +16,11 @@ if (!defined('PRINTERSTORING_FILE_STL1_BZ2')) {
 	define('PRINTERSTORING_FILE_IMG_JPG',	'image.jpg');
 	define('PRINTERSTORING_FILE_INFO_JSON',	'info.json');
 	
-	define('PRINTERSTORING_TITLE_LENG_R',	'l1');
-	define('PRINTERSTORING_TITLE_LENG_L',	'l2');
-	define('PRINTERSTORING_TITLE_MATER_R',	'm1');
-	define('PRINTERSTORING_TITLE_MATER_L',	'm2');
+	define('PRINTERSTORING_TITLE_LENG_R',		'l1');
+	define('PRINTERSTORING_TITLE_LENG_L',		'l2');
+	define('PRINTERSTORING_TITLE_MATER_R',		'm1');
+	define('PRINTERSTORING_TITLE_MATER_L',		'm2');
+	define('PRINTERSTORING_TITLE_MULTI_STL',	'multiple');
 	
 	define('PRINTERSTORING_VALUE_MIN_FREESPACE',	209715200); // 200MB
 }
@@ -207,7 +208,8 @@ function PrinterStoring_storeStl($name, $f1, $f2) {
 		"id" => $model_id,
 		"name" => $name,
 		"creation_date" => date("Y-m-d"),
-		"multiple" => ($f2 === NULL ? false : true)
+// 		"multiple" => ($f2 === NULL ? false : true)
+		PRINTERSTORING_TITLE_MULTI_STL	=> ($f2 === NULL ? false : true),
 	);
 
 	if (!PrinterStoring__createInfoFile($info_file, $info)) {
@@ -239,6 +241,10 @@ function PrinterStoring_storeStl($name, $f1, $f2) {
 		return ERROR_DISK_FULL;
 	}
 	
+	//stats info
+	$CI->load->helper('printerlog');
+	PrinterLog_statsLibrarySTL(PRINTERLOG_STATS_LABEL_LOAD, ($f2 === NULL ? 1 : 2));
+	
 	return ERROR_OK;
 }
 
@@ -269,15 +275,25 @@ function PrinterStoring_renameStl($id, $name) {
 }
 
 function PrinterStoring_deleteStl($id) {
-	global $CFG;
+	$stl_info = array();
 	$CI = &get_instance();
-	$model_folder = $CFG->config['stl_library'] . sprintf('%06d', $id) . '/';
+	$model_folder = $CI->config->item('stl_library') . sprintf('%06d', $id) . '/';
 	
 	// check if library folder exist
 	if (@is_dir($model_folder) == false) {
 		$CI->load->helper('printerlog');
 		PrinterLog_logError('stl model id not found', __FILE__, __LINE__);
 		return ERROR_UNKNOWN_MODEL;
+	}
+	
+	$stl_info = PrinterStoring_getInfo('stl', $id);
+	if (is_null($stl_info)) {
+		return ERROR_UNKNOWN_MODEL;
+	}
+	else {
+		// stats info
+		$CI->load->helper('printerlog');
+		PrinterLog_statsLibrarySTL(PRINTERLOG_STATS_LABEL_DELETE, ($stl_info[PRINTERSTORING_TITLE_MULTI_STL] === TRUE ? 2 : 1));
 	}
 	
 	$CI->load->helper('file');
@@ -344,15 +360,33 @@ function PrinterStoring_renameGcode($id, $name) {
 }
 
 function PrinterStoring_deleteGcode($id) {
-	global $CFG;
+	$gcode_info = array();
 	$CI = &get_instance();
-	$model_folder = $CFG->config['gcode_library'] . sprintf('%06d', $id) . '/';
+	$model_folder = $CI->config->item('gcode_library') . sprintf('%06d', $id) . '/';
 	
 	// check if library folder exist
 	if (@is_dir($model_folder) == false) {
 		$CI->load->helper('printerlog');
 		PrinterLog_logError('gcode model id not found', __FILE__, __LINE__);
 		return ERROR_UNKNOWN_MODEL;
+	}
+	
+	$gcode_info = PrinterStoring_getInfo('gcode', $id);
+	if (is_null($gcode_info)) {
+		return ERROR_UNKNOWN_MODEL;
+	}
+	else {
+		// stats info
+		$nb_models = 0;
+		
+		foreach(array(PRINTERSTORING_TITLE_LENG_R, PRINTERSTORING_TITLE_LENG_L) as $check_key) {
+			if (isset($gcode_info[$check_key]) && $gcode_info[$check_key] > 0) {
+				++$nb_models;
+			}
+		}
+		
+		$CI->load->helper('printerlog');
+		PrinterLog_statsLibraryGcode(PRINTERLOG_STATS_LABEL_DELETE, $nb_models);
 	}
 	
 	$CI->load->helper('file');
@@ -495,12 +529,18 @@ function PrinterStoring_printStl($id) {
 		$model_file1 = $CFG->config['stl_library'] . sprintf('%06d', $id) . '/' . PRINTERSTORING_FILE_STL1_BZ2;
 		$name_stl1 = PrinterStoring__generateFilename($info['name'] . PRINTERSTORING_FILE_STL1_EXT);
 		if (($file_path = PrinterStoring__extractFile($model_file1, $name_stl1)) !== null) {
-			if ($info["multiple"] === true) {
+			//stats info
+			$CI->load->helper('printerlog');
+			
+			if ($info[PRINTERSTORING_TITLE_MULTI_STL] === true) {
 				$name_stl2 = NULL;
 				
 				$model_file2 = $CFG->config['stl_library'] . sprintf('%06d', $id) . '/' . PRINTERSTORING_FILE_STL2_BZ2;
 				$name_stl2 = PrinterStoring__generateFilename($info['name'] . PRINTERSTORING_FILE_STL2_EXT);
 				if (($file2_path = PrinterStoring__extractFile($model_file2, $name_stl2)) !== null) {
+					//stats info
+					PrinterLog_statsLibrarySTL(PRINTERLOG_STATS_LABEL_PRINT, 2);
+					
 					return Slicer_addModel(array($file_path, $file2_path));
 				}
 				else {
@@ -510,6 +550,9 @@ function PrinterStoring_printStl($id) {
 				}
 			}
 			else {
+				//stats info
+				PrinterLog_statsLibrarySTL(PRINTERLOG_STATS_LABEL_PRINT, 1);
+				
 				return Slicer_addModel(array($file_path));
 			}
 		}
@@ -536,6 +579,7 @@ function PrinterStoring_storeGcode($name) {
 	$data_json = NULL;
 	$array_length = array();
 	$array_material = array();
+	$nb_models = 0;
 
 	// check if library folder exist
 	if (@is_dir($gcode_library_path) == false) {
@@ -572,6 +616,7 @@ function PrinterStoring_storeGcode($name) {
 				&& $data_json[$abb_cartridge][PRINTERSTATE_TITLE_NEED_L] > 0) {
 			$array_length[$abb_cartridge] = $data_json[$abb_cartridge][PRINTERSTATE_TITLE_NEED_L];
 			$array_material[$abb_cartridge] = $data_json[$abb_cartridge][PRINTERSTATE_TITLE_MATERIAL];
+			++$nb_models;
 		}
 		else {
 			$array_length[$abb_cartridge] = 0;
@@ -637,6 +682,10 @@ function PrinterStoring_storeGcode($name) {
 		PrinterLog_logError('overpass user library minimum free space limit', __FILE__, __LINE__);
 		return ERROR_DISK_FULL;
 	}
+	
+	// stats info
+	$CI->load->helper('printerlog');
+	PrinterLog_statsLibraryGcode(PRINTERLOG_STATS_LABEL_LOAD, $nb_models);
 	
 	return ERROR_OK;
 }

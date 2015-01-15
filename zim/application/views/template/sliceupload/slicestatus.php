@@ -11,7 +11,6 @@
 </div>
 
 <script type="text/javascript">
-<!--
 var var_slice_status;
 var var_slice_status_lock = false;
 var var_slice_interval;
@@ -88,6 +87,4 @@ function stopSlice() {
 
 	return;
 }
-
--->
 </script>

@@ -24,13 +24,13 @@
 						<div class="ui-block-a"><div id="left_cartridge" class="ui-bar ui-bar-f">
 						<label>{left_temperature}:<span id="temperature_text_1">{temper_l}</span>°C</label>
 						<div id="temper_l">
-							<input type="range" id="slider_left" name="l" value="{temper_l}" min="160" max="260" />
+							<input type="range" id="slider_left" name="l" value="{temper_l}" min="160" max="260" data-show-value="true" />
 						</div>
 						</div></div>
 						<div class="ui-block-b"><div id="right_cartridge" class="ui-bar ui-bar-f">
 							<label>{right_temperature}:<span id="temperature_text_2">{temper_r}</span>°C</label>
 							<div id="temper_r">
-								<input type="range" id="slider_right" name="r" value="{temper_r}" min="160" max="260" />
+								<input type="range" id="slider_right" name="r" value="{temper_r}" min="160" max="260" data-show-value="true" />
 							</div>
 						</div></div>
 <!-- 						<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;"> -->

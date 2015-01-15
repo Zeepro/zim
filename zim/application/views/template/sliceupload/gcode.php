@@ -1,6 +1,6 @@
 <div data-role="page" data-url="/sliceupload/gcode">
 	<div id="overlay"></div>
-	<link rel="stylesheet" type="text/css" href="/assets/gcode/css/cupertino/jquery-ui-1.9.0.custom.css" media="screen" />
+<!-- 	<link rel="stylesheet" type="text/css" href="/assets/gcode/css/cupertino/jquery-ui-1.9.0.custom.css" media="screen" /> -->
 	<link rel="stylesheet" type="text/css" href="/assets/gcode/lib/codemirror.css" media="screen" />
 	<link rel="stylesheet" type="text/css" href="/assets/gcode/css/style.css" media="screen" />
 	
@@ -50,6 +50,19 @@
 							<div class="ui-block-c" id="rendering_layerEnd" style="text-align: right; display: none;">{layer_end}</div>
 						</div>
 						<div id="rendering_layerslider_container" style="display: none;"><input type="range" id="rendering_layerslider" name="layer" value="1" min="1" max="100" /></div>
+						<div id="rendering_option_container" style="display: none;">
+							<label>{speed_label}</label>
+								<label for="speedDisplayRadio"><input type="radio" name="speedDisplay" id="speedDisplayRadio" value="1" data-mini="true" onclick="GCODE.ui.processOptions()" checked>{speedDisplay}</label>
+								<label for="exPerMMRadio"><input type="radio" name="speedDisplay" id="exPerMMRadio" value="1" data-mini="true" onclick="GCODE.ui.processOptions()" >{exPerMM}</label>
+								<label for="volPerSecRadio"><input type="radio" name="speedDisplay" id="volPerSecRadio" value="1" data-mini="true" onclick="GCODE.ui.processOptions()" >{volPerSec}</label>
+							<label for="showMovesCheckbox"><input type="checkbox" id="showMovesCheckbox" value="1" data-mini="true" onclick="GCODE.ui.processOptions()">{showMoves}</label>
+							<label for="showRetractsCheckbox"><input type="checkbox" id="showRetractsCheckbox" value="2" data-mini="true" onclick="GCODE.ui.processOptions()">{showRetracts}</label>
+							<label for="moveModelCheckbox"><input type="checkbox" id="moveModelCheckbox" value="3" data-mini="true" onclick="GCODE.ui.processOptions()" checked>{moveModel}</label>
+							<label for="differentiateColorsCheckbox"><input type="checkbox" id="differentiateColorsCheckbox" value="7" data-mini="true" onclick="GCODE.ui.processOptions()" checked>{differentiateColors}</label>
+							<label for="thickExtrusionCheckbox"><input type="checkbox" id="thickExtrusionCheckbox" value="8" data-mini="true" onclick="GCODE.ui.processOptions()">{thickExtrusion}</label>
+							<label for="alphaCheckbox"><input type="checkbox" id="alphaCheckbox" value="10" data-mini="true" onclick="GCODE.ui.processOptions()" >{alpha}</label>
+							<label for="showNextLayer"><input type="checkbox" id="showNextLayer" value="9" data-mini="true" onclick="GCODE.ui.processOptions()" >{showNextLayer}</label>
+						</div>
 					</div>
 					<div id="gCodeContainer" style="display: none;"></div>
 				</div>
@@ -101,6 +114,8 @@ function gcode_hide_wait_spinner() {
 	$('div#rendering_layerEnd').show();
 	$('div#rendering_rangeslider').show();
 	$('div#rendering_layerslider_container').show();
+	$('div#rendering_option_container').show();
+// 	$('div#rendering_option_container').trigger('create');
 }
 
 function rendering_change_layerNb_display(layerNb) {

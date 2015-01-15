@@ -162,12 +162,16 @@ case "$1" in
 		unload_filament $2 pva $3
 		;;
 		
+	stats)
+		/etc/init.d/zeepro-statsd send $2
+		;;
+		
 	reboot)
 		/sbin/reboot -i
 		;;
 		
 	*)
-		echo "Usage: $0 {force_reco|start_tomboning|stop_romboning|status_tomboning|restart_arcontrol|*}"
+		echo "Usage: $0 {force_reco|start_tomboning|stop_romboning|status_tomboning|restart_arcontrol|start_slic3r|unload|unload_pva|stats|*}"
 		exit 1
 esac
 

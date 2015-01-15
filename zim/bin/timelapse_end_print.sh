@@ -11,9 +11,8 @@ PHOTOPATH=/var/www/tmp/image.jpg
 POWEREDVD=/var/www/images/powered.mp4
 CAMERAINF=/tmp/Camera.json
 
-# stop ffmpeg
+# stop ffmpeg (do not release camera json for photo later)
 /etc/init.d/ffmpeg stop
-rm -fv $CAMERAINF
 
 # get estimated duration and fade out point
 fadeptr=`find $IMAGEPATH -maxdepth 1 -name img*.jpg | wc -l`
@@ -44,7 +43,7 @@ do
 		ffmpeg -f video4linux2 -i /dev/video0 -y -vframes 1 $PHOTOPATH
 		break
 	fi
-	/bin/sleep 3
+	sleep 3
 	retry=`expr $retry + 1`
 done
 
@@ -67,5 +66,6 @@ then
 	chmod 777 $TIMELAPSE
 fi
 
-# clean temporary file
+# clean temporary file and release camera
 /etc/init.d/ffmpeg clean_tl
+rm -fv $CAMERAINF

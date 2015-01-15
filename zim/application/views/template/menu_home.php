@@ -4,7 +4,7 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
-			<a href="/printerstate/upgradenote"><b><span id="upgrade_notification">{update_available}</span></b></a>
+			<a href="/printerstate/upgradenote?reboot"><b><span id="upgrade_notification">{update_available}</span></b></a>
 			<ul data-role="listview" id="listview_print" class="shadowBox" data-inset="true">
 				<li><a href="/printmodel/listmodel">
 					<h2>{menu_printlist}</h2></a>
@@ -18,7 +18,7 @@
 					<a href="/printerstoring/libraries"><h2>{my_library}</h2></a>
 				</li>
 				<li>
-					<a id="zim_shop" href="http://zeepro.com/collections/all"><h2>{my_zim_shop}</h2></a>
+					<a id="zim_shop" href="http://zeepro.com/collections/all" target="_blank"><h2>{my_zim_shop}</h2></a>
 				</li>
 			</ul>
 			<ul data-role="listview" id="listview_manage" class="shadowBox" data-inset="true">
@@ -47,9 +47,11 @@ if (iOS) {
 }
 
 $('a#zim_shop').click(function(event) {
-	event.preventDefault();
-	event.stopPropagation();
-	window.open(this.href, '_blank');
+// 	event.preventDefault();
+// 	event.stopPropagation();
+// 	window.open(this.href, '_blank');
+	
+	$.get('/menu_home/stats_my_shop', function() { console.log('stats my shop call sent.'); });
 });
 
 function index_checkUpgrade() {

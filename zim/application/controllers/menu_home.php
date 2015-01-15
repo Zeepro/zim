@@ -11,8 +11,7 @@ class Menu_home extends MY_Controller {
 		) );
 	}
 	
-	public function index()
-	{
+	public function index() {
 		$template_data = array();
 		$body_page = NULL;
 		$need_update = FALSE;
@@ -21,8 +20,7 @@ class Menu_home extends MY_Controller {
 		$this->lang->load('menu_home', $this->config->item('language'));
 		$this->load->helper('zimapi');
 		
-		if (!ZimAPI_cameraOff())
-		{
+		if (!ZimAPI_cameraOff()) {
 			$this->load->helper('printerlog');
 			PrinterLog_logError('can not turn off camera', __FILE__, __LINE__);
 		}
@@ -56,5 +54,15 @@ class Menu_home extends MY_Controller {
 		return;
 	}
 	
+	public function stats_my_shop() {
+		$this->load->helper('printerlog');
+		$this->load->library('parser');
+		
+		// stats info
+		PrinterLog_statsWebClick(PRINTERLOG_STATS_LABEL_SHOP);
+		$this->parser->parse('template/plaintxt', array('display' => 'ok'));
+		
+		return;
+	}
 }
 

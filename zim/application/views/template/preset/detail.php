@@ -591,13 +591,13 @@
 							<label for="min_fan_speed">{min_fan_speed}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" style="text-align:right;" data-clear-btn="false" name="min_fan_speed" id="min_fan_speed" value="{min_fan_speed_value}">
+							<input type="number" style="text-align:right;" data-clear-btn="false" name="min_fan_speed" id="min_fan_speed" value="{min_fan_speed_value}" min="35" max="100">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="bridge_fan_speed">{max_fan_speed}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" style="text-align:right;" data-clear-btn="false" name="max_fan_speed" id="max_fan_speed" value="{max_fan_speed_value}">
+							<input type="number" style="text-align:right;" data-clear-btn="false" name="max_fan_speed" id="max_fan_speed" value="{max_fan_speed_value}" min="40" max="100">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="bridge_fan_speed">{bridge_fan_speed}</label>

@@ -495,33 +495,36 @@ GCODE.ui = (function(){
 
         processOptions: function(){
             /*if(document.getElementById('sortLayersCheckbox').checked)GCODE.gCodeReader.setOption({sortLayers: true});
-            else*/ GCODE.gCodeReader.setOption({sortLayers: true});
+            else GCODE.gCodeReader.setOption({sortLayers: false});*/
+			GCODE.gCodeReader.setOption({sortLayers: true});
 
             /*if(document.getElementById('purgeEmptyLayersCheckbox').checked)GCODE.gCodeReader.setOption({purgeEmptyLayers: true});
-            else*/ GCODE.gCodeReader.setOption({purgeEmptyLayers: true});
+            else GCODE.gCodeReader.setOption({purgeEmptyLayers: false});*/
+			GCODE.gCodeReader.setOption({purgeEmptyLayers: true});
 
-            showGCode = false;//document.getElementById('showGCodeCheckbox').checked;
+//            showGCode = document.getElementById('showGCodeCheckbox').checked;
+			showGCode = false;
 
-            /*if(document.getElementById('moveModelCheckbox').checked)GCODE.renderer.setOption({moveModel: true});
-            else*/ GCODE.renderer.setOption({moveModel: false});
+            if(document.getElementById('moveModelCheckbox').checked)GCODE.renderer.setOption({moveModel: true});
+            else GCODE.renderer.setOption({moveModel: false});
 
-            /*if(document.getElementById('showMovesCheckbox').checked)GCODE.renderer.setOption({showMoves: true});
-            else*/ GCODE.renderer.setOption({showMoves: false});
+            if(document.getElementById('showMovesCheckbox').checked)GCODE.renderer.setOption({showMoves: true});
+            else GCODE.renderer.setOption({showMoves: false});
 
-            /*if(document.getElementById('showRetractsCheckbox').checked)GCODE.renderer.setOption({showRetracts: true});
-            else*/ GCODE.renderer.setOption({showRetracts: false});
+            if(document.getElementById('showRetractsCheckbox').checked)GCODE.renderer.setOption({showRetracts: true});
+            else GCODE.renderer.setOption({showRetracts: false});
 
-            /*if(document.getElementById('differentiateColorsCheckbox').checked)GCODE.renderer.setOption({differentiateColors: true});
-            else*/ GCODE.renderer.setOption({differentiateColors: false});
+            if(document.getElementById('differentiateColorsCheckbox').checked)GCODE.renderer.setOption({differentiateColors: true});
+            else GCODE.renderer.setOption({differentiateColors: false});
 
-            /*if(document.getElementById('thickExtrusionCheckbox').checked)GCODE.renderer.setOption({actualWidth: true});
-            else*/ GCODE.renderer.setOption({actualWidth: false});
+            if(document.getElementById('thickExtrusionCheckbox').checked)GCODE.renderer.setOption({actualWidth: true});
+            else GCODE.renderer.setOption({actualWidth: false});
 
-            /*if(document.getElementById('alphaCheckbox').checked)GCODE.renderer.setOption({alpha: true});
-            else*/ GCODE.renderer.setOption({alpha: false});
+            if(document.getElementById('alphaCheckbox').checked)GCODE.renderer.setOption({alpha: true});
+            else GCODE.renderer.setOption({alpha: false});
 
-            /*if(document.getElementById('showNextLayer').checked)GCODE.renderer.setOption({showNextLayer: true});
-            else*/ GCODE.renderer.setOption({showNextLayer: false});
+            if(document.getElementById('showNextLayer').checked)GCODE.renderer.setOption({showNextLayer: true});
+            else GCODE.renderer.setOption({showNextLayer: false});
 
             /*if(document.getElementById('renderErrors').checked){
                 GCODE.renderer.setOption({showMoves: false});
@@ -543,10 +546,10 @@ GCODE.ui = (function(){
             if(document.getElementById('plasticPLA').checked)GCODE.gCodeReader.setOption({filamentType: "PLA"});
 */
 			GCODE.gCodeReader.setOption({filamentType: "PLA"});
-/*            if(document.getElementById('speedDisplayRadio').checked)GCODE.renderer.setOption({speedDisplayType: displayType.speed});
+            if(document.getElementById('speedDisplayRadio').checked)GCODE.renderer.setOption({speedDisplayType: displayType.speed});
             if(document.getElementById('exPerMMRadio').checked)GCODE.renderer.setOption({speedDisplayType: displayType.expermm});
             if(document.getElementById('volPerSecRadio').checked)GCODE.renderer.setOption({speedDisplayType: displayType.volpersec});
-*/
+
         },
 
         updateOptions: function(){

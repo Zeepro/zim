@@ -3,7 +3,6 @@
 <button id="prime_button" onclick='prime()'>{prime_button}</button>
 
 <script type="text/javascript">
-<!--
 var_next_phase = '{next_phase}';
 // var_enable_unload = {enable_unload};
 
@@ -54,5 +53,4 @@ $('#cartridge_detail_info').trigger("create");
 // 		})
 // 	}, 5000);
 // }
--->
 </script>

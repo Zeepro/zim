@@ -23,12 +23,10 @@
 	</div>
 
 <script type="text/javascript">
-<!--
 function load_wait() {
 	$("#overlay").addClass("gray-overlay");
 	$(".ui-loader").css("display", "block");
 }
--->
 </script>
 
 </div>

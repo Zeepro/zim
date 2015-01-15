@@ -20,6 +20,7 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 	define('SLICER_URL_ADD_STATUS',		'addstatus');
 	define('SLICER_URL_SETPARAMETER',	'setparameter?');
 	define('SLICER_URL_CHECKSIZES',		'checksizes');
+	define('SLICER_URL_EXPORTAMF',		'exportamf');
 	
 	define('SLICER_PRM_ID',		'id');
 	define('SLICER_PRM_XPOS',	'xpos');
@@ -80,12 +81,29 @@ function Slicer_addModel($models_path, $auto_resize = TRUE, &$array_return = arr
 	$cr = 0;
 	$CI = &get_instance();
 	$ret_val = 0;
+	$total_size = 0;
 	
 	if (!is_array($models_path)) {
 		$CI->load->helper('printerlog');
 		PrinterLog_logDebug("add slicer model api error");
 		return ERROR_INTERNAL;
 	}
+	
+	// stats info
+	$CI->load->helper(array('printerlog', 'file'));
+	foreach($models_path as $model_path) {
+		$file_info = array();
+		
+		if (!file_exists($model_path)) {
+			PrinterLog_logError('add slicer model file not found: ' . $model_path, __FILE__, __LINE__);
+			
+			return ERROR_WRONG_PRM;
+		}
+		
+		$file_info = get_file_info(realpath($model_path), array('size'));
+		$total_size += $file_info['size'];
+	}
+	PrinterLog_statsUpload($total_size);
 	
 	if ($auto_resize == TRUE) {
 		$ret_val = Slicer__requestSlicer(SLICER_URL_ADD_MODEL . json_encode($models_path), FALSE);
@@ -98,6 +116,11 @@ function Slicer_addModel($models_path, $auto_resize = TRUE, &$array_return = arr
 		$tmp_array = json_decode($response, TRUE);
 		if ($tmp_array != NULL && is_array($tmp_array)) {
 			$array_return = $tmp_array;
+			
+			// stats info
+			if ($array_return[SLICER_TITLE_MAXSCALE] < 100) {
+				PrinterLog_statsUploadResize();
+			}
 		}
 		else {
 			$ret_val = ERROR_INTERNAL;
@@ -233,10 +256,18 @@ function Slicer_getModelFile($model_id, &$path_models, $basename = FALSE) {
 
 function Slicer_slice() {
 	$cr = 0;
+	$CI = &get_instance();
 	$ret_val = Slicer__requestSlicer(SLICER_URL_SLICE);
 	
 	if ($ret_val == SLICER_RESPONSE_OK) {
 		if (CoreStatus_setInSlicing()) {
+			$stats_info = array();
+			
+			// stats info
+			$CI->load->helper(array('printerstate', 'printerlog'));
+			$stats_info = PrinterState_prepareStatsSliceLabel();
+			PrinterLog_statsSlice(PRINTERLOG_STATS_ACTION_START, $stats_info);
+			
 			$cr = ERROR_OK;
 		}
 		else {
@@ -256,9 +287,12 @@ function Slicer_sliceHalt() {
 	
 	if ($ret_val == SLICER_RESPONSE_OK) {
 		$CI = &get_instance();
-		$CI->load->helper('corestatus');
+		$CI->load->helper(array('corestatus', 'printerlog'));
 		
 		CoreStatus_setInIdle();
+		
+		// stats info
+		PrinterLog_statsSlice(PRINTERLOG_STATS_ACTION_CANCEL, NULL);
 		
 		$cr = ERROR_OK;
 		Slicer_restart(); //FIXME remove me as soon as possible
@@ -460,30 +494,17 @@ function Slicer_setModel($array_data) {
 	if (!is_array($array_data)) {
 		return ERROR_INTERNAL;
 	}
-	else if (!isset($array_data[SLICER_PRM_ID])
-			|| !isset($array_data[SLICER_PRM_XPOS])
-			|| !isset($array_data[SLICER_PRM_YPOS])
-			|| !isset($array_data[SLICER_PRM_ZPOS])
-			|| !isset($array_data[SLICER_PRM_XROT])
-			|| !isset($array_data[SLICER_PRM_YROT])
-			|| !isset($array_data[SLICER_PRM_ZROT])
-			|| !isset($array_data[SLICER_PRM_SCALE])
-			|| !isset($array_data[SLICER_PRM_COLOR])) {
+	else if (!isset($array_data[SLICER_PRM_ID]) || (!isset($array_data[SLICER_PRM_XPOS])
+			&& !isset($array_data[SLICER_PRM_YPOS])
+			&& !isset($array_data[SLICER_PRM_ZPOS])
+			&& !isset($array_data[SLICER_PRM_XROT])
+			&& !isset($array_data[SLICER_PRM_YROT])
+			&& !isset($array_data[SLICER_PRM_ZROT])
+			&& !isset($array_data[SLICER_PRM_SCALE])
+			&& !isset($array_data[SLICER_PRM_COLOR]))) {
+		// id required, then at least one parameter required
 		return ERROR_MISS_PRM;
 	}
-// 	else if (!isset($array_data[SLICER_PRM_ID])) {
-// 		return ERROR_MISS_PRM;
-// 	}
-// 	else if (!isset($array_data[SLICER_PRM_XPOS])
-// 			&& !isset($array_data[SLICER_PRM_YPOS])
-// 			&& !isset($array_data[SLICER_PRM_ZPOS])
-// 			&& !isset($array_data[SLICER_PRM_XROT])
-// 			&& !isset($array_data[SLICER_PRM_YROT])
-// 			&& !isset($array_data[SLICER_PRM_ZROT])
-// 			&& !isset($array_data[SLICER_PRM_SCALE])
-// 			&& !isset($array_data[SLICER_PRM_COLOR])) {
-// 		return ERROR_MISS_PRM;
-// 	}
 	
 	// prepare url
 	$url_request .= SLICER_PRM_ID . '=' . $array_data[SLICER_PRM_ID];
@@ -524,7 +545,7 @@ function Slicer_setModel($array_data) {
 }
 
 function Slicer_rendering($rho, $theta, $delta, &$path_image, $color1 = NULL, $color2 = NULL) {
-	global $CFG;
+// 	global $CFG;
 	$cr = 0;
 	$ret_val = 0;
 	$response = NULL;
@@ -568,7 +589,8 @@ function Slicer_rendering($rho, $theta, $delta, &$path_image, $color1 = NULL, $c
 			break;
 	}
 	
-	if ($cr = ERROR_OK) {
+	$path_image = NULL;
+	if ($cr == ERROR_OK) {
 		$explode_array = explode("\n", $response);
 		if (isset($explode_array[1])) {
 			$path_image = $explode_array[1];
@@ -595,9 +617,6 @@ function Slicer_rendering($rho, $theta, $delta, &$path_image, $color1 = NULL, $c
 		}
 // 		$path_image = $CFG->config['temp'] . SLICER_FILE_RENDERING;
 // 		$path_image = $response;
-	}
-	else {
-		$path_image = NULL;
 	}
 	
 	return $cr;
@@ -784,6 +803,63 @@ function Slicer_checkOnline($restart = TRUE) {
 	}
 	
 	return FALSE;
+}
+
+function Slicer_exportAMF(&$path_amf, $color1 = NULL, $color2 = NULL) {
+	$cr = 0;
+	$ret_val = 0;
+	$joint_char = '?';
+	$url_request = SLICER_URL_EXPORTAMF;
+	
+	foreach (array(
+			SLICER_PRM_COLOR1	=> $color1,
+			SLICER_PRM_COLOR2	=> $color2,
+	) as $key => $color) {
+		if ($color) {
+			$url_request .= $joint_char . $key . '=' . urlencode($color);
+			if ($joint_char == '?') {
+				$joint_char = '&';
+			}
+		}
+	}
+	
+	$ret_val = Slicer__requestSlicer($url_request, FALSE, $response);
+	
+	switch ($ret_val) {
+		case SLICER_RESPONSE_OK:
+// 		case SLICER_RESPONSE_WRONG_PRM:
+			$cr = $ret_val;
+			break;
+			
+		case SLICER_RESPONSE_NO_MODEL:
+			$cr = ERROR_EMPTY_PLATFORM;
+			break;
+			
+		default:
+			$cr = ERROR_INTERNAL;
+			break;
+	}
+	
+	$path_amf = NULL;
+	if ($cr == ERROR_OK) {
+		$explode_array = explode("\n", $response);
+		if (isset($explode_array[1])) {
+			$path_amf = $explode_array[1];
+			
+			if (!file_exists($path_amf)) {
+				$CI = &get_instance();
+				$CI->load->helper('printerlog');
+				PrinterLog_logDebug('export amf not found: ' . $path_amf, __FILE__, __LINE__);
+				
+				$cr = ERROR_INTERNAL;
+			}
+		}
+		else {
+			$cr = ERROR_INTERNAL;
+		}
+	}
+	
+	return $cr;
 }
 
 //internal function

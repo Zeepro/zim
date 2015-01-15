@@ -420,14 +420,25 @@ class Sliceupload extends MY_Controller {
 		$this->lang->load('sliceupload/gcode', $this->config->item('language'));
 		
 		$template_data = array(
-				'home'			=> t('home'),
-				'back'			=> t('back'),
-				'js_render'		=> ($mode == 'display') ? 'false' : 'true',
-				'tab_render'	=> t('tab_render'),
-				'tab_gcode'		=> t('tab_gcode'),
-				'layer_start'	=> t('layer_start'),
-				'layer_end'		=> t('layer_end'),
-				'layer_prefix'	=> t('layer_prefix'),
+				'home'					=> t('home'),
+				'back'					=> t('back'),
+				'js_render'				=> ($mode == 'display') ? 'false' : 'true',
+				'tab_render'			=> t('tab_render'),
+				'tab_gcode'				=> t('tab_gcode'),
+				'layer_start'			=> t('layer_start'),
+				'layer_end'				=> t('layer_end'),
+				'layer_prefix'			=> t('layer_prefix'),
+				'speed_label'			=> t('speed_label'),
+				'speedDisplay'			=> t('speedDisplay'),
+				'exPerMM'				=> t('exPerMM'),
+				'volPerSec'				=> t('volPerSec'),
+				'showMoves'				=> t('showMoves'),
+				'showRetracts'			=> t('showRetracts'),
+				'moveModel'				=> t('moveModel'),
+				'differentiateColors'	=> t('differentiateColors'),
+				'thickExtrusion'		=> t('thickExtrusion'),
+				'alpha'					=> t('alpha'),
+				'showNextLayer'			=> t('showNextLayer'),
 		);
 		$body_page = $this->parser->parse('/template/sliceupload/gcode.php', $template_data, TRUE);
 		$template_data = array(

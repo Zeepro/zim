@@ -412,11 +412,12 @@ class Printerstate extends MY_Controller {
 		$ret_val = 0;
 		$status_upgrade = FALSE;
 		$status_tromboning = FALSE;
+		$status_statistic = FALSE;
 		$status_ssh = FALSE;
 		$option_selected = 'selected="selected"';
 		
 		// get function status
-		$this->load->helper('zimapi');
+		$this->load->helper(array('zimapi', 'printerlog'));
 		$ret_val = ZimAPI_getUpgradeMode($status_upgrade);
 		if ($ret_val != TRUE) {
 			$status_upgrade = 'off';
@@ -426,6 +427,7 @@ class Printerstate extends MY_Controller {
 			$status_ssh = FALSE;
 		}
 		$status_tromboning = ZimAPI_getTromboning();
+		$status_statistic = ZimAPI_getStatistic();
 		
 // 		$this->changecartridge();
 		$this->load->library('parser');
@@ -440,10 +442,12 @@ class Printerstate extends MY_Controller {
 				'set_preset'			=> t('set_preset'),
 				'upgrade_on'			=> ($status_upgrade != 'off') ? $option_selected : NULL,
 				'tromboning_on'			=> ($status_tromboning == TRUE) ? $option_selected : NULL,
+				'statistic_on'			=> ($status_statistic == TRUE) ? $option_selected : NULL,
+				'remote_control_on'		=> ($status_ssh == TRUE) ? $option_selected : NULL,
 				'upgrade'				=> t('upgrade'),
 				'tromboning'			=> t('tromboning'),
 				'remote_control'		=> t('remote_control'),
-				'remote_control_on'		=> ($status_ssh == TRUE) ? $option_selected : NULL,
+				'statistic'				=> t('statistic'),
 				'function_on'			=> t('function_on'),
 				'function_off'			=> t('function_off'),
 				'nozzles_adjustments'	=> t('nozzles_adjustments'),
@@ -495,7 +499,7 @@ class Printerstate extends MY_Controller {
 								array(
 										'id'		=> 'button_release',
 										'value'		=> $temp_info[PRINTERSTATE_TITLE_VERSION],
-										'link'		=> ZIMAPI_VALUE_RELEASENOTE_URL,
+										'link'		=> '/printerstate/upgradenote',
 										'button'	=> '{button_release}',
 								), TRUE),
 				),
@@ -576,7 +580,7 @@ class Printerstate extends MY_Controller {
 		$note_html = NULL;
 		$array_upgrade = array();
 		
-		$this->load->helper('zimapi');
+		$this->load->helper(array('zimapi', 'printerlog'));
 		$this->load->library('parser');
 		$this->lang->load('printerstate/upgradenote', $this->config->item('language'));
 		
@@ -640,6 +644,9 @@ class Printerstate extends MY_Controller {
 		else {
 			$note_html = 'N/A';
 		}
+		
+		// stats info
+		PrinterLog_statsWebClick(PRINTERLOG_STATS_LABEL_UPGRADE);
 		
 		$template_data = array(
 				'note_title'		=> t('releasenote_title'),
@@ -1548,6 +1555,17 @@ class Printerstate extends MY_Controller {
 		$this->load->library('parser');
 		$this->output->set_content_type('txt_u');
 		$this->parser->parse('template/plaintxt', array('display' => ZimAPI_getVersion(TRUE))); //optional
+		
+		return;
+	}
+	
+	public function stats_support() {
+		$this->load->helper('printerlog');
+		$this->load->library('parser');
+		
+		// stats info
+		PrinterLog_statsWebClick(PRINTERLOG_STATS_LABEL_SUPPORT);
+		$this->parser->parse('template/plaintxt', array('display' => 'ok'));
 		
 		return;
 	}

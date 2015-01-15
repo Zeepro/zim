@@ -45,7 +45,6 @@
 	</div>
 
 <script type="text/javascript">
-<!--
 var var_preset_id = 0;
 
 function confirm_delete_preset(id) {
@@ -64,6 +63,5 @@ function delete_preset() {
 	
 	return;
 }
--->
 </script>
 </div>

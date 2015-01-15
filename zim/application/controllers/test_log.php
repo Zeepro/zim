@@ -41,6 +41,17 @@ class Test_log extends CI_Controller {
 		return;
 	}
 	
+	public function test_curl() {
+		$this->load->helper('printerlog');
+		PrinterLog_logDebug('category: ' . $this->input->post('category') . ', action: ' . $this->input->post('action')
+				. ', printersn: ' . $this->input->post('printersn') . ', label: ' . $this->input->post('label')
+				. ', value: ' . $this->input->post('value'));
+		
+		$this->load->library('parser');
+		$this->parser->parse('template/plaintxt', array('display' => 'ok'));
+		return;
+	}
+	
 	public function clear() {
 		if (file_exists($this->config->item('log_file'))) {
 			unlink($this->config->item('log_file'));
@@ -57,6 +68,9 @@ class Test_log extends CI_Controller {
 			if (file_exists($this->config->item('log_file'))) {
 				unlink($this->config->item('log_file'));
 			}
+			
+			$this->output->set_header('Location: /test_log/debug');
+			return;
 		}
 		
 		$this->file('debug');
@@ -69,6 +83,9 @@ class Test_log extends CI_Controller {
 			if (file_exists($this->config->item('log_arduino'))) {
 				unlink($this->config->item('log_arduino'));
 			}
+			
+			$this->output->set_header('Location: /test_log/arduino');
+			return;
 		}
 		
 		$this->file('arduino');
@@ -84,6 +101,12 @@ class Test_log extends CI_Controller {
 	
 	public function slicelog() {
 		$this->file('slicelog');
+		
+		return;
+	}
+	
+	public function statslog() {
+		$this->file('statslog');
 		
 		return;
 	}
@@ -109,6 +132,10 @@ class Test_log extends CI_Controller {
 				$this->load->helper('slicer');
 				$path_file = SLICER_FILE_SLICELOG;
 				break;
+				
+			case 'statslog':
+				$this->load->helper('printerlog');
+				$path_file = PRINTERLOG_STATS_FILEPATH_LOG;
 				
 			default:
 				break;

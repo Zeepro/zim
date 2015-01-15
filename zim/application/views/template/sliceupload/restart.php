@@ -12,7 +12,6 @@
 	</div>
 
 <script type="text/javascript">
-<!--
 var var_ajax;
 var var_ajax_lock = false;
 var var_check_in_boot = {check_in_boot};
@@ -56,7 +55,6 @@ function checkOnline(var_first) {
 		var_ajax_lock = false;
 	});
 }
--->
 </script>
 
 </div>

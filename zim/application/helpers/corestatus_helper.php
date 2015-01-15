@@ -30,6 +30,7 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_TITLE_P_TEMPER_R',	'PrintTemperatureR');
 	define('CORESTATUS_TITLE_P_EXCH_BUS',	'PrintExchangeBus');
 	define('CORESTATUS_TITLE_FILA_MAT',		'FilamentMaterial');
+	define('CORESTATUS_TITLE_GUID',			'RandomGUID');
 	
 	define('CORESTATUS_VALUE_IDLE',				'idle');
 	define('CORESTATUS_VALUE_PRINT',			'printing');
@@ -65,6 +66,8 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_FILENAME_PAUSE',		'_Printer_inPause.tmp');
 	
 	define('CORESTATUS_GLOBAL_URL_RDV',		'zeepro.com');
+	
+	define('CORESTATUS_VALUE_RAND_STRING_LENGTH',	8);
 }
 
 function CoreStatus_initialFile() {
@@ -235,6 +238,7 @@ function CoreStatus_checkInIdle(&$status_current = '', &$array_status = array())
 // 	if ($tmp_array['json'][CORESTATUS_TITLE_STATUS] == CORESTATUS_VALUE_IDLE
 // 			|| $tmp_array['json'][CORESTATUS_TITLE_STATUS] == CORESTATUS_VALUE_SLICED) {
 	if ($tmp_array['json'][CORESTATUS_TITLE_STATUS] == CORESTATUS_VALUE_IDLE) {
+		$status_current = $tmp_array['json'][CORESTATUS_TITLE_STATUS];
 		return TRUE;
 	}
 	$status_current = $tmp_array['json'][CORESTATUS_TITLE_STATUS];
@@ -651,30 +655,20 @@ function CoreStatus_cleanSliced() {
 
 // function CoreStatus_setInPrinting($model_id, $stop_printing = FALSE) {
 function CoreStatus_setInPrinting($model_id, $exchange_extruder = FALSE, $array_temper = array()) {
-// 	if ($stop_printing == FALSE) {
-		// start camera http live streaming
-		$ret_val = 0;
-		
-// 		$CI = &get_instance();
-// 		$CI->load->helper('zimapi');
-// 		$ret_val = ZimAPI_cameraOn(ZIMAPI_PRM_CAMERA_PRINTSTART);
-// 		if ($ret_val == FALSE) {
-// 			return FALSE;
-// 		}
-		
-		return CoreStatus__setInStatus(CORESTATUS_VALUE_PRINT,
-				array(
-						CORESTATUS_TITLE_STARTTIME		=> time(),
-						CORESTATUS_TITLE_ELAPSED_TIME	=> 0,
-						CORESTATUS_TITLE_PRINTMODEL		=> $model_id,
-						CORESTATUS_TITLE_P_TEMPER_L		=> array_key_exists('l', $array_temper) ? $array_temper['l'] : NULL,
-						CORESTATUS_TITLE_P_TEMPER_R		=> array_key_exists('r', $array_temper) ? $array_temper['r'] : NULL,
-						CORESTATUS_TITLE_P_EXCH_BUS		=> $exchange_extruder ? 1 : 0,
-				)
-		);
-// 	}
-// 	else {
-// 	}
+	$CI = &get_instance();
+	$CI->load->helper('string');
+	
+	return CoreStatus__setInStatus(CORESTATUS_VALUE_PRINT,
+			array(
+					CORESTATUS_TITLE_STARTTIME		=> time(),
+					CORESTATUS_TITLE_ELAPSED_TIME	=> 0,
+					CORESTATUS_TITLE_PRINTMODEL		=> $model_id,
+					CORESTATUS_TITLE_P_TEMPER_L		=> array_key_exists('l', $array_temper) ? $array_temper['l'] : NULL,
+					CORESTATUS_TITLE_P_TEMPER_R		=> array_key_exists('r', $array_temper) ? $array_temper['r'] : NULL,
+					CORESTATUS_TITLE_P_EXCH_BUS		=> $exchange_extruder ? 1 : 0,
+					CORESTATUS_TITLE_GUID			=> random_string('alnum', CORESTATUS_VALUE_RAND_STRING_LENGTH),
+			)
+	);
 }
 
 function CoreStatus_setInCanceling() {
@@ -752,10 +746,14 @@ function CoreStatus_setInUnloading($abb_filament, $material = NULL) {
 }
 
 function CoreStatus_setInSlicing() {
+	$CI = &get_instance();
+	$CI->load->helper('string');
+	
 	return CoreStatus__setInStatus(CORESTATUS_VALUE_SLICE,
 			array(
 					CORESTATUS_TITLE_LASTERROR	=> NULL,
 					CORESTATUS_TITLE_MESSAGE	=> NULL,
+					CORESTATUS_TITLE_GUID		=> random_string('alnum', CORESTATUS_VALUE_RAND_STRING_LENGTH),
 			)
 	);
 }
@@ -783,7 +781,7 @@ function CoreStatus_getStartTime(&$time_start) {
 	
 	// check status
 // 	if ($data_json[CORESTATUS_TITLE_STATUS] == CORESTATUS_VALUE_PRINT) {
-	if (!isset($data_json[CORESTATUS_TITLE_STARTTIME]) || $data_json[CORESTATUS_TITLE_STARTTIME] == NULL) {
+	if (!isset($data_json[CORESTATUS_TITLE_STARTTIME])) {
 		return FALSE;
 	}
 	$time_start = $data_json[CORESTATUS_TITLE_STARTTIME];
@@ -805,6 +803,35 @@ function CoreStatus_checkInWaitTime($time_wait) {
 	}
 	
 	return TRUE; // we treat getting start time error as still in wait time
+}
+
+function CoreStatus_getRandomGUID(&$guid) {
+	global $CFG;
+	$state_file = $CFG->config['conf'] . CORESTATUS_FILENAME_WORK;
+	$tmp_array = array();
+	$data_json = array();
+	$guid = NULL;
+	
+	$CI = &get_instance();
+	$CI->load->helper('json');
+	
+	// read json file
+	try {
+		$tmp_array = json_read($state_file);
+		if ($tmp_array['error']) {
+			throw new Exception('read json error');
+		}
+	} catch (Exception $e) {
+		return FALSE;
+	}
+	$data_json = $tmp_array['json'];
+	
+	if (!isset($data_json[CORESTATUS_TITLE_GUID])) {
+		return FALSE;
+	}
+	$guid = $data_json[CORESTATUS_TITLE_GUID];
+	
+	return TRUE;
 }
 
 function CoreStatus_wantConnection() {

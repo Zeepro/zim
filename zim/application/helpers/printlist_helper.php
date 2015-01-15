@@ -11,6 +11,7 @@ $CI->load->helper(array (
 		'directory',
 		'json',
 		'url',
+		'corestatus',
 ));
 
 if (!defined('PRINTLIST_MAX_PIC_SIZE')) {
@@ -64,8 +65,9 @@ if (!defined('PRINTLIST_MAX_PIC_SIZE')) {
 // 		define('PRINTLIST_GETPIC_BASE_WEB',	'http://' . $_SERVER['HTTP_HOST'] . base_url('rest/getpicture'));
 // 	}
 // 	if ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) {
-	if ($_SERVER['REMOTE_ADDR'] == $_SERVER['SERVER_ADDR']
-			&& substr($_SERVER['HTTP_HOST'], -strlen(PRINTLIST_GLOBAL_URL_RDV)) === PRINTLIST_GLOBAL_URL_RDV) {
+// 	if ($_SERVER['REMOTE_ADDR'] == $_SERVER['SERVER_ADDR']
+// 			&& substr($_SERVER['HTTP_HOST'], -strlen(PRINTLIST_GLOBAL_URL_RDV)) === PRINTLIST_GLOBAL_URL_RDV) {
+	if (CoreStatus_checkTromboning()) {
 		// SSL connection
 		define('PRINTLIST_GETPIC_BASE_WEB',	'https://' . $_SERVER['HTTP_HOST'] . base_url('rest/getpicture'));
 	}

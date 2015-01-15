@@ -277,20 +277,6 @@ class Printdetail extends MY_Controller {
 		return;
 	}
 	
-	public function end_print() {
-		//TODO need option for changing return page
-		//TODO finish me
-// 		$this->load->helper('printerstate');
-		
-// 		foreach(array('l', 'r') as $abb_filament) {
-// 			PrinterState_setTemperature($array_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1], 'e', $abb_filament);
-// 		}
-		
-		$this->output->set_header('Location: /');
-		
-		return;
-	}
-	
 	public function status() {
 		$time_remain = NULL;
 		$body_page = NULL;
@@ -330,65 +316,17 @@ class Printdetail extends MY_Controller {
 			return;
 		}
 		
-		if ($abb_cartridge || $id == CORESTATUS_VALUE_MID_CALIBRATION) {
-			// do not launch timelapse image generation for priming and calibration model
+		if (array_key_exists(PRINTERSTATE_TITLE_EXTEND_PRM, $data_status)
+				&& array_key_exists(PRINTERSTATE_TITLE_EXT_OPER, $data_status[PRINTERSTATE_TITLE_EXTEND_PRM])
+				&& $data_status[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_EXT_OPER] == PRINTERSTATE_VALUE_PRINT_OPERATION_HEAT) {
+			// only launch camera video for heating parse (camera is in use for other parses)
 			if (!ZimAPI_cameraOn(ZIMAPI_PRM_CAMERA_PRINTSTART)) {
 				$this->load->helper('printerlog');
 				PrinterLog_logError('can not set camera', __FILE__, __LINE__);
 			}
 		}
-		else {
-			// get print length for timelapse
-			$length = 0;
-			
-			// if just sliced model, get value from temporary json file
-			if ($id == CORESTATUS_VALUE_MID_SLICE) {
-				$temp_json = array();
-				
-				$this->load->helper('printerstate');
-				
-				if (ERROR_OK == PrinterState_getSlicedJson($temp_json)) {
-					foreach($temp_json as $temp_filament) {
-						if (array_key_exists(PRINTERSTATE_TITLE_NEED_L, $temp_filament)) {
-							$length += $temp_filament[PRINTERSTATE_TITLE_NEED_L];
-						}
-					}
-				}
-			}
-			// if gcode file from user library
-			else if (strpos($id, CORESTATUS_VALUE_MID_PREFIXGCODE) === 0) {
-				$gcode_info = array();
-				
-				$this->load->helper('printerstoring');
-				$id = (int) substr($id, strlen(CORESTATUS_VALUE_MID_PREFIXGCODE));
-				
-				$gcode_info = PrinterStoring_getInfo("gcode", $id);
-				if (!is_null($gcode_info) && array_key_exists(PRINTERSTORING_TITLE_LENG_R, $gcode_info)
-						&& array_key_exists(PRINTERSTORING_TITLE_LENG_L, $gcode_info)) {
-					$length = $gcode_info[PRINTERSTORING_TITLE_LENG_R] + $gcode_info[PRINTERSTORING_TITLE_LENG_L];
-				}
-			}
-			// if presliced model get from helper
-			else if (strlen($id) == 32) {
-				$model_info = array();
-				
-				$this->load->helper('printlist');
-				if (ERROR_OK == ModelList__getDetailAsArray($id, $model_info) && !is_null($model_info)) {
-					foreach (array(PRINTLIST_TITLE_LENG_F1, PRINTLIST_TITLE_LENG_F2) as $key_length) {
-						if (array_key_exists($key_length, $model_info)) {
-							$length += $model_info[$key_length];
-						}
-					}
-				}
-			}
-			
-			if (!ZimAPI_cameraOn(ZIMAPI_PRM_CAMERA_PRINTSTART_TIMELAPSE, $length)) {
-				$this->load->helper('printerlog');
-				PrinterLog_logError('can not set camera with timelapse, length: ' . $length, __FILE__, __LINE__);
-			}
-		}
 		
-		//TODO improve passing the real value of LED later
+		// pass the real value of LED later
 		$this->get_led($status_strip, $status_head);
 		
 		if ($id == CORESTATUS_VALUE_MID_SLICE) {
@@ -424,14 +362,7 @@ class Printdetail extends MY_Controller {
 				'initial_head'		=> ($status_head == TRUE) ? $option_selected : NULL,
 				'video_error'		=> t('video_error'),
 				'loading_player'	=> t('loading_player'),
-				// storegcode + timelapse
-				//TODO check if we can remove this part or not
-				'storegcode_info'	=> t('storegcode_info'),
-				'storegcode_name'	=> t('storegcode_name'),
-				'timelapse_error'	=> t('timelapse_error'),
-				'timelapse_ok'		=> t('timelapse_ok'),
-				'timelapse_info'	=> t('timelapse_info'),
-				'timelapse_button'	=> t('timelapse_button'),
+				'reloading_player'	=> t('reloading_player'),
 		);
 		
 		if ($print_slice == TRUE) {
@@ -826,7 +757,10 @@ class Printdetail extends MY_Controller {
 		$temper_l = 0;
 		$temper_r = 0;
 		$finish_hint = NULL;
-		$hold_temper = NULL;
+		$hold_temper = 'false';
+		$status_current = NULL;
+		$array_status = array();
+		$reload_player = 'false';
 		
 		$this->load->helper(array('printer', 'timedisplay'));
 		$this->load->library('parser');
@@ -842,7 +776,7 @@ class Printdetail extends MY_Controller {
 				$this->load->helper('printerlog');
 				PrinterLog_logError('can not set idle after printing', __FILE__, __LINE__);
 			}
-
+			
 			if ($this->config->item('simulator')) {
 				// just set temperature for simulation
 				$this->load->helper('printerstate');
@@ -867,13 +801,15 @@ class Printdetail extends MY_Controller {
 		}
 		$time_passed = TimeDisplay__convertsecond($data_status['print_tpassed'], t('time_elapsed'));
 		
+		CoreStatus_checkInIdle($status_current, $array_status);
+		if (isset($array_status[CORESTATUS_TITLE_PRINTMODEL]) && !in_array($array_status[CORESTATUS_TITLE_PRINTMODEL],
+						array(CORESTATUS_VALUE_MID_PRIME_L, CORESTATUS_VALUE_MID_PRIME_R, CORESTATUS_VALUE_MID_CALIBRATION)
+				) && $data_status['print_heating'] == FALSE) {
+			$reload_player = 'true';
+		}
+		
 		if ($data_status['print_percent'] == 100) {
-			$current_status = NULL;
-			$array_status = array();
-			
-			CoreStatus_checkInIdle($status_current, $array_status);
-			if (is_array($array_status) && array_key_exists(CORESTATUS_TITLE_PRINTMODEL, $array_status)
-					&& in_array($array_status[CORESTATUS_TITLE_PRINTMODEL],
+			if (isset($array_status[CORESTATUS_TITLE_PRINTMODEL]) && in_array($array_status[CORESTATUS_TITLE_PRINTMODEL],
 							array(CORESTATUS_VALUE_MID_PRIME_L, CORESTATUS_VALUE_MID_PRIME_R)
 					)) {
 				$finish_hint = t('in_finish_prime');
@@ -885,7 +821,7 @@ class Printdetail extends MY_Controller {
 			$hold_temper = 'true';
 		}
 		else {
-			$hold_temper = 'false';
+// 			$hold_temper = 'false';
 			$temper_l = $data_status['print_temperL'];
 			$temper_r = $data_status['print_temperR'];
 		}
@@ -903,6 +839,7 @@ class Printdetail extends MY_Controller {
 				'value_temperL'	=> $temper_l,
 				'value_temperR'	=> $temper_r,
 				'in_finish'		=> $finish_hint,
+				'reload_player'	=> $reload_player,
 		);
 		$this->parser->parse('template/printdetail/status_ajax', $template_data);
 		

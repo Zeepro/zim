@@ -11,7 +11,7 @@
 				<script type="text/javascript" src="/assets/jwplayer/jwplayer.js"></script>
 	 			<script type="text/javascript">jwplayer.key="Jh6aqwb1m2vKLCoBtS7BJxRWHnF/Qs3LMjnt13P9D6A=";</script>
 	 			<style type="text/css">div#myVideo_wrapper {margin: 0 auto;}</style>
-				<div id="myVideo">{loading_player}</div>
+				<div id="myVideo_container"><div id="myVideo">{loading_player}</div></div>
 			</div>
 			<div data-role="collapsible">
 				<h4>{lighting}</h4>
@@ -48,45 +48,47 @@
 			<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete" id="print_action" onclick='javascript: stopPrint();'>{print_stop}</button>
 		</div>
 	</div>
-</div>
 
 <script>
-function load_jwplayer_video()
-{
+var video_check;
+
+function load_jwplayer_video() {
 	var player = jwplayer("myVideo").setup({
-							file: "{video_url}",
-							width: "100%",
-							autostart: true,
-							fallback: false,
-							androidhls: true
-						});
-	player.onSetupError(function()
-	{
+		file: "{video_url}",
+		width: "100%",
+		autostart: true,
+		fallback: false,
+		androidhls: true
+	});
+	player.onSetupError(function() {
 		$("#myVideo").empty().append('<img src="/images/error.png" height="280" width="280" />' +
 									"<p>{video_error}</p>");
 	});
 }
 
-var video_check = setInterval(function()
-{
-	var req = $.ajax(
-	{
-		url: "{video_url}",
-		type: "HEAD",
-		success: function()
-		{
-			load_jwplayer_video();
-			clearInterval(video_check);
-		}
-	});
-}, 1000);
+function check_video_toLoad() {
+	video_check = setInterval(function() {
+		var req = $.ajax({
+			url: "{video_url}",
+			type: "HEAD",
+			success: function() {
+				load_jwplayer_video();
+				clearInterval(video_check);
+				video_check = 0;
+			}
+		});
+	}, 1000);
+}
+
+check_video_toLoad();
 </script>
 
-<script type="text/javascript">
+<script>
 var var_refreshPrintStatus;
 var var_refreshVideoURL = 0;
-var var_firstRun = true;
-var var_onPlay = false;
+// var var_firstRun = true;
+// var var_onPlay = false;
+var var_reloaded = false;
 var var_ajax;
 var var_prime = {var_prime};
 var var_slice = {var_slice};
@@ -204,7 +206,7 @@ function checkPrintStatus() {
 // 			finishAction();
 // 			finishLoop();
 // 			alert("no connection");
-<!--	//	<?php //FIXME just disable redirection and do same as finished for simulation ?> -->
+<?php //FIXME just disable redirection and do same as finished for simulation ?>
 		})
 		.always(function() {
 			var_ajax_lock = false;
@@ -219,7 +221,7 @@ function checkPrintStatus() {
 }
 
 function refreshVideoURL() {
-// 	if (var_refreshVideoURL == 0) {
+// 	if (var_onPlay == false) {
 // 		var_refreshVideoURL = setInterval(refreshVideo, 1000 * 5);
 // 	}
 // 	else if (var_firstRun == true) {
@@ -227,17 +229,19 @@ function refreshVideoURL() {
 // 		var_refreshVideoURL = setInterval(refreshVideo, 1000 * 30 * 4);
 // 		var_firstRun = false;
 // 	}
-	if (var_onPlay == false) {
-		var_refreshVideoURL = setInterval(refreshVideo, 1000 * 5);
-	}
-	else if (var_firstRun == true) {
-		clearInterval(var_refreshVideoURL);
-		var_refreshVideoURL = setInterval(refreshVideo, 1000 * 30 * 4);
-		var_firstRun = false;
-	}
 	
-	function refreshVideo() {
-		jwplayer('myVideo').load({file:'{video_url}'});
+// 	function refreshVideo() {
+// 		jwplayer('myVideo').load({file:'{video_url}'});
+// 	}
+	if (var_reloaded == false) {
+		var_reloaded = true;
+		if (video_check != 0) {
+			console.log("ignore reload command in loading video");
+			// already in checking video at page loading state (the case when refresh page in printing / end parse)
+			return;
+		}
+		$("div#myVideo_container").html("<div id=\"myVideo\">{reloading_player}</div>");
+		check_video_toLoad();
 	}
 
 	return;
@@ -270,80 +274,10 @@ function stopPrint()
 	return;
 }
 
-function storegcode() {
-	if ($('#checkbox_storegcode').is(":checked")) {
-		$.ajax({
-			cache: false,
-			type: "POST",
-			async: false,
-			url: "/rest/libstoregcode",
-			data: { "name": $('#storegcode_name').val()},
-//			dataType: "json",
-			success: function (data, textStatus, xhr) {
-				console.log("stored");
-			},
-			error: function (data, textStatus, xhr) {
-				alert('{print_error}');
-				console.log(data);
-			},
-		});
-	}
-}
-
 function finishAction() {
 	finishLoop();
 	
-// 	// library function - add checkbox + name input, store the gcode file in the library -> add onclick on home/printagain button
-// 	if (var_slice == true) {
-// 		$("#print_detail_info").append('<div id=\'parent_checkbox\'><label><input type="checkbox" id="checkbox_storegcode" value="1" />{storegcode_info}</label><input type="text" id="storegcode_name" value="{storegcode_name}" onclick="if (this.value == \'{storegcode_name}\') {this.value=\'\';}" onfocus="this.select()" onblur="this.value=!this.value?\'{storegcode_name}\':this.value;"/></div>');
-// 		//$("#print_detail_info").append("<div class=\"ui-checkbox ui-mini\"><label class=\"ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left ui-checkbox-off\"><input type=\"checkbox\" name=\"checkbox_storegcode\" id=\"checkbox_storegcode\">{storegcode_info}</label></div> \
-// 		//  <div class=\"ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset\"><input type=\"text\" name=\"storegcode_name\" id=\"storegcode_name\" value=\"{storegcode_name}\" /></div>");
-// 		$("div#parent_checkbox").checkboxradio({mini: true});
-// 		$("div#parent_checkbox").trigger("create");
-// 		$("#storegcode_name").parent().toggle(false);
-// 		$("#checkbox_storegcode").click(function() {
-// 			$("#storegcode_name").parent().toggle(this.checked);
-// 		});
-// 		$("#again_button").attr("onclick", "storegcode(); again()");
-// 		$('button#print_action').click(function(){storegcode(); window.location.href='/'; return false;});
-// 	}
-	
 	if (var_prime == false && var_calibration == false) {
-		// add loading + button Download Timelapse + Encode
-// 		$("#print_detail_info").append('<div id=\'timelapse\'><label id="timelapse_info">{timelapse_info}</label><a href="#" id="timelapse_button" data-ajax="false" data-role="button" class="ui-link ui-btn ui-shadow ui-corner-all ui-disabled" role="button" disable>{timelapse_button}</a></div>');
-		
-// 		$.ajax({
-// 			cache: false,
-// 			type: "POST",
-// 			url: "/printdetail/camera_stop_ajax",
-// 			data: {
-// // 				capture: ((var_slice == true) ? 1 : 0),
-// 				capture: 0, // gcode library isn't ready to public
-// 			},
-// //			dataType: "json",
-// 			success: function (data, textStatus, xhr) {
-// // 				if (data != '') {
-// // 					$('label#timelapse_info').html('{timelapse_ok}');
-// // 					$('a#timelapse_button').removeClass('ui-disabled');
-// // 					$('a#timelapse_button').addClass('externalLink');
-// // 					$('a#timelapse_button').attr('href', data);
-// // 					$('a#timelapse_button').click(function(event) {
-// // 						event.preventDefault();
-// // 						event.stopPropagation();
-// // 						window.open(this.href, '_blank');
-// // 					});
-// // 				}
-// // 				else {
-// // 					$('label#timelapse_info').html('{timelapse_error}');
-// // 				}
-// 				console.log(data);
-// 			},
-// 			error: function (data, textStatus, xhr) {
-// // 				$('label#timelapse_info').html('{timelapse_error}');
-// 				console.log(data);
-// 			},
-// 		});
-		
 		// do redirection when timelapse is here (even in generation)
 		var_timelapse_int = setInterval(function() {
 			var_timelapse_ajax = $.ajax({
@@ -377,3 +311,4 @@ function finishAction() {
 }
 </script>
 
+</div>

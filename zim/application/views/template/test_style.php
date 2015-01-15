@@ -166,7 +166,6 @@
 </div>
 
 <script type="text/javascript">
-<!--
 $(document).ready(function() {
 	$('<input>').appendTo('#print_detail_info_temper_l')
 	.attr({'name':'slider','id':'sliderL','data-highlight':'true','min':'0','max':'260','value':'200','type':'range'}).slider({
@@ -179,5 +178,4 @@ $(document).ready(function() {
 		}
 	});
 });
-//-->
 </script>

@@ -57,6 +57,7 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 		define('ZIMAPI_FILEPATH_CAPTURE',	$CI->config->item('bin') . 'capture.jpg');
 		define('ZIMAPI_FILEPATH_ENDPRINT',	$CI->config->item('bin') . 'timelapse_end_print.sh');
 		define('ZIMAPI_FILEPATH_ENDCANCEL',	$CI->config->item('bin') . 'timelapse_end_cancel.sh');
+		define('ZIMAPI_FILEPATH_POSTHEAT',	$CI->config->item('bin') . 'timelapse_post_heat.sh');
 		define('ZIMAPI_FILEPATH_UPGRADE',	$CI->config->item('conf') . 'profile.json');
 		define('ZIMAPI_FILEPATH_VIDEO_TS',	$CI->config->item('temp') . 'zim0.ts');
 		define('ZIMAPI_FILEPATH_UPGD_NOTE',	$CI->config->item('nandconf') . 'release_note.xml');
@@ -67,6 +68,7 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 		define('ZIMAPI_FILEPATH_CAPTURE',	'/var/www/tmp/image.jpg');
 		define('ZIMAPI_FILEPATH_ENDPRINT',	'/var/www/bin/timelapse_end_print.sh');
 		define('ZIMAPI_FILEPATH_ENDCANCEL',	'/var/www/bin/timelapse_end_cancel.sh');
+		define('ZIMAPI_FILEPATH_POSTHEAT',	'/var/www/bin/timelapse_post_heat.sh');
 		define('ZIMAPI_FILEPATH_UPGRADE',	'/config/conf/profile.json');
 		define('ZIMAPI_FILEPATH_VIDEO_TS',	'/var/www/tmp/zim0.ts');
 		define('ZIMAPI_FILEPATH_UPGD_NOTE',	'/config/release_note.xml');
@@ -111,7 +113,7 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_VALUE_DEFAULT_LENGTH',		8000);
 	define('ZIMAPI_VALUE_DEFAULT_SPEED',		0.78);
 	define('ZIMAPI_VALUE_DEFAULT_TL_LENGTH',	30);
-	define('ZIMAPI_VALUE_DEFAULT_TL_OFFSET',	300); // 5 minutes
+	define('ZIMAPI_VALUE_DEFAULT_TL_OFFSET',	5); // 5 secondes
 	define('ZIMAPI_VALUE_MANDRILL_KEY',			'fvdIarvGVCRpDHmV41swgA');
 	define('ZIMAPI_VALUE_TL_FROM_EMAIL',		'zim-motion@zeepro.com');
 	define('ZIMAPI_VALUE_TL_FROM_NAME',			'Zim');
@@ -847,37 +849,49 @@ function ZimAPI_cameraCapture(&$path_capture) {
 	return TRUE;
 }
 
-function ZimAPI_cameraOn($parameter, $timelapse_length = 0) {
-	global $CFG;
+//TODO send always ok and do nothing in printing and lowering_platform of printing status
+// function ZimAPI_cameraOn($parameter, $timelapse_length = 0) {
+function ZimAPI_cameraOn($parameter) {
 	$output = NULL;
 	$ret_val = 0;
 	$mode_current = '';
 	$data_json = array();
 	$fp = 0;
+	$CI = &get_instance();
 	
-	$status_file = $CFG->config['temp'] . ZIMAPI_FILENAME_CAMERA;
+	$status_file = $CI->config->item('temp') . ZIMAPI_FILENAME_CAMERA;
 	$mode_request = ZimAPI__getModebyParameter($parameter);
 	
-	// complete command parameter if in timelapse mode
-	if ($parameter == ZIMAPI_PRM_CAMERA_PRINTSTART_TIMELAPSE) {
-		// assign a default value
-		if ($timelapse_length == 0) {
-			$timelapse_length = ZIMAPI_VALUE_DEFAULT_LENGTH;
-		}
+// 	// complete command parameter if in timelapse mode
+// 	if ($parameter == ZIMAPI_PRM_CAMERA_PRINTSTART_TIMELAPSE) {
+// 		// assign a default value
+// 		if ($timelapse_length == 0) {
+// 			$timelapse_length = ZIMAPI_VALUE_DEFAULT_LENGTH;
+// 		}
 		
-		// 30s timelapse at 10 fps, so 300 / print time with 0.5mm/s average speed
-		$parameter = str_replace('{fps}',
-					(ZIMAPI_VALUE_DEFAULT_TL_LENGTH * 10 / ($timelapse_length / ZIMAPI_VALUE_DEFAULT_SPEED + ZIMAPI_VALUE_DEFAULT_TL_OFFSET)),
-					ZIMAPI_PRM_CAMERA_PRINTSTART_TIMELAPSE);
+// 		// 30s timelapse at 10 fps, so 300 / print time with 0.5mm/s average speed
+// 		$parameter = str_replace('{fps}',
+// 					(ZIMAPI_VALUE_DEFAULT_TL_LENGTH * 10 / ($timelapse_length / ZIMAPI_VALUE_DEFAULT_SPEED + ZIMAPI_VALUE_DEFAULT_TL_OFFSET)),
+// 					ZIMAPI_PRM_CAMERA_PRINTSTART_TIMELAPSE);
+// 	}
+	$command = $CI->config->item('camera') . $parameter;
+	
+	$CI->load->helper(array('printerstate', 'corestatus'));
+	$data_json = PrinterState_checkStatusAsArray(FALSE);
+	if (is_array($data_json) && $data_json[PRINTERSTATE_TITLE_STATUS] == CORESTATUS_VALUE_PRINT
+			&& isset($data_json[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_EXT_OPER])
+			&& $data_json[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_EXT_OPER] != PRINTERSTATE_VALUE_PRINT_OPERATION_HEAT) {
+		$CI->load->helper('printerlog');
+		PrinterLog_logMessage('ignore all camera requests in printing non-heating phase');
+		
+		return TRUE;
 	}
-	$command = $CFG->config['camera'] . $parameter;
 	
 	$ret_val = ZimAPI_checkCamera($mode_current);
 	if ($ret_val == FALSE) {
 		return $ret_val;
 	}
-	if ($mode_current != ZIMAPI_VALUE_MODE_OFF) {
-		$CI = &get_instance();
+	else if ($mode_current != ZIMAPI_VALUE_MODE_OFF) {
 		$CI->load->helper('printerlog');
 		
 		if ($mode_request != $mode_current) {
@@ -890,7 +904,6 @@ function ZimAPI_cameraOn($parameter, $timelapse_length = 0) {
 	
 	exec($command, $output, $ret_val);
 	if ($ret_val != ERROR_NORMAL_RC_OK) {
-		$CI = &get_instance();
 		$CI->load->helper('printerlog');
 		PrinterLog_logError('camera start command error', __FILE__, __LINE__);
 		return FALSE;
@@ -901,13 +914,12 @@ function ZimAPI_cameraOn($parameter, $timelapse_length = 0) {
 	);
 	
 	// write json file
-	$fp = fopen($CFG->config['temp'] . ZIMAPI_FILENAME_CAMERA, 'w');
+	$fp = fopen($CI->config->item('temp') . ZIMAPI_FILENAME_CAMERA, 'w');
 	if ($fp) {
 		fwrite($fp, json_encode($data_json));
 		fclose($fp);
 	}
 	else {
-		$CI = &get_instance();
 		$CI->load->helper('printerlog');
 		PrinterLog_logError('write camera status error', __FILE__, __LINE__);
 		return FALSE;
@@ -916,6 +928,7 @@ function ZimAPI_cameraOn($parameter, $timelapse_length = 0) {
 	return TRUE;
 }
 
+//TODO send always ok and do nothing in printing and lowering_platform of printing status
 function ZimAPI_cameraOff() {
 	global $CFG;
 	$output = NULL;
@@ -1114,6 +1127,9 @@ function ZimAPI_sendTimelapse($emails, $model_name = NULL) {
 	if (count($array_to) == 0) {
 		return ERROR_MISS_PRM;
 	}
+	
+	//stats info
+	PrinterLog_statsShareEmail(count($array_to));
 	
 	$CI->lang->load('sendtimelapse', $CI->config->item('language'));
 	
@@ -1573,6 +1589,24 @@ function ZimAPI_setUpgradeMode($mode, $profile = NULL) {
 	}
 	
 	return ERROR_OK;
+}
+
+function ZimAPI_getStatistic() {
+	$CI = &get_instance();
+	$CI->load->helper('printerlog');
+	
+	return PrinterLog_getStats();
+}
+
+function ZimAPI_setStatistic($mode) {
+	$CI = &get_instance();
+	$CI->load->helper('printerlog');
+	
+	if (PrinterLog_setStats($mode)) {
+		return ERROR_OK;
+	}
+	
+	return ERROR_INTERNAL;
 }
 
 // abandoned function
