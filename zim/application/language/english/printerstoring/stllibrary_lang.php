@@ -6,10 +6,10 @@ $lang['home']
 	= 'home';
 
 $lang['browse_models']
-	= 'Browse my models';
+	= 'Browse models';
 
 $lang['add_model']
-	= 'Add a new model';
+	= 'Add a model';
 
 $lang['printerstoring_stllibrary_pagetitle']
 	= 'zim - Bibliotheque STL';

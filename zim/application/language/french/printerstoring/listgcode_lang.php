@@ -17,7 +17,7 @@ $lang['delete_no']
 	= 'Non';
 
 $lang['list_info']
-	= 'Ma biblioth&egrave;que de mod&egrave;le';
+	= 'Après chaque impression, vous pouvez sauvegarder ici le modèle avec ses configurations d\'impression associées. Pas nécessaire de slicer à nouveau !';
 
 $lang['print-model']
 	= 'Imprimer';
@@ -33,6 +33,10 @@ $lang['select_alphabetical']
 	= 'A &agrave; Z';
 $lang['select_mostrecent']
 	= 'Plus r&eacute;cent';
+$lang['preset_name_title']
+	= 'Pré-sélection : ';
+$lang['preset_not_found']
+	= '(non trouvable)';
 
 $lang['printerstoring_listgcode_pagetitle']
 	= 'zim - Liste de modeles Gcode';

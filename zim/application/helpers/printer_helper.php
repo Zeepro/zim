@@ -27,6 +27,7 @@ if (!defined('PRINTER_FN_CHARGE')) {
 	define('PRINTER_TYPE_MODELLIST',	'model');
 	define('PRINTER_TYPE_GCODELIB',		'gcode');
 	
+	define('PRINTER_VALUE_MID_API_CALL',	'API');
 // 	define('PRINTER_VALUE_DEFAULT_TEMPER',	230);
 }
 
@@ -41,7 +42,8 @@ function Printer_preparePrint($model_id, $need_prime = TRUE) {
 	if (!in_array($model_id, array(
 			CORESTATUS_VALUE_MID_CALIBRATION,
 			CORESTATUS_VALUE_MID_PRIME_L,
-			CORESTATUS_VALUE_MID_PRIME_R))) {
+			CORESTATUS_VALUE_MID_PRIME_R,
+			PRINTER_VALUE_MID_API_CALL))) {
 		$CI->load->helper('zimapi');
 		
 		// get printing length
@@ -129,14 +131,14 @@ function Printer_preparePrint($model_id, $need_prime = TRUE) {
 	}
 	
 	if ($need_prime == TRUE) {
-		$cr = Printer__getFileFromModel(PRINTER_TYPE_MODELLIST, ModelList_codeModelHash(PRINTLIST_MODEL_PRINTPRIME_L),
+		$cr = Printer_getFileFromModel(PRINTER_TYPE_MODELLIST, ModelList_codeModelHash(PRINTLIST_MODEL_PRINTPRIME_L),
 				$gcode_path, PRINTER_FN_PRINTPRIME_L);
 		if ($cr != ERROR_OK) {
 			$CI->load->helper('printerlog');
 			PrinterLog_logError('prepare print prime left gcode error', __FILE__, __LINE__);
 			return $cr;
 		}
-		$cr = Printer__getFileFromModel(PRINTER_TYPE_MODELLIST, ModelList_codeModelHash(PRINTLIST_MODEL_PRINTPRIME_R),
+		$cr = Printer_getFileFromModel(PRINTER_TYPE_MODELLIST, ModelList_codeModelHash(PRINTLIST_MODEL_PRINTPRIME_R),
 				$gcode_path, PRINTER_FN_PRINTPRIME_R);
 		if ($cr != ERROR_OK) {
 			$CI->load->helper('printerlog');
@@ -149,14 +151,14 @@ function Printer_preparePrint($model_id, $need_prime = TRUE) {
 		@unlink($CI->config->item('temp') . PRINTER_FN_PRINTPRIME_R);
 	}
 	
-// 	$cr = Printer__getFileFromModel(PRINTER_TYPE_MODELLIST, ModelList_codeModelHash(PRINTLIST_MODEL_CHARGE),
+// 	$cr = Printer_getFileFromModel(PRINTER_TYPE_MODELLIST, ModelList_codeModelHash(PRINTLIST_MODEL_CHARGE),
 // 			$gcode_path, PRINTER_FN_CHARGE);
 // 	if ($cr != ERROR_OK) {
 // 		$CI->load->helper('printerlog');
 // 		PrinterLog_logError('prepare charge gcode error', __FILE__, __LINE__);
 // 		return $cr;
 // 	}
-// 	$cr = Printer__getFileFromModel(PRINTER_TYPE_MODELLIST, ModelList_codeModelHash(PRINTLIST_MODEL_RETRACT),
+// 	$cr = Printer_getFileFromModel(PRINTER_TYPE_MODELLIST, ModelList_codeModelHash(PRINTLIST_MODEL_RETRACT),
 // 			$gcode_path, PRINTER_FN_RETRACT);
 // 	if ($cr != ERROR_OK) {
 // 		$CI->load->helper('printerlog');
@@ -240,7 +242,7 @@ function Printer_printFromPrime($abb_extruder, $first_run = TRUE) {
 	}
 	$id_model = ModelList_codeModelHash($name_prime);
 	
-	$ret_val = Printer__getFileFromModel(PRINTER_TYPE_MODELLIST, $id_model, $gcode_path, NULL, $array_info);
+	$ret_val = Printer_getFileFromModel(PRINTER_TYPE_MODELLIST, $id_model, $gcode_path, NULL, $array_info);
 	if (($ret_val == ERROR_OK) && $gcode_path) {
 		$array_filament = array();
 		$array_temper = array();
@@ -274,7 +276,7 @@ function Printer_printFromModel($id_model, $model_calibration, $exchange_extrude
 	$ret_val = 0;
 	$array_info = array();
 	
-	$ret_val = Printer__getFileFromModel(PRINTER_TYPE_MODELLIST, $id_model, $gcode_path, NULL, $array_info);
+	$ret_val = Printer_getFileFromModel(PRINTER_TYPE_MODELLIST, $id_model, $gcode_path, NULL, $array_info);
 	if (($ret_val == ERROR_OK) && $gcode_path) {
 		$array_filament = array();
 		
@@ -355,7 +357,7 @@ function Printer_printFromLibrary($id_gcode, $exchange_extruder = FALSE, $array_
 	$array_filament = array();
 	$CI = &get_instance();
 	
-	$ret_val = Printer__getFileFromModel(PRINTER_TYPE_GCODELIB, $id_gcode, $gcode_path, NULL, $array_info);
+	$ret_val = Printer_getFileFromModel(PRINTER_TYPE_GCODELIB, $id_gcode, $gcode_path, NULL, $array_info);
 	if (($ret_val == ERROR_OK) && $gcode_path) {
 		$array_filament = array();
 		
@@ -749,8 +751,7 @@ function Printer_checkPauseStatus() {
 	return FALSE;
 }
 
-// internal function
-function Printer__getFileFromModel($type_model, $id_model, &$gcode_path, $filename = NULL, &$array_info = NULL) {
+function Printer_getFileFromModel($type_model, $id_model, &$gcode_path, $filename = NULL, &$array_info = NULL) {
 	$model_path = NULL;
 	$bz2_path = NULL;
 	$command = '';
@@ -836,6 +837,7 @@ function Printer__getFileFromModel($type_model, $id_model, &$gcode_path, $filena
 	return ERROR_OK; // never reach here
 }
 
+// internal function
 function Printer__getLengthFromJson($array_type, $array_info, &$array_filament) {
 	$key_length_r = NULL;
 	$key_length_l = NULL;

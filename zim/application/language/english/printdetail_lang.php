@@ -32,13 +32,8 @@ $lang['cancel_confirm_prime']
 	= 'Do you really want to stop the priming ?';
 $lang['wait_info_prime']
 	= 'Starting the priming...';
-$lang['reloading_player']
-	= 'Reloading the player to start zim-motion time-lapse...';
-
-$lang['storegcode_info']
-	= 'Save this print in <b>My Models Library</b>';
-$lang['storegcode_name']
-	= 'Print name HERE';
+// $lang['reloading_player']
+// 	= 'Reloading the player to start zim-motion time-lapse...';
 
 $lang['timelapse_error']
 	= 'We were not able to give you the timelapse';
@@ -116,7 +111,7 @@ $lang['send_fb_button']
 $lang['uploading']
 	= 'Your video is being uploaded';
 $lang['yt_upload_popup_text']
-	= 'Upload on YouTube finished!';
+	= 'Youtube upload completed!';
 $lang['yt_callback_ok']
 	= 'Ok';
 $lang['send_email_hint']
@@ -155,3 +150,9 @@ $lang['timelapse_info_temperature_value_l']
 	= 'Left: %d °C';
 $lang['storegcode_err_cfm']
 	= 'Save print failed, do you still want to go to the homepage?';
+$lang['storegcode_title']
+	= 'Save print';
+$lang['storegcode_info']
+	= 'Save model and its print settings in My Models Library';
+$lang['storegcode_name']
+	= 'Print name HERE';

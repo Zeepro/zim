@@ -64,7 +64,8 @@ function displaylist() {
 	for(k in modellist) {
 		var model = modellist[k];
 		listelement.append('<li id="gcodemodel-' + model.mid + '"><a href="/printerstoring/gcodedetail?id=' + model.mid + '">'
-				+ '<img src="/printerstoring/getpicture?type=gcode&id=' + model.mid + '" style="margin-top: 10px;"><h2>' + model.modelname + '</h2><p>' + model.creation_datestr + '</p></a>'
+				+ '<img src="/printerstoring/getpicture?type=gcode&id=' + model.mid + '" style="margin-top: 20px;"><h2>' + model.modelname + '</h2><p>' + model.creation_datestr + '</p>'
+				+ '<p>{preset_name_title}' + model.presetname + '</p></a>'
 				+ '<a href="#delete_popup" data-rel="popup" onclick=\'javascript: pre_deletegcode("' + model.mid + '");\'>Delete</a></li>');
 	}
 	listelement.listview("refresh");

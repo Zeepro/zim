@@ -240,7 +240,8 @@ function refreshVideoURL() {
 			// already in checking video at page loading state (the case when refresh page in printing / end parse)
 			return;
 		}
-		$("div#myVideo_container").html("<div id=\"myVideo\">{reloading_player}</div>");
+// 		$("div#myVideo_container").html("<div id=\"myVideo\">{reloading_player}</div>");
+		$("div#myVideo_container").html("<div id=\"myVideo\">{loading_player}</div>");
 		check_video_toLoad();
 	}
 

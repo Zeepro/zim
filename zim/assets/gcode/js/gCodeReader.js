@@ -189,7 +189,7 @@ GCODE.gCodeReader = (function(){
             model = [];
             z_heights = [];
             detectSlicer(text);
-            lines = text.split(/\n/);
+            lines = text.split(/(.*\n)/); // old regex: /\n/, which doesn't work with UNIX/OSX EOF Format file
             //reader.target.result = null;
 //            prepareGCode();
 

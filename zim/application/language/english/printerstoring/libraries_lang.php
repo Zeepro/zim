@@ -9,10 +9,10 @@ $lang['libraries_info']
 	= '<b>My Library</b> is your dedicated location to store models and prints.<br />Use it also to trigger a print from your mobile device!';
 
 $lang['stl_models']
-	= 'My models';
+	= 'All models';
 
 $lang['gcode_models']
-	= 'My previous models';
+	= 'Prints';
 
 $lang['printerstoring_libraries_pagetitle']
 	= 'zim - Libraries';

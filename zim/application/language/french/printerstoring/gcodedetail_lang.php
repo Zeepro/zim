@@ -29,12 +29,12 @@ $lang['change_filament']
 $lang['load_filament']
 	= 'Charger';
 $lang['photo_title']
-	= 'Photo';
+	= 'Visualisation';
 $lang['filament_title']
 	= 'Filament';
 $lang['print_button']
 	= 'Imprimer';
 $lang['temp_adjustments_l']
-	= 'Température gauche :';
+	= 'Température gauche (°C)';
 $lang['temp_adjustments_r']
-	= 'Température droite :';
+	= 'Température droite (°C)';

@@ -29,12 +29,12 @@ $lang['change_filament']
 $lang['load_filament']
 	= 'Load';
 $lang['photo_title']
-	= 'Photo';
+	= 'Visualization';
 $lang['filament_title']
 	= 'Filament';
 $lang['print_button']
 	= 'Print';
 $lang['temp_adjustments_l']
-	= 'Left temperature :';
+	= 'Left temperature (°C)';
 $lang['temp_adjustments_r']
-	= 'Right temperature :';
+	= 'Right temperature (°C)';

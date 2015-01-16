@@ -33,7 +33,7 @@
 				<a id="send_yt_button" href="/share/youtube_form" data-ajax="false" data-role="button" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-yt-icon" style="display:none;">{send_yt_button}</a>
 				<a id="send_fb_button" href="/share/facebook_form" data-ajax="false" data-role="button" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-fb-icon" style="display:none;">{send_fb_button}</a>
 			</div>
-			<div data-role="collapsible" data-collapsed="false" style="align: center;">
+			<div data-role="collapsible" data-collapsed="true" style="align: center;">
 				<h4>{timelapse_info_title}</h4>
 				<style type="text/css"> .ui-table-columntoggle-btn { display: none !important; } </style>
 				<table data-role="table" data-mode="columntoggle" id="test-table" class="ui-shadow table-stroke" style="background-color:#e7e7e7">
@@ -49,12 +49,14 @@
 			</div>
 <!-- 			<div id="storegcode_collapsible" data-role="collapsible" data-collapsed="true" style="display: {display_storegocde};"> -->
 			<div id="storegcode_container" style="display: none;">
-<!-- 				<h4>{storegcode_title}</h4> -->
-				<form>
-					<input type="checkbox" id="storegcode_checkbox" data-mini="true">
-					<label for="storegcode_checkbox">{storegcode_checkbox}</label>
-					<input id="storegcode_name" type="text" data-clear-btn="true" placeholder="{storegcode_hint}">
-				</form>
+				<div data-role="collapsible" data-collapsed="false">
+					<h4>{storegcode_title}</h4>
+					<form>
+						<input type="checkbox" id="storegcode_checkbox">
+						<label for="storegcode_checkbox">{storegcode_checkbox}</label>
+						<input id="storegcode_name" type="text" data-clear-btn="true" placeholder="{storegcode_hint}">
+					</form>
+				</div>
 			</div>
 			<a href="#home_popup" data-rel="popup" data-role="button" class="ui-btn ui-icon-home ui-btn-icon-left ui-corner-all ui-shadow" data-transition="pop">{home_button}</a>
 			<!--<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-home" id="print_action" onclick='javascript: finish_timelapse();'>{home_button}</button>-->

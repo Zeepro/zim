@@ -362,7 +362,7 @@ class Printdetail extends MY_Controller {
 				'initial_head'		=> ($status_head == TRUE) ? $option_selected : NULL,
 				'video_error'		=> t('video_error'),
 				'loading_player'	=> t('loading_player'),
-				'reloading_player'	=> t('reloading_player'),
+// 				'reloading_player'	=> t('reloading_player'),
 		);
 		
 		if ($print_slice == TRUE) {
@@ -731,6 +731,7 @@ class Printdetail extends MY_Controller {
 				'storegcode_checkbox'	=> t('storegcode_info'),
 				'storegcode_hint'		=> t('storegcode_name'),
 				'storegcode_err_cfm'	=> t('storegcode_err_cfm'),
+				'storegcode_title'		=> t('storegcode_title'),
 		);
 		
 		$body_page = $this->parser->parse('template/printdetail/timelapse', $template_data, TRUE);

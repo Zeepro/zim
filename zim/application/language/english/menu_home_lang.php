@@ -14,7 +14,7 @@ $lang['upload']
 $lang['about']
 	= 'About my zim';
 $lang['my_library']
-	= 'My library';
+	= 'My libraries';
 $lang['my_zim_shop']
 	= 'My zim shop';
 $lang['update_available']

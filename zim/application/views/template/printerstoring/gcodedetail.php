@@ -44,18 +44,25 @@
 						</div>
 					</div>
 					<div class="ui-grid-a">
-						<div class="ui-block-a">
-							{temp_adjustments_l} <span id="temperature_text_1">{temper_filament_l}°C</span>
-						</div>
-						<div class="ui-block-b">
-							{temp_adjustments_r} <span id="temperature_text_2">{temper_filament_r}°C</span>
-						</div>
+						<div class="ui-block-a">{temp_adjustments_l}</div>
+						<div class="ui-block-b">{temp_adjustments_r}</div>
 						<div class="ui-block-a" id="div-slider1">
 							<input type="range" name="l" id="slider-1" value="{temper_filament_l}" min="160" max="260" data-show-value="true">
 						</div>
 						<div class="ui-block-b" id="div-slider2">
 							<input type="range" name="r" id="slider-2" value="{temper_filament_r}" min="160" max="260" data-show-value="true">
 						</div>
+					</div>
+				</div>
+			</div>
+			<div data-role="collapsible" style="clear: both;">
+				<h4>{advanced}</h4>
+				<div class="ui-grid-a">
+					<div class="ui-block-a">
+						<a data-role="button" href="/gcode/library/display?id={id}" data-ajax="false">{gcode_link}</a>
+					</div>
+					<div class="ui-block-b">
+						<a data-role="button" href="/gcode/library/render?id={id}" data-ajax="false">{2drender_link}</a>
 					</div>
 				</div>
 			</div>
@@ -106,16 +113,6 @@ $(document).on("pagecreate",function() {
 // 		$("input[type=submit]").attr("disabled", "disabled");
 		$("input[type=submit]").button("disable");
 	}
-});
-
-$("#div-slider1").on("change", function()
-{
-	$("#temperature_text_1").html($("#slider-1").val() + "°C");
-});
-
-$("#div-slider2").on("change", function()
-{
-	$("#temperature_text_2").html($("#slider-2").val() + "°C");
 });
 </script>
 </div>

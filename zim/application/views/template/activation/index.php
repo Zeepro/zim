@@ -23,7 +23,7 @@
 				echo form_submit('submit', '{sign_in}');
 				echo form_close();
 			?>
-		<a href="/login/privacy" data-ajax="false" style="font-weight:normal;"><i>{privacy_policy_link}</i></a>
+			<a href="https://home.zeepro.com/login/privacy" data-ajax="false" style="font-weight:normal;" target="_blank"><i>{privacy_policy_link}</i></a>
 		</div>
 	</div>
 	<script>

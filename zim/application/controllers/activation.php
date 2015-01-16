@@ -21,18 +21,19 @@ class Activation extends MY_Controller
 			$body_page = $this->parser->parse('/template/activation/index', array(), TRUE);
 			$this->lang->load('activation/activation', $this->config->item('language'));
 			$template_data = array(
-					'lang'			=> $this->config->item('language_abbr'),
-					'headers'		=> '<title>' . "zim - Activation" . '</title>',
-					'contents'		=> $body_page,
-					'title'			=> t('title'),
-					'errors'		=> "",
-					'password'		=> t('password'),
-					'sign_in'		=> t('sign_in'),
-					'sign_up'		=> t('sign_up'),
-					'back'			=> t('back'),
-					'create_account'=> t('create_account'),
-					'show_password'	=> t('show_password'),
-					'returnUrl'		=> isset($_GET['returnUrl']) ? ("?returnUrl=".$_GET['returnUrl']) : ""
+					'lang'					=> $this->config->item('language_abbr'),
+					'headers'				=> '<title>' . "zim - Activation" . '</title>',
+					'contents'				=> $body_page,
+					'title'					=> t('title'),
+					'errors'				=> "",
+					'password'				=> t('password'),
+					'sign_in'				=> t('sign_in'),
+					'sign_up'				=> t('sign_up'),
+					'back'					=> t('back'),
+					'privacy_policy_link'	=> t('privacy_policy_link'),
+					'create_account'		=> t('create_account'),
+					'show_password'			=> t('show_password'),
+					'returnUrl'				=> isset($_GET['returnUrl']) ? ("?returnUrl=".$_GET['returnUrl']) : ""
 			);
 		}
 		else

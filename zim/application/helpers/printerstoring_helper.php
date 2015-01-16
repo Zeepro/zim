@@ -21,6 +21,7 @@ if (!defined('PRINTERSTORING_FILE_STL1_BZ2')) {
 	define('PRINTERSTORING_TITLE_MATER_R',		'm1');
 	define('PRINTERSTORING_TITLE_MATER_L',		'm2');
 	define('PRINTERSTORING_TITLE_MULTI_STL',	'multiple');
+	define('PRINTERSTORING_TITLE_PRESET_ID',	'preset');
 	
 	define('PRINTERSTORING_VALUE_MIN_FREESPACE',	209715200); // 200MB
 }
@@ -455,10 +456,11 @@ function PrinterStoring_listGcode() {
 					if (($str = @file_get_contents($gcode_model_folder . PRINTERSTORING_FILE_INFO_JSON)) && ($info = json_decode($str, true)) && array_key_exists('name', $info)
 					&& array_key_exists('id', $info)) {
 						$model = array(
-							'id' => $info['id'],
-							'name' => $info['name'],
-							'imglink' => NULL,
-							'creation_date' => $info['creation_date']
+								'id'							=> $info['id'],
+								'name'							=> $info['name'],
+								'imglink'						=> NULL,
+								'creation_date'					=> $info['creation_date'],
+								PRINTERSTORING_TITLE_PRESET_ID	=> isset($info[PRINTERSTORING_TITLE_PRESET_ID]) ? $info[PRINTERSTORING_TITLE_PRESET_ID] : NULL,
 						);
 						if (is_file($gcode_model_folder . PRINTERSTORING_FILE_IMG_JPG)) {
 							$model['imglink'] = $gcode_library_path . sprintf('%06d', $model['id']) . '/' . PRINTERSTORING_FILE_IMG_JPG;
@@ -580,6 +582,7 @@ function PrinterStoring_storeGcode($name) {
 	$array_length = array();
 	$array_material = array();
 	$nb_models = 0;
+	$preset_id = NULL;
 
 	// check if library folder exist
 	if (@is_dir($gcode_library_path) == false) {
@@ -623,6 +626,12 @@ function PrinterStoring_storeGcode($name) {
 			$array_material[$abb_cartridge] = NULL;
 		}
 	}
+	
+	// get preset id
+	$CI->load->helper('zimapi');
+	if (!ZimAPI_getPreset($preset_id)) {
+		$preset_id = NULL;
+	}
 
 	// create info file
 	$info_file = $model_folder . PRINTERSTORING_FILE_INFO_JSON;
@@ -636,6 +645,7 @@ function PrinterStoring_storeGcode($name) {
 			PRINTERSTORING_TITLE_LENG_L		=> $array_length['l'],
 			PRINTERSTORING_TITLE_MATER_R	=> $array_material['r'],
 			PRINTERSTORING_TITLE_MATER_L	=> $array_material['l'],
+			PRINTERSTORING_TITLE_PRESET_ID	=> $preset_id,
 	);
 
 	if (!PrinterStoring__createInfoFile($info_file, $info)) {

@@ -6,7 +6,7 @@ $lang['home']
 	= 'accueil';
 
 $lang['browse_models']
-	= 'Parcourir mes mod&egrave;les';
+	= 'Parcourir mod&egrave;les';
 
 $lang['add_model']
 	= 'Ajouter un mod&egrave;le';

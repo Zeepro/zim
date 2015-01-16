@@ -19,7 +19,14 @@ $lang['layer_prefix']
 	= 'Couche : ';
 
 $lang['speed_label']
-	= 'Type d\'affichage de vitesse :';
+	= 'Affichage de vitesse :';
+$lang['layer_number']
+	= 'Numéro de couche :';
+$lang['layer_flow']
+	= 'Circulation de couche :';
+$lang['option_others']
+	= 'Autres :';
+
 $lang['speedDisplay']
 	= 'mm/sec';
 $lang['exPerMM']
@@ -40,3 +47,5 @@ $lang['alpha']
 	= 'Rendre des lignes visiblement transparantes';
 $lang['showNextLayer']
 	= 'Afficher +1 couche';
+$lang['back_print_button']
+	= 'Retourner à imprimer';

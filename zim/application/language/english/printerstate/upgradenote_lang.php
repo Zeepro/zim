@@ -1,5 +1,8 @@
 <?php
 
+$lang['back']
+	= 'back';
+
 $lang['printerstate_upgradenote_pagetitle']
 	= 'Release note';
 $lang['releasenote_title']

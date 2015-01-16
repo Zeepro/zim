@@ -11,15 +11,22 @@ $lang['tab_render']
 	= 'Rendering';
 $lang['tab_gcode']
 	= 'G-code';
-$lang['layer_start']
-	= 'Layer start';
-$lang['layer_end']
-	= 'Layer end';
-$lang['layer_prefix']
-	= 'Layer: ';
+// $lang['layer_start']
+// 	= 'Layer start';
+// $lang['layer_end']
+// 	= 'Layer end';
+// $lang['layer_prefix']
+// 	= 'Layer: ';
 
 $lang['speed_label']
-	= 'Speed display type:';
+	= 'Speed display:';
+$lang['layer_number']
+	= 'Layer number:';
+$lang['layer_flow']
+	= 'Layer flow:';
+$lang['option_others']
+	= 'Others:';
+
 $lang['speedDisplay']
 	= 'mm/sec';
 $lang['exPerMM']
@@ -40,3 +47,5 @@ $lang['alpha']
 	= 'Render lines slightly transparent';
 $lang['showNextLayer']
 	= 'Show +1 layer';
+$lang['back_print_button']
+	= 'Back to print';

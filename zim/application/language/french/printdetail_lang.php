@@ -32,13 +32,9 @@ $lang['cancel_confirm_prime']
 	= "Voulez-vous vraiment arrêter l'amorçage ?";
 $lang['wait_info_prime']
 	= 'En attente de démarrage...';
-$lang['reloading_player']
-	= 'Rechargement du lecteur à démarrer zim-motion time-lapse...';
+// $lang['reloading_player']
+// 	= 'Rechargement du lecteur à démarrer zim-motion time-lapse...';
 
-$lang['storegcode_info']
-	= 'Sauvegarder ce mod&egrave;le dans Ma Biblioth&egrave;que';
-$lang['storegcode_name']
-	= 'Nom du mod&egrave;le';
 $lang['timelapse_error']
 	= 'Nous ne sommes pas en mesure de cr&eacute;er la vid&eacute;o de timelapse';
 $lang['timelapse_ok']
@@ -154,3 +150,9 @@ $lang['timelapse_info_temperature_value_l']
 	= 'Gauche : %d °C';
 $lang['storegcode_err_cfm']
 	= 'Sauvegarde du modèle échouée, voulez-vous toujours aller à l\'accueil ?';
+$lang['storegcode_title']
+	= 'Sauvegarde d\'impression';
+$lang['storegcode_info']
+	= 'Sauvegarder ce mod&egrave;le et ses configurations dans Ma Biblioth&egrave;que';
+$lang['storegcode_name']
+	= 'Nom du mod&egrave;le ICI';

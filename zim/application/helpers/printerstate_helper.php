@@ -2020,7 +2020,7 @@ function PrinterState_runGcodeFile($gcode_path, $rewrite = TRUE) {
 // 		return ERROR_INTERNAL;
 // 	}
 	if ($rewrite == TRUE) {
-		Printer_preparePrint();
+		Printer_preparePrint(PRINTER_VALUE_MID_API_CALL);
 	}
 	$command = PrinterState_getPrintCommand(array(), $rewrite) . $gcode_path;
 	

@@ -305,14 +305,22 @@ class Printerstoring extends MY_Controller {
 		$json_data = json_decode(PrinterStoring_listGcode(), true);
 		// prepare display data
 		foreach ($json_data as $model_data) {
+			$preset_name = t('preset_not_found');
+			$preset_array = array();
+			
+			$this->load->helper('zimapi');
+			if (ERROR_OK == ZimAPI_getPresetInfoAsArray($model_data[PRINTERSTORING_TITLE_PRESET_ID], $preset_array)) {
+				$preset_name = $preset_array[ZIMAPI_TITLE_PRESET_NAME];
+			}
 			
 			$display_printlist[] = array(
-					'modelname'	=> $model_data['name'],
-					'mid'	=> $model_data['id'],
+					'modelname'			=> $model_data['name'],
+					'mid'				=> $model_data['id'],
 //					'image'	=> $model_data['imglink'],
 // 					'image'	=> "/printerstoring/getpicture?id=" . $model_data['id'] . "&type=gcode",
-					'creation_date' => strtotime($model_data['creation_date']), //date('d-M-Y', strtotime($model_data['creation_date']))
-					'creation_datestr' => $model_data['creation_date'] //date('d-M-Y', strtotime($model_data['creation_date']))
+					'presetname'		=> $preset_name,
+					'creation_date'		=> strtotime($model_data['creation_date']), //date('d-M-Y', strtotime($model_data['creation_date']))
+					'creation_datestr'	=> $model_data['creation_date'] //date('d-M-Y', strtotime($model_data['creation_date']))
 			);
 		}
 
@@ -321,20 +329,21 @@ class Printerstoring extends MY_Controller {
 		}
 
 		$template_data = array(
-				'back'			=> t('back'),
-				'home'			=> t('home'),
-				'list_info'		=> t('list_info'),
-				'print-model'		=> t('print-model'),
-				'delete-model'		=> t('delete-model'),
+				'back'					=> t('back'),
+				'home'					=> t('home'),
+				'list_info'				=> t('list_info'),
+				'print-model'			=> t('print-model'),
+				'delete-model'			=> t('delete-model'),
 				//'list'		=> $display_printlist,
-				'encoded_list'		=> json_encode((isset($display_printlist) ? $display_printlist : array())),
-				'select_alphabetical'		=> t('select_alphabetical'),
+				'encoded_list'			=> json_encode((isset($display_printlist) ? $display_printlist : array())),
+				'select_alphabetical'	=> t('select_alphabetical'),
 				'select_mostrecent'		=> t('select_mostrecent'),
-				'print_error'		=> t('print_error'),
-				'delete_error'	=> t('delete_error'),
-				'delete_popup_text'	=> t('delete_popup_text'),
-				'delete_yes'		=> t('delete_yes'),
-				'delete_no'			=> t('delete_no'),
+				'print_error'			=> t('print_error'),
+				'delete_error'			=> t('delete_error'),
+				'delete_popup_text'		=> t('delete_popup_text'),
+				'delete_yes'			=> t('delete_yes'),
+				'delete_no'				=> t('delete_no'),
+				'preset_name_title'		=> t('preset_name_title'),
 		);
 		$body_page = $this->parser->parse('template/printerstoring/listgcode', $template_data, TRUE);
 		
@@ -532,5 +541,36 @@ class Printerstoring extends MY_Controller {
 		
 		return;
 	}
-
+	
+	function gcode_ajax() {
+		$cr = 0;
+		$display = NULL;
+		$gcode_path = NULL;
+		$id_model = $this->input->get('id');
+		
+		$this->load->helper('printer');
+		
+		$cr = Printer_getFileFromModel(PRINTER_TYPE_GCODELIB, $id_model, $gcode_path);
+		if ($cr == ERROR_OK) {
+			if (file_exists($gcode_path)) {
+				$this->load->helper('file');
+				
+				$this->output->set_content_type(get_mime_by_extension($gcode_path))->set_output(@file_get_contents($gcode_path));
+				
+				return;
+			}
+			else {
+				$cr = ERROR_INTERNAL;
+			}
+		}
+		
+		$display = $cr . " " . t(MyERRMSG($cr));
+		$this->output->set_status_header($cr, $display);
+		// 		http_response_code($cr);
+		$this->output->set_content_type('text/plain; charset=UTF-8');
+		$this->load->library('parser');
+		$this->parser->parse('template/plaintxt', array('display' => $display)); //optional
+		
+		return;
+	}
 }

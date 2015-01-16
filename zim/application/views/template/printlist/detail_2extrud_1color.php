@@ -69,10 +69,10 @@
 					</div>
 					<div class="ui-grid-a">
 						<div class="ui-block-a">
-							{temp_adjustments_l} <span id="temperature_text_1">{temper_filament_l}°C</span>
+							{temp_adjustments_l}
 						</div>
 						<div class="ui-block-b">
-							{temp_adjustments_r} <span id="temperature_text_2">{temper_filament_r}°C</span>
+							{temp_adjustments_r}
 						</div>
 						<div class="ui-block-a" id="div-slider1">
 							<input type="range" name="l" id="slider-1" value="{temper_filament_l}" min="160" max="260" data-show-value="true">
@@ -163,16 +163,6 @@ $("select#exchange_extruder").change(function() {
 	}
 	
 	$("input#exchange_extruder_hidden").val($("select#exchange_extruder").val());
-});
-
-$("#div-slider1").on("change", function()
-{
-	$("#temperature_text_1").html($("#slider-1").val() + "°C");
-});
-
-$("#div-slider2").on("change", function()
-{
-	$("#temperature_text_2").html($("#slider-2").val() + "°C");
 });
 </script>
 </div>

@@ -14,3 +14,4 @@ $lang['missing_parameter'] = 'Tous les champs sont obligatoires';
 $lang['confirm_skip_text'] = 'Si vous ne créez pas de compte Zeepro, vous reconnaissez que vous n\'aurez pas accès à votre zim sur le pouce, et que vous ne pourrez pas bénéficier de certaines offrse premium ZeeproCare Service.<br /><br />Vous n\'aurez accès à votre zim que par les URLs suivantes : http://zim/ ou http://zim.local/<br />Marquez ces pages dans votre navigateur afin d\'avoir facilement accès à votre zim.';
 $lang['still_skip'] = 'Je souhaite toujours sauter cette étape';
 $lang['wrong_pass'] = "Veuillez faire correspondre le mot de passe et sa confirmation.";
+$lang['privacy_policy_link'] = "Politique de confidentialit&eacute";

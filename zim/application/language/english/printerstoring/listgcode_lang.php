@@ -17,7 +17,7 @@ $lang['delete_no']
 = 'No';
 
 $lang['list_info']
-	= 'My models library';
+	= 'After each print, you can store here a model and its associated print settings. No need to slice again!';
 
 $lang['print-model']
 	= 'Print';
@@ -33,6 +33,10 @@ $lang['select_alphabetical']
 	= 'A to Z';
 $lang['select_mostrecent']
 	= 'Most recent';
+$lang['preset_name_title']
+	= 'Preset: ';
+$lang['preset_not_found']
+	= '(not found)';
 
 $lang['printerstoring_listgcode_pagetitle']
 	= 'zim - Gcode Model List';

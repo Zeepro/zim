@@ -11,3 +11,4 @@ $lang['bad_pass'] = "Incorrect password";
 $lang['bad_login'] = "Unknown email";
 $lang['unknown_email'] = "Unknown email";
 $lang['missing_param'] = "All the fields are required";
+$lang['privacy_policy_link'] = "Privacy policy";

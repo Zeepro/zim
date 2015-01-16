@@ -652,10 +652,11 @@ class Printerstate extends MY_Controller {
 		PrinterLog_statsWebClick(PRINTERLOG_STATS_LABEL_UPGRADE);
 		
 		$template_data = array(
+				'back'				=> t('back'),
 				'note_title'		=> t('releasenote_title'),
 				'note_body'			=> $note_html,
 				'reboot_button'		=> t('releasenote_reboot'),
-				'reboot_display'	=> ($this->input->get('reboot') === FALSE) ? 'none' : 'block',
+				'reboot_display'	=> ($this->input->get('reboot') === FALSE) ? 'false' : 'true',
 		);
 		
 		$body_page = $this->parser->parse('template/printerstate/upgradenote', $template_data, TRUE);

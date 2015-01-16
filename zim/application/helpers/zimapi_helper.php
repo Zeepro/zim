@@ -61,7 +61,7 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 		define('ZIMAPI_FILEPATH_UPGRADE',	$CI->config->item('conf') . 'profile.json');
 		define('ZIMAPI_FILEPATH_VIDEO_TS',	$CI->config->item('temp') . 'zim0.ts');
 		define('ZIMAPI_FILEPATH_UPGDNOTE1',	$CI->config->item('nandconf') . 'release_note.xml');
-		define('ZIMAPI_FILEPATH_UPGDNOTE2',	'./data/release_note.xml');
+		define('ZIMAPI_FILEPATH_UPGDNOTE2',	'./data/release_note_1.4.xml');
 	}
 	else {
 		define('ZIMAPI_FILEPATH_TIMELAPSE',	'/var/www/tmp/timelapse.mp4');
@@ -1651,41 +1651,16 @@ function ZimAPI_getUpgradeNote(&$note_html = '') {
 	return TRUE;
 }
 
-function ZimAPI_getUpgradeNoteArray(&$array_upgrade) {
+function ZimAPI_getUpgradeNoteArray(&$array_upgrade, $display_all = FALSE) {
+	// we put a possibility to parse all notes here
 	$array_upgrade = array(); // initialization of array
-
+	
 	foreach (array(ZIMAPI_FILEPATH_UPGDNOTE1, ZIMAPI_FILEPATH_UPGDNOTE2) as $file_note) {
 		try {
 			if (file_exists($file_note)) {
-				$key_version = ZIMAPI_TITLE_RELEASENOTE_VERSION;
-				$key_part = ZIMAPI_TITLE_RELEASENOTE_PART;
-				$key_part_title = ZIMAPI_TITLE_RELEASENOTE_PART_TITLE;
-				$key_part_note = ZIMAPI_TITLE_RELEASENOTE_PART_NOTE;
-				
 				$xml = simplexml_load_file($file_note);
-				if (count($xml->$key_version) == 0) {
-					throw new Exception('upgrade version not found');
-				}
-				if (count($xml->$key_part)) {
-					$tmp_array = array();
-					foreach($xml->$key_part as $part) {
-						if (count($part->$key_part_title) != 1) {
-							throw new Exception('part with no title or several titles detected');
-						}
-						if (count($part->$key_part_note)) {
-							foreach($part->$key_part_note as $note) {
-								$tmp_array[(string) $part->$key_part_title][] = (string) $note;
-							}
-						}
-						else {
-							throw new Exception('part with no notes detected');
-						}
-					}
-					$array_upgrade[(string) $xml->$key_version] = $tmp_array;
-				}
-				else {
-					throw new Exception('upgrade with no parts detected');
-				}
+				ZimAPI__parseUpgradeXML($xml, $array_upgrade);
+				break;
 			}
 			else {
 				throw new Exception('file not found');
@@ -2578,6 +2553,39 @@ function ZimAPI__filterCharacter($raw) {
 	$filtered = "'" . str_replace("'", "'\"'\"'", $raw) . "'";
 	
 	return $filtered;
+}
+
+function ZimAPI__parseUpgradeXML(&$xml, &$array_upgrade) {
+	$key_version = ZIMAPI_TITLE_RELEASENOTE_VERSION;
+	$key_part = ZIMAPI_TITLE_RELEASENOTE_PART;
+	$key_part_title = ZIMAPI_TITLE_RELEASENOTE_PART_TITLE;
+	$key_part_note = ZIMAPI_TITLE_RELEASENOTE_PART_NOTE;
+	
+	if (count($xml->$key_version) == 0) {
+		throw new Exception('upgrade version not found');
+	}
+	if (count($xml->$key_part)) {
+		$tmp_array = array();
+		foreach($xml->$key_part as $part) {
+			if (count($part->$key_part_title) != 1) {
+				throw new Exception('part with no title or several titles detected');
+			}
+			if (count($part->$key_part_note)) {
+				foreach($part->$key_part_note as $note) {
+					$tmp_array[(string) $part->$key_part_title][] = (string) $note;
+				}
+			}
+			else {
+				throw new Exception('part with no notes detected');
+			}
+		}
+		$array_upgrade[(string) $xml->$key_version] = $tmp_array;
+	}
+	else {
+		throw new Exception('upgrade with no parts detected');
+	}
+	
+	return;
 }
 
 function ZimAPI__setPresetLocalization(&$array_json) {

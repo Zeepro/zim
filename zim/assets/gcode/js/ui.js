@@ -217,9 +217,9 @@ GCODE.ui = (function(){
             gCodeLines = GCODE.gCodeReader.getGCodeLines(val, sliderHor.slider("values",0), sliderHor.slider("values",1));
             setLinesColor(true); // highlight lines
 //            printLayerInfo(val);
-			if (typeof(rendering_change_layerNb_display) == 'function') {
-				rendering_change_layerNb_display(val);
-			}
+//			if (typeof(rendering_change_layerNb_display) == 'function') {
+//				rendering_change_layerNb_display(val);
+//			}
         };
 
         sliderVer.slider({
@@ -286,9 +286,9 @@ GCODE.ui = (function(){
 				setLinesColor(true); // highlight lines
 				GCODE.renderer.render(currentLayerNb, currentRangeStart, currentRangeEnd);
 				
-				if (typeof(rendering_change_layerNb_display) == 'function') {
-					rendering_change_layerNb_display(currentLayerNb);
-				}
+//				if (typeof(rendering_change_layerNb_display) == 'function') {
+//					rendering_change_layerNb_display(currentLayerNb);
+//				}
 			}
 		};
 		

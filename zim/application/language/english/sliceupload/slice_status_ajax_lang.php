@@ -8,9 +8,9 @@ $lang['cartridge_material_diff_msg']
 $lang['suggest_reslice']
 	= 'If you\'re unsure, we suggest you to re-slice the model with the same material';
 $lang['left_temperature']
-	= 'Left temperature';
+	= 'Left temperature (°C)';
 $lang['right_temperature']
-	= 'Right temperature';
+	= 'Right temperature (°C)';
 $lang['filament_ok']
 	= 'ok';
 $lang['filament_not_need']

@@ -25,5 +25,5 @@ $lang['tags_label']
 	= "Tags (Comma-separated)";
 $lang['privacy_label']
 	= "Privacy";
-$lang['privacy_label']
+$lang['back']
 	= "Back";

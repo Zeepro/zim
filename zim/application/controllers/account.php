@@ -305,6 +305,7 @@ class Account extends MY_Controller
 		$data['still_skip'] = t('still_skip');
 		$data['back'] = t('back');
 		$data['show_password'] = t('show_password');
+		$data['privacy_policy_link'] = t('privacy_policy_link');
 		$body_page = $this->parser->parse('template/account/signup', $data, TRUE);
 		
 		// parse all page

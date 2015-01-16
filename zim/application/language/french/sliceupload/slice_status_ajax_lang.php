@@ -8,9 +8,9 @@ $lang['cartridge_material_diff_msg']
 $lang['suggest_reslice']
 	= 'Si vous n\'êtes pas sûr ce que vous faites, nous vous proposez de slicer à nouveau le modèle avec des mêmes matériels';
 $lang['left_temperature']
-	= 'Température gauche';
+	= 'Température gauche (°C)';
 $lang['right_temperature']
-	= 'Température droite';
+	= 'Température droite (°C)';
 $lang['filament_ok']
 	= 'ok';
 $lang['filament_not_need']

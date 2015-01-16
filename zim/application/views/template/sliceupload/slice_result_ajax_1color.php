@@ -23,13 +23,13 @@
 					<p style="text-align: left;">{error_msg}</p>
 					<div class="ui-grid-a">
 						<div class="ui-block-a"><div id="left_cartridge" class="ui-bar ui-bar-f">
-							<label>{left_temperature}:<span id="temperature_text_1">{temper_l}</span>°C</label>
+							<label>{left_temperature}</label>
 							<div id="temper_l">
 								<input type="range" id="slider_left" name="l" value="{temper_l}" min="160" max="260" data-show-value="true" />
 							</div>
 						</div></div>
 						<div class="ui-block-b"><div id="right_cartridge" class="ui-bar ui-bar-f">
-							<label>{right_temperature}:<span id="temperature_text_2">{temper_r}</span>°C</label>
+							<label>{right_temperature}</label>
 							<div id="temper_r">
 								<input type="range" id="slider_right" name="r" value="{temper_r}" min="160" max="260" data-show-value="true" />
 							</div>
@@ -44,10 +44,10 @@
 							<h4>{advanced}</h4>
 							<div class="ui-grid-a">
 								<div class="ui-block-a">
-									<a data-role="button" onclick='javascript: window.location.href="/sliceupload/gcode/display"'>{gcode_link}</a>
+									<a data-role="button" onclick='javascript: window.location.href="/gcode/slice/display"'>{gcode_link}</a>
 								</div>
 								<div class="ui-block-b">
-									<a data-role="button" onclick='javascript: window.location.href="/sliceupload/gcode/render"'>{2drender_link}</a>
+									<a data-role="button" onclick='javascript: window.location.href="/gcode/slice/render"'>{2drender_link}</a>
 								</div>
 							</div>
 						</div>
@@ -174,15 +174,5 @@ $("select#exchange_extruder").change(function() {
 	}
 	
 	$("input#exchange_extruder_hidden").val($("select#exchange_extruder").val());
-});
-
-$("div#temper_l").on("change", function()
-{
-	$("#temperature_text_1").html($("#slider_left").val());
-});
-
-$("div#temper_r").on("change", function()
-{
-	$("#temperature_text_2").html($("#slider_right").val());
 });
 </script>
