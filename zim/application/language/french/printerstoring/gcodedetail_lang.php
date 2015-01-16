@@ -38,3 +38,9 @@ $lang['temp_adjustments_l']
 	= 'Température gauche (°C)';
 $lang['temp_adjustments_r']
 	= 'Température droite (°C)';
+$lang['advanced']
+	= 'Avancé';
+$lang['gcode_link']
+	= 'G-code';
+$lang['2drender_link']
+	= '2D Rendering';

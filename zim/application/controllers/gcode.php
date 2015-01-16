@@ -14,7 +14,7 @@ class Gcode extends MY_Controller {
 		$template_data = array();
 		
 		$this->load->library('parser');
-		$this->lang->load('sliceupload/gcode', $this->config->item('language'));
+		$this->lang->load('gcode', $this->config->item('language'));
 		
 		if (!is_null($gcode_id)) {
 			$back_url = '/printerstoring/gcodedetail?id=' . $gcode_id;
@@ -48,7 +48,7 @@ class Gcode extends MY_Controller {
 				'layer_flow'			=> t('layer_flow'),
 				'option_others'			=> t('option_others'),
 		);
-		$body_page = $this->parser->parse('/template/sliceupload/gcode.php', $template_data, TRUE);
+		$body_page = $this->parser->parse('/template/gcode.php', $template_data, TRUE);
 		$template_data = array(
 				'headers'		=> '<title>'. t('sliceupload_gcode_pagetitle') . '</title>',
 				'contents'		=> $body_page,
