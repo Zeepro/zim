@@ -50,7 +50,7 @@ class Gcode extends MY_Controller {
 		);
 		$body_page = $this->parser->parse('/template/gcode.php', $template_data, TRUE);
 		$template_data = array(
-				'headers'		=> '<title>'. t('sliceupload_gcode_pagetitle') . '</title>',
+				'headers'		=> '<title>'. t('gcode_pagetitle') . '</title>',
 				'contents'		=> $body_page,
 		);
 		$this->parser->parse('template/basetemplate', $template_data);

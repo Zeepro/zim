@@ -5,7 +5,7 @@ $lang['back']
 $lang['home']
 	= 'Accueil';
 
-$lang['sliceupload_gcode_pagetitle']
+$lang['gcode_pagetitle']
 	= 'Zim - G-code';
 $lang['tab_render']
 	= 'Rendering';
