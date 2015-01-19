@@ -1,10 +1,5 @@
 <div data-role="page" data-url="/sliceupload/slice">
-	<style>
-    	input[type=number]
-    	{
-        	display : none !important;
-		}
-	</style>
+<!-- 	<style> input[type=number] { display : none !important; } </style> -->
 	<div id="overlay"></div>
 	<header data-role="header" class="page-header">
 		<a href="#" data-icon="back" data-ajax="false" style="visibility:hidden">{back}</a>
@@ -13,17 +8,50 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
-			<div id="preview_zone" style="clear: both; text-align: center;">{wait_preview}</div>
-			<div id="detail_zone" style="clear: both; text-align: center;">
-				<h3><label for="preset_menu">{select_hint}</label></h3>
-				<div data-role="fieldcontain">
-					<select name="preset_menu" id="preset_menu" onchange="javascript: syncParameter();">
-					{preset_list}
-						<option id="p{id}" value="{id}" data-infill="{infill}" data-skirt="{skirt}" data-raft="{raft}" data-support="{support}">{name}</option>
-					{/preset_list}
-						<option value="_GOTO_PRESET_LIST_">{goto_preset}</option>
-					</select>
-					<!-- usage: $("option#p" + $("select#preset_menu").val()).attr("data-xxx"), or use /sliceupload/preset_prm_ajax?id=[PRESET_ID_HERE] to get json info -->
+			<div id="preview_zone" style="clear: both; text-align: center;">
+				<div id="control_general_group" style="display: none;">
+					<button id="preview_near_button" data-inline="true" data-icon="plus" data-iconpos="left" onclick="javascript: getPreviewNear();" class="ui-btn-hidden" data-disabled="false">{near_button}</button>
+					<button id="preview_far_button" data-inline="true" data-icon="minus" data-iconpos="left" onclick="javascript: getPreviewFar();" class="ui-btn-hidden" data-disabled="false">{far_button}</button>
+				</div>
+				<div id="preview_image_zone">{wait_preview}</div>
+			</div>
+			<div id="detail_zone" style="clear: both; text-align: center; display: none;">
+				<div id="model_coordinate_info">
+					X = <span id="model_xsize_info">{model_xsize}</span>mm x 
+					Y = <span id="model_ysize_info">{model_ysize}</span>mm x 
+					Z = <span id="model_zsize_info">{model_zsize}</span>mm
+				</div>
+				<div id="control_modify_group">
+					<div data-role="collapsible" data-collapsed="true">
+						<h4>{scale_title}</h4>
+						<input type="range" name="slicer_size" id="slicer_size" value="{model_scale}" min="1" max="{model_smax}" />
+						<input type="button" class="slicer_set_model_button" value="{set_model_button}">
+						<input type="button" class="slicer_reset_model_button" value="{reset_model_button}">
+					</div>
+					<div data-role="collapsible" data-collapsed="true">
+						<h4>{rotate_title}</h4>
+						<label for="slicer_rotate_x">{rotate_x_title}</label>
+						<input type="range" name="slicer_rotate_x" id="slicer_rotate_x" value="{model_xrot}" min="-180" max="180" />
+						<label for="slicer_rotate_y">{rotate_y_title}</label>
+						<input type="range" name="slicer_rotate_y" id="slicer_rotate_y" value="{model_yrot}" min="-180" max="180" />
+						<label for="slicer_rotate_z">{rotate_z_title}</label>
+						<input type="range" name="slicer_rotate_z" id="slicer_rotate_z" value="{model_zrot}" min="-180" max="180" />
+						<input type="button" class="slicer_set_model_button" value="{set_model_button}">
+						<input type="button" class="slicer_reset_model_button" value="{reset_model_button}">
+					</div>
+				</div>
+				<div data-role="collapsible" data-collapsed="false">
+					<h4>{preset_title}</h4> <!-- <label for="preset_menu"></label> -->
+					<div data-role="fieldcontain">
+						<select name="preset_menu" id="preset_menu" onchange="javascript: syncParameter();">
+						{preset_list}
+							<option id="p{id}" value="{id}" data-infill="{infill}" data-skirt="{skirt}" data-raft="{raft}" data-support="{support}">{name}</option>
+						{/preset_list}
+							<option value="_GOTO_PRESET_LIST_">{goto_preset}</option>
+						</select>
+						<p style="text-align: justify; margin: 0;">{select_hint}</p>
+						<!-- usage: $("option#p" + $("select#preset_menu").val()).attr("data-xxx"), or use /sliceupload/preset_prm_ajax?id=[PRESET_ID_HERE] to get json info -->
+					</div>
 				</div>
 				<a href="#" id="slice_button" class="ui-disabled" data-role="button" onclick="javascript: startSlice();">{slice_button}</a>
 			</div>
@@ -49,16 +77,6 @@ var var_model_scale = {model_scale};
 var var_model_zrot = {model_zrot};
 var var_model_xrot = {model_xrot};
 var var_model_yrot = {model_yrot};
-var var_step_scale = 10;
-var var_interval_zrot = 30;
-var var_interval_xrot = 30;
-var var_interval_yrot = 30;
-var var_interval_rho = 100;
-
-var var_model_reset_scale = {model_scale};
-var var_model_reset_zrot = {model_zrot};
-var var_model_reset_xrot = {model_xrot};
-var var_model_reset_yrot = {model_yrot};
 
 var var_wait_preview = false;
 
@@ -77,6 +95,12 @@ function prepareDisplay() {
 				}
 			}
 		});
+		$("input.slicer_set_model_button").click(function() {
+			changeModel();
+		});
+		$("input.slicer_reset_model_button").click(function() {
+			resetModel();
+		});
 	}
 	else if (var_stage == "wait_print") {
 		// try to get sliced info
@@ -92,7 +116,7 @@ function prepareDisplay() {
 	return;
 }
 
-function getPreview(var_control) {
+function getPreview() {
 	if (var_slice_status_lock == true) {
 		return;
 	}
@@ -113,15 +137,13 @@ function getPreview(var_control) {
 // 			inverse: var_color_inverse,
 			color_right: var_color_right,
 			color_left: var_color_left,
-			},
+		},
 		cache: false,
-		beforeSend: function()
-		{
+		beforeSend: function() {
 			$("#overlay").addClass("gray-overlay");
 			$(".ui-loader").css("display", "block");
 		},
-		complete: function()
-		{	
+		complete: function() {	
 			$("#overlay").removeClass("gray-overlay");
 			$(".ui-loader").css("display", "none");
 			var_wait_preview = false;
@@ -137,66 +159,10 @@ function getPreview(var_control) {
 			return;
 		}
 		
-		// html => link to image
-		var var_html = '<div id="control_general_group">'
-			+ '<button id="preview_near_button" data-inline="true" data-icon="plus" data-iconpos="left"'
-			+ ' onclick="javascript: getPreviewNear(' + var_control + ');" class="ui-btn-hidden" data-disabled="false">{near_button}</button>'
-			+ '<button id="preview_far_button" data-inline="true" data-icon="minus" data-iconpos="left"'
-			+ ' onclick="javascript: getPreviewFar(' + var_control + ');" class="ui-btn-hidden" data-disabled="false">{far_button}</button>'
-			+ '</div>';
-		var_html = var_html + '<img src="' + html + '" style="max-width: 100%;"><br>';
-		if (var_control == true) {
-			var_html = var_html + '<div>'
-				+ '<button id="model_big_button" data-inline="true" data-icon="plus" data-iconpos="left"'
-				+ ' onclick="javascript: changeModel(\'s+\');" class="ui-btn-hidden" data-disabled="false">{big_button}</button>'
-				+ '<button id="model_small_button" data-inline="true" data-icon="minus" data-iconpos="left"'
-				+ ' onclick="javascript: changeModel(\'s-\');" class="ui-btn-hidden" data-disabled="false">{small_button}</button>'
-				
-			+ '</div>'
-			+ '<div class="ui-grid-b" id="control_grid">'
-			+ '<div class="ui-block-a"><div class="ui-bar ui-bar-f" id="xrot_grid">'
-				+ '<button id="model_xrotminus_button" data-inline="true" data-icon="minus" data-iconpos="notext"'
-				+ ' onclick="javascript: changeModel(\'xrot-\');" class="ui-btn-hidden" data-disabled="false">xrot add</button>'
-				+ '<br><br>X<br><br>'
-				+ '<button id="model_xrotadd_button" data-inline="true" data-icon="plus" data-iconpos="notext"'
-				+ ' onclick="javascript: changeModel(\'xrot+\');" class="ui-btn-hidden" data-disabled="false">xrot minus</button>'
-			+ '</div></div>'
-			+ '<div class="ui-block-b"><div class="ui-bar ui-bar-f" id="yrot_grid">'
-				+ '<button id="model_yrotminus_button" data-inline="true" data-icon="minus" data-iconpos="notext"'
-				+ ' onclick="javascript: changeModel(\'yrot-\');" class="ui-btn-hidden" data-disabled="false">yrot add</button>'
-				+ '<br><br>Y<br><br>'
-				+ '<button id="model_yrotadd_button" data-inline="true" data-icon="plus" data-iconpos="notext"'
-				+ ' onclick="javascript: changeModel(\'yrot+\');" class="ui-btn-hidden" data-disabled="false">yrot minus</button>'
-			+ '</div></div>'
-			+ '<div class="ui-block-c"><div class="ui-bar ui-bar-f" id="zrot_grid">'
-				+ '<button id="model_zrotminus_button" data-inline="true" data-icon="minus" data-iconpos="notext"'
-				+ ' onclick="javascript: changeModel(\'zrot-\');" class="ui-btn-hidden" data-disabled="false">zrot add</button>'
-				+ '<br><br>Z<br><br>'
-				+ '<button id="model_zrotadd_button" data-inline="true" data-icon="plus" data-iconpos="notext"'
-				+ ' onclick="javascript: changeModel(\'zrot+\');" class="ui-btn-hidden" data-disabled="false">zrot minus</button>'
-			+ '</div></div>'
-			+ '</div>';
-		}
-		$("#preview_zone").html(var_html);
+		$("#preview_image_zone").html('<img src="' + html + '" style="max-width: 100%;">');
+		$("div#control_general_group").show();
+		$("div#detail_zone").show();
 		$("a#slice_button").removeClass("ui-disabled");
-
-		$("#preview_zone").trigger("create");
-// 		$('div#preview_near_button').button().button('refresh');
-// 		$('div#preview_far_button').button().button('refresh');
-// 		if (var_control == true) {
-// 			$('div#model_small_button').button().button('refresh');
-// 			$('div#model_big_button').button().button('refresh');
-// 			$('div#model_xrotminus_button').button().button('refresh');
-// 			$('div#model_xrotadd_button').button().button('refresh');
-// 			$('div#model_yrotminus_button').button().button('refresh');
-// 			$('div#model_yrotadd_button').button().button('refresh');
-// 			$('div#model_zrotminus_button').button().button('refresh');
-// 			$('div#model_zrotadd_button').button().button('refresh');
-			
-// // 			$('<div>').appendTo('#cartridge_detail_info')
-// // 			.attr({'id': 'prime_button', 'onclick': 'javascript: window.location.href="/printdetail/printprime?v={abb_cartridge}";'})
-// // 			.html('{prime_button}').button().button('refresh');
-// 		}
 	})
 	.fail(function() { // not allowed
 		alert("failed preview");
@@ -205,92 +171,47 @@ function getPreview(var_control) {
 	.always(function() {
 		var_slice_status_lock = false;
 	});
-
+	
 	return;
 }
 
-function getPreviewNear(var_control) {
-	var_control = typeof var_control !== 'undefined' ? var_control : true;
+function getPreviewNear() {
 	var_current_rho = var_current_rho - var_interval_rho;
 	if (var_current_rho < 0) {
 		var_current_rho = 0;
 	}
-	getPreview(var_control);
-
+	getPreview();
+	
 	return;
 }
 
-function getPreviewFar(var_control) {
-	var_control = typeof var_control !== 'undefined' ? var_control : true;
+function getPreviewFar() {
 	var_current_rho = var_current_rho + var_interval_rho;
 	if (var_current_rho > 5000) {
 		var_current_rho = 5000;
 	}
-	getPreview(var_control);
-
+	getPreview();
+	
 	return;
 }
 
-function changeModel(var_action) {
+function changeModel() {
 	var var_model_id = 0;
-// 	var var_ajax_data = {};
-	
-	var_action = typeof var_action !== 'undefined' ? var_action : 'error';
 	
 	if (var_slice_status_lock == true) {
+		return;
+	}
+	else if ($("input#slicer_size").val() == var_model_scale
+			&& $("input#slicer_rotate_x").val() == var_model_xrot
+			&& $("input#slicer_rotate_y").val() == var_model_yrot
+			&& $("input#slicer_rotate_z").val() == var_model_zrot) {
+		// no change
+		console.log("set model without any changes");
 		return;
 	}
 	else {
 		var_slice_status_lock = true;
 	}
-	
-	switch (var_action) {
-		case 'zrot+':
-			var_model_zrot += var_interval_zrot;
-// 			var_ajax_data['zrot'] = var_model_zrot;
-			break;
-			
-		case 'zrot-':
-			var_model_zrot -= var_interval_zrot;
-// 			var_ajax_data['zrot'] = var_model_zrot;
-			break;
-			
-		case 'xrot+':
-			var_model_xrot += var_interval_xrot;
-// 			var_ajax_data['xrot'] = var_model_xrot;
-			break;
-			
-		case 'xrot-':
-			var_model_xrot -= var_interval_xrot;
-// 			var_ajax_data['xrot'] = var_model_xrot;
-			break;
-			
-		case 'yrot+':
-			var_model_yrot += var_interval_yrot;
-// 			var_ajax_data['yrot'] = var_model_yrot;
-			break;
-			
-		case 'yrot-':
-			var_model_yrot -= var_interval_yrot;
-// 			var_ajax_data['yrot'] = var_model_yrot;
-			break;
-			
-		case 's+':
-			var_model_scale += var_step_scale;
-// 			var_ajax_data['s'] = var_model_scale;
-			break;
-			
-		case 's-':
-			if (var_model_scale > var_step_scale)
-				var_model_scale -= var_step_scale;
-// 			var_ajax_data['s'] = var_model_scale;
-			break;
-			
-		case 'error':
-		default:
-			return; 
-	}
-// 	var_ajax_data['id'] = var_model_id;
 	
 	var_model_change = $.ajax({
 		url: "/sliceupload/preview_change_ajax",
@@ -298,72 +219,157 @@ function changeModel(var_action) {
 		cache: false,
 		data: {
 			id:		var_model_id,
-			s:		var_model_scale,
-			xrot:	var_model_xrot,
-			yrot:	var_model_yrot,
-			zrot:	var_model_zrot,
+			s:		$("input#slicer_size").val(),
+			xrot:	$("input#slicer_rotate_x").val(),
+			yrot:	$("input#slicer_rotate_y").val(),
+			zrot:	$("input#slicer_rotate_z").val(),
 		},
-		beforeSend: function()
-		{
+		beforeSend: function() {
 			$("#overlay").addClass("gray-overlay");
 			$(".ui-loader").css("display", "block");
 		},
-		complete: function()
-		{	
+		complete: function() {	
 			if (var_wait_preview == false) {
 				$("#overlay").removeClass("gray-overlay");
 				$(".ui-loader").css("display", "none");
 			}
 		},
 	})
-	.done(function(html) {
+	.done(function(data) {
 		var_slice_status_lock = false;
 		var_wait_preview = true;
+		var_model_scale = parseInt($("input#slicer_size").val());
+		var_model_xrot = parseInt($("input#slicer_rotate_x").val());
+		var_model_yrot = parseInt($("input#slicer_rotate_y").val());
+		var_model_zrot = parseInt($("input#slicer_rotate_z").val());
+		
 		getPreview();
+		
+		try {
+			var response = JSON.parse(data);
+			
+			if (typeof response.{model_key_smax} == 'undefined'
+					|| typeof response.{model_key_xsize} == 'undefined'
+					|| typeof response.{model_key_ysize} == 'undefined'
+					|| typeof response.{model_key_zsize} == 'undefined') {
+				throw 'response json does not contain max scale or size info';
+			}
+			else {
+				var value_toChange = Math.floor(response.{model_key_smax});
+				$("span#model_xsize_info").html(response.{model_key_xsize}.toFixed(2));
+				$("span#model_ysize_info").html(response.{model_key_ysize}.toFixed(2));
+				$("span#model_zsize_info").html(response.{model_key_zsize}.toFixed(2));
+				$("input#slicer_size").attr("max", value_toChange);
+				console.log("change model max scale: " + value_toChange);
+			}
+		}
+		catch (err) {
+			console.log("set model return json data treatment trigger error: " + err);
+		}
 	})
 	.fail(function() { // not allowed
 		alert("{setmodel_fail}");
 		
 		// reverse the original state
-		switch (var_action) {
-			case 'zrot+':
-				var_model_zrot -= var_interval_zrot;
-				break;
-				
-			case 'zrot-':
-				var_model_zrot += var_interval_zrot;
-				break;
-				
-			case 'xrot+':
-				var_model_xrot -= var_interval_xrot;
-				break;
-				
-			case 'xrot-':
-				var_model_xrot += var_interval_xrot;
-				break;
-				
-			case 'yrot+':
-				var_model_yrot -= var_interval_yrot;
-				break;
-				
-			case 'yrot-':
-				var_model_yrot += var_interval_yrot;
-				break;
-				
-			case 's+':
-				var_model_scale -= var_step_scale;
-				break;
-				
-			case 's-':
-				var_model_scale += var_step_scale;
-				break;
-				
-			case 'error':
-			default:
-				return; 
-		}
+		$("input#slicer_size").val(var_model_scale);
+		$("input#slicer_rotate_x").val(var_model_xrot);
+		$("input#slicer_rotate_y").val(var_model_yrot);
+		$("input#slicer_rotate_z").val(var_model_zrot);
+		$("input#slicer_rotate_x").slider("refresh");
+		$("input#slicer_rotate_y").slider("refresh");
+		$("input#slicer_rotate_z").slider("refresh");
+		$("input#slicer_size").slider("refresh");
 	})
 	.always(function() {
+		var_slice_status_lock = false;
+	});
+	
+	return;
+}
+
+function resetModel() {
+	var var_model_id = 0;
+	
+	if (var_slice_status_lock == true) {
+		return;
+	}
+	else if ((var_model_scale == 100 || (var_model_scale < 100 && var_model_scale == {model_smax}))
+			&& $("input#slicer_rotate_x").val() == 0
+			&& $("input#slicer_rotate_y").val() == 0
+			&& $("input#slicer_rotate_z").val() == 0) {
+		// no change
+		console.log("reset model without any changes");
+		return;
+	}
+	else {
+		var_slice_status_lock = true;
+	}
+	
+	var_model_change = $.ajax({
+		url: "/sliceupload/preview_reset_ajax",
+		type: "GET",
+		cache: false,
+		data: {
+			id:		var_model_id,
+		},
+		beforeSend: function() {
+			$("#overlay").addClass("gray-overlay");
+			$(".ui-loader").css("display", "block");
+		},
+		complete: function() {	
+			if (var_wait_preview == false) {
+				$("#overlay").removeClass("gray-overlay");
+				$(".ui-loader").css("display", "none");
+			}
+		},
+	})
+	.done(function(data) {
+		var value_smax = 100;
+		
+		try {
+			var response = JSON.parse(data);
+			
+			if (typeof response.{model_key_smax} == 'undefined'
+					|| typeof response.{model_key_xsize} == 'undefined'
+					|| typeof response.{model_key_ysize} == 'undefined'
+					|| typeof response.{model_key_zsize} == 'undefined') {
+				throw 'response json does not contain max scale or size info';
+			}
+			else {
+				$("span#model_xsize_info").html(response.{model_key_xsize}.toFixed(2));
+				$("span#model_ysize_info").html(response.{model_key_ysize}.toFixed(2));
+				$("span#model_zsize_info").html(response.{model_key_zsize}.toFixed(2));
+				value_smax = Math.floor(response.{model_key_smax});
+				$("input#slicer_size").attr("max", value_smax);
+				console.log("change model max scale: " + value_smax);
+			}
+		}
+		catch (err) {
+			console.log("set model return json data treatment trigger error: " + err);
+		}
+		
+		var_slice_status_lock = false;
+		var_wait_preview = true;
+		var_model_scale = (value_smax >= 100) ? 100 : value_smax;
+		var_model_xrot = 0;
+		var_model_yrot = 0;
+		var_model_zrot = 0;
+		
+		getPreview();
+	})
+	.fail(function() { // not allowed
+		alert("{setmodel_fail}");
+	})
+	.always(function() {
+		$("input#slicer_rotate_x").val(var_model_xrot);
+		$("input#slicer_rotate_y").val(var_model_yrot);
+		$("input#slicer_rotate_z").val(var_model_zrot);
+		$("input#slicer_size").val(var_model_scale);
+		$("input#slicer_rotate_x").slider("refresh");
+		$("input#slicer_rotate_y").slider("refresh");
+		$("input#slicer_rotate_z").slider("refresh");
+		$("input#slicer_size").slider("refresh");
+		
 		var_slice_status_lock = false;
 	});
 	
@@ -377,8 +383,7 @@ function startSlice(var_restart) {
 	else {
 		var_slice_status_lock = true;
 	}
-
-
+	
 	var_restart = typeof var_restart !== 'undefined' ? var_restart : false;
 	var var_id_preset = (var_restart == true) ? 'previous' : $("select#preset_menu").val();
 	
@@ -460,18 +465,17 @@ function getSlice() {
 			callback: 1,
 		},
 		cache: false,
-		beforeSend: function()
-		{
+		beforeSend: function() {
 			$("#overlay").addClass("gray-overlay");
 			$(".ui-loader").css("display", "block");
 		},
-		complete: function()
-		{	
+		complete: function() {
 			$("#overlay").removeClass("gray-overlay");
 			$(".ui-loader").css("display", "none");
 		},
 	})
 	.done(function(html) {
+		$("div#detail_zone").show();
 		if (var_slice_status.status == 202) { // finished checking, wait user to input
 			$("#detail_zone").html(html);
 		}

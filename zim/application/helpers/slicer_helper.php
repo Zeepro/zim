@@ -21,6 +21,7 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 	define('SLICER_URL_SETPARAMETER',	'setparameter?');
 	define('SLICER_URL_CHECKSIZES',		'checksizes');
 	define('SLICER_URL_EXPORTAMF',		'exportamf');
+	define('SLICER_URL_RESET_MODEL',	'resetmodel?id=');
 	
 	define('SLICER_PRM_ID',		'id');
 	define('SLICER_PRM_XPOS',	'xpos');
@@ -31,6 +32,7 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 	define('SLICER_PRM_ZROT',	'zrot');
 	define('SLICER_PRM_SCALE',	's');
 	define('SLICER_PRM_COLOR',	'c');
+// 	define('SLICER_PRM_S_MAX',	'smax');
 	define('SLICER_PRM_RHO',	'rho');
 	define('SLICER_PRM_THETA',	'theta');
 	define('SLICER_PRM_DELTA',	'delta');
@@ -41,7 +43,7 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 	define('SLICER_PRM_PRM',	'slicerparameter');
 	
 	define('SLICER_TITLE_COLOR',	'color');
-	define('SLICER_TITLE_MAXSCALE',	'scalemax');
+	define('SLICER_TITLE_MAXSCALE',	'smax');
 	define('SLICER_TITLE_MODELID',	'id');
 	define('SLICER_TITLE_XSIZE',	'xsize');
 	define('SLICER_TITLE_YSIZE',	'ysize');
@@ -485,7 +487,7 @@ function Slicer_checkPlatformColor(&$array_cartridge = array()) {
 	return $cr;
 }
 
-function Slicer_setModel($array_data) {
+function Slicer_setModel($array_data, &$response = NULL) {
 	$cr = 0;
 	$ret_val = 0;
 	$CI = &get_instance();
@@ -523,7 +525,7 @@ function Slicer_setModel($array_data) {
 		}
 	}
 	
-	$ret_val = Slicer__requestSlicer($url_request, FALSE);
+	$ret_val = Slicer__requestSlicer($url_request, FALSE, $response);
 	
 	switch ($ret_val) {
 		case SLICER_RESPONSE_OK:
@@ -538,8 +540,59 @@ function Slicer_setModel($array_data) {
 			break;
 	}
 	
+	if ($cr == ERROR_OK) {
+		$response_array = json_decode($response, TRUE);
+		
+		if (is_null($response_array)) {
+			$CI->load->helper('printerlog');
+			PrinterLog_logMessage('slicer set model success call returns invalid json: ' . $response);
+			$response = NULL;
+			// do not change return code since it's not a fatel error
+		}
+	}
+	else {
+		$response = NULL;
+	}
+	
 	@unlink($CI->config->item('temp') . SLICER_FILE_MODEL);
 	@unlink($CI->config->item('temp') . SLICER_FILE_TEMP_DATA);
+	
+	return $cr;
+}
+
+function Slicer_resetModel($id, &$response) {
+	$cr = 0;
+	$ret_val = 0;
+	
+	$ret_val = Slicer__requestSlicer(SLICER_URL_RESET_MODEL . $id, FALSE, $response);
+	
+	switch ($ret_val) {
+		case SLICER_RESPONSE_OK:
+		case SLICER_RESPONSE_WRONG_PRM:
+		case SLICER_RESPONSE_MISS_PRM:
+		case SLICER_RESPONSE_NO_MODEL:
+			$cr = $ret_val;
+			break;
+				
+		default:
+			$cr = ERROR_INTERNAL;
+			break;
+	}
+	
+	if ($cr == ERROR_OK) {
+		$response_array = json_decode($response, TRUE);
+		//TODO finish me
+		if (is_null($response_array)) {
+			$CI->load->helper('printerlog');
+			PrinterLog_logMessage('slicer reset model success call returns invalid json: ' . $response);
+			
+			$cr = ERROR_INTERNAL;
+			$response = NULL;
+		}
+	}
+	else {
+		$response = NULL;
+	}
 	
 	return $cr;
 }

@@ -51,9 +51,9 @@ class Sliceupload extends MY_Controller {
 		$button_goto_slice = NULL;
 		
 		$this->load->library('parser');
+		$this->load->helper('slicer');
 		$this->lang->load('sliceupload/upload', $this->config->item('language'));
-		if ($_SERVER['REQUEST_METHOD'] == 'POST')
-		{
+		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$array_model = array();
 			$upload_config = array (
 					'upload_path'	=> $this->config->item('temp'),
@@ -104,6 +104,7 @@ class Sliceupload extends MY_Controller {
 						'model_name'	=> json_encode($array_model),
 						'fail_message'	=> t('fail_message'),
 						'fin_message'	=> t('fin_message'),
+						'key_smax'		=> SLICER_TITLE_MAXSCALE,
 				);
 				$body_page = $this->parser->parse('template/sliceupload/upload_wait', $template_data, TRUE);
 				
@@ -119,7 +120,6 @@ class Sliceupload extends MY_Controller {
 			}
 		}
 		
-		$this->load->helper('slicer');
 		if (0 == strlen(@file_get_contents($this->config->item('temp') . SLICER_FILE_HTTP_PORT))
 				&& FALSE == $this->config->item('simulator')) {
 			$this->output->set_header('Location: /sliceupload/restart?inboot=1');
@@ -181,6 +181,10 @@ class Sliceupload extends MY_Controller {
 		$current_xrot = 0;
 		$current_yrot = 0;
 		$current_zrot = 0;
+		$current_scale_max = 100;
+		$current_xsize = 0;
+		$current_ysize = 0;
+		$current_zsize = 0;
 		
 		// redirect the client when in slicing
 		$this->load->helper('corestatus');
@@ -191,7 +195,7 @@ class Sliceupload extends MY_Controller {
 			return;
 		}
 		
-		$this->load->helper(array('zimapi', 'printerstate'));
+		$this->load->helper(array('zimapi', 'printerstate', 'slicer'));
 		
 		if ($this->input->get('callback') !== FALSE) {
 			$current_stage = 'wait_print';
@@ -217,7 +221,7 @@ class Sliceupload extends MY_Controller {
 				$tmp_string = NULL;
 				$tmp_array = NULL;
 				
-				$this->load->helper('slicer');
+// 				$this->load->helper('slicer');
 				$ret_val = Slicer_listModel($tmp_string);
 				$tmp_array = json_decode($tmp_string, TRUE);
 				
@@ -226,6 +230,10 @@ class Sliceupload extends MY_Controller {
 					$current_xrot = $tmp_array[0][SLICER_PRM_XROT];
 					$current_yrot = $tmp_array[0][SLICER_PRM_YROT];
 					$current_zrot = $tmp_array[0][SLICER_PRM_ZROT];
+					$current_xsize = number_format($tmp_array[0][SLICER_TITLE_XSIZE], 2);
+					$current_ysize = number_format($tmp_array[0][SLICER_TITLE_YSIZE], 2);
+					$current_zsize = number_format($tmp_array[0][SLICER_TITLE_ZSIZE], 2);
+					$current_scale_max = floor($tmp_array[0][SLICER_TITLE_MAXSCALE]);
 				}
 			} catch (Exeception $e) {
 				$this->load->helper('printerlog');
@@ -238,31 +246,45 @@ class Sliceupload extends MY_Controller {
 		
 		// parse the main body
 		$template_data = array(
- 				'home'			=> t('home'),
-				'back'			=> t('back'),
-				'select_hint'	=> t('select_hint'),
-				'slice_button'	=> t('slice_button'),
-				'goto_preset'	=> t('goto_preset'),
-				'value_rho'		=> ZIMAPI_VALUE_DEFAULT_RHO,
-				'value_delta'	=> ZIMAPI_VALUE_DEFAULT_DELTA,
-				'value_theta'	=> ZIMAPI_VALUE_DEFAULT_THETA,
-				'preset_list'	=> $list_display,
-				'current_stage'	=> $current_stage,
-				'goto_hint'		=> t('goto_hint'),
-				'wait_preview'	=> t('wait_preview'),
-				'wait_slice'	=> t('wait_slice'),
-				'wait_in_slice'	=> t('wait_in_slice'),
-				'near_button'	=> t('near_button'),
-				'far_button'	=> t('far_button'),
-				'small_button'	=> t('small_button'),
-				'big_button'	=> t('big_button'),
-				'color_default'	=> PRINTERSTATE_VALUE_DEFAULT_COLOR,
-				'model_scale'	=> $current_scale,
-				'model_xrot'	=> $current_xrot,
-				'model_yrot'	=> $current_yrot,
-				'model_zrot'	=> $current_zrot,
-				'preview_fail'	=> t('preview_fail'),
-				'setmodel_fail'	=> t('setmodel_fail'),
+ 				'home'					=> t('home'),
+				'back'					=> t('back'),
+				'slice_button'			=> t('slice_button'),
+				'goto_preset'			=> t('goto_preset'),
+				'value_rho'				=> ZIMAPI_VALUE_DEFAULT_RHO,
+				'value_delta'			=> ZIMAPI_VALUE_DEFAULT_DELTA,
+				'value_theta'			=> ZIMAPI_VALUE_DEFAULT_THETA,
+				'preset_list'			=> $list_display,
+				'current_stage'			=> $current_stage,
+				'goto_hint'				=> t('goto_hint'),
+				'wait_preview'			=> t('wait_preview'),
+				'wait_slice'			=> t('wait_slice'),
+				'wait_in_slice'			=> t('wait_in_slice'),
+				'near_button'			=> t('near_button'),
+				'far_button'			=> t('far_button'),
+				'color_default'			=> PRINTERSTATE_VALUE_DEFAULT_COLOR,
+				'preview_fail'			=> t('preview_fail'),
+				'setmodel_fail'			=> t('setmodel_fail'),
+				'scale_title'			=> t('scale_title'),
+				'rotate_title'			=> t('rotate_title'),
+				'preset_title'			=> t('preset_title'),
+				'select_hint'			=> t('select_hint'),
+				'rotate_x_title'		=> t('rotate_x_title'),
+				'rotate_y_title'		=> t('rotate_y_title'),
+				'rotate_z_title'		=> t('rotate_z_title'),
+				'set_model_button'		=> t('set_model_button'),
+				'reset_model_button'	=> t('reset_model_button'),
+				'model_key_smax'		=> SLICER_TITLE_MAXSCALE,
+				'model_key_xsize'		=> SLICER_TITLE_XSIZE,
+				'model_key_ysize'		=> SLICER_TITLE_YSIZE,
+				'model_key_zsize'		=> SLICER_TITLE_ZSIZE,
+				'model_scale'			=> $current_scale,
+				'model_xrot'			=> $current_xrot,
+				'model_yrot'			=> $current_yrot,
+				'model_zrot'			=> $current_zrot,
+				'model_xsize'			=> $current_xsize,
+				'model_ysize'			=> $current_ysize,
+				'model_zsize'			=> $current_zsize,
+				'model_smax'			=> $current_scale_max,
 		);
 		$body_page = $this->parser->parse('template/sliceupload/slice', $template_data, TRUE);
 		
@@ -371,14 +393,13 @@ class Sliceupload extends MY_Controller {
 			$zsize = (float) $this->input->get('z');
 			$scalemax = (float) $this->input->get('ms');
 		}
-
+		
 		$scalemax = floor($scalemax);
 		// simple check of passing value
 		if ($xsize * $ysize * $zsize * $scalemax == 0) {
 			$this->output->set_header('Location: /sliceupload/upload');
 			return;
 		}
-		
 		
 		$this->load->library('parser');
 		$this->lang->load('sliceupload/upload', $this->config->item('language'));
@@ -946,11 +967,40 @@ class Sliceupload extends MY_Controller {
 				SLICER_PRM_COLOR	=> $this->input->get('c'),
 		);
 		
-		$cr = Slicer_setModel($array_data);
+		$cr = Slicer_setModel($array_data, $display);
 		
-		$display = $cr . " " . t(MyERRMSG($cr));
-		$this->output->set_status_header($cr, $display);
-		// 		http_response_code($cr);
+		if ($cr != ERROR_OK) {
+			$display = $cr . " " . t(MyERRMSG($cr));
+			$this->output->set_status_header($cr, $display);
+		}
+		else {
+			$this->output->set_status_header($cr);
+		}
+// 		http_response_code($cr);
+		$this->output->set_content_type('txt_u');
+		$this->load->library('parser');
+		$this->parser->parse('template/plaintxt', array('display' => $display)); //optional
+		
+		return;
+	}
+	
+	function preview_reset_ajax() {
+		$cr = 0;
+		$display = NULL;
+		$mid = $this->input->get('id');
+		
+		$this->load->helper('slicer');
+		
+		$cr = Slicer_resetModel($mid, $display);
+		
+		if ($cr != ERROR_OK) {
+			$display = $cr . " " . t(MyERRMSG($cr));
+			$this->output->set_status_header($cr, $display);
+		}
+		else {
+			$this->output->set_status_header($cr);
+		}
+// 		http_response_code($cr);
 		$this->output->set_content_type('txt_u');
 		$this->load->library('parser');
 		$this->parser->parse('template/plaintxt', array('display' => $display)); //optional

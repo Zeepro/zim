@@ -6,8 +6,6 @@ $lang['back']
 
 $lang['sliceupload_slice_pagetitle']
 	= 'Zim - Slicing de modèle';
-$lang['select_hint']
-	= 'Paramètres du slicer :';
 $lang['slice_button']
 	= 'Slicer';
 $lang['goto_preset']
@@ -26,10 +24,24 @@ $lang['near_button']
 	= 'Zoom avant';
 $lang['far_button']
 	= 'Zoom arrière';
-$lang['small_button']
-	= 'Réduire';
-$lang['big_button']
-	= 'Agrandir';
+$lang['scale_title']
+	= 'Taille';
+$lang['preset_title']
+	= 'Pré-sélection d\'impression';
+$lang['select_hint']
+	= '(Allez à PAGE DE PRESELECTION à créer autres pré-sélection)';
+$lang['rotate_title']
+	= 'Rotation';
+$lang['rotate_x_title']
+	= 'Axis X (°)';
+$lang['rotate_y_title']
+	= 'Axis Y (°)';
+$lang['rotate_z_title']
+	= 'Axis Z (°)';
+$lang['set_model_button']
+	= 'Configurer';
+$lang['reset_model_button']
+	= 'Remettre';
 $lang['cancel_button']
 	= 'Annuler';
 $lang['wait_cancel']

@@ -38,7 +38,7 @@ function add_model() {
 			var xsize = response.xsize;
 			var ysize = response.ysize;
 			var zsize = response.zsize;
-			var scalemax = response.scalemax;
+			var scalemax = response.{key_smax};
 			
 			window.location.href="/sliceupload/reducesize?id=" + mid + "&x="
 					+ xsize + "&y=" + ysize + "&z=" + zsize + "&ms=" + scalemax;
