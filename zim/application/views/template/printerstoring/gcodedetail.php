@@ -37,10 +37,10 @@
 							<p id="state_right">{state_f_r}</p>
 						</div>
 						<div class="ui-block-a" style="padding-left:0px">
-							<a href="/printerstate/changecartridge?v=l&f={need_filament_l}&id={model_id}" data-role="button" data-ajax="false" data-iconpos="none" class="ui-shadow ui-corner-all">{change_filament_l}</a>
+							<a href="/printerstate/changecartridge?v=l&f={need_filament_l}&id=gcode{id}" data-role="button" data-ajax="false" data-iconpos="none" class="ui-shadow ui-corner-all">{change_filament_l}</a>
 						</div>
 						<div class="ui-block-b">
-							<a href="/printerstate/changecartridge?v=r&f={need_filament_r}&id={model_id}" data-role="button" data-ajax="false" data-iconpos="none" class="ui-shadow ui-corner-all">{change_filament_r}</a>
+							<a href="/printerstate/changecartridge?v=r&f={need_filament_r}&id=gcode{id}" data-role="button" data-ajax="false" data-iconpos="none" class="ui-shadow ui-corner-all">{change_filament_r}</a>
 						</div>
 					</div>
 					<div class="ui-grid-a">
@@ -102,6 +102,14 @@ $("input[type=submit]").on('click', function()
 if ("{state_f_l}" == "{error}" || "{state_f_r}" == "{error}")
 {
 	$("#slider-" + ("{state_f_l}" == "{error}" ? "1" : "2")).attr("disabled", "disabled");
+}
+else {
+	if ({need_filament_l} <= 0) {
+		$("#slider-1").attr("disabled", "disabled");
+	}
+	if ({need_filament_r} <= 0) {
+		$("#slider-2").attr("disabled", "disabled");
+	}
 }
 
 // if ("{state_f_l}" != "ok" || "{state_f_r}" != "ok")

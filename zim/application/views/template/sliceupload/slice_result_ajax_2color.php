@@ -20,7 +20,7 @@
 						</div></div>
 					</div>
 					<p style="text-align: left;">{error_msg}</p>
-					<div class="ui-grid-a">
+					<div class="ui-grid-a" id="slicer_temperature_adjustment_container">
 						<div class="ui-block-a"><div id="left_cartridge" class="ui-bar ui-bar-f">
 						<label>{left_temperature}</label>
 						<div id="temper_l">

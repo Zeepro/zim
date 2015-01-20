@@ -153,6 +153,6 @@ $lang['storegcode_err_cfm']
 $lang['storegcode_title']
 	= 'Save print';
 $lang['storegcode_info']
-	= 'Save model and its print settings in My Models Library';
+	= 'Save this print in My Libraries';
 $lang['storegcode_name']
 	= 'Print name HERE';

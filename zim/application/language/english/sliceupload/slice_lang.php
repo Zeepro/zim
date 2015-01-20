@@ -27,17 +27,19 @@ $lang['far_button']
 $lang['preset_title']
 	= 'Print Preset';
 $lang['select_hint']
-	= '(Go to SETTINGS PRESETS to create other presets)';
+	= '(Go to SETTINGS AND SUPPORT to create other presets)';
+$lang['scale_rotate_title']
+	= 'Scale and rotate';
 $lang['scale_title']
-	= 'Scale';
+	= 'Scale (%%)';
 $lang['rotate_title']
-	= 'Rotate';
+	= 'Rotate (°)';
 $lang['rotate_x_title']
-	= 'X axis (°)';
+	= 'X axis';
 $lang['rotate_y_title']
-	= 'Y axis (°)';
+	= 'Y axis';
 $lang['rotate_z_title']
-	= 'Z axis (°)';
+	= 'Z axis';
 $lang['set_model_button']
 	= 'Set';
 $lang['reset_model_button']

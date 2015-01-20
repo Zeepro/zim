@@ -4,7 +4,7 @@ $lang['Home']
 $lang['Quick print']
 	= 'Models by Zeepro';
 $lang['Configuration']
-	= 'Configuration and support';
+	= 'Settings and support';
 $lang['ZeePro Personal Printer 21 - Home']
 	= 'Zim - Home';
 $lang['manage']

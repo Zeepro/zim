@@ -24,24 +24,26 @@ $lang['near_button']
 	= 'Zoom avant';
 $lang['far_button']
 	= 'Zoom arrière';
-$lang['scale_title']
-	= 'Taille';
 $lang['preset_title']
 	= 'Pré-sélection d\'impression';
 $lang['select_hint']
-	= '(Allez à PAGE DE PRESELECTION à créer autres pré-sélection)';
+	= '(Allez à CONFIGURATION ET SUPPORT à créer autres pré-sélection)';
+$lang['scale_rotate_title']
+	= 'Taille et rotation';
+$lang['scale_title']
+	= 'Taille (%%)';
 $lang['rotate_title']
-	= 'Rotation';
+	= 'Rotation (°)';
 $lang['rotate_x_title']
-	= 'Axis X (°)';
+	= 'Axis X';
 $lang['rotate_y_title']
-	= 'Axis Y (°)';
+	= 'Axis Y';
 $lang['rotate_z_title']
-	= 'Axis Z (°)';
+	= 'Axis Z';
 $lang['set_model_button']
-	= 'Configurer';
+	= 'Appliquer';
 $lang['reset_model_button']
-	= 'Remettre';
+	= 'Réinitialiser';
 $lang['cancel_button']
 	= 'Annuler';
 $lang['wait_cancel']

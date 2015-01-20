@@ -53,7 +53,7 @@
 					<h4>{storegcode_title}</h4>
 					<form>
 						<input type="checkbox" id="storegcode_checkbox">
-						<label for="storegcode_checkbox">{storegcode_checkbox}</label>
+						<label for="storegcode_checkbox" style="font-weight: normal;">{storegcode_checkbox}</label>
 						<input id="storegcode_name" type="text" data-clear-btn="true" placeholder="{storegcode_hint}">
 					</form>
 				</div>

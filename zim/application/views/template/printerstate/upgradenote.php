@@ -13,7 +13,7 @@
 			</p>
 			<div id="upgradenote_body">{note_body}</div>
 			<div id="go_reboot_part" style="display: none;">
-				<a href="/printerstate/upgradenote?ui&reboot" data-role="button">Mobile UI mode</a>
+<!-- 				<a href="/printerstate/upgradenote?ui&reboot" data-role="button">Mobile UI mode</a> -->
 				<a href="/manage/rebooting" data-role="button">{reboot_button}</a>
 <!-- 				<a href="#" data-role="button" data-icon="arrow-u" onclick='javascript: $("html, body").animate({ scrollTop: 0 });'>Top</a> -->
 			</div>

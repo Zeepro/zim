@@ -1,5 +1,5 @@
 <div data-role="page" data-url="/sliceupload/slice">
-<!-- 	<style> input[type=number] { display : none !important; } </style> -->
+	<style> div#slicer_temperature_adjustment_container input[type=number] { display : none !important; } </style>
 	<div id="overlay"></div>
 	<header data-role="header" class="page-header">
 		<a href="#" data-icon="back" data-ajax="false" style="visibility:hidden">{back}</a>
@@ -23,21 +23,21 @@
 				</div>
 				<div id="control_modify_group">
 					<div data-role="collapsible" data-collapsed="true">
-						<h4>{scale_title}</h4>
-						<input type="range" name="slicer_size" id="slicer_size" value="{model_scale}" min="1" max="{model_smax}" />
-						<input type="button" class="slicer_set_model_button" value="{set_model_button}">
-						<input type="button" class="slicer_reset_model_button" value="{reset_model_button}">
-					</div>
-					<div data-role="collapsible" data-collapsed="true">
-						<h4>{rotate_title}</h4>
-						<label for="slicer_rotate_x">{rotate_x_title}</label>
-						<input type="range" name="slicer_rotate_x" id="slicer_rotate_x" value="{model_xrot}" min="-180" max="180" />
-						<label for="slicer_rotate_y">{rotate_y_title}</label>
-						<input type="range" name="slicer_rotate_y" id="slicer_rotate_y" value="{model_yrot}" min="-180" max="180" />
-						<label for="slicer_rotate_z">{rotate_z_title}</label>
-						<input type="range" name="slicer_rotate_z" id="slicer_rotate_z" value="{model_zrot}" min="-180" max="180" />
-						<input type="button" class="slicer_set_model_button" value="{set_model_button}">
-						<input type="button" class="slicer_reset_model_button" value="{reset_model_button}">
+						<h4>{scale_rotate_title}</h4>
+						<ul data-role="listview" data-inset="true">
+							<li data-role="list-divider">{scale_title}</li> <!-- <label for="slicer_size"></label> -->
+							<li><input type="range" name="slicer_size" id="slicer_size" value="{model_scale}" min="1" max="{model_smax}" />
+							<input type="button" id="slicer_set_model_scale_button" value="{set_model_button}"></li>
+							<li data-role="list-divider">{rotate_title}</li>
+							<li><label for="slicer_rotate_x">{rotate_x_title}</label>
+							<input type="range" name="slicer_rotate_x" id="slicer_rotate_x" value="{model_xrot}" min="-180" max="180" />
+							<label for="slicer_rotate_y">{rotate_y_title}</label>
+							<input type="range" name="slicer_rotate_y" id="slicer_rotate_y" value="{model_yrot}" min="-180" max="180" />
+							<label for="slicer_rotate_z">{rotate_z_title}</label>
+							<input type="range" name="slicer_rotate_z" id="slicer_rotate_z" value="{model_zrot}" min="-180" max="180" />
+							<input type="button" id="slicer_set_model_rotate_button" value="{set_model_button}"></li>
+							<li><input type="button" id="slicer_reset_model_button" value="{reset_model_button}"></li>
+						</ul>
 					</div>
 				</div>
 				<div data-role="collapsible" data-collapsed="false">
@@ -69,6 +69,7 @@ var var_model_change;
 var var_current_rho = {value_rho};
 var var_current_delta = {value_delta};
 var var_current_theta = {value_theta};
+var var_interval_rho = 100;
 // var var_color_inverse = 0;
 var var_color_right = '{color_default}';
 var var_color_left = '{color_default}';
@@ -95,10 +96,13 @@ function prepareDisplay() {
 				}
 			}
 		});
-		$("input.slicer_set_model_button").click(function() {
-			changeModel();
+		$("input#slicer_set_model_scale_button").click(function() {
+			changeModel('scale');
 		});
-		$("input.slicer_reset_model_button").click(function() {
+		$("input#slicer_set_model_rotate_button").click(function() {
+			changeModel('rotate');
+		});
+		$("input#slicer_reset_model_button").click(function() {
 			resetModel();
 		});
 	}
@@ -112,7 +116,7 @@ function prepareDisplay() {
 		// treat error
 		alert("unable to reach here");
 	}
-
+	
 	return;
 }
 
@@ -195,35 +199,54 @@ function getPreviewFar() {
 	return;
 }
 
-function changeModel() {
+function changeModel(changeType) {
 	var var_model_id = 0;
+	var var_ajax_data = {id: var_model_id};
 	
-	if (var_slice_status_lock == true) {
+	if (typeof changeType == 'undefined' || var_slice_status_lock == true) {
 		return;
 	}
-	else if ($("input#slicer_size").val() == var_model_scale
-			&& $("input#slicer_rotate_x").val() == var_model_xrot
-			&& $("input#slicer_rotate_y").val() == var_model_yrot
-			&& $("input#slicer_rotate_z").val() == var_model_zrot) {
-		// no change
-		console.log("set model without any changes");
+	
+	switch (changeType) {
+	case 'scale':
+		if ($("input#slicer_size").val() == var_model_scale) {
+			// no change
+			console.log("set model without any changes");
+			return;
+		}
+		else {
+			var_ajax_data.s = $("input#slicer_size").val();
+		}
+		break;
+		
+	case 'rotate':
+		if ($("input#slicer_rotate_x").val() == var_model_xrot
+				&& $("input#slicer_rotate_y").val() == var_model_yrot
+				&& $("input#slicer_rotate_z").val() == var_model_zrot) {
+			// no change
+			console.log("set model without any changes");
+			return;
+		}
+		else {
+			var_ajax_data.xrot = $("input#slicer_rotate_x").val();
+			var_ajax_data.yrot = $("input#slicer_rotate_y").val();
+			var_ajax_data.zrot = $("input#slicer_rotate_z").val();
+		}
+		break;
+		
+	default:
+		console.log("unknown changeType");
 		return;
+		break;
 	}
-	else {
-		var_slice_status_lock = true;
-	}
+	
+	var_slice_status_lock = true;
 	
 	var_model_change = $.ajax({
 		url: "/sliceupload/preview_change_ajax",
 		type: "GET",
 		cache: false,
-		data: {
-			id:		var_model_id,
-			s:		$("input#slicer_size").val(),
-			xrot:	$("input#slicer_rotate_x").val(),
-			yrot:	$("input#slicer_rotate_y").val(),
-			zrot:	$("input#slicer_rotate_z").val(),
-		},
+		data: var_ajax_data,
 		beforeSend: function() {
 			$("#overlay").addClass("gray-overlay");
 			$(".ui-loader").css("display", "block");
@@ -238,10 +261,14 @@ function changeModel() {
 	.done(function(data) {
 		var_slice_status_lock = false;
 		var_wait_preview = true;
-		var_model_scale = parseInt($("input#slicer_size").val());
-		var_model_xrot = parseInt($("input#slicer_rotate_x").val());
-		var_model_yrot = parseInt($("input#slicer_rotate_y").val());
-		var_model_zrot = parseInt($("input#slicer_rotate_z").val());
+		if (changeType == 'scale') {
+			var_model_scale = parseInt($("input#slicer_size").val());
+		}
+		else { // changeType == 'rotate'
+			var_model_xrot = parseInt($("input#slicer_rotate_x").val());
+			var_model_yrot = parseInt($("input#slicer_rotate_y").val());
+			var_model_zrot = parseInt($("input#slicer_rotate_z").val());
+		}
 		
 		getPreview();
 		
@@ -256,11 +283,17 @@ function changeModel() {
 			}
 			else {
 				var value_toChange = Math.floor(response.{model_key_smax});
+				
 				$("span#model_xsize_info").html(response.{model_key_xsize}.toFixed(2));
 				$("span#model_ysize_info").html(response.{model_key_ysize}.toFixed(2));
 				$("span#model_zsize_info").html(response.{model_key_zsize}.toFixed(2));
+				
 				$("input#slicer_size").attr("max", value_toChange);
 				console.log("change model max scale: " + value_toChange);
+				if (var_model_scale > value_toChange) { // check max size with current value (normally it's impossible)
+					var_model_scale = value_toChange;
+					// assign and refresh is already in ajax always function
+				}
 			}
 		}
 		catch (err) {
@@ -270,7 +303,11 @@ function changeModel() {
 	.fail(function() { // not allowed
 		alert("{setmodel_fail}");
 		
-		// reverse the original state
+		// reverse the original state is in ajax always function
+	})
+	.always(function() {
+		var_slice_status_lock = false;
+		
 		$("input#slicer_size").val(var_model_scale);
 		$("input#slicer_rotate_x").val(var_model_xrot);
 		$("input#slicer_rotate_y").val(var_model_yrot);
@@ -279,9 +316,6 @@ function changeModel() {
 		$("input#slicer_rotate_y").slider("refresh");
 		$("input#slicer_rotate_z").slider("refresh");
 		$("input#slicer_size").slider("refresh");
-	})
-	.always(function() {
-		var_slice_status_lock = false;
 	});
 	
 	return;

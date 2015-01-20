@@ -153,6 +153,6 @@ $lang['storegcode_err_cfm']
 $lang['storegcode_title']
 	= 'Sauvegarde d\'impression';
 $lang['storegcode_info']
-	= 'Sauvegarder ce mod&egrave;le et ses configurations dans Ma Biblioth&egrave;que';
+	= 'Sauvegarder ce mod&egrave;le dans Mes Biblioth&egrave;ques';
 $lang['storegcode_name']
 	= 'Nom du mod&egrave;le ICI';
