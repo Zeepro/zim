@@ -15,3 +15,4 @@ $lang['confirm_skip_text'] = 'Si vous ne créez pas de compte Zeepro, vous recon
 $lang['still_skip'] = 'Je souhaite toujours sauter cette étape';
 $lang['wrong_pass'] = "Veuillez faire correspondre le mot de passe et sa confirmation.";
 $lang['privacy_policy_link'] = "Politique de confidentialit&eacute";
+$lang['optin_title'] = "Je souhaite recevoir des informations sur les mises à jour et des propositions de vos partenaires";

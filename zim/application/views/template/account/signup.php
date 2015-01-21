@@ -22,12 +22,16 @@
 			echo form_label('Email', 'email');
 			echo form_input('email').'<br />';
 			echo form_label(t('Password'), 'password');
-			echo form_password('password').'<br />';
+			echo form_password('password'); // .'<br />'
 			echo form_label(t('Confirm Password'), 'confirm');
-			echo form_password('confirm') . '<br />';
-			echo '<br /><div>';
+			echo form_password('confirm'); //  . '<br />'
+			echo '<div>'; // <br />
 			echo '<label><input type="checkbox" name="show_pass" data-mini=true>{show_password}</label>';
 			echo "</div><br />";
+			echo <<< OPTIN_END
+			<input type="checkbox" id="optin" name="optin" data-mini="true" value="1" checked="checked">
+			<label for="optin">{optin_title}</label>
+OPTIN_END;
 			echo form_submit('submit', t('signup_title'));
 			echo form_close();
 		?>

@@ -254,7 +254,8 @@ class Account extends MY_Controller
 				extract($_POST);
 				$data = array(
 						'email'		=> $email,
-						'password'	=> $password
+						'password'	=> $password,
+						'optin'		=> ((int)$this->input->post('optin') == 1) ? 'on' : 'off',
 				);
 				
 				$options = array(
@@ -306,6 +307,7 @@ class Account extends MY_Controller
 		$data['back'] = t('back');
 		$data['show_password'] = t('show_password');
 		$data['privacy_policy_link'] = t('privacy_policy_link');
+		$data['optin_title'] = t('optin_title');
 		$body_page = $this->parser->parse('template/account/signup', $data, TRUE);
 		
 		// parse all page

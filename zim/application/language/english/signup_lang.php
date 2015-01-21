@@ -15,3 +15,4 @@ $lang['confirm_skip_text'] = 'If you do not create a Zeepro account, you therefo
 $lang['still_skip'] = 'I still want to skip this step';
 $lang['wrong_pass'] = "The password doesn't match its confirmation.";
 $lang['privacy_policy_link'] = "Privacy policy";
+$lang['optin_title'] = "Send me updates and exclusive offers";
