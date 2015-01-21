@@ -59,7 +59,7 @@ $lang['Temperature of the right extruder: %d °C']
 $lang['Printing details']
 	= 'Printing details';
 $lang['Congratulation, your printing is complete!']
-	= 'Congratulations, your printing is complete!';
+	= 'Congratulations, your print is complete!';
 $lang['Home']
 	= 'Home';
 $lang['Restart?']

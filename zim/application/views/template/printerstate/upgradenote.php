@@ -12,8 +12,10 @@
 				Preliminary Note:<br/>If you wish to check previous release notes, please visit our support website.
 			</p>
 			<div id="upgradenote_body">{note_body}</div>
+			<div id="go_uimode_part" style="display: none;">
+				<a href="{ui_link}" data-role="button">{ui_button}</a>
+			</div>
 			<div id="go_reboot_part" style="display: none;">
-<!-- 				<a href="/printerstate/upgradenote?ui&reboot" data-role="button">Mobile UI mode</a> -->
 				<a href="/manage/rebooting" data-role="button">{reboot_button}</a>
 <!-- 				<a href="#" data-role="button" data-icon="arrow-u" onclick='javascript: $("html, body").animate({ scrollTop: 0 });'>Top</a> -->
 			</div>
@@ -23,7 +25,11 @@
 
 <script>
 var var_reboot = {reboot_display};
+var var_uimode = {ui_display};
 
+if (var_uimode == true && $(document).width() < 800) {
+	$("div#go_uimode_part").show();
+}
 if (var_reboot == true) {
 	$("div#go_reboot_part").show();
 }

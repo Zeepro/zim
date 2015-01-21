@@ -16,7 +16,7 @@
 				<div id="preview_image_zone">{wait_preview}</div>
 			</div>
 			<div id="detail_zone" style="clear: both; text-align: center; display: none;">
-				<div id="model_coordinate_info">
+				<div id="model_coordinate_info" style="font-size: small;">
 					X = <span id="model_xsize_info">{model_xsize}</span>mm x 
 					Y = <span id="model_ysize_info">{model_ysize}</span>mm x 
 					Z = <span id="model_zsize_info">{model_zsize}</span>mm
@@ -26,18 +26,22 @@
 						<h4>{scale_rotate_title}</h4>
 						<ul data-role="listview" data-inset="true">
 							<li data-role="list-divider">{scale_title}</li> <!-- <label for="slicer_size"></label> -->
-							<li><input type="range" name="slicer_size" id="slicer_size" value="{model_scale}" min="1" max="{model_smax}" />
-							<input type="button" id="slicer_set_model_scale_button" value="{set_model_button}"></li>
+							<li>
+								<input type="range" name="slicer_size" id="slicer_size" value="{model_scale}" min="1" max="{model_smax}" />
+								<input type="button" id="slicer_set_model_scale_button" value="{set_model_button}">
+							</li>
 							<li data-role="list-divider">{rotate_title}</li>
-							<li><label for="slicer_rotate_x">{rotate_x_title}</label>
-							<input type="range" name="slicer_rotate_x" id="slicer_rotate_x" value="{model_xrot}" min="-180" max="180" />
-							<label for="slicer_rotate_y">{rotate_y_title}</label>
-							<input type="range" name="slicer_rotate_y" id="slicer_rotate_y" value="{model_yrot}" min="-180" max="180" />
-							<label for="slicer_rotate_z">{rotate_z_title}</label>
-							<input type="range" name="slicer_rotate_z" id="slicer_rotate_z" value="{model_zrot}" min="-180" max="180" />
-							<input type="button" id="slicer_set_model_rotate_button" value="{set_model_button}"></li>
-							<li><input type="button" id="slicer_reset_model_button" value="{reset_model_button}"></li>
+							<li>
+								<label for="slicer_rotate_x">{rotate_x_title}</label>
+								<input type="range" name="slicer_rotate_x" id="slicer_rotate_x" value="{model_xrot}" min="-180" max="180" />
+								<label for="slicer_rotate_y">{rotate_y_title}</label>
+								<input type="range" name="slicer_rotate_y" id="slicer_rotate_y" value="{model_yrot}" min="-180" max="180" />
+								<label for="slicer_rotate_z">{rotate_z_title}</label>
+								<input type="range" name="slicer_rotate_z" id="slicer_rotate_z" value="{model_zrot}" min="-180" max="180" />
+								<input type="button" id="slicer_set_model_rotate_button" value="{set_model_button}">
+							</li>
 						</ul>
+						<input type="button" id="slicer_reset_model_button" value="{reset_model_button}">
 					</div>
 				</div>
 				<div data-role="collapsible" data-collapsed="false">
@@ -49,7 +53,7 @@
 						{/preset_list}
 							<option value="_GOTO_PRESET_LIST_">{goto_preset}</option>
 						</select>
-						<p style="text-align: justify; margin: 0;">{select_hint}</p>
+						<p style="text-align: justify; margin: 0; font-size: x-small;">{select_hint}</p>
 						<!-- usage: $("option#p" + $("select#preset_menu").val()).attr("data-xxx"), or use /sliceupload/preset_prm_ajax?id=[PRESET_ID_HERE] to get json info -->
 					</div>
 				</div>

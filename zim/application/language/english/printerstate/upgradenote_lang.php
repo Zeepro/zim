@@ -9,3 +9,5 @@ $lang['releasenote_title']
 	= 'What\'s new in this version?';
 $lang['releasenote_reboot']
 	= 'Restart to install';
+$lang['ui_button']
+	= 'Mobile UI mode';

@@ -656,7 +656,10 @@ class Printerstate extends MY_Controller {
 				'note_title'		=> t('releasenote_title'),
 				'note_body'			=> $note_html,
 				'reboot_button'		=> t('releasenote_reboot'),
+				'ui_button'			=> t('ui_button'),
 				'reboot_display'	=> ($this->input->get('reboot') === FALSE) ? 'false' : 'true',
+				'ui_display'		=> ($this->input->get('ui') === FALSE) ? 'true' : 'false',
+				'ui_link'			=> '/printerstate/upgradenote?ui' . (($this->input->get('reboot') === FALSE) ? NULL : '&reboot'),
 		);
 		
 		$body_page = $this->parser->parse('template/printerstate/upgradenote', $template_data, TRUE);

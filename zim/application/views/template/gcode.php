@@ -30,8 +30,8 @@
 				<div id="gc_analyser_container" style="margin: 0 auto; width: 700px; max-width: 100%;">
 					<div data-role="navbar" style="margin-bottom: 1em;">
 						<ul>
-							<li><a id="nav_a_rendering" href="#" onclick="javascript: nav_show_rendering();">Rendering</a></li>
 							<li><a id="nav_a_gcode" href="#" onclick="javascript: nav_show_gcode();">Gcode</a></li>
+							<li><a id="nav_a_rendering" href="#" onclick="javascript: nav_show_rendering();">Rendering</a></li>
 						</ul>
 					</div>
 					<div id="rendering">
