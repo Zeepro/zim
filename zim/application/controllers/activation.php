@@ -18,7 +18,7 @@ class Activation extends MY_Controller
 		}
 		if ($network_ok)
 		{
-			$body_page = $this->parser->parse('/template/activation/index', array(), TRUE);
+			$body_page = $this->parser->parse('template/activation/index', array(), TRUE);
 			$this->lang->load('activation/activation', $this->config->item('language'));
 			$template_data = array(
 					'lang'					=> $this->config->item('language_abbr'),
@@ -38,7 +38,7 @@ class Activation extends MY_Controller
 		}
 		else
 		{
-			$body_page = $this->parser->parse('/template/activation/network_error', array(), TRUE);
+			$body_page = $this->parser->parse('template/activation/network_error', array(), TRUE);
 			$this->lang->load('activation/network_error', $this->config->item('language'));
 			$template_data = array(
 					'lang'			=> $this->config->item('language_abbr'),
@@ -50,7 +50,7 @@ class Activation extends MY_Controller
 					'network_err_msg'=> t('network_err_msg')
 			);
 		}
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->parser->parse('basetemplate', $template_data);
 	}
 	
 	public function activation_form()
@@ -99,7 +99,7 @@ class Activation extends MY_Controller
 				'confirmation_message'	=> t('hint'),
 				'returnUrl'		=> isset($_GET['returnUrl']) ? "/" . $_GET['returnUrl'] : "/"
 		);
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->parser->parse('basetemplate', $template_data);
 	}
 	
 	public function wizard_confirm($mode = NULL) {
@@ -164,7 +164,7 @@ class Activation extends MY_Controller
 				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Activation') . '</title>',
 				'contents'		=> $body_page,
 		);
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->parser->parse('basetemplate', $template_data);
 		
 		return;
 	}

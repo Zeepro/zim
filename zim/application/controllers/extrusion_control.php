@@ -23,16 +23,16 @@ class Extrusion_control extends MY_Controller {
 		$this->load->library('parser');
 
 		// parse the main body
-		$body_page = $this->parser->parse('template/extrusion_control', array(), TRUE);
+		$body_page = $this->parser->parse('Zim', array(), TRUE);
 
 		// parse all page
 		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>Zeepronterface</title>',
+				'lang'			=> 'en',
+				'headers'		=> '<title>Extrusion control</title>',
 				'contents'		=> $body_page,
 		);
 
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->parser->parse('basetemplate', $template_data);
 
 		return;
 	}

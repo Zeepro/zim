@@ -11,7 +11,7 @@ class Test_video extends CI_Controller {
 		ZimAPI_cameraOn(ZIMAPI_PRM_CAMERA_PRINTSTART);
 		
 		$this->load->library('parser');
-		$this->parser->parse('template/test_video', array('video_url' => $this->config->item('video_url')));
+		$this->parser->parse('test_video', array('video_url' => $this->config->item('video_url')));
 		
 		return;
 	}

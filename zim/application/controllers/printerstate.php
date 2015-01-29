@@ -30,7 +30,7 @@ class Printerstate extends MY_Controller {
 				'id_model'		=> $id_model,
 // 				'enable_unload'	=> ($wait_unload == TRUE) ? 'false' : 'true',
 		);
-		$template_name = 'template/printerstate/changecartridge_ajax/wait_unload_filament';
+		$template_name = 'printerstate/changecartridge_ajax/wait_unload_filament';
 		$this->_display_changecartridge_base($template_name, $template_data);
 		
 		$this->output->set_status_header(202); // disable checking
@@ -61,7 +61,7 @@ class Printerstate extends MY_Controller {
 				'in_heating'	=> $in_heating ? 'true' : 'false',
 				'cancel_button'	=> t('cancel_button'),
 		);
-		$template_name = 'template/printerstate/changecartridge_ajax/in_unload_filament';
+		$template_name = 'printerstate/changecartridge_ajax/in_unload_filament';
 		$this->_display_changecartridge_base($template_name, $template_data);
 		
 		return;
@@ -74,7 +74,7 @@ class Printerstate extends MY_Controller {
 				'low_hint'		=> ($low_hint) ? t('Not enough filament') : '',
 				'action_hint'	=> t('Remove the cartridge above'),
 		);
-		$template_name = 'template/printerstate/changecartridge_ajax/remove_cartridge';
+		$template_name = 'printerstate/changecartridge_ajax/remove_cartridge';
 		$this->_display_changecartridge_base($template_name, $template_data);
 		
 		return;
@@ -86,7 +86,7 @@ class Printerstate extends MY_Controller {
 				'next_phase'	=> PRINTERSTATE_CHANGECART_LOAD_F,
 				'action_hint'	=> t('Insert the cartridge above'),
 		);
-		$template_name = 'template/printerstate/changecartridge_ajax/insert_cartridge';
+		$template_name = 'printerstate/changecartridge_ajax/insert_cartridge';
 		$this->_display_changecartridge_base($template_name, $template_data);
 		
 		return;
@@ -154,7 +154,7 @@ class Printerstate extends MY_Controller {
 		}
 		$template_data['material_array'][$material_value]['on'] = $option_selected;
 		
-		$this->_display_changecartridge_base('template/printerstate/changecartridge_ajax/cartridge', $template_data);
+		$this->_display_changecartridge_base('printerstate/changecartridge_ajax/cartridge', $template_data);
 		
 		$this->output->set_status_header(202); // disable checking
 		
@@ -172,7 +172,7 @@ class Printerstate extends MY_Controller {
 //					'abb_cartridge'	=> $abb_cartridge,
 //					'id_model'		=> $id_model,
 			);
-			$template_name = 'template/printerstate/changecartridge_ajax/wait_load_change_filament';
+			$template_name = 'printerstate/changecartridge_ajax/wait_load_change_filament';
 		}
 		else {
 			$template_data = array (
@@ -180,7 +180,7 @@ class Printerstate extends MY_Controller {
 					'load_button'	=> t('Load the filament'),
 					'hint'			=> t('Your cartridge is loaded'),
 			);
-			$template_name = 'template/printerstate/changecartridge_ajax/wait_load_filament';
+			$template_name = 'printerstate/changecartridge_ajax/wait_load_filament';
 			
 		}
 		$this->_display_changecartridge_base($template_name, $template_data);
@@ -240,7 +240,7 @@ class Printerstate extends MY_Controller {
 				'cart_color'	=> $color_cart,
 		);
 		
-		$this->parser->parse('template/printerstate/changecartridge_ajax/detail_cartridge', $template_data);
+		$this->parser->parse('printerstate/changecartridge_ajax/detail_cartridge', $template_data);
 		
 		return;
 	}
@@ -253,7 +253,7 @@ class Printerstate extends MY_Controller {
 				'cancel_button'	=> t('cancel_button'),
 				'cancel_info'	=> t('cancel_info'),
 		);
-		$template_name = 'template/printerstate/changecartridge_ajax/in_load_filament';
+		$template_name = 'printerstate/changecartridge_ajax/in_load_filament';
 		$this->_display_changecartridge_base($template_name, $template_data);
 		
 		return;
@@ -292,7 +292,7 @@ class Printerstate extends MY_Controller {
 				'yes_url'		=> $yes_url,
 				'no_url'		=> $no_url,
 		);
-		$template_name = 'template/printerstate/changecartridge_ajax/need_prime';
+		$template_name = 'printerstate/changecartridge_ajax/need_prime';
 		$this->_display_changecartridge_base($template_name, $template_data);
 		
 		$this->output->set_status_header(202); // disable checking
@@ -323,7 +323,7 @@ class Printerstate extends MY_Controller {
 		$template_data = array (
 				'message'	=> $message,
 		);
-		$template_name = 'template/printerstate/changecartridge_ajax/error_status';
+		$template_name = 'printerstate/changecartridge_ajax/error_status';
 		$this->_display_changecartridge_base($template_name, $template_data);
 		
 		$this->output->set_status_header(202); // disable checking
@@ -337,7 +337,7 @@ class Printerstate extends MY_Controller {
 				'next_phase'	=> PRINTERSTATE_CHANGECART_UNLOAD_F,
 				'unload_button'	=> t('Unload the filament'),
 		);
-		$template_name = 'template/printerstate/changecartridge_ajax/error_loading';
+		$template_name = 'printerstate/changecartridge_ajax/error_loading';
 		$this->_display_changecartridge_base($template_name, $template_data);
 		
 		$this->output->set_status_header(202); // disable checking
@@ -352,7 +352,7 @@ class Printerstate extends MY_Controller {
 				'unload_error'	=> t('unload_error'),
 				'home_button'	=> t('home'),
 		);
-		$template_name = 'template/printerstate/changecartridge_ajax/error_unloading';
+		$template_name = 'printerstate/changecartridge_ajax/error_unloading';
 		$this->_display_changecartridge_base($template_name, $template_data);
 		
 		$this->output->set_status_header(202); // disable checking
@@ -408,7 +408,6 @@ class Printerstate extends MY_Controller {
 	
 	public function index() {
 		$template_data = array();
-		$body_page = NULL;
 		$ret_val = 0;
 		$status_upgrade = FALSE;
 		$status_tromboning = FALSE;
@@ -454,23 +453,15 @@ class Printerstate extends MY_Controller {
 				'support'				=> t('support')
 		);
 		
-		$body_page = $this->parser->parse('template/printerstate/index', $template_data, TRUE);
-		
 		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('printerstate_index_pagetitle') . '</title>',
-				'contents'		=> $body_page,
-		);
-		
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->_parseBaseTemplate(t('printerstate_index_pagetitle'),
+				$this->parser->parse('printerstate/index', $template_data, TRUE));
 		
 		return;
 	}
 	
 	public function printerinfo() {
 		$template_data = array();
-		$body_page = NULL;
 		$temp_info = array();
 		$array_info = array();
 // 		$sso_name = NULL;
@@ -495,7 +486,7 @@ class Printerstate extends MY_Controller {
 		$array_info = array(
 				array(
 						'title'	=> t('version_title'),
-						'value'	=> $this->parser->parse('template/printerstate/printerinfo_grid_b',
+						'value'	=> $this->parser->parse('printerstate/printerinfo_grid_b',
 								array(
 										'id'		=> 'button_release',
 										'value'		=> $temp_info[PRINTERSTATE_TITLE_VERSION],
@@ -533,7 +524,7 @@ class Printerstate extends MY_Controller {
 				),
 				array(
 						'title' => t('sso_name'),
-						'value'	=> $this->parser->parse('template/printerstate/printerinfo_grid_b',
+						'value'	=> $this->parser->parse('printerstate/printerinfo_grid_b',
 								array(
 										'id'		=> 'button_sso',
 										'value'		=> array_key_exists(PRINTERSTATE_TITLE_SSO_NAME, $temp_info)
@@ -560,23 +551,15 @@ class Printerstate extends MY_Controller {
 				'button_release'	=> t('button_release'),
 		);
 		
-		$body_page = $this->parser->parse('template/printerstate/printerinfo', $template_data, TRUE);
-		
 		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('printerstate_printerinfo_pagetitle') . '</title>',
-				'contents'		=> $body_page,
-		);
-		
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->_parseBaseTemplate(t('printerstate_printerinfo_pagetitle'),
+				$this->parser->parse('printerstate/printerinfo', $template_data, TRUE));
 		
 		return;
 	}
 	
 	public function upgradenote() {
 		$template_data = array();
-		$body_page = NULL;
 		$note_html = NULL;
 		$array_upgrade = array();
 		
@@ -634,10 +617,10 @@ class Printerstate extends MY_Controller {
 				);
 				
 				if ($this->input->get('ui') !== FALSE) {
-					$note_html .= $this->parser->parse('template/printerstate/upgradenote_xml', $template_data, TRUE);
+					$note_html .= $this->parser->parse('printerstate/upgradenote_xml', $template_data, TRUE);
 				}
 				else {
-					$note_html .= $this->parser->parse('template/printerstate/upgradenote_txt', $template_data, TRUE);
+					$note_html .= $this->parser->parse('printerstate/upgradenote_txt', $template_data, TRUE);
 				}
 			}
 		}
@@ -662,23 +645,15 @@ class Printerstate extends MY_Controller {
 				'ui_link'			=> '/printerstate/upgradenote?ui' . (($this->input->get('reboot') === FALSE) ? NULL : '&reboot'),
 		);
 		
-		$body_page = $this->parser->parse('template/printerstate/upgradenote', $template_data, TRUE);
-		
 		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('printerstate_upgradenote_pagetitle') . '</title>',
-				'contents'		=> $body_page,
-		);
-		
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->_parseBaseTemplate(t('printerstate_upgradenote_pagetitle'),
+				$this->parser->parse('printerstate/upgradenote', $template_data, TRUE));
 		
 		return;
 	}
 	
 	public function changecartridge() {
 		$template_data = array();
-		$body_page = NULL;
 		
 		$abb_cartridge = $this->input->get('v');
 		$need_filament = $this->input->get('f');
@@ -710,16 +685,9 @@ class Printerstate extends MY_Controller {
 				'id_model'		=> $id_model,
 		);
 		
-		$body_page = $this->parser->parse('template/printerstate/changecartridge', $template_data, TRUE);
-		
 		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Change cartridge') . '</title>',
-				'contents'		=> $body_page,
-		);
-		
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->_parseBaseTemplate(t('ZeePro Personal Printer 21 - Change cartridge'),
+				$this->parser->parse('printerstate/changecartridge', $template_data, TRUE));
 		
 		return;
 	}
@@ -1236,9 +1204,8 @@ class Printerstate extends MY_Controller {
 	
 	public function resetnetwork() {
 		$template_data = array();
-		$body_page = NULL;
 		$error = '';
-
+		
 		$this->load->library('parser');
 		$this->lang->load('printerstate/resetnetwork', $this->config->item('language'));
 		
@@ -1255,16 +1222,9 @@ class Printerstate extends MY_Controller {
 						'ok_button'	=> t('OK'),
 				);
 				
-				$body_page = $this->parser->parse('template/printerstate/resetnetwork_finish', $template_data, TRUE);
-				
 				// parse all page
-				$template_data = array(
-						'lang'			=> $this->config->item('language_abbr'),
-						'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Reset connection') . '</title>',
-						'contents'		=> $body_page,
-				);
-				
-				$this->parser->parse('template/basetemplate', $template_data);
+				$this->_parseBaseTemplate(t('ZeePro Personal Printer 21 - Reset connection'),
+						$this->parser->parse('printerstate/resetnetwork_finish', $template_data, TRUE));
 				
 				return;
 			}
@@ -1282,23 +1242,15 @@ class Printerstate extends MY_Controller {
 				'home'			=> t('Home')
 		);
 		
-		$body_page = $this->parser->parse('template/printerstate/resetnetwork', $template_data, TRUE);
-		
 		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Reset connection') . '</title>',
-				'contents'		=> $body_page,
-		);
-		
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->_parseBaseTemplate(t('ZeePro Personal Printer 21 - Reset connection'),
+				$this->parser->parse('printerstate/resetnetwork', $template_data, TRUE));
 		
 		return;
 	}
 	
 	public function sethostname() {
 		$template_data = array();
-		$body_page = NULL;
 		$error = '';
 		$ret_val = 0;
 		$hostname = NULL;
@@ -1357,15 +1309,12 @@ class Printerstate extends MY_Controller {
 						$template_data = array(
 								'hint'			=> $hint_message,
 // 								'home_button'	=> t('home_button'),
-						);	
-						$body_page = $this->parser->parse('template/printerstate/sethostname_finish', $template_data, TRUE);
-						// parse all page
-						$template_data = array(
-								'lang'			=> $this->config->item('language_abbr'),
-								'headers'		=> '<title>' . t('page_title') . '</title>',
-								'contents'		=> $body_page,
 						);
-						$this->parser->parse('template/basetemplate', $template_data);
+						
+						// parse all page
+						$this->_parseBaseTemplate(t('page_title'),
+								$this->parser->parse('printerstate/sethostname_finish', $template_data, TRUE));
+						
 						return;
 					}
 				}
@@ -1412,17 +1361,10 @@ class Printerstate extends MY_Controller {
 				'length_error'	=> t('length_error'),
 				'restart'		=> ($restart) ? 1 : 0,
 		);
-	
-		$body_page = $this->parser->parse('template/printerstate/sethostname', $template_data, TRUE);
-	
+		
 		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('page_title') . '</title>',
-				'contents'		=> $body_page,
-		);
-	
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->_parseBaseTemplate(t('page_title'),
+				$this->parser->parse('printerstate/sethostname', $template_data, TRUE));
 		
 		return;
 	}
@@ -1431,28 +1373,21 @@ class Printerstate extends MY_Controller {
 	{
 		$this->load->library('parser');
 		$this->lang->load('printerstate/nozzles', $this->config->item('language'));
-		$body_page = NULL;
 		$template_data = array(
 				'print_calibration'	=> t('print_calibration'),
 				'trim_offset'		=> t('trim_offset'),
 				'back'				=> t('back'),
 				'home'				=> t('home'),
 		);
-		$body_page = $this->parser->parse('template/printerstate/nozzles_adjustment', $template_data, TRUE);
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('nozzle_offset_pagetitle') . '</title>' . "\n"
-				. '<link rel="stylesheet" href="/assets/jquery-mobile-fluid960.min.css">',
-				'contents'		=> $body_page,
-		);
-	
-		$this->parser->parse('template/basetemplate', $template_data);
+		
+		$this->_parseBaseTemplate(t('nozzle_offset_pagetitle'),
+				$this->parser->parse('printerstate/nozzles_adjustment', $template_data, TRUE));
+		
 		return;
 	}
 	
 	public function offset_setting() {
 		$template_data = array();
-		$body_page = NULL;
 		$error = '';
 		
 		$this->load->library('parser');
@@ -1535,16 +1470,10 @@ class Printerstate extends MY_Controller {
 				'home'			=> t('home'),
 				'error'			=> $error,
 		);
-		$body_page = $this->parser->parse('template/printerstate/offset_setting', $template_data, TRUE);
 		
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('nozzle_offset_pagetitle') . '</title>' . "\n"
-				. '<link rel="stylesheet" href="/assets/jquery-mobile-fluid960.min.css">',
-				'contents'		=> $body_page,
-		);
-	
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->_parseBaseTemplate(t('nozzle_offset_pagetitle'),
+				$this->parser->parse('printerstate/offset_setting', $template_data, TRUE));
+		
 		return;
 	}
 	
@@ -1563,7 +1492,7 @@ class Printerstate extends MY_Controller {
 		
 		$this->load->library('parser');
 		$this->output->set_content_type('txt_u');
-		$this->parser->parse('template/plaintxt', array('display' => ZimAPI_getVersion(TRUE))); //optional
+		$this->parser->parse('plaintxt', array('display' => ZimAPI_getVersion(TRUE))); //optional
 		
 		return;
 	}
@@ -1574,7 +1503,7 @@ class Printerstate extends MY_Controller {
 		
 		// stats info
 		PrinterLog_statsWebClick(PRINTERLOG_STATS_LABEL_SUPPORT);
-		$this->parser->parse('template/plaintxt', array('display' => 'ok'));
+		$this->parser->parse('plaintxt', array('display' => 'ok'));
 		
 		return;
 	}

@@ -18,21 +18,10 @@ class Zeepronterface extends MY_Controller {
 	public function index() {
 		global $CFG;
 		$template_data = array();
-		$body_page = NULL;
 
 		$this->load->library('parser');
 
-		// parse the main body
-		$body_page = $this->parser->parse('template/pronterface', array(), TRUE);
-
-		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>Pronterface#</title>',
-				'contents'		=> $body_page,
-		);
-
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->_parseBaseTemplate('Pronterface#', $this->parser->parse('pronterface', array(), TRUE));
 
 		return;
 	}
@@ -307,7 +296,7 @@ class Zeepronterface extends MY_Controller {
 // 					$cr = ERROR_OK;
 // 					$this->output->set_content_type('txt_u');
 // 					$this->load->library('parser');
-// 					$this->parser->parse('template/plaintxt', array('display' => $response));
+// 					$this->parser->parse('plaintxt', array('display' => $response));
 // 				}
 				
 // // 				$command .= $gcode['full_path'] . ' > ' . $path_file;
@@ -335,7 +324,7 @@ class Zeepronterface extends MY_Controller {
 // 			$this->output->set_status_header($cr);
 // 			$this->output->set_content_type('txt_u');
 // 			$this->load->library('parser');
-// 			$this->parser->parse('template/plaintxt', array('display' => $cr . MyERRMSG($cr)));
+// 			$this->parser->parse('plaintxt', array('display' => $cr . MyERRMSG($cr)));
 // 		}
 		
 // 		return;

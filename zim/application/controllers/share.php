@@ -246,14 +246,9 @@ class Share extends MY_Controller
 				'upload_to_fb'			=> t('upload_to_fb')
 		);
 		
-		$body_page = $this->parser->parse('template/share/facebook_form', $data, TRUE);
+		$this->_parseBaseTemplate(t('facebook_title'),
+				$this->parser->parse('share/facebook_form', $data, TRUE));
 		
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('facebook_title') . '</title>',
-				'contents'		=> $body_page
-		);
-		$this->parser->parse('template/basetemplate', $template_data);
 		return;
 	}
 
@@ -282,15 +277,9 @@ class Share extends MY_Controller
 				'fb_upload_popup_text'	=> t('fb_upload_popup_text'),
 				'fb_callback_ok'		=> t('fb_callback_ok'),
 		);
-		$body_page = $this->parser->parse('template/share/facebook_upload', $data, TRUE);
 		
-		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . 'Zim - Zim-motion' . '</title>',
-				'contents'		=> $body_page
-		);
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->_parseBaseTemplate(t('Zim - Zim-motion'), $this->parser->parse('share/facebook_upload', $data, TRUE));
+		
 		return;
 	}
 
@@ -397,14 +386,10 @@ class Share extends MY_Controller
 				'privacy_label'			=> t('privacy_label'),
 				'back'					=> t('back')
 		);
-		$body_page = $this->parser->parse('template/share/youtube_form', $data, TRUE);
-	
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('youtube_title') . '</title>',
-				'contents'		=> $body_page
-		);
-		$this->parser->parse('template/basetemplate', $template_data);
+		
+		$this->_parseBaseTemplate(t('youtube_title'),
+				$this->parser->parse('share/youtube_form', $data, TRUE));
+		
 		return;
 	}
 	
@@ -421,15 +406,10 @@ class Share extends MY_Controller
 				'yt_upload_popup_text'	=> t('yt_upload_popup_text'),
 				'yt_callback_ok'		=> t('yt_callback_ok'),
 		);
-		$body_page = $this->parser->parse('template/share/video_upload', $data, TRUE);
-	
-		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . 'Zim - Zim-motion' . '</title>',
-				'contents'		=> $body_page
-		);
-		$this->parser->parse('template/basetemplate', $template_data);
+		
+		$this->_parseBaseTemplate(t('Zim - Zim-motion'),
+				$this->parser->parse('share/video_upload', $data, TRUE));
+		
 		return;
 	}
 	

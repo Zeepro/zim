@@ -19,14 +19,9 @@ class Usb extends MY_Controller {
 			'hint'	=>	t('hint'),
 		);
 		
-		$body_page = $this->parser->parse('template/usb', $data, TRUE);
+		$this->_parseBaseTemplate(t('usb_pagetitle'),
+				$this->parser->parse('usb', $data, TRUE));
 		
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('usb_pagetitle') . '</title>',
-				'contents'		=> $body_page,
-		);
-		
-		$this->parser->parse('template/basetemplate', $template_data);
+		return;
 	}
 }

@@ -13,7 +13,6 @@ class Menu_home extends MY_Controller {
 	
 	public function index() {
 		$template_data = array();
-		$body_page = NULL;
 		$need_update = FALSE;
 	
 		$this->load->library('parser');
@@ -40,17 +39,10 @@ class Menu_home extends MY_Controller {
 				'library_visible'	=> ($this->config->item('use_sdcard') == TRUE) ? 'block' : 'none',
 		);
 		
-		
-		$body_page = $this->parser->parse('template/menu_home', $template_data, TRUE);
-		
 		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Home') . '</title>',
-				'contents'		=> $body_page
-		);
+		$this->_parseBaseTemplate(t('ZeePro Personal Printer 21 - Home'),
+				$this->parser->parse('menu_home', $template_data, TRUE));
 		
-		$this->parser->parse('template/basetemplate', $template_data);
 		return;
 	}
 	
@@ -60,7 +52,7 @@ class Menu_home extends MY_Controller {
 		
 		// stats info
 		PrinterLog_statsWebClick(PRINTERLOG_STATS_LABEL_SHOP);
-		$this->parser->parse('template/plaintxt', array('display' => 'ok'));
+		$this->parser->parse('plaintxt', array('display' => 'ok'));
 		
 		return;
 	}

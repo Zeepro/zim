@@ -6,15 +6,7 @@ if (!defined('BASEPATH'))
 class Connection extends MY_Controller {
 
 	private function _generate_framePage($body_page) {
-		$template_data = array();
-		
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Connection configuration') . '</title>',
-				'contents'		=> $body_page,
-		);
-		
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->_parseBaseTemplate(t('ZeePro Personal Printer 21 - Connection configuration'), $body_page);
 		
 		return;
 	}
@@ -69,7 +61,7 @@ class Connection extends MY_Controller {
 				'set_hostname'	=> t('set_hostname'),
 		);
 		
-		$body_page = $this->parser->parse('template/connection/index', $template_data, TRUE);
+		$body_page = $this->parser->parse('connection/index', $template_data, TRUE);
 	
 		// parse all page
 		$this->_generate_framePage($body_page);
@@ -110,7 +102,7 @@ class Connection extends MY_Controller {
 					'no_visable'	=> htmlspecialchars(t("Not visible...")),
 			);
 			
-			$body_page = $this->parser->parse('template/connection/wifissid', $template_data, TRUE);
+			$body_page = $this->parser->parse('connection/wifissid', $template_data, TRUE);
 			
 			// parse all page
 			$this->_generate_framePage($body_page);
@@ -149,7 +141,7 @@ class Connection extends MY_Controller {
 					'submit'	=> htmlspecialchars(t("OK")),
 			);
 			
-			$body_page = $this->parser->parse('template/connection/wifinotvisiblessid', $template_data, TRUE);
+			$body_page = $this->parser->parse('connection/wifinotvisiblessid', $template_data, TRUE);
 			
 			// parse all page
 			$this->_generate_framePage($body_page);
@@ -237,7 +229,7 @@ class Connection extends MY_Controller {
 				'show_password'		=> t('show_password'),
 				'err_msg'			=> $valid == FALSE ? t('err_msg') : ""
 		);
-		$body_page = $this->parser->parse('template/connection/wifipswd', $template_data, TRUE);
+		$body_page = $this->parser->parse('connection/wifipswd', $template_data, TRUE);
 			
 		// parse all page
 		$this->_generate_framePage($body_page);
@@ -268,7 +260,7 @@ class Connection extends MY_Controller {
 					'text2'		=> t("Text2"),
 					'adv_btn'	=> htmlspecialchars(t("Advanced")),
 			);
-			$body_page = $this->parser->parse('template/connection/wired', $template_data, TRUE);
+			$body_page = $this->parser->parse('connection/wired', $template_data, TRUE);
 				
 			// parse all page
 			$this->_generate_framePage($body_page);
@@ -351,7 +343,7 @@ class Connection extends MY_Controller {
 					'dns_error'		=> form_error('dns'),
 					'submit'		=> htmlspecialchars(t("OK")),
 			);
-			$body_page = $this->parser->parse('template/connection/wiredadvanced', $template_data, TRUE);
+			$body_page = $this->parser->parse('connection/wiredadvanced', $template_data, TRUE);
 				
 			// parse all page
 			$this->_generate_framePage($body_page);
@@ -438,7 +430,7 @@ class Connection extends MY_Controller {
 				'back'			=> t('back'),
 		);
 		
-		$body_page = $this->parser->parse('template/connection/wifip2p', $template_data, TRUE);
+		$body_page = $this->parser->parse('connection/wifip2p', $template_data, TRUE);
 				
 		// parse all page
 		$this->_generate_framePage($body_page);
@@ -467,7 +459,7 @@ class Connection extends MY_Controller {
 				'confirm'	=> t("confirmation text", array($hostname, $hostname, $hostname, $hostname)),
 		);
 		
-		$body_page = $this->parser->parse('template/connection/confirmation', $template_data, TRUE);
+		$body_page = $this->parser->parse('connection/confirmation', $template_data, TRUE);
 				
 		// parse all page
 		$this->_generate_framePage($body_page);
@@ -486,7 +478,7 @@ class Connection extends MY_Controller {
 				'inf_kit_kat' => t('inf_kit_kat'),
 		);
 		
-		$body_page = $this->parser->parse('template/connection/android_oldversions', $template_data, TRUE);
+		$body_page = $this->parser->parse('connection/android_oldversions', $template_data, TRUE);
 		$this->_generate_framePage($body_page);
 		
 		return;
@@ -516,7 +508,7 @@ class Connection extends MY_Controller {
 				'popup'				=> t('popup', $ssid ? urldecode($ssid) : "XXX")
 		);
 		
-		$body_page = $this->parser->parse('template/connection/in_progress', $template_data, TRUE);
+		$body_page = $this->parser->parse('connection/in_progress', $template_data, TRUE);
 		$this->_generate_framePage($body_page);
 		
 		return;

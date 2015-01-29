@@ -84,7 +84,7 @@ class Test_version extends CI_Controller {
 				'array_info'	=> $array_info,
 		);
 		
-		$body_page = $this->parser->parse('template/test_version', $template_data, TRUE);
+		$body_page = $this->parser->parse('test_version', $template_data, TRUE);
 		
 		// parse all page
 		$template_data = array(
@@ -93,7 +93,7 @@ class Test_version extends CI_Controller {
 				'contents'		=> $body_page,
 		);
 		
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->parser->parse('basetemplate', $template_data);
 		
 		return;
 	}

@@ -2,7 +2,7 @@
 
 class Test_endstop extends CI_Controller
 {
-	public function		index()
+	public function index()
 	{
 		$this->load->library('parser');
 		//$this->lang->load('test_endstop', $this->config->item('language'));
@@ -25,16 +25,17 @@ class Test_endstop extends CI_Controller
 			'rightcart'	=> $endstop['E0'] ? 'Filament' : "No filament",
 			'home'		=> t('Home')
 		);
-		$body_page = $this->parser->parse('/template/test_endstop', $view_data, TRUE);
+		$body_page = $this->parser->parse('test_endstop', $view_data, TRUE);
 		$template_data = array(
+				'lang'			=> 'en',
 				'headers'		=> '<title>Zim</title>',
 				'contents'		=> $body_page
 		);
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->parser->parse('basetemplate', $template_data);
 		return;
 	}
 
-	public function		endstop_ajax()
+	public function endstop_ajax()
 	{
 		$this->load->helper('printerstate');
 		$endstop = array();

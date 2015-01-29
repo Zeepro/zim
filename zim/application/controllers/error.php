@@ -3,7 +3,7 @@
 if (!defined('BASEPATH'))
 	exit('No direct script access allowed');
 
-class Error extends MY_Controller {
+class Error extends CI_Controller {
 
 	function __construct() {
 		parent::__construct();
@@ -28,7 +28,7 @@ class Error extends MY_Controller {
 				'contents'		=> $body_page,
 		);
 		$this->output->set_status_header(503, 'Error - Zeepro');
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->parser->parse('basetemplate', $template_data);
 	}
 
 }

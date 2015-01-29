@@ -189,7 +189,7 @@ class Setupcartridge extends CI_Controller {
 				$template_data['ko'] = $button_html;
 			}
 			
-			$body_page = $this->parser->parse('template/setupcartridge/write', $template_data, TRUE);
+			$body_page = $this->parser->parse('setupcartridge/write', $template_data, TRUE);
 			
 			// parse all page
 			$template_data = array(
@@ -197,7 +197,7 @@ class Setupcartridge extends CI_Controller {
 					'headers'		=> '<title>SetupCartridge 设置标签</title>',
 					'contents'		=> $body_page,
 			);
-			$this->parser->parse('template/basetemplate', $template_data);
+			$this->parser->parse('basetemplate', $template_data);
 		}
 		else {
 			$this->output->set_header('Location: /setupcartridge/input?v=' . $side);
@@ -261,7 +261,7 @@ class Setupcartridge extends CI_Controller {
 						'hint'	=> ($side == 'l') ? $hint_left : NULL,
 				);
 				
-				$body_page = $this->parser->parse('template/setupcartridge/wait', $template_data, TRUE);
+				$body_page = $this->parser->parse('setupcartridge/wait', $template_data, TRUE);
 				
 				// parse all page
 				$template_data = array(
@@ -269,7 +269,7 @@ class Setupcartridge extends CI_Controller {
 						'headers'		=> '<title>SetupCartridge 设置标签</title>',
 						'contents'		=> $body_page,
 				);
-				$this->parser->parse('template/basetemplate', $template_data);
+				$this->parser->parse('basetemplate', $template_data);
 			}
 			else {
 				$this->load->helper('printerlog');
@@ -302,7 +302,7 @@ class Setupcartridge extends CI_Controller {
 					'side'	=> $side,
 			);
 			
-			$body_page = $this->parser->parse('template/setupcartridge/input', $template_data, TRUE);
+			$body_page = $this->parser->parse('setupcartridge/input', $template_data, TRUE);
 			
 			// parse all page
 			$template_data = array(
@@ -310,10 +310,10 @@ class Setupcartridge extends CI_Controller {
 					'headers'		=> '<title>SetupCartridge 设置标签</title>',
 					'contents'		=> $body_page,
 			);
-			$this->parser->parse('template/basetemplate', $template_data);
+			$this->parser->parse('basetemplate', $template_data);
 		}
 		else {
-			$this->parser->parse('template/plaintxt', array(
+			$this->parser->parse('plaintxt', array(
 					'display' => 'Please contact your administrator 请联系您的管理员',
 			));
 		}

@@ -77,7 +77,7 @@ class Debug extends CI_Controller {
 				),
 		);
 		
-		$body_page = $this->parser->parse('template/debug', $template_data, TRUE);
+		$body_page = $this->parser->parse('debug', $template_data, TRUE);
 		
 		// parse all page
 		$template_data = array(
@@ -86,7 +86,7 @@ class Debug extends CI_Controller {
 				'contents'		=> $body_page,
 		);
 		
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->parser->parse('basetemplate', $template_data);
 		
 		return;
 	}

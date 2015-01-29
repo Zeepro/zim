@@ -118,7 +118,7 @@ class Account extends MY_Controller
 				'format'		=> t('hostname_format'),
 				'name_printer'	=> t('name_printer')
 		);
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->parser->parse('basetemplate', $template_data);
 		return;
 	}
 	
@@ -192,7 +192,7 @@ class Account extends MY_Controller
 				'headers'		=> '<title>Zim</title>',
 				'contents'		=> $body_page
 		);
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->parser->parse('basetemplate', $template_data);
 		return;
 	}
 	
@@ -229,7 +229,7 @@ class Account extends MY_Controller
 				$this->output->set_header('Location: /activation/wizard_confirm/fail');
 			}
 			else {
-				$body_page = $this->parser->parse('/template/activation/network_error', array(), TRUE);
+				$body_page = $this->parser->parse('template/activation/network_error', array(), TRUE);
 				$this->lang->load('activation/network_error', $this->config->item('language'));
 				$template_data = array(
 						'lang'			=> $this->config->item('language_abbr'),
@@ -238,7 +238,7 @@ class Account extends MY_Controller
 						'back'			=> t('back'),
 						'network_err_msg'=> t('network_err_msg')
 				);
-				$this->parser->parse('template/basetemplate', $template_data);
+				$this->parser->parse('basetemplate', $template_data);
 			}
 			
 			return;
@@ -316,7 +316,7 @@ class Account extends MY_Controller
 				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Home') . '</title>',
 				'contents'		=> $body_page,
 		);
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->parser->parse('basetemplate', $template_data);
 		
 		return;
 	}

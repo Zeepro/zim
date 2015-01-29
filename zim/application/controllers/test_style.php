@@ -11,7 +11,7 @@ class Test_style extends CI_Controller {
 		$body_page = NULL;
 		
 		$this->load->library('parser');
-		$body_page = $this->parser->parse('template/test_style', array(), TRUE);
+		$body_page = $this->parser->parse('test_style', array(), TRUE);
 		
 		$template_data = array(
 				'lang'			=> $this->config->item('language_abbr'),
@@ -20,7 +20,7 @@ class Test_style extends CI_Controller {
 				'contents'		=> $body_page,
 		);
 		
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->parser->parse('basetemplate', $template_data);
 		
 		return;
 	}

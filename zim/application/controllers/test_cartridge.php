@@ -122,7 +122,7 @@ class Test_cartridge extends CI_Controller {
 		$this->output->set_content_type('txt_u');
 // 		echo $display;
 		$this->load->library('parser');
-		$this->parser->parse('template/plaintxt', array('display' => $display));
+		$this->parser->parse('plaintxt', array('display' => $display));
 		
 		return;
 	}
@@ -172,7 +172,7 @@ class Test_cartridge extends CI_Controller {
 		$this->output->set_content_type('txt_u');
 // 		echo $display;
 		$this->load->library('parser');
-		$this->parser->parse('template/plaintxt', array('display' => $display));
+		$this->parser->parse('plaintxt', array('display' => $display));
 		
 		return;
 	}

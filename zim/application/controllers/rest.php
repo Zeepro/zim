@@ -106,7 +106,7 @@ class Rest extends MY_Controller {
 // 		http_response_code($cr);
 		$this->output->set_content_type(RETURN_CONTENT_TYPE);
 		$this->load->library('parser');
-		$this->parser->parse('template/plaintxt', array('display' => $display)); //optional
+		$this->parser->parse('plaintxt', array('display' => $display)); //optional
 		
 		return;
 	}
@@ -175,7 +175,7 @@ class Rest extends MY_Controller {
 			// 		http_response_code($cr);
 			$this->output->set_content_type(RETURN_CONTENT_TYPE_JSON);
 			$this->load->library('parser');
-			$this->parser->parse('template/plaintxt', array('display' => $json_data));
+			$this->parser->parse('plaintxt', array('display' => $json_data));
 		}
 		
 		return;
@@ -204,7 +204,7 @@ class Rest extends MY_Controller {
 			// 		http_response_code($cr);
 			$this->output->set_content_type(RETURN_CONTENT_TYPE_JSON);
 			$this->load->library('parser');
-			$this->parser->parse('template/plaintxt', array('display' => $json_data));
+			$this->parser->parse('plaintxt', array('display' => $json_data));
 		}
 		
 		return;
@@ -225,7 +225,7 @@ class Rest extends MY_Controller {
 			// 		http_response_code($cr);
 			$this->output->set_content_type(RETURN_CONTENT_TYPE_JSON);
 			$this->load->library('parser');
-			$this->parser->parse('template/plaintxt', array('display' => $json_data));
+			$this->parser->parse('plaintxt', array('display' => $json_data));
 		}
 		
 		return;
@@ -240,7 +240,7 @@ class Rest extends MY_Controller {
 		$this->output->set_content_type(RETURN_CONTENT_TYPE_JSON);
 // 		echo $display;
 		$this->load->library('parser');
-		$this->parser->parse('template/plaintxt', array('display' => $display));
+		$this->parser->parse('plaintxt', array('display' => $display));
 		
 		return;
 	}
@@ -385,7 +385,7 @@ class Rest extends MY_Controller {
 // 		header('Content-type: text/plain; charset=UTF-8');
 // 		echo $display;
 		$this->load->library('parser');
-		$this->parser->parse('template/plaintxt', array('display' => $display));
+		$this->parser->parse('plaintxt', array('display' => $display));
 		
 		return;
 	}
@@ -470,7 +470,7 @@ class Rest extends MY_Controller {
 		$this->output->set_content_type(RETURN_CONTENT_TYPE_JSON);
 // 		echo $display;
 		$this->load->library('parser');
-		$this->parser->parse('template/plaintxt', array('display' => $display));
+		$this->parser->parse('plaintxt', array('display' => $display));
 		
 		return;
 	}
@@ -839,7 +839,7 @@ class Rest extends MY_Controller {
 		$this->output->set_content_type(RETURN_CONTENT_TYPE);
 // 		echo $display;
 		$this->load->library('parser');
-		$this->parser->parse('template/plaintxt', array('display' => $display));
+		$this->parser->parse('plaintxt', array('display' => $display));
 		
 		return;
 	}
@@ -1311,7 +1311,7 @@ class Rest extends MY_Controller {
 // 		header('Content-type: text/plain; charset=UTF-8');
 // 		echo $display;
 		$this->load->library('parser');
-		$this->parser->parse('template/plaintxt', array('display' => $display));
+		$this->parser->parse('plaintxt', array('display' => $display));
 		
 		return;
 	}
@@ -1372,7 +1372,7 @@ class Rest extends MY_Controller {
 			$this->load->library('parser');
 			$this->output->set_status_header($cr, $display);
 			$this->output->set_content_type(RETURN_CONTENT_TYPE_JSON);
-			$this->parser->parse('template/plaintxt', array('display' => $display));
+			$this->parser->parse('plaintxt', array('display' => $display));
 		}
 		
 		return;
@@ -1476,7 +1476,7 @@ class Rest extends MY_Controller {
 						
 						$this->output->set_content_type(RETURN_CONTENT_TYPE_JSON);
 						$this->load->library('parser');
-						$this->parser->parse('template/plaintxt', array('display' => $display));
+						$this->parser->parse('plaintxt', array('display' => $display));
 						
 						return;
 					}
@@ -1924,7 +1924,7 @@ class Rest extends MY_Controller {
 		$display = PrinterStoring_listStl();
 		$this->output->set_content_type(RETURN_CONTENT_TYPE_JSON);
 		$this->load->library('parser');
-		$this->parser->parse('template/plaintxt', array('display' => $display));
+		$this->parser->parse('plaintxt', array('display' => $display));
 	
 		return;
 	}
@@ -1937,7 +1937,7 @@ class Rest extends MY_Controller {
 		$display = PrinterStoring_listGcode();
 		$this->output->set_content_type(RETURN_CONTENT_TYPE_JSON);
 		$this->load->library('parser');
-		$this->parser->parse('template/plaintxt', array('display' => $display));
+		$this->parser->parse('plaintxt', array('display' => $display));
 	
 		return;
 	}

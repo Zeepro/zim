@@ -35,7 +35,7 @@ class Test_log extends CI_Controller {
 		}
 		
 		$this->load->library('parser');
-		$this->parser->parse('template/plaintxt', array('display' => $display));
+		$this->parser->parse('plaintxt', array('display' => $display));
 // 		$this->output->set_header('Location: /test_log/debug');
 		
 		return;
@@ -48,7 +48,7 @@ class Test_log extends CI_Controller {
 				. ', value: ' . $this->input->post('value'));
 		
 		$this->load->library('parser');
-		$this->parser->parse('template/plaintxt', array('display' => 'ok'));
+		$this->parser->parse('plaintxt', array('display' => 'ok'));
 		return;
 	}
 	

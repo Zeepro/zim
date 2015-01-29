@@ -13,7 +13,6 @@ class Manage extends MY_Controller {
 	
 	public function index() {
 		$template_data = array();
-		$body_page = NULL;
 		$ret_val = 0;
 		
 		$this->load->library('parser');
@@ -68,17 +67,11 @@ class Manage extends MY_Controller {
 				'strip_led_on'	=> ($status_strip == TRUE) ? "selected=selected" : NULL,
 				'head_led_on'	=> ($status_head == TRUE) ? "selected=selected" : NULL,
 		);
-		$body_page = $this->parser->parse('template/manage/index', $template_data, TRUE);
 		
 		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('manage_index_pagetitle') . '</title>' . "\n"
-						. '<link rel="stylesheet" href="/assets/jquery-mobile-fluid960.min.css">',
-				'contents'		=> $body_page,
-		);
-		
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->_parseBaseTemplate(t('manage_index_pagetitle'),
+				$this->parser->parse('manage/index', $template_data, TRUE),
+				'<link rel="stylesheet" href="/assets/jquery-mobile-fluid960.min.css">');
 		
 		return;
 	}
@@ -194,19 +187,15 @@ class Manage extends MY_Controller {
 				'hint'	=> t('hint'),
 				'tromboning'	=> CoreStatus_checkTromboning() ? "true" : "false"
 		);
-		$this->parser->parse('template/manage/rebooting', $template_data);
-		$body_page = $this->parser->parse('template/manage/index', $template_data, TRUE);
 		
-		if (ZimAPI_reboot() == ERROR_OK)
-		{
-			$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('title_reboot') . '</title>' . "\n"
-				. '<link rel="stylesheet" href="/assets/jquery-mobile-fluid960.min.css">',
-				'contents'		=> $body_page,
-			);
-			$this->parser->parse('template/basetemplate', $template_data);
-		}	
+		if (ERROR_OK != ZimAPI_reboot()) {
+			$this->output->set_header('Location: /manage');
+			
+			return;
+		}
+		
+		$this->_parseBaseTemplate(t('title_reboot'), $this->parser->parse('manage/rebooting', $template_data, TRUE));
+		
 		return;
 	}
 
@@ -220,16 +209,11 @@ class Manage extends MY_Controller {
 			'yes_reboot'		=> t('yes_reboot'),
 			'no_reboot'			=> t('no_reboot')
 		);
-		$body_page = $this->parser->parse('template/manage/reboot_confirm', $template_data, TRUE);
-		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('title_reboot') . '</title>' . "\n"
-				. '<link rel="stylesheet" href="/assets/jquery-mobile-fluid960.min.css">',
-				'contents'		=> $body_page,
-		);
 		
-		$this->parser->parse('template/basetemplate', $template_data);
+		// parse all page
+		$this->_parseBaseTemplate(t('title_reboot'),
+				$this->parser->parse('manage/reboot_confirm', $template_data, TRUE));
+		
 		return;
 	}
 
@@ -243,17 +227,11 @@ class Manage extends MY_Controller {
 				'no'		=> t('no'),
 				'shutdown_confirm'	=> t('shutdown_confirm')
 		);
-		$body_page = $this->parser->parse('template/manage/shutdown_confirm', $template_data, TRUE);
 		
 		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('title_shutdown') . '</title>' . "\n"
-				. '<link rel="stylesheet" href="/assets/jquery-mobile-fluid960.min.css">',
-				'contents'		=> $body_page,
-		);
+		$this->_parseBaseTemplate(t('title_shutdown'),
+				$this->parser->parse('manage/shutdown_confirm', $template_data, TRUE));
 		
-		$this->parser->parse('template/basetemplate', $template_data);
 		return; 
 	}
 
@@ -284,7 +262,7 @@ class Manage extends MY_Controller {
 								'length'	=> number_format(round(($initial - $used) / 1000, 2, PHP_ROUND_HALF_DOWN), 2),
 								'length_text'	=> t('length_text'),
 								'action'		=> $action);
-			$this->parser->parse('template/manage/manage_filament_ajax', $template_data);
+			$this->parser->parse('manage/manage_filament_ajax', $template_data);
 		}
 		else
 		{
@@ -295,7 +273,7 @@ class Manage extends MY_Controller {
 					'length'	=> "",
 					'length_text'	=> "",
 					'action'		=> t('insert_action')  . "<br /><br /><br /><br />");
-			$this->parser->parse('template/manage/manage_filament_ajax', $template_data);
+			$this->parser->parse('manage/manage_filament_ajax', $template_data);
 		}
 		
 		$this->output->set_status_header(202);

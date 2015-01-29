@@ -29,7 +29,6 @@ class Preset extends MY_Controller {
 		$display_presetlist = array();
 		$display_all_list = array();
 		$template_data = array();
-		$body_page = NULL;
 		
 		$this->load->library('parser');
 		$this->lang->load('preset/listpreset', $this->config->item('language'));
@@ -71,16 +70,9 @@ class Preset extends MY_Controller {
 				'delete_no'			=> t('delete_no'),
 		);
 		
-		$body_page = $this->parser->parse('template/preset/listpreset', $template_data, TRUE);
-		
 		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('preset_list_title') . '</title>',
-				'contents'		=> $body_page,
-		);
-		
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->_parseBaseTemplate(t('preset_list_title'),
+				$this->parser->parse('preset/listpreset', $template_data, TRUE));
 		
 		return;
 	}
@@ -103,7 +95,6 @@ class Preset extends MY_Controller {
 		$array_setting = NULL;
 		$array_info = NULL;
 		$template_data = array();
-		$body_page = NULL;
 		$option_selected = 'selected="selected"';
 		$display_hide = 'display: none;';
 		$system_preset = FALSE;
@@ -776,16 +767,9 @@ class Preset extends MY_Controller {
 				break;
 		}
 		
-		$body_page = $this->parser->parse('template/preset/detail', $template_data, TRUE);
-		
 		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('preset_detail_pagetitle') . '</title>',
-				'contents'		=> $body_page,
-		);
-		
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->_parseBaseTemplate(t('preset_detail_pagetitle'),
+				$this->parser->parse('preset/detail', $template_data, TRUE));
 		
 		return;
 	}

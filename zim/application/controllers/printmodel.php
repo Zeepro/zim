@@ -22,7 +22,6 @@ class Printmodel extends MY_Controller {
 // 		curl_init('http://example.com');
 		$display_printlist = array();
 		$template_data = array();
-		$body_page = NULL;
 		
 		$this->load->helper('printlist');
 		$this->load->library('parser');
@@ -52,16 +51,9 @@ class Printmodel extends MY_Controller {
 				'back'				=> t('back'),
 		);
 		
-		$body_page = $this->parser->parse('template/printlist/listmodel', $template_data, TRUE);
-		
 		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Quick printing list') . '</title>',
-				'contents'		=> $body_page,
-		);
-		
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->_parseBaseTemplate(t('ZeePro Personal Printer 21 - Quick printing list'),
+				$this->parser->parse('printlist/listmodel', $template_data, TRUE));
 		
 		return;
 	}
@@ -285,34 +277,28 @@ class Printmodel extends MY_Controller {
 				$template_data['need_filament_l'] = $model_data[PRINTLIST_TITLE_LENG_F2];
 				$template_data['exchange_off'] = t('exchange_straight');
 				$template_data['exchange_on'] = t('exchange_crossover');
-				$body_page = $this->parser->parse('template/printlist/detail_2extrud_2color', $template_data, TRUE);
+				$body_page = $this->parser->parse('printlist/detail_2extrud_2color', $template_data, TRUE);
 			}
 			else {
 				$template_data['need_filament_l'] = 0;
 				$template_data['exchange_off'] = t('exchange_right');
 				$template_data['exchange_on'] = t('exchange_left');
-				$body_page = $this->parser->parse('template/printlist/detail_2extrud_1color', $template_data, TRUE);
+				$body_page = $this->parser->parse('printlist/detail_2extrud_1color', $template_data, TRUE);
 			}
 		}
 		else if ($nb_extruder == 1) {
 			if ($mono_color == FALSE) {
 				$template_data['model_c_l'] = $model_data[PRINTLIST_TITLE_COLOR_F2];
 				$template_data['need_filament_l'] = $model_data[PRINTLIST_TITLE_LENG_F2];
-				$body_page = $this->parser->parse('template/printlist/detail_1extrud_2color', $template_data, TRUE);
+				$body_page = $this->parser->parse('printlist/detail_1extrud_2color', $template_data, TRUE);
 			}
 			else {
-				$body_page = $this->parser->parse('template/printlist/detail_1extrud_1color', $template_data, TRUE);
+				$body_page = $this->parser->parse('printlist/detail_1extrud_1color', $template_data, TRUE);
 			}
 		}
 		
 		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Printing details') . '</title>',
-				'contents'		=> $body_page,
-		);
-		
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->_parseBaseTemplate(t('ZeePro Personal Printer 21 - Printing details'), $body_page);
 		
 		return;
 	}

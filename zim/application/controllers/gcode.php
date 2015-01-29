@@ -10,7 +10,6 @@ class Gcode extends MY_Controller {
 	private function _analyse_gcode($mode = 'display', $gcode_id = NULL) {
 		$back_url = '/sliceupload/slice?callback';
 		$request_url = '/sliceupload/gcode_ajax';
-		$body_page = NULL;
 		$template_data = array();
 		
 		$this->load->library('parser');
@@ -48,12 +47,9 @@ class Gcode extends MY_Controller {
 				'layer_flow'			=> t('layer_flow'),
 				'option_others'			=> t('option_others'),
 		);
-		$body_page = $this->parser->parse('/template/gcode.php', $template_data, TRUE);
-		$template_data = array(
-				'headers'		=> '<title>'. t('gcode_pagetitle') . '</title>',
-				'contents'		=> $body_page,
-		);
-		$this->parser->parse('template/basetemplate', $template_data);
+		
+		$this->_parseBaseTemplate(t('gcode_pagetitle'),
+				$this->parser->parse('gcode.php', $template_data, TRUE));
 		
 		return;
 	}

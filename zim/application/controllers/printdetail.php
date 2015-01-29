@@ -279,7 +279,6 @@ class Printdetail extends MY_Controller {
 	
 	public function status() {
 		$time_remain = NULL;
-		$body_page = NULL;
 		$pagetitle = NULL;
 		$template_data = array();
 		$data_status = array();
@@ -398,24 +397,17 @@ class Printdetail extends MY_Controller {
 			}
 		}
 		
-		$body_page = $this->parser->parse('template/printdetail/status', $template_data, TRUE);
-		
 		// parse all page
 		$pagetitle = ($abb_cartridge) ? t('pagetitle_prime') : t('ZeePro Personal Printer 21 - Printing details');
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . $pagetitle . '</title>',
-				'contents'		=> $body_page,
-		);
-		
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->_parseBaseTemplate($pagetitle,
+				$this->parser->parse('printdetail/status', $template_data, TRUE));
 		
 		return;
 	}
 	
 // 	public function slice() {
 // 		$this->load->library('parser');
-// 		$this->parser->parse('template/plaintxt', array('display' => 'IN CONSTRUCTION, goto /rest/status or any rest service'));
+// 		$this->parser->parse('plaintxt', array('display' => 'IN CONSTRUCTION, goto /rest/status or any rest service'));
 // 	}
 	
 	public function cancel() {
@@ -425,7 +417,6 @@ class Printdetail extends MY_Controller {
 		$ret_val = Printer_stopPrint();
 		if ($ret_val == TRUE) {
 			$template_data = array();
-			$body_page = '';
 			$array_status = array();
 			
 			$this->load->library('parser');
@@ -497,16 +488,9 @@ class Printdetail extends MY_Controller {
 				}
 			}
 			
-			$body_page = $this->parser->parse('template/printdetail/cancel', $template_data, TRUE);
-			
 			// parse all page
-			$template_data = array(
-					'lang'			=> $this->config->item('language_abbr'),
-					'headers'		=> '<title>' . t('printdetail_cancel_pagetitle') . '</title>',
-					'contents'		=> $body_page,
-			);
-			
-			$this->parser->parse('template/basetemplate', $template_data);
+			$this->_parseBaseTemplate(t('printdetail_cancel_pagetitle'),
+					$this->parser->parse('printdetail/cancel', $template_data, TRUE));
 			
 			return;
 		}
@@ -522,7 +506,6 @@ class Printdetail extends MY_Controller {
 	
 	public function recovery() {
 		$ret_val = NULL;
-		$body_page = NULL;
 		$template_data = array();
 		
 		//TODO finish me for recovery
@@ -539,22 +522,14 @@ class Printdetail extends MY_Controller {
 				'return_url'	=> '/',
 		);
 		
-		$body_page = $this->parser->parse('template/printdetail/recovery', $template_data, TRUE);
-		
 		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('printdetail_recovery_pagetitle') . '</title>',
-				'contents'		=> $body_page,
-		);
-		
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->_parseBaseTemplate(t('printdetail_recovery_pagetitle'),
+				$this->parser->parse('printdetail/recovery', $template_data, TRUE));
 		
 		return;
 	}
 	
 	public function timelapse() {
-		$body_page = NULL;
 		$template_data = array();
 		$array_info = array();
 		$status_current = NULL;
@@ -766,16 +741,9 @@ class Printdetail extends MY_Controller {
 				'storegcode_title'		=> t('storegcode_title'),
 		);
 		
-		$body_page = $this->parser->parse('template/printdetail/timelapse', $template_data, TRUE);
-		
 		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Printing details') . '</title>',
-				'contents'		=> $body_page,
-		);
-		
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->_parseBaseTemplate(t('ZeePro Personal Printer 21 - Printing details'),
+				$this->parser->parse('printdetail/timelapse', $template_data, TRUE));
 		
 		return;
 	}
@@ -874,7 +842,7 @@ class Printdetail extends MY_Controller {
 				'in_finish'		=> $finish_hint,
 				'reload_player'	=> $reload_player_times,
 		);
-		$this->parser->parse('template/printdetail/status_ajax', $template_data);
+		$this->parser->parse('printdetail/status_ajax', $template_data);
 		
 		$this->output->set_content_type('text/plain; charset=UTF-8');
 		
@@ -930,7 +898,7 @@ class Printdetail extends MY_Controller {
 		$template_data = array(
 				'wait_info'	=> t('wait_hint_cancel'),
 		);
-		$this->parser->parse('template/printdetail/cancel_ajax', $template_data);
+		$this->parser->parse('printdetail/cancel_ajax', $template_data);
 		
 		$this->output->set_content_type('text/plain; charset=UTF-8');
 		
@@ -980,7 +948,7 @@ class Printdetail extends MY_Controller {
 		}
 		
 		// parse the ajax part
-		$this->parser->parse('template/printdetail/cancel_ajax', $template_data); // we can use the same view for recovery
+		$this->parser->parse('printdetail/cancel_ajax', $template_data); // we can use the same view for recovery
 		
 		$this->output->set_content_type('text/plain; charset=UTF-8');
 		

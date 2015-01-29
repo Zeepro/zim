@@ -14,7 +14,6 @@ class Printerstoring extends MY_Controller {
 
 	public function storestl() {
 		$template_data = array();
-		$body_page = NULL;
 		$error = NULL;
 		$response = 0;
 		$button_goto_slice = NULL;
@@ -87,16 +86,10 @@ class Printerstoring extends MY_Controller {
 				'error'			=> $error,
 				'name'		=> t('name')
 		);
-		$body_page = $this->parser->parse('template/printerstoring/storestl', $template_data, TRUE);
 		
 		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('printerstoring_storestl_pagetitle') . '</title>',
-				'contents'		=> $body_page,
-		);
-		
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->_parseBaseTemplate(t('printerstoring_storestl_pagetitle'),
+				$this->parser->parse('printerstoring/storestl', $template_data, TRUE));
 		
 		return;
 	}
@@ -115,16 +108,12 @@ class Printerstoring extends MY_Controller {
 				'stl_models'		=> t('stl_models'),
 				'gcode_models'		=> t('gcode_models'),
 		);
-		$body_page = $this->parser->parse('template/printerstoring/libraries', $template_data, TRUE);
 		
 		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('printerstoring_libraries_pagetitle') . '</title>',
-				'contents'		=> $body_page,
-		);
+		$this->_parseBaseTemplate(t('printerstoring_libraries_pagetitle'),
+				$this->parser->parse('printerstoring/libraries', $template_data, TRUE));
 		
-		$this->parser->parse('template/basetemplate', $template_data);
+		return;
 	}
 
 	public function stllibrary() {
@@ -140,16 +129,12 @@ class Printerstoring extends MY_Controller {
 				'browse_models'		=> t('browse_models'),
 				'add_model'			=> t('add_model')
 		);
-		$body_page = $this->parser->parse('template/printerstoring/stllibrary', $template_data, TRUE);
 		
 		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('printerstoring_stllibrary_pagetitle') . '</title>',
-				'contents'		=> $body_page,
-		);
+		$this->_parseBaseTemplate(t('printerstoring_stllibrary_pagetitle'),
+				$this->parser->parse('printerstoring/stllibrary', $template_data, TRUE));
 		
-		$this->parser->parse('template/basetemplate', $template_data);
+		return;
 	}
 
 	private function array_sort($array, $on, $order=SORT_ASC)
@@ -232,16 +217,12 @@ class Printerstoring extends MY_Controller {
 				'delete_yes'		=> t('delete_yes'),
 				'delete_no'			=> t('delete_no'),
 		);
-		$body_page = $this->parser->parse('template/printerstoring/liststl', $template_data, TRUE);
 		
 		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('printerstoring_liststl_pagetitle') . '</title>',
-				'contents'		=> $body_page,
-		);
+		$this->_parseBaseTemplate(t('printerstoring_liststl_pagetitle'),
+				$this->parser->parse('printerstoring/liststl', $template_data, TRUE));
 		
-		$this->parser->parse('template/basetemplate', $template_data);
+		return;
 	}
 
 	public function getpicture() {
@@ -345,20 +326,15 @@ class Printerstoring extends MY_Controller {
 				'delete_no'				=> t('delete_no'),
 				'preset_name_title'		=> t('preset_name_title'),
 		);
-		$body_page = $this->parser->parse('template/printerstoring/listgcode', $template_data, TRUE);
 		
 		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('printerstoring_listgcode_pagetitle') . '</title>',
-				'contents'		=> $body_page,
-		);
+		$this->_parseBaseTemplate(t('printerstoring_listgcode_pagetitle'),
+				$this->parser->parse('printerstoring/listgcode', $template_data, TRUE));
 		
-		$this->parser->parse('template/basetemplate', $template_data);
+		return;
 	}
 	
 	public function gcodedetail() {
-		$body_page = NULL;
 		$data_json = array();
 		$gid = $this->input->get('id');
 		$array_data = array();
@@ -531,16 +507,9 @@ class Printerstoring extends MY_Controller {
 				'temper_delta'		=> PRINTERSTATE_TEMPER_CHANGE_VAL,
 		);
 		
-		$body_page = $this->parser->parse('template/printerstoring/gcodedetail', $template_data, TRUE);
-		
 		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('printerstoring_gcodedetail_pagetitle') . '</title>',
-				'contents'		=> $body_page,
-		);
-		
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->_parseBaseTemplate(t('printerstoring_gcodedetail_pagetitle'),
+				$this->parser->parse('printerstoring/gcodedetail', $template_data, TRUE));
 		
 		return;
 	}
@@ -572,7 +541,7 @@ class Printerstoring extends MY_Controller {
 		// 		http_response_code($cr);
 		$this->output->set_content_type('text/plain; charset=UTF-8');
 		$this->load->library('parser');
-		$this->parser->parse('template/plaintxt', array('display' => $display)); //optional
+		$this->parser->parse('plaintxt', array('display' => $display)); //optional
 		
 		return;
 	}

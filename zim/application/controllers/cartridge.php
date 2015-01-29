@@ -32,7 +32,6 @@ class Cartridge extends MY_Controller {
 		$err_code = NULL;
 		$error = NULL;
 		$cartridge_data = array();
-		$body_page = NULL;
 		$initial_length_value = 0;
 		$used_length_value = 0;
 		$temper_value = 0;
@@ -182,17 +181,11 @@ class Cartridge extends MY_Controller {
 			}
 			$template_data['cartridge_array'][$cartridge_value]['on'] = $option_selected;
 		}
-	
-		$body_page = $this->parser->parse('template/cartridge', $template_data, TRUE);
-	
+		
 		// parse all page
-		$template_data = array(
-				'lang'			=> 'en',
-				'headers'		=> '<title>'. t('readnwrite_pagetitle') .'</title>',
-				'contents'		=> $body_page,
-		);
-		$this->parser->parse('template/basetemplate', $template_data);
-	
+		$this->_parseBaseTemplate(t('readnwrite_pagetitle'),
+				$this->parser->parse('cartridge', $template_data, TRUE));
+		
 		return;
 	}
 	
@@ -213,10 +206,9 @@ class Cartridge extends MY_Controller {
 		// change color from name to hex code
 		$this->load->helper('printlist');
 		$ret_val = ModelList__changeColorName($color);
-		if ($ret_val == ERROR_WRONG_PRM)
-		{
+		if ($ret_val == ERROR_WRONG_PRM) {
 			$this->output->set_status_header(404);
-	
+			
 			$this->load->helper('printerlog');
 			PrinterLog_logMessage('unknown color name: ' . $color, __FILE__, __LINE__);
 			return;
@@ -235,7 +227,7 @@ class Cartridge extends MY_Controller {
 		$ret_val = PrinterState_setCartridgeAsArray($abb_cartridge, $array_data);
 		if ($ret_val != ERROR_OK) {
 			$this->output->set_status_header(403);
-	
+			
 			$this->load->helper('printerlog');
 			PrinterLog_logMessage('write rfid error: ' . $ret_val, __FILE__, __LINE__);
 		}

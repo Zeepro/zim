@@ -48,10 +48,24 @@ class MY_Controller extends CI_Controller {
 		// optional
 		$this->load->library('parser');
 		$this->output->set_content_type('Content-type: text/plain; charset=UTF-8');
-		$this->parser->parse('template/plaintxt', array('display' => $display));
+		$this->parser->parse('plaintxt', array('display' => $display));
 		$this->output->_display();
 		
 		exit;
+	}
+	
+	public function _parseBaseTemplate($title, $content, $extra_header = NULL) {
+		$this->load->library('parser');
+		
+		$template_data = array(
+				'lang'			=> $this->config->item('language_abbr'),
+				'headers'		=> '<title>' . $title . "</title>\n" . $extra_header,
+				'contents'		=> $content,
+		);
+		
+		$this->parser->parse('basetemplate', $template_data);
+		
+		return;
 	}
 	
 	public function __construct() {

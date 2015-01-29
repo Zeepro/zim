@@ -45,7 +45,6 @@ class Sliceupload extends MY_Controller {
 	
 	public function upload() {
 		$template_data = array();
-		$body_page = NULL;
 		$error = NULL;
 		$response = 0;
 		$button_goto_slice = NULL;
@@ -106,15 +105,9 @@ class Sliceupload extends MY_Controller {
 						'fin_message'	=> t('fin_message'),
 						'key_smax'		=> SLICER_TITLE_MAXSCALE,
 				);
-				$body_page = $this->parser->parse('template/sliceupload/upload_wait', $template_data, TRUE);
 				
-				$template_data = array(
-						'lang'			=> $this->config->item('language_abbr'),
-						'headers'		=> '<title>' . t('sliceupload_upload_pagetitle') . '</title>',
-						'contents'		=> $body_page,
-				);
-				
-				$this->parser->parse('template/basetemplate', $template_data);
+				$this->_parseBaseTemplate(t('sliceupload_upload_pagetitle'),
+						$this->parser->parse('sliceupload/upload_wait', $template_data, TRUE));
 				
 				return;
 			}
@@ -142,7 +135,7 @@ class Sliceupload extends MY_Controller {
 					'link'	=> '/sliceupload/slice',
 					'id'	=> 'goto_slice_button',
 			);
-			$button_goto_slice = $this->parser->parse('template/sliceupload/a_button', $template_data, TRUE);
+			$button_goto_slice = $this->parser->parse('sliceupload/a_button', $template_data, TRUE);
 			
 			if (Slicer_checkSlicedModel()) {
 				$template_data = array(
@@ -150,7 +143,7 @@ class Sliceupload extends MY_Controller {
 						'link'	=> '/sliceupload/slice?callback',
 						'id'	=> 'goto_result_button',
 				);
-				$button_goto_slice .= $this->parser->parse('template/sliceupload/a_button', $template_data, TRUE);
+				$button_goto_slice .= $this->parser->parse('sliceupload/a_button', $template_data, TRUE);
 			}
 		}
 		
@@ -165,16 +158,9 @@ class Sliceupload extends MY_Controller {
 				'goto_slice'	=> $button_goto_slice,
 				'error'			=> $error,
 		);
-		$body_page = $this->parser->parse('template/sliceupload/upload', $template_data, TRUE);
 		
-		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('sliceupload_upload_pagetitle') . '</title>',
-				'contents'		=> $body_page,
-		);
-		
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->_parseBaseTemplate(t('sliceupload_upload_pagetitle'),
+				$this->parser->parse('sliceupload/upload', $template_data, TRUE));
 		
 		return;
 	}
@@ -182,7 +168,6 @@ class Sliceupload extends MY_Controller {
 	function slice() {
 		$ret_val = 0;
 		$status_current = NULL;
-		$body_page = NULL;
 		$list_display = array();
 		$template_data = array();
 		$current_stage = 'wait_slice';
@@ -296,23 +281,15 @@ class Sliceupload extends MY_Controller {
 				'model_zsize'			=> $current_zsize,
 				'model_smax'			=> $current_scale_max,
 		);
-		$body_page = $this->parser->parse('template/sliceupload/slice', $template_data, TRUE);
 		
-		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('sliceupload_slice_pagetitle') . '</title>',
-				'contents'		=> $body_page,
-		);
-		
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->_parseBaseTemplate(t('sliceupload_slice_pagetitle'),
+				$this->parser->parse('sliceupload/slice', $template_data, TRUE));
 		
 		return;
 	}
 	
 	function slicestatus() {
 		$template_data = array();
-		$body_page = NULL;
 		$ret_val = 0;
 		$status_current = NULL;
 		
@@ -334,23 +311,15 @@ class Sliceupload extends MY_Controller {
 				'cancel_button'	=> t('cancel_button'),
 				'wait_cancel'	=> t('wait_cancel'),
 		);
-		$body_page = $this->parser->parse('template/sliceupload/slicestatus', $template_data, TRUE);
 		
-		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('sliceupload_slice_pagetitle') . '</title>',
-				'contents'		=> $body_page,
-		);
-		
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->_parseBaseTemplate(t('sliceupload_slice_pagetitle'),
+				$this->parser->parse('sliceupload/slicestatus', $template_data, TRUE));
 		
 		return;
 	}
 	
 	function restart() {
 		$template_data = array();
-		$body_page = NULL;
 		$in_boot = $this->input->get('inboot');
 		
 		$this->load->library('parser');
@@ -362,23 +331,15 @@ class Sliceupload extends MY_Controller {
 				'check_in_boot'	=> $in_boot ? 'true' : 'false',
 				'wait_msg'		=> $in_boot ? t('wait_in_boot') : t('wait_in_restart'),
 		);
-		$body_page = $this->parser->parse('template/sliceupload/restart', $template_data, TRUE);
 		
-		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('sliceupload_slice_pagetitle') . '</title>',
-				'contents'		=> $body_page,
-		);
-		
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->_parseBaseTemplate(t('sliceupload_slice_pagetitle'),
+				$this->parser->parse('sliceupload/restart', $template_data, TRUE));
 		
 		return;
 	}
 	
 	function reducesize() {
 		$template_data = array();
-		$body_page = NULL;
 		$id = 0;
 		$xsize = 0;
 		$ysize = 0;
@@ -430,17 +391,10 @@ class Sliceupload extends MY_Controller {
 				'reduced_size'		=> t('reduced_size'),
 				'resize_button'		=> t('resize_button'),
 		);
-		$body_page = $this->parser->parse('template/sliceupload/reducesize', $template_data, TRUE);
 		
-		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('sliceupload_slice_pagetitle') . '</title>' . "\n"
-						. '<link rel="stylesheet" href="/assets/jquery-mobile-fluid960.min.css">',
-				'contents'		=> $body_page,
-		);
-		
-		$this->parser->parse('template/basetemplate', $template_data);
+		$this->_parseBaseTemplate(t('sliceupload_slice_pagetitle'),
+				$this->parser->parse('sliceupload/reducesize', $template_data, TRUE));
+		//'<link rel="stylesheet" href="/assets/jquery-mobile-fluid960.min.css">'
 		
 		return;
 	}
@@ -478,7 +432,7 @@ class Sliceupload extends MY_Controller {
 									$this->output->set_status_header(202);
 									$this->output->set_content_type('txt_u');
 									$this->load->library('parser');
-									$this->parser->parse('template/plaintxt', array('display' => $display)); //optional
+									$this->parser->parse('plaintxt', array('display' => $display)); //optional
 									
 									return;
 								}
@@ -501,7 +455,7 @@ class Sliceupload extends MY_Controller {
 		$this->output->set_status_header($cr, $display);
 		$this->output->set_content_type('txt_u');
 		$this->load->library('parser');
-		$this->parser->parse('template/plaintxt', array('display' => $display)); //optional
+		$this->parser->parse('plaintxt', array('display' => $display)); //optional
 		
 		if ($cr != ERROR_OK) {
 			$this->load->helper('printerlog');
@@ -587,7 +541,7 @@ class Sliceupload extends MY_Controller {
 		$this->output->set_status_header($cr, $display);
 		$this->output->set_content_type('txt_u');
 		$this->load->library('parser');
-		$this->parser->parse('template/plaintxt', array('display' => $display)); //optional
+		$this->parser->parse('plaintxt', array('display' => $display)); //optional
 		
 		return;
 	}
@@ -628,7 +582,7 @@ class Sliceupload extends MY_Controller {
 				$cr = ERROR_OK;
 				$this->output->set_status_header($cr);
 				$this->output->set_content_type('txt_u');
-				$this->parser->parse('template/plaintxt', array('display' => $array_data[PRINTERSTATE_TITLE_PERCENT]));
+				$this->parser->parse('plaintxt', array('display' => $array_data[PRINTERSTATE_TITLE_PERCENT]));
 				
 				return;
 			}
@@ -659,7 +613,7 @@ class Sliceupload extends MY_Controller {
 		}
 		$display = $cr . " " . t(MyERRMSG($cr));
 		$this->output->set_content_type('txt_u');
-		$this->parser->parse('template/plaintxt', array('display' => $display)); //optional
+		$this->parser->parse('plaintxt', array('display' => $display)); //optional
 		
 		return;
 	}
@@ -691,7 +645,7 @@ class Sliceupload extends MY_Controller {
 			$display = $cr . " " . t(MyERRMSG($cr));
 			$this->output->set_status_header($cr);
 			$this->output->set_content_type('txt_u');
-			$this->parser->parse('template/plaintxt', array('display' => $display)); //optional
+			$this->parser->parse('plaintxt', array('display' => $display)); //optional
 			
 			return;
 		}
@@ -886,7 +840,7 @@ class Sliceupload extends MY_Controller {
 		
 		if ($array_need['r'] == 'true' && $array_need['l'] == 'true') {
 			$template_data['bicolor_model'] = 'true';
-			$this->parser->parse('template/sliceupload/slice_result_ajax_2color', $template_data);
+			$this->parser->parse('sliceupload/slice_result_ajax_2color', $template_data);
 		}
 		else {
 			$template_data['exchange_o1']		= t('exchange_left');
@@ -897,7 +851,7 @@ class Sliceupload extends MY_Controller {
 				$template_data['exchange_o2_val']	= 0;
 				$template_data['exchange_o2_sel']	= $option_selected;
 			}
-			$this->parser->parse('template/sliceupload/slice_result_ajax_1color', $template_data);
+			$this->parser->parse('sliceupload/slice_result_ajax_1color', $template_data);
 		}
 		
 		$this->output->set_status_header(202);
@@ -955,7 +909,7 @@ class Sliceupload extends MY_Controller {
 		$this->output->set_status_header($cr, ($cr != ERROR_OK) ? $display : 'ok');
 		$this->output->set_content_type('txt_u');
 		$this->load->library('parser');
-		$this->parser->parse('template/plaintxt', array('display' => $display));
+		$this->parser->parse('plaintxt', array('display' => $display));
 		
 		return;
 	}
@@ -989,7 +943,7 @@ class Sliceupload extends MY_Controller {
 // 		http_response_code($cr);
 		$this->output->set_content_type('txt_u');
 		$this->load->library('parser');
-		$this->parser->parse('template/plaintxt', array('display' => $display)); //optional
+		$this->parser->parse('plaintxt', array('display' => $display)); //optional
 		
 		return;
 	}
@@ -1013,7 +967,7 @@ class Sliceupload extends MY_Controller {
 // 		http_response_code($cr);
 		$this->output->set_content_type('txt_u');
 		$this->load->library('parser');
-		$this->parser->parse('template/plaintxt', array('display' => $display)); //optional
+		$this->parser->parse('plaintxt', array('display' => $display)); //optional
 		
 		return;
 	}
@@ -1067,7 +1021,7 @@ class Sliceupload extends MY_Controller {
 				
 				$this->output->set_status_header($ret_val, $display);
 				$this->output->set_content_type('application/json; charset=UTF-8');
-				$this->parser->parse('template/plaintxt', array('display' => $display));
+				$this->parser->parse('plaintxt', array('display' => $display));
 				
 				return;
 			}
@@ -1079,7 +1033,7 @@ class Sliceupload extends MY_Controller {
 		$display = $ret_val . " " . t(MyERRMSG($ret_val));
 		$this->output->set_status_header($ret_val, $display);
 		$this->output->set_content_type('text/plain; charset=UTF-8');
-		$this->parser->parse('template/plaintxt', array('display' => $display));
+		$this->parser->parse('plaintxt', array('display' => $display));
 		
 		return;
 	}
@@ -1115,7 +1069,7 @@ class Sliceupload extends MY_Controller {
 		// 		http_response_code($cr);
 		$this->output->set_content_type('text/plain; charset=UTF-8');
 		$this->load->library('parser');
-		$this->parser->parse('template/plaintxt', array('display' => $display)); //optional
+		$this->parser->parse('plaintxt', array('display' => $display)); //optional
 		
 		return;
 	}
