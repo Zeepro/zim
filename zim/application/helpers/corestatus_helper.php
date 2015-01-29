@@ -12,6 +12,8 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_FILENAME_REMOTEOFF',	'tromboning_off');
 	define('CORESTATUS_FILEPATH_PRODCON',	'/tmp/ProdTmpConnection.tmp');
 	
+	define('CORESTATUS_KEY_GLOBAL_VAR',		'status');
+	
 	define('CORESTATUS_TITLE_VERSION',		'Version');
 // 	define('CORESTATUS_TITLE_CMD',			'CommandLine');
 	define('CORESTATUS_TITLE_STATUS',		'State');
@@ -213,35 +215,56 @@ function CoreStatus_checkTromboning($pure_check = TRUE) {
 	return FALSE;
 }
 
-function CoreStatus_checkInIdle(&$status_current = '', &$array_status = array()) {
-// 	global $CFG;
-	$CI = &get_instance();
-	$state_file = $CI->config->item('conf') . CORESTATUS_FILENAME_WORK;
-	$tmp_array = array();
+function CoreStatus_getStatusArray(&$array_status = array()) {
+	global $PRINTER;
 	
-	$CI->load->helper('json');
-	
-	// read json file
-	try {
-		$tmp_array = json_read($state_file);
-		if ($tmp_array['error']) {
-			throw new Exception('read json error');
+	// check already read or not (need to unset or modify it in setting status)
+	if (!is_array($PRINTER)) {
+		$PRINTER = array();
+	}
+	if (isset($PRINTER[CORESTATUS_KEY_GLOBAL_VAR])) {
+		$array_status = $PRINTER[CORESTATUS_KEY_GLOBAL_VAR];
+	}
+	else {
+		$CI = &get_instance();
+		$state_file = $CI->config->item('conf') . CORESTATUS_FILENAME_WORK;
+		$tmp_array = array();
+		
+		$CI->load->helper('json');
+		
+		// read json file
+		try {
+			$tmp_array = json_read($state_file);
+			if ($tmp_array['error']) {
+				throw new Exception('read json error');
+			}
+		} catch (Exception $e) {
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('read work json error', __FILE__, __LINE__);
+			return FALSE;
 		}
-	} catch (Exception $e) {
-		$CI->load->helper('printerlog');
-		PrinterLog_logError('read work json error', __FILE__, __LINE__);
+		
+		$array_status = $tmp_array['json'];
+		$PRINTER[CORESTATUS_KEY_GLOBAL_VAR] = $array_status;
+	}
+	
+	return TRUE;
+}
+
+// use CoreStatus_getStatusArray in the case when we need status array only
+function CoreStatus_checkInIdle(&$status_current = '', &$array_status = array()) {
+	if (!CoreStatus_getStatusArray($array_status)) {
 		return FALSE;
 	}
 	
 	// check status
-	$array_status = $tmp_array['json'];
 // 	if ($tmp_array['json'][CORESTATUS_TITLE_STATUS] == CORESTATUS_VALUE_IDLE
 // 			|| $tmp_array['json'][CORESTATUS_TITLE_STATUS] == CORESTATUS_VALUE_SLICED) {
-	if ($tmp_array['json'][CORESTATUS_TITLE_STATUS] == CORESTATUS_VALUE_IDLE) {
-		$status_current = $tmp_array['json'][CORESTATUS_TITLE_STATUS];
+	if ($array_status[CORESTATUS_TITLE_STATUS] == CORESTATUS_VALUE_IDLE) {
+		$status_current = $array_status[CORESTATUS_TITLE_STATUS];
 		return TRUE;
 	}
-	$status_current = $tmp_array['json'][CORESTATUS_TITLE_STATUS];
+	$status_current = $array_status[CORESTATUS_TITLE_STATUS];
 	
 	return FALSE;
 }
@@ -626,33 +649,6 @@ function CoreStatus_cleanSliced() {
 	return TRUE;
 }
 
-// function CoreStatus_setInSliced($last_error = FALSE) {
-// 	$status_previous = NULL;
-// 	$ret_val = CoreStatus_checkInIdle($status_previous);
-// 	if ($ret_val == TRUE && $status_previous == CORESTATUS_VALUE_SLICED) {
-// 		return TRUE; // we are already in idle
-// 	}
-// 	else if ($ret_val != FALSE || $status_previous != CORESTATUS_VALUE_SLICE) {
-// 		// reject the changment to sliced when not passing by slicing
-// 		return FALSE;
-// 	}
-	
-// 	if ($last_error !== FALSE) {
-// 		// add last_error for slicing
-// 		// perhaps also check $status_previous == CORESTATUS_VALUE_SLICE ?
-// 		return CoreStatus__setInStatus(CORESTATUS_VALUE_SLICED,
-// 				array(
-// 						CORESTATUS_TITLE_STARTTIME	=> NULL,
-// 						CORESTATUS_TITLE_MESSAGE	=> $last_error,
-// 				)
-// 		);
-// 	}
-	
-// 	return CoreStatus__setInStatus(CORESTATUS_VALUE_SLICED,
-// 			array(CORESTATUS_TITLE_STARTTIME => NULL)
-// 	);
-// }
-
 // function CoreStatus_setInPrinting($model_id, $stop_printing = FALSE) {
 function CoreStatus_setInPrinting($model_id, $exchange_extruder = FALSE, $array_temper = array()) {
 	$CI = &get_instance();
@@ -672,7 +668,6 @@ function CoreStatus_setInPrinting($model_id, $exchange_extruder = FALSE, $array_
 }
 
 function CoreStatus_setInCanceling() {
-// 	return CoreStatus_setInPrinting(CORESTATUS_VALUE_MID_CANCEL, TRUE);
 	//TODO check if we need remaining time for canceling or not?
 // 	return CoreStatus__setInStatus(CORESTATUS_VALUE_CANCEL,
 // 			array(CORESTATUS_TITLE_STARTTIME => time())
@@ -839,12 +834,6 @@ function CoreStatus_wantConnection() {
 	$state_file = $CFG->config['conf'] . CORESTATUS_FILENAME_CONNECT;
 	
 	if (file_exists($state_file)) {
-// 		$ret_val = CoreStatus__setInStatus(CORESTATUS_VALUE_WAIT_CONNECT);
-// 		if ($ret_val != TRUE) {
-// 			return FALSE;
-// 		}
-		
-// 		$ret_val = unlink($state_file);
 		return unlink($state_file);
 	}
 	else if (file_exists(CORESTATUS_FILEPATH_PRODCON))
@@ -1082,24 +1071,14 @@ function CoreStatus__checkCallURI($array_URI) {
 
 function CoreStatus__setInStatus($value_status, $data_array = array()) {
 	global $CFG;
+	global $PRINTER;
 	$state_file = $CFG->config['conf'] . CORESTATUS_FILENAME_WORK;
-	$tmp_array = array();
 	$data_json = array();
 	$fp = NULL;
 	
-	$CI = &get_instance();
-	$CI->load->helper('json');
-	
-	// read json file
-	try {
-		$tmp_array = json_read($state_file);
-		if ($tmp_array['error']) {
-			throw new Exception('read json error');
-		}
-	} catch (Exception $e) {
+	if (!CoreStatus_getStatusArray($data_json)) {
 		return FALSE;
 	}
-	$data_json = $tmp_array['json'];
 	
 	// change status
 	$data_json[CORESTATUS_TITLE_STATUS] = $value_status;
@@ -1107,8 +1086,11 @@ function CoreStatus__setInStatus($value_status, $data_array = array()) {
 		$data_json[$key] = $value;
 	}
 	
+	// assign global variable (initialization is done in getStatusArray, so no need to verify existance)
+	$PRINTER[CORESTATUS_KEY_GLOBAL_VAR] = $data_json;
+	
 	// write json file
-	$fp = fopen($CFG->config['conf'] . CORESTATUS_FILENAME_WORK, 'w');
+	$fp = fopen($state_file, 'w');
 	if ($fp) {
 		fwrite($fp, json_encode($data_json));
 		fclose($fp);

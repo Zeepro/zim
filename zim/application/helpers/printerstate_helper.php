@@ -87,6 +87,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_GET_POSITION',		' M114');
 	define('PRINTERSTATE_ASSIGN_FILA_L',	' -1 ');
 	define('PRINTERSTATE_ASSIGN_FILA_R',	' -0 ');
+	define('PRINTERSTATE_GET_CONSUMPTION',	' M1907');
 	
 	global $CFG;
 	if ($CFG->config['simulator']) {
@@ -573,8 +574,7 @@ function PrinterState_getCartridgeCode(&$code_cartridge, $abb_cartridge, $power_
 	if (!is_array($PRINTER)) {
 		$PRINTER = array();
 	}
-	if (array_key_exists($abb_cartridge, $PRINTER)
-			&& array_key_exists(PRINTERSTATE_PRM_CARTRIDGE, $PRINTER[$abb_cartridge])) {
+	if (isset($PRINTER[$abb_cartridge][PRINTERSTATE_PRM_CARTRIDGE])) {
 		$code_cartridge = $PRINTER[$abb_cartridge][PRINTERSTATE_PRM_CARTRIDGE];
 	}
 	else {
@@ -1223,7 +1223,7 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) 
 	$ret_val = 0;
 	$time_wait = NULL;
 	$time_max = NULL;
-	$temp_status = NULL;
+// 	$temp_status = NULL;
 	$temp_array = array();
 	$CI = &get_instance();
 	
@@ -1243,6 +1243,12 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) 
 		case CORESTATUS_VALUE_CANCEL:
 			// jump out if it's a simulator or when cancelling is finished
 			if ($CI->config->item('simulator') || !file_exists(PRINTERSTATE_FILE_STOPFILE)) {
+				$stats_info = array();
+				
+				//TODO trigger a special gcode to get filament consumption
+				$stats_info = PrinterState_prepareStatsPrintLabel();
+				PrinterLog_statsPrint(PRINTERLOG_STATS_ACTION_CANCEL, $stats_info);
+				
 				CoreStatus_setInIdle();
 				$status_current = CORESTATUS_VALUE_IDLE;
 				
@@ -1328,7 +1334,8 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) 
 			
 		case CORESTATUS_VALUE_LOAD_FILA_L:
 		case CORESTATUS_VALUE_LOAD_FILA_R:
-			CoreStatus_checkInIdle($temp_status, $temp_array);
+// 			CoreStatus_checkInIdle($temp_status, $temp_array);
+			CoreStatus_getStatusArray($temp_array);
 			if (array_key_exists(CORESTATUS_TITLE_FILA_MAT, $temp_array)
 					&& $temp_array[CORESTATUS_TITLE_FILA_MAT] == PRINTERSTATE_DESP_MATERIAL_PVA) {
 				$time_wait = PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD_PVA;
@@ -1377,7 +1384,8 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) 
 					}
 				}
 				
-				CoreStatus_checkInIdle($temp_status, $temp_array);
+// 				CoreStatus_checkInIdle($temp_status, $temp_array);
+				CoreStatus_getStatusArray($temp_array);
 				if (array_key_exists(CORESTATUS_TITLE_FILA_MAT, $temp_array)
 						&& $temp_array[CORESTATUS_TITLE_FILA_MAT] == PRINTERSTATE_DESP_MATERIAL_PVA) {
 					$time_wait = PRINTERSTATE_VALUE_OFFSET_TO_CHECK_UNLOAD_PVA;
@@ -1478,15 +1486,7 @@ function PrinterState_checkSlicedCondition(&$data_json) {
 	
 	// check if we need to change idle into sliced or not
 	$CI->load->helper(array('corestatus', 'slicer'));
-	$temp_data = array(
-			$CI->config->item('temp') . SLICER_FILE_TEMP_DATA,
-			$CI->config->item('temp') . SLICER_FILE_MODEL,
-	);
-	foreach ($temp_data as $filename) {
-		if (!file_exists($filename)) {
-			$in_sliced = FALSE;
-		}
-	}
+	$in_sliced = Slicer_checkSlicedModel();
 	
 	if ($in_sliced == TRUE) {
 		$array_tmp = array();
@@ -1495,7 +1495,7 @@ function PrinterState_checkSlicedCondition(&$data_json) {
 		
 		// try to get information of slicing
 		$CI->load->helper('json');
-		$array_tmp = json_read($temp_data[0], TRUE);
+		$array_tmp = json_read($CI->config->item('temp') . SLICER_FILE_TEMP_DATA, TRUE);
 			
 		if (isset($array_tmp['error'])) {
 			$CI->load->helper('printerlog');
@@ -3192,20 +3192,26 @@ function PrinterState_getPosition(&$json_position) {
 }
 
 function PrinterState_prepareStatsPrintLabel() {
-	$status_current = NULL;
 	$status_array = array();
+	$filament_used = array();
 	$stats_info = array();
 	$CI = &get_instance();
 	
 	$CI->load->helper(array('printerlog', 'corestatus'));
-	CoreStatus_checkInIdle($status_current, $status_array);
+	CoreStatus_getStatusArray($status_array);
 	
 	if (isset($status_array[CORESTATUS_TITLE_PRINTMODEL])) {
 		$stats_info[PRINTERLOG_STATS_MODEL] = $status_array[CORESTATUS_TITLE_PRINTMODEL];
 	}
+	if (ERROR_OK != PrinterState_getConsumption($filament_used)) {
+		$filament_used = array();
+	}
+	
 	foreach (array(
-			CORESTATUS_TITLE_P_TEMPER_L => array('l', PRINTERLOG_STATS_FILA_TYPE_L, PRINTERLOG_STATS_FILA_COLOR_L, PRINTERLOG_STATS_FILA_TEMPER_L),
-			CORESTATUS_TITLE_P_TEMPER_R => array('r', PRINTERLOG_STATS_FILA_TYPE_R, PRINTERLOG_STATS_FILA_COLOR_R, PRINTERLOG_STATS_FILA_TEMPER_R),
+			CORESTATUS_TITLE_P_TEMPER_L => array('l', PRINTERLOG_STATS_FILA_TYPE_L, PRINTERLOG_STATS_FILA_COLOR_L,
+					PRINTERLOG_STATS_FILA_TEMPER_L, PRINTERLOG_STATS_FILA_USED_L),
+			CORESTATUS_TITLE_P_TEMPER_R => array('r', PRINTERLOG_STATS_FILA_TYPE_R, PRINTERLOG_STATS_FILA_COLOR_R,
+					PRINTERLOG_STATS_FILA_TEMPER_R, PRINTERLOG_STATS_FILA_USED_R),
 	) as $check_key => $assign_key) {
 		$json_cartridge = array();
 		
@@ -3213,6 +3219,9 @@ function PrinterState_prepareStatsPrintLabel() {
 			$stats_info[$assign_key[1]] = $json_cartridge[PRINTERSTATE_TITLE_MATERIAL];
 			$stats_info[$assign_key[2]] = $json_cartridge[PRINTERSTATE_TITLE_COLOR];
 			$stats_info[$assign_key[3]] = $status_array[$check_key];
+		}
+		if (isset($filament_used[$assign_key[0]])) {
+			$stats_info[$assign_key[4]] = $filament_used[$assign_key[0]];
 		}
 	}
 	
@@ -3284,6 +3293,50 @@ function PrinterState_prepareStatsSliceLabel($end_slice = FALSE) {
 	}
 	
 	return $stats_info;
+}
+
+function PrinterState_getConsumption(&$array_filament) {
+	global $CFG;
+	$output = array();
+	$command = $CFG->config['arcontrol_c'] . PRINTERSTATE_GET_CONSUMPTION;
+	$ret_val = 0;
+	
+	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output, $command)) {
+		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	PrinterLog_logArduino($command, $output);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		return ERROR_INTERNAL;
+	}
+	
+	// treat return of arduino
+	if (count($output) > 1) {
+		$status = NULL;
+		foreach ($output as $line) {
+			if (strpos($line, ':') === FALSE) {
+				continue;
+			}
+			$tmp_array = explode(':', $line);
+			$consumption = (float) trim($tmp_array[1]);
+			
+			if ($consumption > 0) {
+				$endstop_line = PrinterState_cartridgeNumber2Abbreviate((int)str_replace('E', '', trim($tmp_array[0])));
+				if ($endstop_line != 'error') {
+					$array_filament[$endstop_line] = $consumption;
+				}
+			}
+		}
+		
+		return ERROR_OK;
+	}
+	else {
+		// no usful return
+		PrinterLog_logError('no arduino return', __FILE__, __LINE__);
+	}
+	
+	return ERROR_INTERNAL;
 }
 
 //internal function

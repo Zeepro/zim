@@ -16,6 +16,8 @@ $lang['upload_button']
 	= 'Charger';
 $lang['button_goto_slice']
 	= 'Utiliser ancien modèle';
+$lang['button_goto_result']
+	= 'Utiliser ancien résultat de slicing';
 $lang['header_single']
 	= 'Charger un fichier unique';
 $lang['header_multi']

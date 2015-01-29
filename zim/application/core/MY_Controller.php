@@ -17,7 +17,6 @@ class MY_Controller extends CI_Controller {
 		$json_context = @json_encode($context);
 		$message = strip_tags($msg . " in " . $file . " at " . $line. " with " . $json_context);
 		$this->load->helper('printerlog');
-		PrinterLog_logSSO($level, 500, $message);
 		PrinterLog_logDebug('ErrorHandler ' . $level . ': ' . $message);
 		
 		// just display error for simulator (develop staff), and return 503 for ajax call
@@ -29,6 +28,9 @@ class MY_Controller extends CI_Controller {
 					'message'	=> $message,
 			));
 			die("error");
+		}
+		else {
+			PrinterLog_logSSO($level, 500, $message);
 		}
 		
 		header('Location: /error');

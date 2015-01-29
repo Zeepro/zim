@@ -96,6 +96,7 @@ use constant CMD_GET_OFFSET_X        => 'M1661';
 use constant CMD_GET_OFFSET_Y        => 'M1662';
 use constant CMD_SET_OFFSET          => 'M1660';
 use constant CMD_GET_POSITION        => 'M114';
+use constant CMD_GET_CONSUMPTION     => 'M1907';
 
 use constant CMD_STOP_PRINT    => 'M1000';
 use constant CMD_RESET_PRINTER => 'M1100';
@@ -1189,6 +1190,9 @@ else {
 	}
 	elsif ( $command eq CMD_GET_POSITION ) {
 		print "X:1.23Y:3.21Z:0.00E:27.66 Count X: 1.89Y:3.98Z:0.99\n";
+	}
+	elsif ( $command eq CMD_GET_CONSUMPTION ) {
+		print "E0:123.456\nE1:0.00\n";
 	}
 	elsif ( $command eq CMD_SET_SPEED
 			|| $command eq CMD_SET_ACCELERATION ) {

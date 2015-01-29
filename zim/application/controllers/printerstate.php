@@ -915,10 +915,11 @@ class Printerstate extends MY_Controller {
 				
 			case PRINTERSTATE_CHANGECART_REMOVE_C:
 				// we call the page: in unload filament
-				$status_current = NULL;
+// 				$status_current = NULL;
 				$array_status = array();
 				
-				CoreStatus_checkInIdle($status_current, $array_status);
+// 				CoreStatus_checkInIdle($status_current, $array_status);
+				CoreStatus_getStatusArray($array_status);
 				
 				if (!$this->_deal_with_unloading_wait_time($abb_cartridge, $array_status)) {
 					$this->_display_changecartridge_in_unload_filament($abb_cartridge);
@@ -1047,11 +1048,12 @@ class Printerstate extends MY_Controller {
 				
 			case PRINTERSTATE_CHANGECART_NEED_P:
 				// we call the page: in load filament
-				$status_current = NULL;
+// 				$status_current = NULL;
 				$array_status = array();
 				$offset_check = PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD;
 				
-				CoreStatus_checkInIdle($status_current, $array_status);
+// 				CoreStatus_checkInIdle($status_current, $array_status);
+				CoreStatus_getStatusArray($array_status);
 				if (array_key_exists(CORESTATUS_TITLE_FILA_MAT, $array_status)
 						&& $array_status[CORESTATUS_TITLE_FILA_MAT] == PRINTERSTATE_DESP_MATERIAL_PVA) {
 					$offset_check = PRINTERSTATE_VALUE_OFFSET_TO_CHECK_LOAD_PVA;

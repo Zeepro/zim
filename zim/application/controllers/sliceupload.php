@@ -143,6 +143,15 @@ class Sliceupload extends MY_Controller {
 					'id'	=> 'goto_slice_button',
 			);
 			$button_goto_slice = $this->parser->parse('template/sliceupload/a_button', $template_data, TRUE);
+			
+			if (Slicer_checkSlicedModel()) {
+				$template_data = array(
+						'text'	=> t('button_goto_result'),
+						'link'	=> '/sliceupload/slice?callback',
+						'id'	=> 'goto_result_button',
+				);
+				$button_goto_slice .= $this->parser->parse('template/sliceupload/a_button', $template_data, TRUE);
+			}
 		}
 		
 		// parse the main body
@@ -230,9 +239,9 @@ class Sliceupload extends MY_Controller {
 					$current_xrot = $tmp_array[0][SLICER_PRM_XROT];
 					$current_yrot = $tmp_array[0][SLICER_PRM_YROT];
 					$current_zrot = $tmp_array[0][SLICER_PRM_ZROT];
-					$current_xsize = number_format($tmp_array[0][SLICER_TITLE_XSIZE], 2);
-					$current_ysize = number_format($tmp_array[0][SLICER_TITLE_YSIZE], 2);
-					$current_zsize = number_format($tmp_array[0][SLICER_TITLE_ZSIZE], 2);
+					$current_xsize = number_format($tmp_array[0][SLICER_TITLE_XSIZE], 1);
+					$current_ysize = number_format($tmp_array[0][SLICER_TITLE_YSIZE], 1);
+					$current_zsize = number_format($tmp_array[0][SLICER_TITLE_ZSIZE], 1);
 					$current_scale_max = floor($tmp_array[0][SLICER_TITLE_MAXSCALE]);
 				}
 			} catch (Exeception $e) {

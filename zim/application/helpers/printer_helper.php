@@ -17,6 +17,7 @@ if (!defined('PRINTER_FN_CHARGE')) {
 	define('PRINTER_FN_PRINTPRIME_R',	'_print_prime_right.gcode');
 	define('PRINTER_FN_END_PRINT',		'_print_endscript.sh');
 	define('PRINTER_FN_POST_HEAT',		'_print_postheat.sh');
+	define('PRINTER_FN_PRE_FINISH',		'_print_prefin.sh');
 	define('PRINTER_PRM_TEMPER_L_N',	' -ll ');	// left temperature for other layer (if exist)
 	define('PRINTER_PRM_TEMPER_L_F',	' -l ');	// left temperature for first layer (or all layer)
 	define('PRINTER_PRM_TEMPER_R_N',	' -rr ');	// right temperature for other layer (if exist)
@@ -93,8 +94,9 @@ function Printer_preparePrint($model_id, $need_prime = TRUE) {
 		// timelapse camera switch and prepare script, and write fps info into file
 		if (file_exists(ZIMAPI_FILEPATH_POSTHEAT)) {
 			$script_path = $CI->config->item('temp') . PRINTER_FN_POST_HEAT;
+			$fps = ZIMAPI_VALUE_DEFAULT_TL_LENGTH * 10 / ($timelapse_length / ZIMAPI_VALUE_DEFAULT_SPEED + ZIMAPI_VALUE_DEFAULT_TL_OFFSET);
 			$parameter = str_replace('{fps}',
-					(ZIMAPI_VALUE_DEFAULT_TL_LENGTH * 10 / ($timelapse_length / ZIMAPI_VALUE_DEFAULT_SPEED + ZIMAPI_VALUE_DEFAULT_TL_OFFSET)),
+					min(array(2.5, $fps * 2)), // take the limit value between 2 fps and 2 times of estimate fps
 					ZIMAPI_PRM_CAMERA_PRINTSTART_TIMELAPSE);
 			$command_addon = "\n" . str_replace('sudo nice', 'nice', $CI->config->item('camera')) . $parameter . "\n";
 			
@@ -113,21 +115,27 @@ function Printer_preparePrint($model_id, $need_prime = TRUE) {
 			PrinterLog_logError('prepare post heat script error', __FILE__, __LINE__);
 		}
 		
-		// timelapse generation script
-		if (file_exists(ZIMAPI_FILEPATH_ENDPRINT)) {
-			$script_path = $CI->config->item('temp') . PRINTER_FN_END_PRINT;
-			
-			copy(ZIMAPI_FILEPATH_ENDPRINT, $script_path);
-			chmod($script_path, 0775);
-		}
-		else {
-			$CI->load->helper('printerlog');
-			PrinterLog_logError('prepare end print script error', __FILE__, __LINE__);
+		// timelapse end part generation script + generation script
+		foreach (array(
+						PRINTER_FN_PRE_FINISH	=> ZIMAPI_FILEPATH_PREFINISH,
+						PRINTER_FN_END_PRINT	=> ZIMAPI_FILEPATH_ENDPRINT,
+				) as $tmp_file => $bin_path) {
+			if (file_exists($bin_path)) {
+				$script_path = $CI->config->item('temp') . $tmp_file;
+				
+				copy($bin_path, $script_path);
+				chmod($script_path, 0775);
+			}
+			else {
+				$CI->load->helper('printerlog');
+				PrinterLog_logError('prepare script error: ' . $tmp_file, __FILE__, __LINE__);
+			}
 		}
 	}
 	else {
-		@unlink($CI->config->item('temp') . PRINTER_FN_END_PRINT);
-		@unlink($CI->config->item('temp') . PRINTER_FN_POST_HEAT);
+		foreach (array(PRINTER_FN_END_PRINT, PRINTER_FN_POST_HEAT, PRINTER_FN_PRE_FINISH) as $file_unlink) {
+			@unlink($CI->config->item('temp') . $file_unlink);
+		}
 	}
 	
 	if ($need_prime == TRUE) {
@@ -535,7 +543,7 @@ function Printer_printFromFile($gcode_path, $model_id, $need_prime = TRUE, $exch
 }
 
 function Printer_stopPrint() {
-	$stats_info = array();
+// 	$stats_info = array();
 	$CI = &get_instance();
 	$CI->load->helper('corestatus');
 	
@@ -554,7 +562,8 @@ function Printer_stopPrint() {
 		}
 		else {
 			// in printing
-			$CI->load->helper(array('printlist', 'printerstate', 'zimapi'));
+// 			$CI->load->helper(array('printlist', 'printerstate', 'zimapi'));
+			$CI->load->helper(array('printerstate', 'zimapi'));
 			
 			// change end print script if we cancel printing to not generate timelapse
 			if (file_exists($CI->config->item('temp') . PRINTER_FN_END_PRINT) && file_exists(ZIMAPI_FILEPATH_ENDCANCEL)) {
@@ -562,9 +571,9 @@ function Printer_stopPrint() {
 				chmod($CI->config->item('temp') . PRINTER_FN_END_PRINT, 0775);
 			}
 			
-			//stats info
-			$stats_info = PrinterState_prepareStatsPrintLabel();
-			PrinterLog_statsPrint(PRINTERLOG_STATS_ACTION_CANCEL, $stats_info);
+// 			//stats info
+// 			$stats_info = PrinterState_prepareStatsPrintLabel();
+// 			PrinterLog_statsPrint(PRINTERLOG_STATS_ACTION_CANCEL, $stats_info);
 			
 			// call stop printing gcode status
 			$cr = PrinterState_stopPrinting();
@@ -673,6 +682,7 @@ function Printer_checkPrintStatus(&$return_data) {
 	$data_status = array();
 	$temper_l = 0;
 	$temper_r = 0;
+	$current_phase = -1;
 	
 	$CI = &get_instance();
 	$CI->load->helper(array('printerstate', 'corestatus'));
@@ -699,14 +709,32 @@ function Printer_checkPrintStatus(&$return_data) {
 // 		return FALSE;
 	}
 	
+	if (isset($data_status[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_EXT_OPER])) {
+		switch ($data_status[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_EXT_OPER]) {
+			case PRINTERSTATE_VALUE_PRINT_OPERATION_HEAT:
+				$current_phase = 0;
+				break;
+				
+			case PRINTERSTATE_VALUE_PRINT_OPERATION_PRINT:
+				$current_phase = 1;
+				break;
+				
+			case PRINTERSTATE_VALUE_PRINT_OPERATION_END:
+				$current_phase = 2;
+				break;
+				
+			default:
+				$current_phase = -1;
+				break;
+		}
+	}
+	
 	$return_data = array(
 			'print_percent'	=> $data_status[PRINTERSTATE_TITLE_PERCENT],
 			'print_temperL'	=> $temper_l,
 			'print_temperR'	=> $temper_r,
 			'print_tpassed'	=> $data_status[PRINTERSTATE_TITLE_PASSTIME],
-			'print_heating'	=> (isset($data_status[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_EXT_OPER])
-					&& $data_status[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_EXT_OPER] == PRINTERSTATE_VALUE_PRINT_OPERATION_HEAT)
-					? TRUE : FALSE,
+			'print_inPhase'	=> $current_phase,
 	);
 	
 	// get time remaining if exists
@@ -764,10 +792,12 @@ function Printer_getFileFromModel($type_model, $id_model, &$gcode_path, $filenam
 	$CI = &get_instance();
 	switch ($type_model) {
 		case PRINTER_TYPE_MODELLIST:
+			$CI->load->helper('printlist');
+			
 			$filename_json = PRINTLIST_FILE_JSON;
 			$filename_bz2 = PRINTLIST_FILE_GCODE_BZ2;
 			$filename_gcode = PRINTLIST_FILE_GCODE;
-			$CI->load->helper('printlist');
+			
 			$model_cr = ModelList__find($id_model, $model_path);
 			
 			// get json info
@@ -788,12 +818,12 @@ function Printer_getFileFromModel($type_model, $id_model, &$gcode_path, $filenam
 			break;
 			
 		case PRINTER_TYPE_GCODELIB:
-			$tmp_array = NULL;
+			$CI->load->helper('printerstoring');
 			
+			$tmp_array = NULL;
 			$filename_json = PRINTERSTORING_FILE_INFO_JSON;
 			$filename_bz2 = PRINTERSTORING_FILE_GCODE_BZ2;
 			$filename_gcode = PRINTERSTORING_FILE_GCODE_EXT;
-			$CI->load->helper('printerstoring');
 			
 			$array_info = PrinterStoring_getInfo('gcode', $id_model, $model_path);
 			if (is_null($array_info)) {

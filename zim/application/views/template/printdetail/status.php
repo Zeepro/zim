@@ -59,10 +59,11 @@ function load_jwplayer_video() {
 		autostart: true,
 		fallback: false,
 		androidhls: true
-	});
-	player.onSetupError(function() {
+	}).onSetupError(function() {
 		$("#myVideo").empty().append('<img src="/images/error.png" height="280" width="280" />' +
 									"<p>{video_error}</p>");
+	}).onError(function() {
+		console.log('jwplayer onError: ' + message);
 	});
 }
 
@@ -70,7 +71,8 @@ function check_video_toLoad() {
 	video_check = setInterval(function() {
 		var req = $.ajax({
 			url: "{video_url}",
-			type: "HEAD",
+// 			type: "HEAD",
+			cache: false,
 			success: function() {
 				load_jwplayer_video();
 				clearInterval(video_check);
@@ -85,10 +87,10 @@ check_video_toLoad();
 
 <script>
 var var_refreshPrintStatus;
-var var_refreshVideoURL = 0;
+// var var_refreshVideoURL = 0;
 // var var_firstRun = true;
 // var var_onPlay = false;
-var var_reloaded = false;
+var var_reloaded = 0;
 var var_ajax;
 var var_prime = {var_prime};
 var var_slice = {var_slice};
@@ -220,7 +222,7 @@ function checkPrintStatus() {
 	return;
 }
 
-function refreshVideoURL() {
+function refreshVideoURL(var_reload_times) {
 // 	if (var_onPlay == false) {
 // 		var_refreshVideoURL = setInterval(refreshVideo, 1000 * 5);
 // 	}
@@ -233,8 +235,12 @@ function refreshVideoURL() {
 // 	function refreshVideo() {
 // 		jwplayer('myVideo').load({file:'{video_url}'});
 // 	}
-	if (var_reloaded == false) {
-		var_reloaded = true;
+	if (typeof(var_reload_times) == 'undefined') {
+		return;
+	}
+	
+	if (var_reloaded < var_reload_times) {
+		var_reloaded = var_reload_times;
 		if (video_check != 0) {
 			console.log("ignore reload command in loading video");
 			// already in checking video at page loading state (the case when refresh page in printing / end parse)
@@ -250,7 +256,7 @@ function refreshVideoURL() {
 
 function finishLoop() {
 	clearInterval(var_refreshPrintStatus);
-	clearInterval(var_refreshVideoURL);
+// 	clearInterval(var_refreshVideoURL);
 
 	return;
 }

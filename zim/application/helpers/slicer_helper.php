@@ -915,6 +915,21 @@ function Slicer_exportAMF(&$path_amf, $color1 = NULL, $color2 = NULL) {
 	return $cr;
 }
 
+function Slicer_checkSlicedModel() {
+	global $CFG;
+	
+	foreach (array(
+					$CFG->config['temp'] . SLICER_FILE_TEMP_DATA,
+					$CFG->config['temp'] . SLICER_FILE_MODEL,
+			) as $filename) {
+		if (!file_exists($filename)) {
+			return FALSE;
+		}
+	}
+	
+	return TRUE;
+}
+
 //internal function
 function Slicer__getHTTPCode($http_response_header) {
 	$matches = array();

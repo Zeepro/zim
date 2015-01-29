@@ -93,6 +93,12 @@ function refreshVideoURL() {
 	return;
 }
 
+function again_in_cancel() {
+	$("#overlay").addClass("gray-overlay");
+	$(".ui-loader").css("display", "block");
+	window.location.href="{restart_url}";
+};
+
 function finishAction() {
 	clearInterval(var_refreshCancelStatus);
 	// display info
@@ -100,6 +106,9 @@ function finishAction() {
 	// add return button for Home
 	$('<div>').appendTo('#container')
 	.attr({'id': 'print_action', 'onclick': 'javascript: window.location.href="{return_url}";'}).html('{return_button}')
+	.button().button('refresh');
+	$('<div>').appendTo('#container')
+	.attr({'id': 'again_action', 'onclick': 'javascript: again_in_cancel();'}).html('{again_button}')
 	.button().button('refresh');
 
 	return;

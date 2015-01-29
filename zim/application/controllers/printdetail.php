@@ -316,9 +316,7 @@ class Printdetail extends MY_Controller {
 			return;
 		}
 		
-		if (array_key_exists(PRINTERSTATE_TITLE_EXTEND_PRM, $data_status)
-				&& array_key_exists(PRINTERSTATE_TITLE_EXT_OPER, $data_status[PRINTERSTATE_TITLE_EXTEND_PRM])
-				&& $data_status[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_EXT_OPER] == PRINTERSTATE_VALUE_PRINT_OPERATION_HEAT) {
+		if (!ZimAPI_checkCameraInBlock()) {
 			// only launch camera video for heating parse (camera is in use for other parses)
 			if (!ZimAPI_cameraOn(ZIMAPI_PRM_CAMERA_PRINTSTART)) {
 				$this->load->helper('printerlog');
@@ -428,7 +426,6 @@ class Printdetail extends MY_Controller {
 		if ($ret_val == TRUE) {
 			$template_data = array();
 			$body_page = '';
-			$status_current = NULL;
 			$array_status = array();
 			
 			$this->load->library('parser');
@@ -455,14 +452,49 @@ class Printdetail extends MY_Controller {
 					'return_button'		=> t('Home'),
 					'return_url'		=> '/',
 					'video_url'			=> $this->config->item('video_url'),
+					'restart_url'		=> NULL,
+					'again_button'		=> t('Print again'),
 			);
 			
-			CoreStatus_checkInIdle($status_current, $array_status);
-			if (is_array($array_status) && array_key_exists(CORESTATUS_TITLE_PRINTMODEL, $array_status)
-					&& in_array($array_status[CORESTATUS_TITLE_PRINTMODEL],
-							array(CORESTATUS_VALUE_MID_PRIME_L, CORESTATUS_VALUE_MID_PRIME_R)
-					)) {
-				$template_data['title'] = t('title_prime');
+			if (CoreStatus_getStatusArray($array_status) && is_array($array_status)
+					&& isset($array_status[CORESTATUS_TITLE_PRINTMODEL])) {
+				if (strpos($array_status[CORESTATUS_TITLE_PRINTMODEL], CORESTATUS_VALUE_MID_PREFIXGCODE) === 0) {
+					// gcode library model
+					$gid = (int) substr($array_status[CORESTATUS_TITLE_PRINTMODEL], strlen(CORESTATUS_VALUE_MID_PREFIXGCODE));
+					
+					$template_data['restart_url'] = '/printdetail/printgcode?id=' . $gid;
+				}
+				else {
+					$abb_cartridge = NULL;
+					$restart_url = NULL;
+					
+					switch ($array_status[CORESTATUS_TITLE_PRINTMODEL]) {
+						case CORESTATUS_VALUE_MID_SLICE:
+							$restart_url = '/printdetail/printslice';
+							break;
+							
+						case CORESTATUS_VALUE_MID_PRIME_L:
+							$abb_cartridge = 'l';
+							
+						case CORESTATUS_VALUE_MID_PRIME_R:
+							$abb_cartridge = is_null($abb_cartridge) ? 'r' : $abb_cartridge;
+							
+							$restart_url = '/printdetail/printprime?v=' . $abb_cartridge;
+							$template_data['title'] = t('title_prime');
+							$template_data['again_button'] = t('prime_agin');
+							break;
+							
+						case CORESTATUS_VALUE_MID_CALIBRATION:
+							$restart_url = '/printmodel/detail?id=calibration';
+							break;
+							
+						default:
+							// treat as pre-sliced model
+							$restart_url = '/printdetail/printmodel?id=' . $array_status[CORESTATUS_TITLE_PRINTMODEL];
+							break;
+					}
+					$template_data['restart_url'] = $restart_url;
+				}
 			}
 			
 			$body_page = $this->parser->parse('template/printdetail/cancel', $template_data, TRUE);
@@ -759,9 +791,9 @@ class Printdetail extends MY_Controller {
 		$temper_r = 0;
 		$finish_hint = NULL;
 		$hold_temper = 'false';
-		$status_current = NULL;
+// 		$status_current = NULL;
 		$array_status = array();
-		$reload_player = 'false';
+		$reload_player_times = 0;
 		
 		$this->load->helper(array('printer', 'timedisplay'));
 		$this->load->library('parser');
@@ -802,11 +834,11 @@ class Printdetail extends MY_Controller {
 		}
 		$time_passed = TimeDisplay__convertsecond($data_status['print_tpassed'], t('time_elapsed'));
 		
-		CoreStatus_checkInIdle($status_current, $array_status);
+// 		CoreStatus_checkInIdle($status_current, $array_status);
+		CoreStatus_getStatusArray($array_status);
 		if (isset($array_status[CORESTATUS_TITLE_PRINTMODEL]) && !in_array($array_status[CORESTATUS_TITLE_PRINTMODEL],
-						array(CORESTATUS_VALUE_MID_PRIME_L, CORESTATUS_VALUE_MID_PRIME_R, CORESTATUS_VALUE_MID_CALIBRATION)
-				) && $data_status['print_heating'] == FALSE) {
-			$reload_player = 'true';
+						array(CORESTATUS_VALUE_MID_PRIME_L, CORESTATUS_VALUE_MID_PRIME_R, CORESTATUS_VALUE_MID_CALIBRATION))) {
+			$reload_player_times = $data_status['print_inPhase'];
 		}
 		
 		if ($data_status['print_percent'] == 100) {
@@ -840,7 +872,7 @@ class Printdetail extends MY_Controller {
 				'value_temperL'	=> $temper_l,
 				'value_temperR'	=> $temper_r,
 				'in_finish'		=> $finish_hint,
-				'reload_player'	=> $reload_player,
+				'reload_player'	=> $reload_player_times,
 		);
 		$this->parser->parse('template/printdetail/status_ajax', $template_data);
 		
@@ -953,41 +985,6 @@ class Printdetail extends MY_Controller {
 		$this->output->set_content_type('text/plain; charset=UTF-8');
 		
 		return;
-	}
-
-	public function camera_stop_ajax() {
-		$timelapse_path = '';
-		$capture = (int) $this->input->post('capture');
-		
-		$this->load->helper('zimapi');
-		if (!ZimAPI_cameraOff()) {
-			$this->load->helper('printerlog');
-			PrinterLog_logError('can not turn off camera', __FILE__, __LINE__);
-			return null;
-		}
-		
-		// we need capture image only in slice model case
-		if ($capture == 1) {
-			$capture_path = '';
-			
-			sleep(3); // wait for release of camera
-			if (!ZimAPI_cameraCapture($capture_path)) {
-				$this->load->helper('printerlog');
-				PrinterLog_logError('can not take capture camera', __FILE__, __LINE__);
-				return null;
-			}
-		}
-		
-		if (!ZimAPI_encodeTimelapse($timelapse_path)) {
-			$this->load->helper('printerlog');
-			PrinterLog_logError('can not take encode timelapse', __FILE__, __LINE__);
-			return null;
-		}
-		
-		echo '/tmp/' . ZIMAPI_FILENAME_TIMELAPSE;
-		
-		return;
-//		return $timelapse_path;
 	}
 	
 	public function timelapse_ready_ajax() {

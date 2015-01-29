@@ -68,6 +68,7 @@ unload_filament() {
 	case "$2" in
 		pva)
 			gcode_unload="$gcode_unload P";
+			gcode_charge="$gcode_charge P";
 			prime_speed=50
 			unload_offset=48
 			;;
@@ -120,7 +121,7 @@ unload_filament() {
 	done
 	rm $STATUS_FILE_UNLOAD_HEAT
 	
-	arcontrol_cli G90 M83 $gcode_extruder $gcode_charge "G1 E40 F$prime_speed";
+	arcontrol_cli G90 M83 $gcode_extruder "$gcode_charge" "G1 E40 F$prime_speed";
 	sleep $unload_offset; # wait charging and extruding
 	arcontrol_cli "$gcode_unload";
 	arcontrol_cli "M104 S0 $gcode_extruder";

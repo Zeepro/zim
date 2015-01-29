@@ -46,6 +46,8 @@ $lang['timelapse_button']
 
 $lang['Print again']
 	= 'Print again';
+$lang['prime_agin']
+	= 'Prime again';
 	
 //printdetail status_ajax()
 $lang['Percentage: %d%%']

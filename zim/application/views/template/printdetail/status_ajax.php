@@ -68,9 +68,6 @@ else {
 	$("div#print_detail_info_temper_r").hide();
 }
 
-var var_reloadPlayer = {reload_player};
+refreshVideoURL({reload_player});
 
-if (var_reloadPlayer == true) {
-	refreshVideoURL();
-}
 </script>

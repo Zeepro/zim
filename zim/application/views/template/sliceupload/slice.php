@@ -53,7 +53,7 @@
 						{/preset_list}
 							<option value="_GOTO_PRESET_LIST_">{goto_preset}</option>
 						</select>
-						<p style="text-align: justify; margin: 0; font-size: x-small;">{select_hint}</p>
+						<p style="text-align: center; margin: 0; font-size: x-small;">{select_hint}</p>
 						<!-- usage: $("option#p" + $("select#preset_menu").val()).attr("data-xxx"), or use /sliceupload/preset_prm_ajax?id=[PRESET_ID_HERE] to get json info -->
 					</div>
 				</div>
@@ -288,9 +288,9 @@ function changeModel(changeType) {
 			else {
 				var value_toChange = Math.floor(response.{model_key_smax});
 				
-				$("span#model_xsize_info").html(response.{model_key_xsize}.toFixed(2));
-				$("span#model_ysize_info").html(response.{model_key_ysize}.toFixed(2));
-				$("span#model_zsize_info").html(response.{model_key_zsize}.toFixed(2));
+				$("span#model_xsize_info").html(response.{model_key_xsize}.toFixed(1));
+				$("span#model_ysize_info").html(response.{model_key_ysize}.toFixed(1));
+				$("span#model_zsize_info").html(response.{model_key_zsize}.toFixed(1));
 				
 				$("input#slicer_size").attr("max", value_toChange);
 				console.log("change model max scale: " + value_toChange);
@@ -374,9 +374,9 @@ function resetModel() {
 				throw 'response json does not contain max scale or size info';
 			}
 			else {
-				$("span#model_xsize_info").html(response.{model_key_xsize}.toFixed(2));
-				$("span#model_ysize_info").html(response.{model_key_ysize}.toFixed(2));
-				$("span#model_zsize_info").html(response.{model_key_zsize}.toFixed(2));
+				$("span#model_xsize_info").html(response.{model_key_xsize}.toFixed(1));
+				$("span#model_ysize_info").html(response.{model_key_ysize}.toFixed(1));
+				$("span#model_zsize_info").html(response.{model_key_zsize}.toFixed(1));
 				value_smax = Math.floor(response.{model_key_smax});
 				$("input#slicer_size").attr("max", value_smax);
 				console.log("change model max scale: " + value_smax);

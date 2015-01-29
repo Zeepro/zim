@@ -53,11 +53,12 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	
 	if (DectectOS_checkWindows()) {
 		define('ZIMAPI_FILEPATH_TIMELAPSE',	$CI->config->item('temp') . 'timelapse.mp4');
-		define('ZIMAPI_FILEPATH_TL_TMPIMG',	$CI->config->item('temp') . 'img001.jpg');
+		define('ZIMAPI_FILEPATH_TL_TMPIMG',	$CI->config->item('temp') . 'img0001.jpg');
 		define('ZIMAPI_FILEPATH_CAPTURE',	$CI->config->item('bin') . 'capture.jpg');
 		define('ZIMAPI_FILEPATH_ENDPRINT',	$CI->config->item('bin') . 'timelapse_end_print.sh');
 		define('ZIMAPI_FILEPATH_ENDCANCEL',	$CI->config->item('bin') . 'timelapse_end_cancel.sh');
 		define('ZIMAPI_FILEPATH_POSTHEAT',	$CI->config->item('bin') . 'timelapse_post_heat.sh');
+		define('ZIMAPI_FILEPATH_PREFINISH',	$CI->config->item('bin') . 'timelapse_pre_finish.sh');
 		define('ZIMAPI_FILEPATH_UPGRADE',	$CI->config->item('conf') . 'profile.json');
 		define('ZIMAPI_FILEPATH_VIDEO_TS',	$CI->config->item('temp') . 'zim0.ts');
 		define('ZIMAPI_FILEPATH_UPGDNOTE1',	$CI->config->item('nandconf') . 'release_note.xml');
@@ -65,11 +66,12 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	}
 	else {
 		define('ZIMAPI_FILEPATH_TIMELAPSE',	'/var/www/tmp/timelapse.mp4');
-		define('ZIMAPI_FILEPATH_TL_TMPIMG',	'/var/www/tmp/img001.jpg');
+		define('ZIMAPI_FILEPATH_TL_TMPIMG',	'/var/www/tmp/timelapse/img0001.jpg');
 		define('ZIMAPI_FILEPATH_CAPTURE',	'/var/www/tmp/image.jpg');
 		define('ZIMAPI_FILEPATH_ENDPRINT',	'/var/www/bin/timelapse_end_print.sh');
 		define('ZIMAPI_FILEPATH_ENDCANCEL',	'/var/www/bin/timelapse_end_cancel.sh');
 		define('ZIMAPI_FILEPATH_POSTHEAT',	'/var/www/bin/timelapse_post_heat.sh');
+		define('ZIMAPI_FILEPATH_PREFINISH',	'/var/www/bin/timelapse_pre_finish.sh');
 		define('ZIMAPI_FILEPATH_UPGRADE',	'/config/conf/profile.json');
 		define('ZIMAPI_FILEPATH_VIDEO_TS',	'/var/www/tmp/zim0.ts');
 		define('ZIMAPI_FILEPATH_UPGDNOTE1',	'/config/release_note.xml');
@@ -79,12 +81,10 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_FILENAME_CAMERA',	'Camera.json');
 	define('ZIMAPI_FILENAME_SOFTWARE',	'Software.json');
 	define('ZIMAPI_FILENAME_TIMELAPSE',	'timelapse.mp4');
-	define('ZIMAPI_CMD_GENERATION_TIMELAPSE', // abandoned
-			'nice -n 19 ffmpeg -v quiet -r 10 -f image2 -s 640x360 -i /var/www/tmp/img%03d.jpg -i /var/www/images/logo_calque_60.png -y -filter_complex "[0:v][1:v]overlay=380:5" -vcodec libx264 -crf 35 /var/www/tmp/timelapse.mp4');
 	define('ZIMAPI_PRM_CAMERA_PRINTSTART',
 			' -v quiet -r 15 -s 640x480 -f video4linux2 -i /dev/video0 -vf "crop=640:360:0:60" -minrate 512k -maxrate 512k -bufsize 2512k -map 0 -force_key_frames "expr:gte(t,n_forced*2)" -c:v libx264 -r 15 -threads 2 -crf 35 -profile:v baseline -b:v 512k -pix_fmt yuv420p -flags -global_header -f hls -hls_time 5 -hls_wrap 20 -hls_list_size 10 /var/www/tmp/zim.m3u8');
 	define('ZIMAPI_PRM_CAMERA_PRINTSTART_TIMELAPSE',
-			' -v quiet -r 15 -s 640x480 -f video4linux2 -i /dev/video0 -vf "crop=640:360:0:60" -minrate 512k -maxrate 512k -bufsize 2512k -map 0 -force_key_frames "expr:gte(t,n_forced*2)" -c:v libx264 -r 15 -threads 2 -crf 35 -profile:v baseline -b:v 512k -pix_fmt yuv420p -flags -global_header -f hls -hls_time 5 -hls_wrap 20 -hls_list_size 10 /var/www/tmp/zim.m3u8 -f image2 -vf fps=fps={fps} -qscale:v 2 /var/www/tmp/img%03d.jpg');
+			' -v quiet -r 15 -s 640x480 -f video4linux2 -i /dev/video0 -vf "crop=640:360:0:60" -minrate 512k -maxrate 512k -bufsize 2512k -map 0 -force_key_frames "expr:gte(t,n_forced*2)" -c:v libx264 -r 15 -threads 2 -crf 35 -profile:v baseline -b:v 512k -pix_fmt yuv420p -flags -global_header -f hls -hls_time 5 -hls_wrap 20 -hls_list_size 10 /var/www/tmp/zim.m3u8 -f image2 -vf fps=fps={fps} -qscale:v 2 /var/www/tmp/timelapse/img%04d.jpg');
 	define('ZIMAPI_PRM_CAMERA_STOP',	' stop ');
 	define('ZIMAPI_PRM_END_TIMELAPSE',	' clean_tl ');
 	define('ZIMAPI_PRM_CAMERA_CAPTURE',
@@ -851,7 +851,38 @@ function ZimAPI_cameraCapture(&$path_capture) {
 	return TRUE;
 }
 
-//TODO send always ok and do nothing in printing and lowering_platform of printing status
+function ZimAPI_checkCameraInBlock() {
+	$data_json = array();
+	$CI = &get_instance();
+	
+	$CI->load->helper(array('corestatus', 'printerstate'));
+	
+	// check we are in printing, and not in heating
+	$data_json = PrinterState_checkStatusAsArray(FALSE);
+	if (is_array($data_json) && $data_json[PRINTERSTATE_TITLE_STATUS] == CORESTATUS_VALUE_PRINT
+			&& isset($data_json[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_EXT_OPER])
+			&& $data_json[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_EXT_OPER] != PRINTERSTATE_VALUE_PRINT_OPERATION_HEAT) {
+// 		$status_current = NULL;
+		
+		// check we are in printing of normal model which has timelapse
+		//TODO union two verification of timelapse into 1 (preparePrint function in printer helper and this function)
+// 		CoreStatus_checkInIdle($status_current, $data_json);
+		CoreStatus_getStatusArray($data_json);
+		if (isset($data_json[CORESTATUS_TITLE_PRINTMODEL]) && in_array($data_json[CORESTATUS_TITLE_PRINTMODEL], array(
+						CORESTATUS_VALUE_MID_PRIME_R, CORESTATUS_VALUE_MID_PRIME_L, CORESTATUS_VALUE_MID_CALIBRATION))) {
+			return FALSE;
+		}
+		else {
+			$CI->load->helper('printerlog');
+			PrinterLog_logMessage('ignore all camera requests in printing non-heating phase');
+		}
+		
+		return TRUE;
+	}
+	
+	return FALSE;
+}
+
 // function ZimAPI_cameraOn($parameter, $timelapse_length = 0) {
 function ZimAPI_cameraOn($parameter) {
 	$output = NULL;
@@ -878,14 +909,8 @@ function ZimAPI_cameraOn($parameter) {
 // 	}
 	$command = $CI->config->item('camera') . $parameter;
 	
-	$CI->load->helper(array('printerstate', 'corestatus'));
-	$data_json = PrinterState_checkStatusAsArray(FALSE);
-	if (is_array($data_json) && $data_json[PRINTERSTATE_TITLE_STATUS] == CORESTATUS_VALUE_PRINT
-			&& isset($data_json[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_EXT_OPER])
-			&& $data_json[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_EXT_OPER] != PRINTERSTATE_VALUE_PRINT_OPERATION_HEAT) {
-		$CI->load->helper('printerlog');
-		PrinterLog_logMessage('ignore all camera requests in printing non-heating phase');
-		
+	// check camera is in block status or not
+	if (ZimAPI_checkCameraInBlock()) {
 		return TRUE;
 	}
 	
@@ -930,12 +955,11 @@ function ZimAPI_cameraOn($parameter) {
 	return TRUE;
 }
 
-//TODO send always ok and do nothing in printing and lowering_platform of printing status
 function ZimAPI_cameraOff() {
-	global $CFG;
+	$CI = &get_instance();
 	$output = NULL;
 	$ret_val = 0;
-	$command = $CFG->config['camera'] . ZIMAPI_PRM_CAMERA_STOP;
+	$command = $CI->config->item('camera') . ZIMAPI_PRM_CAMERA_STOP;
 	$data_json = array();
 	$fp = 0;
 	$mode_current = '';
@@ -943,9 +967,13 @@ function ZimAPI_cameraOff() {
 	if (!ZimAPI_checkCamera($mode_current)) {
 		return FALSE;
 	}
-	if ($mode_current == ZIMAPI_VALUE_MODE_OFF) {
+	else if ($mode_current == ZIMAPI_VALUE_MODE_OFF) {
 		return TRUE;
 	}
+	else if (ZimAPI_checkCameraInBlock()) {
+		return TRUE;
+	}
+	
 	exec($command, $output, $ret_val);
 	if ($ret_val != ERROR_NORMAL_RC_OK) {
 		$CI = &get_instance();
@@ -960,7 +988,7 @@ function ZimAPI_cameraOff() {
 	);
 	
 	// write json file
-	$fp = fopen($CFG->config['temp'] . ZIMAPI_FILENAME_CAMERA, 'w');
+	$fp = fopen($CI->config->item('temp') . ZIMAPI_FILENAME_CAMERA, 'w');
 	if ($fp) {
 		fwrite($fp, json_encode($data_json));
 		fclose($fp);
@@ -988,27 +1016,6 @@ function ZimAPI_cleanTimelapseTempFile() {
 		PrinterLog_logMessage('camera clean timelapse command error', __FILE__, __LINE__);
 // 		return FALSE; // we ignore this error
 	}
-	
-	return TRUE;
-}
-
-function ZimAPI_encodeTimelapse(&$path_timelapse) {
-	$output = NULL;
-	$ret_val = 0;
-	
-	exec(ZIMAPI_CMD_GENERATION_TIMELAPSE, $output, $ret_val);
-	if ($ret_val != ERROR_NORMAL_RC_OK) {
-		$CI = &get_instance();
-		$CI->load->helper('printerlog');
-		PrinterLog_logError('encode timelapse command error', __FILE__, __LINE__);
-// 		PrinterLog_logError(ZIMAPI_CMD_GENERATION_TIMELAPSE, __FILE__, __LINE__);
-		return FALSE;
-	}
-	
-	// clean temporary image files
-	ZimAPI_cleanTimelapseTempFile();
-	
-	$path_timelapse = ZIMAPI_FILEPATH_TIMELAPSE;
 	
 	return TRUE;
 }
@@ -1233,6 +1240,30 @@ function ZimAPI_getPresetListAsArray($set_localization = TRUE, $user_only = FALS
 			// localization preset name
 			if ($set_localization) {
 				ZimAPI__setPresetLocalization($tmp_array['json']);
+			}
+			
+			// check json info with 4 parameters
+			if (!array_key_exists(ZIMAPI_TITLE_PRESET_INFILL, $tmp_array['json'])
+					|| !array_key_exists(ZIMAPI_TITLE_PRESET_SKIRT, $tmp_array['json'])
+					|| !array_key_exists(ZIMAPI_TITLE_PRESET_RAFT, $tmp_array['json'])
+					|| !array_key_exists(ZIMAPI_TITLE_PRESET_SUPPORT, $tmp_array['json'])) {
+				$array_settings = array();
+				$ret_val = ZimAPI_getPresetSettingAsArray($preset_id, $array_settings);
+				
+				// assign json data
+				if ($ret_val != ERROR_OK) {
+					continue;
+				}
+				else if (ERROR_OK != ZimAPI_setPresetSetting($preset_id, $array_settings, $tmp_array['json'][ZIMAPI_TITLE_PRESET_NAME], TRUE)) {
+					// we let setPresetSetting function to correct and write json file, and ignore preset in error
+					continue;
+				}
+				else {
+					$tmp_array['json'][ZIMAPI_TITLE_PRESET_INFILL] = $array_settings[ZIMAPI_TITLE_PRESET_INFILL];
+					$tmp_array['json'][ZIMAPI_TITLE_PRESET_SKIRT] = $array_settings[ZIMAPI_TITLE_PRESET_SKIRT];
+					$tmp_array['json'][ZIMAPI_TITLE_PRESET_RAFT] = $array_settings[ZIMAPI_TITLE_PRESET_RAFT];
+					$tmp_array['json'][ZIMAPI_TITLE_PRESET_SUPPORT] = $array_settings[ZIMAPI_TITLE_PRESET_SUPPORT];
+				}
 			}
 			
 			$json_data[] = $tmp_array['json']; //asign final data
@@ -1897,6 +1928,7 @@ function ZimAPI_setPresetSetting($id_preset, $array_input, $name_preset = NULL, 
 	$array_setting = array();
 	$preset_path = NULL;
 	$system_preset = FALSE;
+// 	$rewrite_json = FALSE;
 	$CI = &get_instance();
 	
 	if (!is_array($array_input)) {
@@ -1959,6 +1991,27 @@ function ZimAPI_setPresetSetting($id_preset, $array_input, $name_preset = NULL, 
 		return ERROR_INTERNAL;
 	}
 	
+	// check if 4 parameters are changed in same preset name saving (preset json is forced generated in different preset name saving)
+	if ($name_preset == NULL) {
+		foreach (array(ZIMAPI_TITLE_PRESET_INFILL, ZIMAPI_TITLE_PRESET_SKIRT,
+				ZIMAPI_TITLE_PRESET_RAFT, ZIMAPI_TITLE_PRESET_SUPPORT) as $key) {
+			if ($array_setting[$key] != $array_input[$key]) {
+				$json_data = array();
+				
+				if (ERROR_OK == ZimAPI_getPresetInfoAsArray($id_preset, $json_data)) {
+					$name_preset = $json_data[ZIMAPI_TITLE_PRESET_NAME]; // assign preset name as the case in same name overwrite case
+				}
+				else {
+					$CI->load->helper('printerlog');
+					PrinterLog_logError('read preset info error in reassignment of 4 parameters', __FILE__, __LINE__);
+					
+					return ERROR_INTERNAL;
+				}
+// 				$rewrite_json = TRUE;
+			}
+		}
+	}
+	
 	// assign new setting
 	foreach ($array_input as $key => $value) {
 		$array_setting[$key] = $value;
@@ -1968,7 +2021,7 @@ function ZimAPI_setPresetSetting($id_preset, $array_input, $name_preset = NULL, 
 	if (!file_exists($preset_path)) {
 		mkdir($preset_path);
 	}
-	if ($name_preset != NULL) {
+	if ($name_preset != NULL) { // || $rewrite_json == TRUE
 		$json_data = array(
 				ZIMAPI_TITLE_PRESET_ID		=> ZimAPI_codePresetHash($name_preset),
 				ZIMAPI_TITLE_PRESET_NAME	=> $name_preset,
@@ -2604,5 +2657,4 @@ function ZimAPI__setPresetLocalization(&$array_json) {
 	}
 	
 	return;
-	
 }
