@@ -8,9 +8,7 @@
 	<div data-role="content">
 		<div id="container">
 			<h2>{note_title}</h2>
-			<p id="upgradenote_hint" style="display: none;"><!-- perhaps we pass this part from controller to be multi-language -->
-				Preliminary Note:<br/>If you wish to check previous release notes, please visit our support website.
-			</p>
+			<p id="upgradenote_hint" style="display: none;">{note_hint}</p>
 			<div id="upgradenote_body">{note_body}</div>
 			<div id="go_uimode_part" style="display: none;">
 				<a href="{ui_link}" data-role="button">{ui_button}</a>

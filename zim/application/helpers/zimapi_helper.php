@@ -61,8 +61,8 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 		define('ZIMAPI_FILEPATH_PREFINISH',	$CI->config->item('bin') . 'timelapse_pre_finish.sh');
 		define('ZIMAPI_FILEPATH_UPGRADE',	$CI->config->item('conf') . 'profile.json');
 		define('ZIMAPI_FILEPATH_VIDEO_TS',	$CI->config->item('temp') . 'zim0.ts');
-		define('ZIMAPI_FILEPATH_UPGDNOTE1',	$CI->config->item('nandconf') . 'release_note.xml');
-		define('ZIMAPI_FILEPATH_UPGDNOTE2',	'./data/release_note_1.4.xml');
+		define('ZIMAPI_FILEPATH_UPGDNOTE',	$CI->config->item('nandconf') . 'release_note.xml');
+		define('ZIMAPI_FILEPATH_UPGDNOTES',	'./data/release_notes.xml');
 	}
 	else {
 		define('ZIMAPI_FILEPATH_TIMELAPSE',	'/var/www/tmp/timelapse.mp4');
@@ -74,8 +74,8 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 		define('ZIMAPI_FILEPATH_PREFINISH',	'/var/www/bin/timelapse_pre_finish.sh');
 		define('ZIMAPI_FILEPATH_UPGRADE',	'/config/conf/profile.json');
 		define('ZIMAPI_FILEPATH_VIDEO_TS',	'/var/www/tmp/zim0.ts');
-		define('ZIMAPI_FILEPATH_UPGDNOTE1',	'/config/release_note.xml');
-		define('ZIMAPI_FILEPATH_UPGDNOTE2',	'/var/www/data/release_note.xml');
+		define('ZIMAPI_FILEPATH_UPGDNOTE',	'/config/release_note.xml');
+		define('ZIMAPI_FILEPATH_UPGDNOTES',	'/var/www/data/release_notes.xml');
 	}
 	
 	define('ZIMAPI_FILENAME_CAMERA',	'Camera.json');
@@ -108,6 +108,8 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_TITLE_RELEASENOTE_PART',			'part');
 	define('ZIMAPI_TITLE_RELEASENOTE_PART_TITLE',	'title');
 	define('ZIMAPI_TITLE_RELEASENOTE_PART_NOTE',	'note');
+	define('ZIMAPI_TITLE_RELEASENOTE_UPGRADE',		'upgrade');
+	define('ZIMAPI_TITLE_RELEASENOTE_ATTRIB_LANG',	'lang');
 	
 	define('ZIMAPI_VALUE_DEFAULT_RHO',			800);
 	define('ZIMAPI_VALUE_DEFAULT_DELTA',		45);
@@ -1684,29 +1686,24 @@ function ZimAPI_getUpgradeNote(&$note_html = '') {
 
 function ZimAPI_getUpgradeNoteArray(&$array_upgrade, $display_all = FALSE) {
 	// we put a possibility to parse all notes here
+	$file_note = ($display_all == TRUE) ? ZIMAPI_FILEPATH_UPGDNOTES : ZIMAPI_FILEPATH_UPGDNOTE;
+	
 	$array_upgrade = array(); // initialization of array
 	
-	foreach (array(ZIMAPI_FILEPATH_UPGDNOTE1, ZIMAPI_FILEPATH_UPGDNOTE2) as $file_note) {
-		try {
-			if (file_exists($file_note)) {
-				$xml = simplexml_load_file($file_note);
-				ZimAPI__parseUpgradeXML($xml, $array_upgrade);
-				break;
-			}
-			else {
-				throw new Exception('file not found');
-			}
-		} catch (Exception $e) {
-			$CI = &get_instance();
-			$CI->load->helper('printerlog');
-			PrinterLog_logError('read upgrade release note error, file: ' . $file_note . ', message: ' . $e->getMessage(), __FILE__, __LINE__);
-			
-			if ($file_note != ZIMAPI_FILEPATH_UPGDNOTE2) {
-				continue;
-			}
-			
-			return FALSE;
+	try {
+		if (file_exists($file_note)) {
+			$xml = simplexml_load_file($file_note);
+			ZimAPI__parseUpgradeXML($xml, $array_upgrade);
 		}
+		else {
+			throw new Exception('file not found');
+		}
+	} catch (Exception $e) {
+		$CI = &get_instance();
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('read upgrade release note error, file: ' . $file_note . ', message: ' . $e->getMessage(), __FILE__, __LINE__);
+		
+		return FALSE;
 	}
 	
 	return TRUE;
@@ -2613,29 +2610,76 @@ function ZimAPI__parseUpgradeXML(&$xml, &$array_upgrade) {
 	$key_part = ZIMAPI_TITLE_RELEASENOTE_PART;
 	$key_part_title = ZIMAPI_TITLE_RELEASENOTE_PART_TITLE;
 	$key_part_note = ZIMAPI_TITLE_RELEASENOTE_PART_NOTE;
+	$key_upgrade = ZIMAPI_TITLE_RELEASENOTE_UPGRADE;
+	$attrib_lang = ZIMAPI_TITLE_RELEASENOTE_ATTRIB_LANG;
+	$array_xml = array();
+	$CI = &get_instance();
 	
-	if (count($xml->$key_version) == 0) {
-		throw new Exception('upgrade version not found');
-	}
-	if (count($xml->$key_part)) {
-		$tmp_array = array();
-		foreach($xml->$key_part as $part) {
-			if (count($part->$key_part_title) != 1) {
-				throw new Exception('part with no title or several titles detected');
+	switch(count($xml->$key_version)) {
+		case 0: // new release note system (1.4.1+)
+			if (count($xml->$key_upgrade) == 0) {
+				throw new Exception('upgrade version and node not found');
 			}
-			if (count($part->$key_part_note)) {
-				foreach($part->$key_part_note as $note) {
-					$tmp_array[(string) $part->$key_part_title][] = (string) $note;
+			
+			foreach($xml->$key_upgrade as $upgd_xml) {
+				$array_xml[] = $upgd_xml;
+			}
+			break;
+			
+		case 1: // release note system 1.4
+			$array_xml[] = $xml;
+			break;
+			
+		default:
+			throw new Exception('unknown format with several versions in root');
+	}
+	
+	foreach ($array_xml as $upgd_xml) {
+		if (count($upgd_xml->$key_version) != 1) {
+			throw new Exception('upgrade node contains several versions');
+		}
+		
+		$upgd_version = (string) $upgd_xml->$key_version;
+		
+		if (count($upgd_xml->$key_part)) {
+			$tmp_array = array();
+			$retry = 0;
+			
+			while ($retry < 2) { // this loop just do twice at maximum
+				foreach($upgd_xml->$key_part as $part) {
+					if (isset($part[$attrib_lang]) && (
+							($retry == 0 && $part[$attrib_lang] != $CI->config->item('language_abbr'))
+							|| ($retry > 0 && $part[$attrib_lang] != 'en'))) {
+						// if xml element has language attribute, we select user language, but force to english version if no result;
+						// if xml element has no language attribute, we let it pass the check anyway (that means neutral message)
+						continue;
+					}
+					
+					if (count($part->$key_part_title) != 1) {
+						throw new Exception('part with no title or several titles detected');
+					}
+					if (count($part->$key_part_note)) {
+						foreach($part->$key_part_note as $note) {
+							$tmp_array[(string) $part->$key_part_title][] = (string) $note;
+						}
+					}
+					else {
+						throw new Exception('part with no notes detected');
+					}
+				}
+				
+				if (count($tmp_array)) {
+					break;
+				}
+				else {
+					++$retry;
 				}
 			}
-			else {
-				throw new Exception('part with no notes detected');
-			}
+			$array_upgrade[$upgd_version] = $tmp_array;
 		}
-		$array_upgrade[(string) $xml->$key_version] = $tmp_array;
-	}
-	else {
-		throw new Exception('upgrade with no parts detected');
+		else {
+			throw new Exception('upgrade with no parts detected');
+		}
 	}
 	
 	return;

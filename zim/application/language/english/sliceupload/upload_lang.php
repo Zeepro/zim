@@ -17,7 +17,7 @@ $lang['upload_button']
 $lang['button_goto_slice']
 	= 'Use previous model';
 $lang['button_goto_result']
-	= 'Use previous sliced result';
+	= 'Use previous sliced model';
 $lang['header_single']
 	= 'Single file model';
 $lang['header_multi']

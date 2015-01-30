@@ -562,13 +562,14 @@ class Printerstate extends MY_Controller {
 		$template_data = array();
 		$note_html = NULL;
 		$array_upgrade = array();
+		$normal_mode = ($this->input->get('reboot') === FALSE) ? TRUE : FALSE;
 		
 		$this->load->helper(array('zimapi', 'printerlog'));
 		$this->load->library('parser');
 		$this->lang->load('printerstate/upgradenote', $this->config->item('language'));
 		
 // 		ZimAPI_getUpgradeNote($note_html);
-		if (ZimAPI_getUpgradeNoteArray($array_upgrade)) {
+		if (ZimAPI_getUpgradeNoteArray($array_upgrade, $normal_mode)) {
 			// convert API array to codeigniter display array
 // 			$api_array = array(
 // 					'upgrade vesrion number'	=> array(
@@ -636,13 +637,14 @@ class Printerstate extends MY_Controller {
 		
 		$template_data = array(
 				'back'				=> t('back'),
-				'note_title'		=> t('releasenote_title'),
+				'note_title'		=> ($normal_mode == TRUE) ? t('releasenote_title') : t('whatsnew_title'),
+				'note_hint'			=> t('note_hint'),
 				'note_body'			=> $note_html,
 				'reboot_button'		=> t('releasenote_reboot'),
 				'ui_button'			=> t('ui_button'),
-				'reboot_display'	=> ($this->input->get('reboot') === FALSE) ? 'false' : 'true',
+				'reboot_display'	=> ($normal_mode == TRUE) ? 'false' : 'true',
 				'ui_display'		=> ($this->input->get('ui') === FALSE) ? 'true' : 'false',
-				'ui_link'			=> '/printerstate/upgradenote?ui' . (($this->input->get('reboot') === FALSE) ? NULL : '&reboot'),
+				'ui_link'			=> '/printerstate/upgradenote?ui' . (($normal_mode == TRUE) ? NULL : '&reboot'),
 		);
 		
 		// parse all page
