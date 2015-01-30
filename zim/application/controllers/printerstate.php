@@ -563,6 +563,7 @@ class Printerstate extends MY_Controller {
 		$note_html = NULL;
 		$array_upgrade = array();
 		$normal_mode = ($this->input->get('reboot') === FALSE) ? TRUE : FALSE;
+		$ui_mode = ($this->input->get('ui') === FALSE) ? FALSE : TRUE;
 		
 		$this->load->helper(array('zimapi', 'printerlog'));
 		$this->load->library('parser');
@@ -596,6 +597,10 @@ class Printerstate extends MY_Controller {
 // 						// another part here
 // 				),
 // 			);
+			//TODO move html code into view if marketing group prefer ui mode in collapsibleset
+			if ($ui_mode == TRUE) {
+				$note_html .= '<div id="upgradenote_collapsibleset" data-role="collapsibleset">';
+			}
 			foreach ($array_upgrade as $version => $parts) {
 				$tmp_array = array();
 				
@@ -617,12 +622,15 @@ class Printerstate extends MY_Controller {
 						'part_ele'	=> $tmp_array,
 				);
 				
-				if ($this->input->get('ui') !== FALSE) {
+				if ($ui_mode == TRUE) {
 					$note_html .= $this->parser->parse('printerstate/upgradenote_xml', $template_data, TRUE);
 				}
 				else {
 					$note_html .= $this->parser->parse('printerstate/upgradenote_txt', $template_data, TRUE);
 				}
+			}
+			if ($ui_mode == TRUE) {
+				$note_html .= '</div>';
 			}
 		}
 		else {
@@ -643,7 +651,7 @@ class Printerstate extends MY_Controller {
 				'reboot_button'		=> t('releasenote_reboot'),
 				'ui_button'			=> t('ui_button'),
 				'reboot_display'	=> ($normal_mode == TRUE) ? 'false' : 'true',
-				'ui_display'		=> ($this->input->get('ui') === FALSE) ? 'true' : 'false',
+				'ui_display'		=> ($ui_mode == FALSE) ? 'true' : 'false',
 				'ui_link'			=> '/printerstate/upgradenote?ui' . (($normal_mode == TRUE) ? NULL : '&reboot'),
 		);
 		

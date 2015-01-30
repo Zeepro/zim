@@ -9,10 +9,10 @@
 		<div id="container">
 			<h2>{note_title}</h2>
 			<p id="upgradenote_hint" style="display: none;">{note_hint}</p>
-			<div id="upgradenote_body">{note_body}</div>
 			<div id="go_uimode_part" style="display: none;">
 				<a href="{ui_link}" data-role="button">{ui_button}</a>
 			</div>
+			<div id="upgradenote_body">{note_body}</div>
 			<div id="go_reboot_part" style="display: none;">
 				<a href="/manage/rebooting" data-role="button">{reboot_button}</a>
 <!-- 				<a href="#" data-role="button" data-icon="arrow-u" onclick='javascript: $("html, body").animate({ scrollTop: 0 });'>Top</a> -->
@@ -34,5 +34,7 @@ if (var_reboot == true) {
 else {
 	$("p#upgradenote_hint").show();
 }
+
+$("#upgradenote_collapsibleset").children(":first").collapsible().collapsible("expand");
 </script>
 </div>
