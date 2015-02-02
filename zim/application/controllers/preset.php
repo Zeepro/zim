@@ -52,8 +52,8 @@ class Preset extends MY_Controller {
 				);
 			}
 		}
-		sort($display_presetlist);
-		sort($display_all_list);
+		usort($display_presetlist, 'ZimAPI_usortComparePreset');
+		usort($display_all_list, 'ZimAPI_usortComparePreset');
 		
 		// parse the main body
 		$template_data = array(

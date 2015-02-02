@@ -11,6 +11,10 @@ class Printmodel extends MY_Controller {
 		) );
 	}
 	
+	private function _model_usortCompare($a, $b) {
+		return strcasecmp($a['name'], $b['name']);
+	}
+	
 	public function index() {
 // 		$this->listmodel();
 		$this->output->set_header('Location: /printmodel/listmodel');
@@ -40,7 +44,7 @@ class Printmodel extends MY_Controller {
 			);
 		}
 		// sort list by name of translation, by name of folder if not do so
-		sort($display_printlist);
+		usort($display_printlist, 'Printmodel::_model_usortCompare');
 		
 		// parse the main body
 		$template_data = array(

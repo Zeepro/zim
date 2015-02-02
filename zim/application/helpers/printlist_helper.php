@@ -429,7 +429,7 @@ function ModelList__listAsArray($set_localization = FALSE) {
 	$tmp_array = NULL;
 	
 	$model_array = directory_map($printlist_basepath, 1);
-	sort($model_array); // force make the order of model by alphabet of folder
+// 	sort($model_array); // force make the order of model by alphabet of folder
 	
 	foreach ($model_array as $model_name) {
 		$model_path = $printlist_basepath . $model_name . '/';

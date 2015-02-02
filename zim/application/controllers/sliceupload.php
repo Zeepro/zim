@@ -209,7 +209,7 @@ class Sliceupload extends MY_Controller {
 						'support'	=> isset($preset[ZIMAPI_TITLE_PRESET_SUPPORT]) ? $preset[ZIMAPI_TITLE_PRESET_SUPPORT] : 1,
 				);
 			}
-			sort($list_display);
+			usort($list_display, 'ZimAPI_usortComparePreset');
 			
 			try {
 				$tmp_string = NULL;

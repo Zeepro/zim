@@ -157,10 +157,10 @@ class Printerstoring extends MY_Controller {
 
         switch ($order) {
             case SORT_ASC:
-                asort($sortable_array);
+                asort($sortable_array, SORT_NATURAL | SORT_FLAG_CASE);
             break;
             case SORT_DESC:
-                arsort($sortable_array);
+                arsort($sortable_array, SORT_NATURAL | SORT_FLAG_CASE);
             break;
         }
 
@@ -305,9 +305,9 @@ class Printerstoring extends MY_Controller {
 			);
 		}
 
-		if (isset($display_printlist)) {
-			$display_printlist = $this->array_sort($display_printlist, 'modelname');
-		}
+// 		if (isset($display_printlist)) {
+// 			$display_printlist = $this->array_sort($display_printlist, 'modelname');
+// 		}
 
 		$template_data = array(
 				'back'					=> t('back'),

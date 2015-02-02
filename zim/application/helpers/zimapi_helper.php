@@ -2702,3 +2702,21 @@ function ZimAPI__setPresetLocalization(&$array_json) {
 	
 	return;
 }
+
+function ZimAPI_usortComparePreset($a, $b) {
+	$CI = &get_instance();
+	$lang_current = $CI->config->item('language_abbr');
+	
+	if (!is_array($a[ZIMAPI_TITLE_PRESET_NAME]) || !is_array($b[ZIMAPI_TITLE_PRESET_NAME])) {
+		return strcasecmp($a[ZIMAPI_TITLE_PRESET_NAME], $b[ZIMAPI_TITLE_PRESET_NAME]);
+	}
+	
+	if (isset($array_json[ZIMAPI_TITLE_PRESET_NAME][$lang_current])) {
+		return strcasecmp($a[ZIMAPI_TITLE_PRESET_NAME][$lang_current], $b[ZIMAPI_TITLE_PRESET_NAME][$lang_current]);
+	}
+	else {
+		return strcasecmp($a[ZIMAPI_TITLE_PRESET_NAME]['en'], $b[ZIMAPI_TITLE_PRESET_NAME]['en']);
+	}
+	
+	return 0;
+}
