@@ -34,7 +34,7 @@
 					<h2>{about}</h2></a>
 				</li>
 			</ul>
-			<img src="/assets/images/shadow2.png" class="shadow" alt="shadow">
+			<img src="/images/listShadow.png" class="shadow" alt="shadow">
 		</div>
 	</div>
 <script>

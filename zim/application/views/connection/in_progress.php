@@ -77,10 +77,10 @@ function ping_printer()
 		
 		if (localip.length > 0)
 		{
-			image3.src = "http://" + localip + "/assets/images/pixel.png?_=" + (new Date()).getTime();
+			image3.src = "http://" + localip + "/images/pixel.png?_=" + (new Date()).getTime();
 		}
-		image.src = "http://{hostname}/assets/images/pixel.png?_=" + (new Date()).getTime();
-		image2.src = "http://{hostname}.local/assets/images/pixel.png?_=" + (new Date()).getTime();
+		image.src = "http://{hostname}/images/pixel.png?_=" + (new Date()).getTime();
+		image2.src = "http://{hostname}.local/images/pixel.png?_=" + (new Date()).getTime();
 		setTimeout(function()
 		{
 			if (image3.height != 0)

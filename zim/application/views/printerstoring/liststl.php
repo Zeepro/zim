@@ -21,7 +21,7 @@
 				</li>
 				{/list}
 			</ul>
-			<img src="/assets/images/shadow2.png" class="shadow" alt="shadow">
+			<img src="/images/listShadow.png" class="shadow" alt="shadow">
 		</div>
 		<div id="delete_popup" data-role="popup" data-dismissible="false" class="ui-content" style="max-width: 250px; text-align: center;">
 				{delete_popup_text}

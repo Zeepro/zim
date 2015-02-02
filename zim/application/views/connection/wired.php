@@ -12,13 +12,13 @@
 				class="shadowBox">
 				<li><a href="/connection/wiredauto">{auto_btn}</a></li>
 			</ul>
-			<img src="/assets/images/shadow2.png" class="shadow" alt="shadow">
+			<img src="/images/listShadow.png" class="shadow" alt="shadow">
 			{text2}
 			<ul data-role="listview" data-inset="true" id="listview"
 				class="shadowBox">
 				<li><a href="/connection/wiredadvanced" data-prefetch>{adv_btn}</a></li>
 			</ul>
-			<img src="/assets/images/shadow2.png" class="shadow" alt="shadow">
+			<img src="/images/listShadow.png" class="shadow" alt="shadow">
 		</div>
 	</div>
 </div>

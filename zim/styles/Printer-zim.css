@@ -18,11 +18,11 @@ div#link_logo {
 }
 .ui-page-theme-a {
 	color:#575749;
-	background: url("/assets/images/page-backgrounds/back-4.jpg") 0 -100px repeat-x #f9f7f3;
+	background: url("/images/pageBack.jpg") 0 -100px repeat-x #f9f7f3;
 	background-size: 79px 200px; 
 }
 .page-header { 
-	background: url("/assets/images/headerBack.png") bottom repeat-x !important;
+	background: url("/images/headerBack.png") bottom repeat-x !important;
 	border: 0px !important;
 	color: #333;
 	height: 38px;

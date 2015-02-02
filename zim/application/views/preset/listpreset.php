@@ -40,7 +40,7 @@
 				</li>
 				{/model_lists}
 			</ul>
-			<img src="/assets/images/shadow2.png" class="shadow" alt="shadow">
+			<img src="/images/listShadow.png" class="shadow" alt="shadow">
 		</div>
 	</div>
 

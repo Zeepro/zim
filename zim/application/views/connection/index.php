@@ -14,7 +14,7 @@
 			</ul>
 <!-- 			<br> -->
 <!-- 			<a href="/printerstate/sethostname?norestart" data-role="button" style="font-weight: lighter;">{set_hostname}</a> -->
-			<img src="/assets/images/shadow2.png" class="shadow" alt="shadow">
+			<img src="/images/listShadow.png" class="shadow" alt="shadow">
 		</div>
 	</div>
 </div>

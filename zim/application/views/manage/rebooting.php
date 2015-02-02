@@ -28,7 +28,7 @@
 				var ping = new Image();
 				var interval = setInterval(function()
 				{
-					ping.src = "/assets/images/pixel.png?_=" + (new Date()).getTime();
+					ping.src = "/images/pixel.png?_=" + (new Date()).getTime();
 					if (ping.height > 0)
 					{
 						clearInterval(interval);
