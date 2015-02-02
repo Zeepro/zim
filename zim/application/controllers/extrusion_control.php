@@ -23,7 +23,7 @@ class Extrusion_control extends MY_Controller {
 		$this->load->library('parser');
 
 		// parse the main body
-		$body_page = $this->parser->parse('Zim', array(), TRUE);
+		$body_page = $this->parser->parse('extrusion_control', array(), TRUE);
 
 		// parse all page
 		$template_data = array(
