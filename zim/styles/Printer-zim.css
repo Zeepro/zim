@@ -5,19 +5,21 @@
 
 div.logo {
 	width: 100%;
-	height: 75px;
+	height: 66px;
 	background: url("/images/logo_zeeproshare.png") top center no-repeat;
+	margin-top: -20px;
+	margin-bottom: 16px;
 }
 div#link_logo {
 	margin: 0 auto;
-	width: 275px;
-	height: 70px;
+	width: 270px;
+	height: 100%;
 	cursor: pointer;
 }
 .ui-page-theme-a {
 	color:#575749;
 	background: url("/assets/images/page-backgrounds/back-4.jpg") 0 -100px repeat-x #f9f7f3;
-	background-size: 79px 210px; 
+	background-size: 79px 200px; 
 }
 .page-header { 
 	background: url("/assets/images/headerBack.png") bottom repeat-x !important;

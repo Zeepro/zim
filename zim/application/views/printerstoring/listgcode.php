@@ -49,9 +49,12 @@ function compare_date(a,b) {
 }
 
 function compare_name(a,b) {
-	if (a.modelname < b.modelname)
+	var comp_a = a.modelname.toLowerCase();
+	var comp_b = b.modelname.toLowerCase();
+	
+	if (comp_a < comp_b)
 		return -1;
-	else if (a.modelname > b.modelname)
+	else if (comp_a > comp_b)
 		return 1;
 	else
 		return 0;

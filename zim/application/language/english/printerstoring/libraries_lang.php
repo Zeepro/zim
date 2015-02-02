@@ -9,7 +9,7 @@ $lang['libraries_info']
 	= '<b>My Library</b> is your dedicated location to store models and prints.<br />Use it also to trigger a print from your mobile device!';
 
 $lang['stl_models']
-	= 'All my models';
+	= 'My models';
 
 $lang['gcode_models']
 	= 'My prints';
