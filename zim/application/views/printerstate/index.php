@@ -114,21 +114,21 @@ $("#remote_control").change(function() {
  		alert("failed");
  	});
 });
-// $("#statistic").change(function() {
-// 	var var_state = $("#statistic").val().toString();
-// 	var_ajax = $.ajax({
-// 		url: "/rest/set",
-// 		cache: false,
-// 		data: {
-// 			p: "stats",
-// 			v: var_state,
-// 			},
-// 		type: "GET",
-// 	})
-// 	.fail(function() {
-// 		alert("failed");
-// 	});
-// });
+$("#statistic").change(function() {
+	var var_state = $("#statistic").val().toString();
+	var_ajax = $.ajax({
+		url: "/rest/set",
+		cache: false,
+		data: {
+			p: "stats",
+			v: var_state,
+			},
+		type: "GET",
+	})
+	.fail(function() {
+		alert("failed");
+	});
+});
 
 $('a#zim_support').click(function(event) {
 	$.get('/printerstate/stats_support', function() { console.log('stats support call sent.'); });
