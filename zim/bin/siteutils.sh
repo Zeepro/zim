@@ -164,7 +164,7 @@ case "$1" in
 		;;
 		
 	remote_slice)
-		/etc/init.d/remote_slice start "$2" "$3"
+		/etc/init.d/remote_slice slice "$2" "$3"
 		;;
 		
 	remote_slice_stop)
