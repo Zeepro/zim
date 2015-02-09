@@ -1,4 +1,41 @@
 <?php
+// slice status ajax
+$lang['state_initialize_remote']
+	= 'Initializing remote slicing';
+$lang['state_request_remote']
+	= 'Connecting';
+$lang['state_upload_remote']
+	= 'Uploading';
+$lang['state_working_remote']
+	= 'Phrasing working state';
+$lang['state_download_remote']
+	= 'Downloading';
+$lang['state_local_remote']
+	= 'Starting local slicing';
+$lang['state_finalize_remote']
+	= 'Finalizing remote slicing';
+$lang['state_loading_remote']
+	= 'Initializing remotely';
+$lang['Initialization slicing']
+	= 'Initialization slicing';
+$lang['Processing triangulated mesh']
+	= 'Processing triangulated mesh';
+$lang['Generating perimeters']
+	= 'Generating perimeters';
+$lang['Preparing infill']
+	= 'Preparing infill';
+$lang['Infilling layers']
+	= 'Infilling layers';
+$lang['Generating support material']
+	= 'Generating support material';
+$lang['Generating skirt/brim']
+	= 'Generating skirt/brim';
+$lang['Running post-processing scripts']
+	= 'Running post-processing scripts';
+$lang['Exporting G-code']
+	= 'Exporting G-code';
+
+// slice result ajax
 $lang['temper_diff_msg']
 	= 'Detect difference between slice data and cartridge, extrusion temperature: %d vs %d';
 $lang['first_temper_diff_msg']

@@ -14,8 +14,8 @@
 				{list}
 				<li id="stlmodel_{id}">
 					<a href='#' id="printmodel-{id}" onclick="printmodel('{id}');">
-						<img src="{image}" style="vertical-align:middle">
-						<h2>{name}</h2>
+						<img src="/printerstoring/getpicture?type=stl&id={id}" style="vertical-align:middle">
+						<h2>{name}</h2><p>{creation_date}</p>
 					</a>
 					<a href='#delete_popup' data-rel="popup" id="deletemodel-{id}" onclick="javascript: pre_deletemodel('{id}');">{delete-model}</a>
 				</li>

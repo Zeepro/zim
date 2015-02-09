@@ -22,6 +22,8 @@ if (!defined('PRINTERSTORING_FILE_STL1_BZ2')) {
 	define('PRINTERSTORING_TITLE_MATER_L',		'm2');
 	define('PRINTERSTORING_TITLE_MULTI_STL',	'multiple');
 	define('PRINTERSTORING_TITLE_PRESET_ID',	'preset');
+	define('PRINTERSTORING_TITLE_CREATE_DATE',	'creation_date');
+	define('PRINTERSTORING_TITLE_CREATE_TIME',	'creation_time');
 	
 	define('PRINTERSTORING_VALUE_MIN_FREESPACE',	209715200); // 200MB
 }
@@ -208,9 +210,10 @@ function PrinterStoring_storeStl($name, $f1, $f2) {
 	$info = array(
 		"id" => $model_id,
 		"name" => $name,
-		"creation_date" => date("Y-m-d"),
+// 		"creation_date"	=> date("Y-m-d"),
 // 		"multiple" => ($f2 === NULL ? false : true)
-		PRINTERSTORING_TITLE_MULTI_STL	=> ($f2 === NULL ? false : true),
+		PRINTERSTORING_TITLE_CREATE_DATE	=> date("Y-m-d"),
+		PRINTERSTORING_TITLE_MULTI_STL		=> ($f2 === NULL ? false : true),
 	);
 
 	if (!PrinterStoring__createInfoFile($info_file, $info)) {
@@ -419,7 +422,8 @@ function PrinterStoring_listStl() {
 							'id' => $info['id'],
 							'name' => $info['name'],
 							'imglink' => NULL,
-							'creation_date' => $info['creation_date']
+// 							'creation_date' => $info['creation_date'],
+							PRINTERSTORING_TITLE_CREATE_DATE	=> $info[PRINTERSTORING_TITLE_CREATE_DATE]
 						);
 						if (@is_file($stl_model_folder . PRINTERSTORING_FILE_IMG_PNG)) {
 							$model['imglink'] = $CFG->config['stl_library'] . sprintf('%06d', $model['id']) . '/' . PRINTERSTORING_FILE_IMG_PNG;
@@ -459,11 +463,24 @@ function PrinterStoring_listGcode() {
 								'id'							=> $info['id'],
 								'name'							=> $info['name'],
 								'imglink'						=> NULL,
-								'creation_date'					=> $info['creation_date'],
+// 								'creation_date'					=> $info[PRINTERSTORING_TITLE_CREATE_DATE],
 								PRINTERSTORING_TITLE_PRESET_ID	=> isset($info[PRINTERSTORING_TITLE_PRESET_ID]) ? $info[PRINTERSTORING_TITLE_PRESET_ID] : NULL,
 						);
 						if (is_file($gcode_model_folder . PRINTERSTORING_FILE_IMG_JPG)) {
 							$model['imglink'] = $gcode_library_path . sprintf('%06d', $model['id']) . '/' . PRINTERSTORING_FILE_IMG_JPG;
+						}
+						
+						// 
+						if (isset($info[PRINTERSTORING_TITLE_CREATE_TIME])) {
+							$model[PRINTERSTORING_TITLE_CREATE_DATE] = date('Y-M-d', $info[PRINTERSTORING_TITLE_CREATE_TIME]);
+							$model[PRINTERSTORING_TITLE_CREATE_TIME] = $info[PRINTERSTORING_TITLE_CREATE_TIME];
+						}
+						else if (isset($info[PRINTERSTORING_TITLE_CREATE_DATE])) {
+							$model[PRINTERSTORING_TITLE_CREATE_DATE] = $info[PRINTERSTORING_TITLE_CREATE_DATE];
+							$model[PRINTERSTORING_TITLE_CREATE_TIME] = strtotime($info[PRINTERSTORING_TITLE_CREATE_DATE]);
+						}
+						else {
+							throw new Exception('unknown gcode library model info json');
 						}
 
 						array_push($modellist, $model);
@@ -639,13 +656,14 @@ function PrinterStoring_storeGcode($name) {
 	$info = array(
 			"id" => $model_id,
 			"name" => $name,
-			"creation_date" => date("Y-m-d"),
+// 			"creation_date" => date("Y-m-d"),
 // 			"length" => $length
-			PRINTERSTORING_TITLE_LENG_R		=> $array_length['r'],
-			PRINTERSTORING_TITLE_LENG_L		=> $array_length['l'],
-			PRINTERSTORING_TITLE_MATER_R	=> $array_material['r'],
-			PRINTERSTORING_TITLE_MATER_L	=> $array_material['l'],
-			PRINTERSTORING_TITLE_PRESET_ID	=> $preset_id,
+			PRINTERSTORING_TITLE_CREATE_TIME	=> time(),
+			PRINTERSTORING_TITLE_LENG_R			=> $array_length['r'],
+			PRINTERSTORING_TITLE_LENG_L			=> $array_length['l'],
+			PRINTERSTORING_TITLE_MATER_R		=> $array_material['r'],
+			PRINTERSTORING_TITLE_MATER_L		=> $array_material['l'],
+			PRINTERSTORING_TITLE_PRESET_ID		=> $preset_id,
 	);
 
 	if (!PrinterStoring__createInfoFile($info_file, $info)) {

@@ -1126,6 +1126,7 @@ function PrinterState_afterFileCommand() {
 }
 
 function PrinterState__setSlicedJson($array_slicer, &$array_ret = array()) {
+	$array_data = array();
 	$CI = &get_instance();
 	$CI->load->helper('slicer');
 	
@@ -1259,10 +1260,11 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) 
 		case CORESTATUS_VALUE_SLICE:
 			// get percentage and check finished or not
 			$progress = 0;
+			$message = NULL;
 			$array_slicer = array();
 			
 			$CI->load->helper('slicer');
-			$ret_val = Slicer_checkSlice($progress, $array_slicer);
+			$ret_val = Slicer_checkSlice($progress, $message, $array_slicer);
 			if ($ret_val != ERROR_OK) {
 				$error_message = NULL;
 				$stats_info = array();
@@ -1276,25 +1278,27 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) 
 					//TODO treat the error with api and ui
 					case ERROR_NO_SLICING:
 						$error_message = 'not in slicing';
-						PrinterLog_logMessage($error_message, __FILE__, __LINE__);
 						break;
 						
 					case ERROR_WRONG_PRM:
 						$error_message = 'slicer error'; // perhaps because of parameter
-						PrinterLog_logMessage($error_message, __FILE__, __LINE__);
 						break;
 						
 					case ERROR_UNKNOWN_MODEL:
 						$error_message = 'slicer export error'; // perhaps because of model
-						PrinterLog_logMessage($error_message, __FILE__, __LINE__);
+						break;
+						
+					case ERROR_REMOTE_SLICE:
+						$error_message = 'remote slicer error';
 						break;
 						
 					default:
 						$error_message = 'slicer internal error'; // internal system error
-						PrinterLog_logError($error_message, __FILE__, __LINE__);
 						PrinterLog_logDebug('return: ' . $ret_val . ', progress: ' . $progress);
 						break;
 				}
+				PrinterLog_logMessage($error_message, __FILE__, __LINE__);
+				
 				CoreStatus_setInIdle($ret_val, $error_message);
 				$array_data[PRINTERSTATE_TITLE_DETAILMSG] = $error_message;
 				
@@ -1329,6 +1333,7 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) 
 			}
 			else { // still in slicing, so get percentage (estimated time is useless for now, slicer exports percentage badly)
 				$array_data[PRINTERSTATE_TITLE_PERCENT] = $progress;
+				$array_data[PRINTERSTATE_TITLE_DETAILMSG] = $message;
 			}
 			break;
 			
@@ -3145,6 +3150,10 @@ function PrinterState_getPositionAsArray(&$array_pos) {
 	$array_pos = array();
 	
 	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output, $command)) {
+		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
 	PrinterLog_logArduino($command, $output);
 	if ($ret_val != ERROR_NORMAL_RC_OK) {
 		PrinterLog_logError('get position command error', __FILE__, __LINE__);

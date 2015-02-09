@@ -20,8 +20,9 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 	define('SLICER_URL_ADD_STATUS',		'addstatus');
 	define('SLICER_URL_SETPARAMETER',	'setparameter?');
 	define('SLICER_URL_CHECKSIZES',		'checksizes');
-	define('SLICER_URL_EXPORTAMF',		'exportamf');
+	define('SLICER_URL_EXPORT_AMF',		'exportamf');
 	define('SLICER_URL_RESET_MODEL',	'resetmodel?id=');
+	define('SLICER_URL_EXPORT_ALL',		'export2slice');
 	
 	define('SLICER_PRM_ID',		'id');
 	define('SLICER_PRM_XPOS',	'xpos');
@@ -55,6 +56,25 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 	define('SLICER_FILE_HTTP_PORT',	'Slic3rPort.txt');
 	
 	define('SLICER_FILE_SLICELOG',	'/var/log/slic3r');
+	if (DectectOS_checkWindows()) {
+		define('SLICER_FILE_REMOTE_STATUS',	$CI->config->item('temp') . 'remote_slice.json');
+		define('SLICER_FILE_REMOTE_LOG',	$CI->config->item('temp') . 'remoteSlice.log');
+	}
+	else {
+		define('SLICER_FILE_REMOTE_STATUS',	'/tmp/remote_slice.json');
+		define('SLICER_FILE_REMOTE_LOG',	'/var/log/remoteSlice');
+	}
+	
+	define('SLICER_TITLE_REMOTE_STATE',		'state');
+	define('SLICER_TITLE_REMOTE_EXTENDED',	'extended');
+	
+	define('SLICER_VALUE_REMOTE_STATE_INITIAL',		'initial');
+	define('SLICER_VALUE_REMOTE_STATE_REQUEST',		'request');
+	define('SLICER_VALUE_REMOTE_STATE_UPLOAD',		'upload');
+	define('SLICER_VALUE_REMOTE_STATE_WORKING',		'working');
+	define('SLICER_VALUE_REMOTE_STATE_DOWNLOAD',	'download');
+	define('SLICER_VALUE_REMOTE_STATE_LOCAL',		'local');
+	define('SLICER_VALUE_REMOTE_STATE_ERROR',		'error');
 	
 	define('SLICER_OFFSET_VALUE_COLOR2EXTRUDER',	-1);
 	
@@ -75,6 +95,11 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 	define('SLICER_CMD_SLICER_PS_STATUS',	'ps -A | grep slic3r.bin');
 	define('SLICER_CMD_RESTART_SLICER',		'sudo /etc/init.d/zeepro-slic3r restart &');
 	define('SLICER_CMD_PRM_PREVIEW_FILE',	'preview.png');
+	define('SLICER_CMD_PRM_REMOTE_LAUNCH',	' remote_slice ');
+	define('SLICER_CMD_PRM_REMOTE_STOP',	' remote_slice_stop');
+	
+	define('SLICER_MSG_EXPORTING_MODEL',	'Exporting G-code');
+	define('SLICER_MSG_REMOTE_INITIAL',		'Loading');
 	
 // 	define('SLICER_FILENAME_ZIPMODEL',	'_model_slicer.zip');
 }
@@ -256,10 +281,36 @@ function Slicer_getModelFile($model_id, &$path_models, $basename = FALSE) {
 	return $cr;
 }
 
-function Slicer_slice() {
+function Slicer_slice($remote_slice = TRUE) {
 	$cr = 0;
+	$ret_val = 0;
 	$CI = &get_instance();
-	$ret_val = Slicer__requestSlicer(SLICER_URL_SLICE);
+	
+	if ($remote_slice == TRUE) {
+		$path_model = NULL;
+		$path_config = NULL;
+		$command = 'sudo ' . $CI->config->item('siteutil') . SLICER_CMD_PRM_REMOTE_LAUNCH; // use root to avoid permission problem
+		
+		// request export all to launch remote slicing
+		$ret_val = Slicer_exportAll($path_model, $path_config);
+		// return ok if succeed, continue to use local slicing if failed
+		if ($ret_val == ERROR_OK) {
+			$output = array();
+			
+			$command .= '"' . $path_model . '" "' . $path_config . '"';
+			exec($command, $output, $ret_val);
+			if ($ret_val == ERROR_NORMAL_RC_OK) {
+				$ret_val = SLICER_RESPONSE_OK;
+			}
+			else {
+				$ret_val = SLICER_RESPONSE_ERROR;
+			}
+		}
+	}
+	else {
+		// local slicing case
+		$ret_val = Slicer__requestSlicer(SLICER_URL_SLICE);
+	}
 	
 	if ($ret_val == SLICER_RESPONSE_OK) {
 		if (CoreStatus_setInSlicing()) {
@@ -283,9 +334,32 @@ function Slicer_slice() {
 	return $cr;
 }
 
-function Slicer_sliceHalt() {
+function Slicer_sliceHalt($force_remote = FALSE) {
 	$cr = 0;
-	$ret_val = Slicer__requestSlicer(SLICER_URL_SLICE_HALT);
+	$ret_val = 0;
+	$action_remote = FALSE;
+	
+	if (file_exists(SLICER_FILE_REMOTE_STATUS) || $force_remote = TRUE) {
+		// remote slicing
+		$output = array();
+		$CI = &get_instance();
+		$command = 'sudo ' . $CI->config->item('siteutil') . SLICER_CMD_PRM_REMOTE_STOP;
+		
+		$action_remote = TRUE;
+		exec($command, $output, $ret_val);
+		
+		if ($ret_val != ERROR_NORMAL_RC_OK) {
+			$CI->load->helper('remote slicing cancel utils command error', __FILE__, __LINE__);
+			$ret_val = SLICER_RESPONSE_ERROR;
+		}
+		else {
+			$ret_val = SLICER_RESPONSE_OK;
+		}
+	}
+	else {
+		// local slicing
+		$ret_val = Slicer__requestSlicer(SLICER_URL_SLICE_HALT);
+	}
 	
 	if ($ret_val == SLICER_RESPONSE_OK) {
 		$CI = &get_instance();
@@ -297,7 +371,9 @@ function Slicer_sliceHalt() {
 		PrinterLog_statsSlice(PRINTERLOG_STATS_ACTION_CANCEL, NULL);
 		
 		$cr = ERROR_OK;
-		Slicer_restart(); //FIXME remove me as soon as possible
+		if ($action_remote == FALSE) {
+			Slicer_restart(); //FIXME remove me as soon as possible
+		}
 	}
 	else {
 		$cr = ERROR_NO_SLICING;
@@ -306,8 +382,111 @@ function Slicer_sliceHalt() {
 	return $cr;
 }
 
-function Slicer_checkSlice(&$progress, &$array_extruder = array()) {
+function Slicer_checkSlice(&$progress, &$message = NULL, &$array_extruder = array()) {
 	$cr = 0;
+	$ret_val = 0;
+	
+	if (file_exists(SLICER_FILE_REMOTE_STATUS)) {
+		// remote slicing case
+		$tmp_array = array();
+		$CI = &get_instance();
+		
+		// read remote slicing status
+		$CI->load->helper('json');
+		$tmp_array = json_read(SLICER_FILE_REMOTE_STATUS, TRUE);
+		if (!file_exists(SLICER_FILE_REMOTE_STATUS)) {
+			$progress = 99;
+			$message = 'state_finalize_remote';
+			
+			$cr = ERROR_OK;
+		}
+		else if (isset($tmp_array['error'])) {
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('read json error: ' . json_encode($tmp_array), __FILE__, __LINE__);
+			Slicer_sliceHalt(TRUE); // force to cancel remote slicing
+			
+			$cr = ERROR_INTERNAL;
+		}
+		else {
+			$status_array = $tmp_array['json'];
+			
+			// check state
+			if (!isset($status_array[SLICER_TITLE_REMOTE_STATE])) {
+				$CI->load->helper('printerlog');
+				PrinterLog_logError('unknown remote slicing status json format', __FILE__, __LINE__);
+				
+				return ERROR_INTERNAL;
+			}
+			
+			$cr = ERROR_OK;
+			switch ($status_array[SLICER_TITLE_REMOTE_STATE]) {
+				case SLICER_VALUE_REMOTE_STATE_INITIAL:
+					$progress = 0;
+					$message = 'state_initialize_remote';
+					break;
+					
+				case SLICER_VALUE_REMOTE_STATE_REQUEST:
+					$progress = 0;
+					$message = 'state_request_remote'; // " Connecting / Connexion en cours "
+					break;
+					
+				case SLICER_VALUE_REMOTE_STATE_UPLOAD:
+					$progress = 0;
+					$message = 'state_upload_remote'; // " Uploading / Transfert "
+					break;
+					
+				case SLICER_VALUE_REMOTE_STATE_WORKING:
+					// use default value for error cases (phrasing extended failed, etc.)
+					$progress = 0;
+					$message = 'state_working_remote';
+					
+					if (isset($status_array[SLICER_TITLE_REMOTE_EXTENDED])) {
+						if ($status_array[SLICER_TITLE_REMOTE_EXTENDED] == SLICER_MSG_REMOTE_INITIAL) {
+							// remote slicing initialization case
+							$message = 'state_loading_remote';
+							break;
+						}
+						$explode_array = explode("=", $status_array[SLICER_TITLE_REMOTE_EXTENDED]);
+						if (count($explode_array) >= 2) {
+							$progress = (int) trim($explode_array[0]);
+							$message = trim($explode_array[1]);
+							
+							// blind model path
+							if (strpos($message, SLICER_MSG_EXPORTING_MODEL) !== FALSE) {
+								$message = SLICER_MSG_EXPORTING_MODEL;
+							}
+						}
+					}
+					break;
+					
+				case SLICER_VALUE_REMOTE_STATE_DOWNLOAD:
+					$progress = 99;
+					$message = 'state_download_remote'; // " Downloading / Téléchargement "
+					break;
+					
+				case SLICER_VALUE_REMOTE_STATE_LOCAL:
+					$progress = 0;
+					$message = 'state_local_remote';
+					break;
+					
+				case SLICER_VALUE_REMOTE_STATE_ERROR:
+				default:
+					$progress = -2;
+// 					$message = 'state_error_remote';
+					if ($status_array[SLICER_TITLE_REMOTE_STATE] != SLICER_VALUE_REMOTE_STATE_ERROR) {
+						$CI->load->helper('printerlog');
+						PrinterLog_logError('unknown remote slicing status', __FILE__, __LINE__);
+					}
+					
+					$cr = ERROR_REMOTE_SLICE;
+					break;
+			}
+		}
+		
+		return $cr;
+	}
+	
+	// local slicing case
 	$ret_val = Slicer__requestSlicer(SLICER_URL_SLICE_STATUS, TRUE, $response);
 	
 	if ($ret_val == SLICER_RESPONSE_OK) {
@@ -335,6 +514,17 @@ function Slicer_checkSlice(&$progress, &$array_extruder = array()) {
 					$cr = ERROR_INTERNAL;
 				}
 			}
+			else {
+				$explode_array = explode("\n", $response);
+				
+				if (isset($explode_array[1])) {
+					$message = $explode_array[1];
+					// blind model path
+					if (strpos($message, SLICER_MSG_EXPORTING_MODEL) !== FALSE) {
+						$message = SLICER_MSG_EXPORTING_MODEL;
+					}
+				}
+			}
 		}
 	}
 	else if ($ret_val == SLICER_RESPONSE_ERROR) {
@@ -348,6 +538,7 @@ function Slicer_checkSlice(&$progress, &$array_extruder = array()) {
 			$cr = ERROR_INTERNAL;
 		}
 		$progress = -1;
+		$message = $response;
 		
 		$CI = &get_instance();
 		$CI->load->helper('printerlog');
@@ -440,13 +631,16 @@ function Slicer_checkPlatformModel() {
 	return $cr;
 }
 
-function Slicer_checkPlatformColor(&$array_cartridge = array()) {
+// function Slicer_checkPlatformColor(&$array_cartridge = array()) {
+function Slicer_checkPlatformColor(&$array_cartridge = array(), &$custom_change = FALSE) {
 	$cr = 0;
+	$multi_part = FALSE;
 	$array_platform = array();
 	$array_color = array();
 	
 	Slicer_listModel($array_model);
 	$array_platform = json_decode($array_model, TRUE);
+	$custom_change = FALSE;
 	if (is_null($array_platform)) {
 		$cr = ERROR_EMPTY_PLATFORM;
 	}
@@ -460,6 +654,10 @@ function Slicer_checkPlatformColor(&$array_cartridge = array()) {
 			foreach ($colors as $color) {
 				$array_color[] = (int)$color + SLICER_OFFSET_VALUE_COLOR2EXTRUDER;
 			}
+		}
+		// check if it's multipart model
+		if (count($array_color) > 1) {
+			$multi_part = TRUE;
 		}
 		$array_color = array_unique($array_color);
 		foreach ($array_color as $number_color) {
@@ -481,6 +679,17 @@ function Slicer_checkPlatformColor(&$array_cartridge = array()) {
 // 				$cr = ERROR_MISS_RIGT_FILA;
 // 				break;
 // 			}
+		}
+		
+		// check if we have done some custom changes to force local slicing or not
+		if ($multi_part == TRUE) {
+			foreach($array_platform as $model) {
+				if ($model[SLICER_PRM_XROT] != 0 || $model[SLICER_PRM_YROT] != 0
+						|| $model[SLICER_PRM_SCALE] != 100) {
+					$custom_change = TRUE;
+					break;
+				}
+			}
 		}
 	}
 	
@@ -862,7 +1071,9 @@ function Slicer_exportAMF(&$path_amf, $color1 = NULL, $color2 = NULL) {
 	$cr = 0;
 	$ret_val = 0;
 	$joint_char = '?';
-	$url_request = SLICER_URL_EXPORTAMF;
+	$response = NULL;
+	$path_amf = NULL;
+	$url_request = SLICER_URL_EXPORT_AMF;
 	
 	foreach (array(
 			SLICER_PRM_COLOR1	=> $color1,
@@ -893,7 +1104,6 @@ function Slicer_exportAMF(&$path_amf, $color1 = NULL, $color2 = NULL) {
 			break;
 	}
 	
-	$path_amf = NULL;
 	if ($cr == ERROR_OK) {
 		$explode_array = explode("\n", $response);
 		if (isset($explode_array[1])) {
@@ -905,6 +1115,54 @@ function Slicer_exportAMF(&$path_amf, $color1 = NULL, $color2 = NULL) {
 				PrinterLog_logDebug('export amf not found: ' . $path_amf, __FILE__, __LINE__);
 				
 				$cr = ERROR_INTERNAL;
+			}
+		}
+		else {
+			$cr = ERROR_INTERNAL;
+		}
+	}
+	
+	return $cr;
+}
+
+function Slicer_exportAll(&$path_model, &$path_config) {
+	$cr = 0;
+	$ret_val = 0;
+	$response = NULL;
+	
+	$path_model = NULL;
+	$path_config = NULL;
+	$ret_val = Slicer__requestSlicer(SLICER_URL_EXPORT_ALL, FALSE, $response);
+	
+	switch ($ret_val) {
+		case SLICER_RESPONSE_OK:
+// 		case SLICER_RESPONSE_WRONG_PRM:
+			$cr = $ret_val;
+			break;
+				
+		case SLICER_RESPONSE_NO_MODEL:
+			$cr = ERROR_EMPTY_PLATFORM;
+			break;
+				
+		default:
+			$cr = ERROR_INTERNAL;
+			break;
+	}
+	
+	if ($cr == ERROR_OK) {
+		$explode_array = explode("\n", $response);
+		if (isset($explode_array[1]) && isset($explode_array[2])) {
+			$path_config = $explode_array[1];
+			$path_model = $explode_array[2];
+			
+			foreach (array($path_config, $path_model) as $path_check) {
+				if (!file_exists($path_check)) {
+					$CI = &get_instance();
+					$CI->load->helper('printerlog');
+					PrinterLog_logDebug('export all not found: ' . $path_check, __FILE__, __LINE__);
+					
+					$cr = ERROR_INTERNAL;
+				}
 			}
 		}
 		else {

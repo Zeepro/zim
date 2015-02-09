@@ -576,6 +576,7 @@ function CoreStatus_checkCallNoBlockRESTInSlice() {
 	return CoreStatus__checkCallURI(array(
 			'/rest/status'			=> NULL,
 			'/rest/cancelslicing'	=> NULL,
+			'/rest/slice'			=> NULL,
 	));
 }
 
@@ -662,7 +663,7 @@ function CoreStatus_setInPrinting($model_id, $exchange_extruder = FALSE, $array_
 					CORESTATUS_TITLE_P_TEMPER_L		=> array_key_exists('l', $array_temper) ? $array_temper['l'] : NULL,
 					CORESTATUS_TITLE_P_TEMPER_R		=> array_key_exists('r', $array_temper) ? $array_temper['r'] : NULL,
 					CORESTATUS_TITLE_P_EXCH_BUS		=> $exchange_extruder ? 1 : 0,
-					CORESTATUS_TITLE_GUID			=> random_string('alnum', CORESTATUS_VALUE_RAND_STRING_LENGTH),
+					CORESTATUS_TITLE_GUID			=> random_string('numeric', CORESTATUS_VALUE_RAND_STRING_LENGTH),
 			)
 	);
 }
@@ -748,7 +749,7 @@ function CoreStatus_setInSlicing() {
 			array(
 					CORESTATUS_TITLE_LASTERROR	=> NULL,
 					CORESTATUS_TITLE_MESSAGE	=> NULL,
-					CORESTATUS_TITLE_GUID		=> random_string('alnum', CORESTATUS_VALUE_RAND_STRING_LENGTH),
+					CORESTATUS_TITLE_GUID		=> random_string('numeric', CORESTATUS_VALUE_RAND_STRING_LENGTH),
 			)
 	);
 }

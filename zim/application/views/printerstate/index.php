@@ -26,17 +26,17 @@
 						</select>
 					</div>
 				</div>
-<!-- 				<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;"> -->
-<!-- 					<label for="slider"><h2>{statistic}</h2></label> -->
-<!-- 				</div></div> -->
-<!-- 				<div class="ui-block-b"> -->
-<!-- 					<div class="ui-bar ui-bar-f" style="height:3em;"> -->
-<!-- 						<select name="statistic" id="statistic" data-role="slider" data-track-theme="a" data-theme="a"> -->
-<!-- 							<option value="off">{function_off}</option> -->
-<!-- 							<option value="on" {statistic_on}>{function_on}</option> -->
-<!-- 						</select> -->
-<!-- 					</div> -->
-<!-- 				</div> -->
+				<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;">
+					<label for="slider"><h2>{statistic}</h2></label>
+				</div></div>
+				<div class="ui-block-b">
+					<div class="ui-bar ui-bar-f" style="height:3em;">
+						<select name="statistic" id="statistic" data-role="slider" data-track-theme="a" data-theme="a">
+							<option value="off">{function_off}</option>
+							<option value="on" {statistic_on}>{function_on}</option>
+						</select>
+					</div>
+				</div>
 				<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;">
 					<label for="slider"><h2>{remote_control}</h2></label>
 				</div></div>

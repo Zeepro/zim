@@ -163,6 +163,14 @@ case "$1" in
 		unload_filament $2 pva $3
 		;;
 		
+	remote_slice)
+		/etc/init.d/remote_slice start "$2" "$3"
+		;;
+		
+	remote_slice_stop)
+		/etc/init.d/remote_slice stop
+		;;
+		
 	stats)
 		/etc/init.d/zeepro-statsd send $2
 		;;
@@ -172,7 +180,7 @@ case "$1" in
 		;;
 		
 	*)
-		echo "Usage: $0 {force_reco|start_tomboning|stop_romboning|status_tomboning|restart_arcontrol|start_slic3r|unload|unload_pva|stats|*}"
+		echo "Usage: $0 {force_reco|start_tomboning|stop_romboning|status_tomboning|restart_arcontrol|start_slic3r|unload|unload_pva|stats|remote_slice|remote_slice_stop|*}"
 		exit 1
 esac
 

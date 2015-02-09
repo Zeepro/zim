@@ -29,7 +29,7 @@ class Rest extends MY_Controller {
 			}
 			
 			// we haven't finished initialization or connection yet
-			$this->_exitWithError500(ERROR_BUSY_PRINTER . ' ' . t(MyERRMSG(ERROR_BUSY_PRINTER)));
+			$this->_exitWithError500(ERROR_BUSY_PRINTER . ' ' . t(MyERRMSG(ERROR_BUSY_PRINTER)), ERROR_BUSY_PRINTER);
 		}
 		else if (!CoreStatus_checkInIdle($status_current)) {
 			// check if the status is changed
@@ -96,7 +96,7 @@ class Rest extends MY_Controller {
 			}
 			
 			// return that printer is busy
-			$this->_exitWithError500(ERROR_BUSY_PRINTER . ' ' . t(MyERRMSG(ERROR_BUSY_PRINTER)));
+			$this->_exitWithError500(ERROR_BUSY_PRINTER . ' ' . t(MyERRMSG(ERROR_BUSY_PRINTER)), ERROR_BUSY_PRINTER);
 		}
 	}
 	
@@ -1518,11 +1518,21 @@ class Rest extends MY_Controller {
 	
 	public function slice() {
 		$cr = 0;
+		$status_current = NULL;
 		$array_cartridge = array();
+		$custom_change = FALSE;
 		$this->load->helper('slicer');
 		
+		// we bypass this call when checking status block in slicing to make possible for local slicing callback
+		// so we have to check printer is really in remote slicing case when calling this function (return error if not so)
+		CoreStatus_checkInIdle($status_current);
+		if ($status_current == CORESTATUS_VALUE_SLICE && !file_exists(SLICER_FILE_REMOTE_STATUS)) {
+			$this->_exitWithError500(ERROR_BUSY_PRINTER . ' ' . t(MyERRMSG(ERROR_BUSY_PRINTER)), ERROR_BUSY_PRINTER);
+			return; // never reach here
+		}
+		
 		// check platform and filament present (do not check filament quantity)
-		$cr = Slicer_checkPlatformColor($array_cartridge);
+		$cr = Slicer_checkPlatformColor($array_cartridge, $custom_change);
 		
 		if ($cr == ERROR_OK) {
 			$cr = Slicer_changeTemperByCartridge($array_cartridge);
@@ -1530,7 +1540,9 @@ class Rest extends MY_Controller {
 		
 		// start slice command after checking filament
 		if ($cr == ERROR_OK) {
-			$cr = Slicer_slice();
+			$remote_slice = (FALSE === $this->input->get('local')) ? TRUE : FALSE;
+			
+			$cr = Slicer_slice($remote_slice && !$custom_change);
 		}
 		
 		$this->_return_cr($cr);

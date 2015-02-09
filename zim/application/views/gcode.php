@@ -156,6 +156,7 @@ else {
 $(document).ready(function() {
 	var_gcode_ajax = $.ajax({
 		url: "{gcode_request_url}",
+		dataType: "text",
 		cache: false,
 		beforeSend: function() {
 			$("#overlay").addClass("gray-overlay");

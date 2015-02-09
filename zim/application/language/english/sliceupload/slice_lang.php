@@ -16,10 +16,16 @@ $lang['wait_preview']
 	= 'Loading preview...';
 $lang['wait_slice']
 	= 'Start slicing...';
-$lang['wait_in_slice']
+$lang['slice_percent_prefix']
 	= 'Slicing: ';
-$lang['slice_suffix']
-	= '%%<br/>Please wait...';
+$lang['slice_percent_suffix']
+	= '%%';
+$lang['wait_in_slice']
+	= 'Please wait...';
+$lang['slice_failmsg']
+	= 'Slicing failed';
+$lang['return_home_button']
+	= 'Home';
 $lang['near_button']
 	= 'Zoom in';
 $lang['far_button']

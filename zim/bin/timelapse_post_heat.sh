@@ -4,7 +4,8 @@ PATH=$PATH:/bin
 
 CAMERAINF=/tmp/Camera.json
 TMPTLPATH=/var/www/tmp/timelapse
-TMPSDPATH=/sdcard/tmp/timelapse
+TMPSDFOLD=/sdcard/tmp
+TMPSDPATH=$TMPSDFOLD/timelapse
 
 # stop ffmpeg and temporary clean m3u8 file
 /etc/init.d/ffmpeg stop
@@ -43,6 +44,7 @@ then
 else
 	mkdir -pv $TMPSDPATH
 	chmod -v 777 $TMPSDPATH
+	chmod -v 777 $TMPSDFOLD
 	touch $TMPSDPATH
 	
 	if [ $? != 0 ]

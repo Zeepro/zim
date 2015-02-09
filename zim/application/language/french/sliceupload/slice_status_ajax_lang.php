@@ -1,4 +1,41 @@
 <?php
+// slice status ajax
+$lang['state_initialize_remote']
+	= 'Initialisation de slicing à distance';
+$lang['state_request_remote']
+	= 'Connexion en cours';
+$lang['state_upload_remote']
+	= 'Transfert';
+$lang['state_working_remote']
+	= 'Traitement d\'état de travail';
+$lang['state_download_remote']
+	= 'Téléchargement';
+$lang['state_local_remote']
+	= 'Démarrage de slicing local';
+$lang['state_finalize_remote']
+	= 'Finalisation de slicing à distance';
+$lang['state_loading_remote']
+	= 'Initialisation à distance';
+$lang['Initialization slicing']
+	= 'Initialisation de slicing';
+$lang['Processing triangulated mesh']
+	= 'Préparation de composant triangulaire';
+$lang['Generating perimeters']
+	= 'Génération de périmètre';
+$lang['Preparing infill']
+	= 'Préparation de Remplissage';
+$lang['Infilling layers']
+	= 'Remplissage de couche';
+$lang['Generating support material']
+	= 'Génération de matériau de support';
+$lang['Generating skirt/brim']
+	= 'Génération de tours/tapis';
+$lang['Running post-processing scripts']
+	= 'Exécution de script post-traitement';
+$lang['Exporting G-code']
+	= 'Export de G-code';
+
+// slice result ajax
 $lang['temper_diff_msg']
 	= 'Détecté la différence entre la donnée et la cartrouche, température d\'extrusion: %d vs %d';
 $lang['first_temper_diff_msg']

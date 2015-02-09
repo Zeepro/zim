@@ -38,12 +38,32 @@ class MY_Controller extends CI_Controller {
 		exit;
 	}
 	
-	public function _exitWithError500($display = NULL) {
+	protected function _sendFileContent($file_path = NULL, $client_name = 'download.bin') {
+		if (file_exists($file_path)) {
+			header('Content-Description: File Transfer');
+			header('Content-Type: application/octet-stream');
+			header('Content-Disposition: attachment; filename=' . $client_name);
+			header('Expires: 0');
+			header('Cache-Control: must-revalidate');
+			header('Pragma: public');
+			header('Content-Length: ' . filesize($file_path));
+			readfile($file_path);
+			
+			exit;
+		}
+		else {
+			$this->_exitWithError500();
+		}
+		
+		return; // never reach here
+	}
+	
+	protected function _exitWithError500($display = NULL, $code = 500) {
 		if (is_null($display)) {
 			$display = 'throw system internal error';
 		}
 		
-		$this->output->set_status_header(500);
+		$this->output->set_status_header($code);
 		
 		// optional
 		$this->load->library('parser');
@@ -54,7 +74,7 @@ class MY_Controller extends CI_Controller {
 		exit;
 	}
 	
-	public function _parseBaseTemplate($title, $content, $extra_header = NULL) {
+	protected function _parseBaseTemplate($title, $content, $extra_header = NULL) {
 		$this->load->library('parser');
 		
 		$template_data = array(
@@ -97,7 +117,7 @@ class MY_Controller extends CI_Controller {
 			PrinterLog_logMessage('detected and refused tromboning connection', __FILE__, __LINE__);
 			
 			// let request failed
-			$this->_exitWithError500(ERROR_REMOTE_REFUSE . ' ' . MyERRMSG(ERROR_REMOTE_REFUSE));
+			$this->_exitWithError500(ERROR_REMOTE_REFUSE . ' ' . MyERRMSG(ERROR_REMOTE_REFUSE), ERROR_REMOTE_REFUSE);
 		}
 		
 		// Workflow management
@@ -115,8 +135,8 @@ class MY_Controller extends CI_Controller {
 			// stats info (do not stats rest, app can initialize cookies in each request)
 			$this->load->library('session');
 			if (FALSE === $this->session->userdata('stats_browserLog')) {
-				PrinterLog_statsWebAgent();
 				$this->session->set_userdata('stats_browserLog', 'ok');
+				PrinterLog_statsWebAgent();
 			}
 			
 			// check initialization issue

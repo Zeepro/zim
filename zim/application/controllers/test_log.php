@@ -111,6 +111,12 @@ class Test_log extends CI_Controller {
 		return;
 	}
 	
+	public function remoteslice() {
+		$this->file('remoteslice');
+		
+		return;
+	}
+	
 	private function file($type = 'debug') {
 		$path_file = '';
 		
@@ -136,6 +142,11 @@ class Test_log extends CI_Controller {
 			case 'statslog':
 				$this->load->helper('printerlog');
 				$path_file = PRINTERLOG_STATS_FILEPATH_LOG;
+				
+			case 'remoteslice':
+				$this->load->helper('slicer');
+				$path_file = SLICER_FILE_REMOTE_LOG;
+				break;
 				
 			default:
 				break;

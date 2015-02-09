@@ -306,10 +306,13 @@ class Sliceupload extends MY_Controller {
 		
 		// parse the main body
 		$template_data = array(
-				'wait_in_slice'	=> t('wait_in_slice'),
-				'slice_suffix'	=> t('slice_suffix'),
-				'cancel_button'	=> t('cancel_button'),
-				'wait_cancel'	=> t('wait_cancel'),
+				'wait_in_slice'			=> t('wait_in_slice'),
+				'slice_percent_prefix'	=> t('slice_percent_prefix'),
+				'slice_percent_suffix'	=> t('slice_percent_suffix'),
+				'cancel_button'			=> t('cancel_button'),
+				'wait_cancel'			=> t('wait_cancel'),
+				'return_button'			=> t('return_home_button'),
+				'slice_failmsg'			=> t('slice_failmsg'),
 		);
 		
 		$this->_parseBaseTemplate(t('sliceupload_slice_pagetitle'),
@@ -475,6 +478,7 @@ class Sliceupload extends MY_Controller {
 		$raft = $this->input->get('raft');
 		$support = $this->input->get('support');
 		$array_setting = array();
+		$custom_change = FALSE;
 		
 		$this->load->helper('slicer');
 		
@@ -525,7 +529,7 @@ class Sliceupload extends MY_Controller {
 		
 		// check platform and filament present (do not check filament quantity)
 		if ($cr == ERROR_OK) {
-			$cr = Slicer_checkPlatformColor($array_cartridge);
+			$cr = Slicer_checkPlatformColor($array_cartridge, $custom_change);
 		}
 		
 		if ($cr == ERROR_OK) {
@@ -534,7 +538,8 @@ class Sliceupload extends MY_Controller {
 		
 		// start slice command after checking filament
 		if ($cr == ERROR_OK) {
-			$cr = Slicer_slice();
+			// we prefer to slice remotely except modified AMF
+			$cr = Slicer_slice(!$custom_change);
 		}
 		
 		$display = $cr . " " . t(MyERRMSG($cr));
@@ -579,10 +584,17 @@ class Sliceupload extends MY_Controller {
 				$cr = ERROR_INTERNAL;
 			}
 			else {
+				$this->lang->load('sliceupload/slice_status_ajax', $this->config->item('language'));
+				$array_display = array(
+						'percent'	=> $array_data[PRINTERSTATE_TITLE_PERCENT],
+						'message'	=> isset($array_data[PRINTERSTATE_TITLE_DETAILMSG])
+								? t($array_data[PRINTERSTATE_TITLE_DETAILMSG]) : NULL
+				);
+				
 				$cr = ERROR_OK;
 				$this->output->set_status_header($cr);
-				$this->output->set_content_type('txt_u');
-				$this->parser->parse('plaintxt', array('display' => $array_data[PRINTERSTATE_TITLE_PERCENT]));
+				$this->output->set_content_type('jsonu');
+				$this->parser->parse('plaintxt', array('display' => json_encode($array_display)));
 				
 				return;
 			}
@@ -1050,9 +1062,11 @@ class Sliceupload extends MY_Controller {
 			$gcode_path = $this->config->item('temp') . SLICER_FILE_MODEL;
 			
 			if (file_exists($gcode_path)) {
-				$this->load->helper('file');
-				
-				$this->output->set_content_type(get_mime_by_extension($gcode_path))->set_output(@file_get_contents($gcode_path));
+// 				$this->load->helper('file');
+// 				$this->output->set_content_type(get_mime_by_extension($gcode_path))->set_output(@file_get_contents($gcode_path));
+// 				$this->load->helper('download');
+// 				force_download('slice.gcode', @file_get_contents($gcode_path));
+				$this->_sendFileContent($gcode_path, 'slice.gcode');
 				
 				return;
 			}

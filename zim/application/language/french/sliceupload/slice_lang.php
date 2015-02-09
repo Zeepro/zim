@@ -16,10 +16,16 @@ $lang['wait_preview']
 	= 'Attente de lecture d\'une image de rendering';
 $lang['wait_slice']
 	= 'Slicing du modèle commencé...';
-$lang['wait_in_slice']
+$lang['slice_percent_prefix']
 	= 'Slicing en cours, pourcentage: ';
-$lang['slice_suffix']
-	= '%%<br/>Attendez SVP...';
+$lang['slice_percent_suffix']
+	= '%%';
+$lang['wait_in_slice']
+	= 'Attendez SVP...';
+$lang['slice_failmsg']
+	= 'Slicing échoué';
+$lang['return_home_button']
+	= 'Accueil';
 $lang['near_button']
 	= 'Zoom avant';
 $lang['far_button']

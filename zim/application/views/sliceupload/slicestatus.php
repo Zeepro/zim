@@ -5,7 +5,7 @@
 		<div id="container">
 			<div id="detail_zone" style="clear: both; text-align: center;">
 			</div>
-			<div id="cancel_div"><a href="#" class="ui-btn" onclick="javascript: stopSlice();">{cancel_button}</a></div>
+			<div id="cancel_div"><a id="cancel_slice_button" href="#" class="ui-btn" onclick="javascript: stopSlice();">{cancel_button}</a></div>
 		</div>
 	</div>
 </div>
@@ -46,12 +46,35 @@ function checkSlice() {
 		}
 		else if (var_slice_status.status == 200) { // in checking
 			// html => percentage
-			$("#detail_zone").html("{wait_in_slice} " + html + "{slice_suffix}");
+			if (typeof html == 'string') {
+				$("#detail_zone").html("{wait_in_slice} " + html + "{slice_suffix}");
+			}
+			else if (typeof html == 'object' && typeof html.percent != 'undefined') {
+				// we ignore message not found case for this moment
+// 				if (typeof html.message != 'undefined') {
+				if ((html.percent == 0 || html.percent == 99) && typeof html.message != 'undefined') {
+					// in remote slicing special case
+					$("#detail_zone").html(html.message + "<br/>{wait_in_slice}");
+				}
+				else {
+					// we do not display message for this moment (need to improve later)
+					$("#detail_zone").html("{slice_percent_prefix} " + html.percent + "{slice_percent_suffix}<br/>{wait_in_slice}");
+				}
+				console.log(html);
+			}
+			else {
+				console.log(html);
+			}
+			
 		}
 	})
 	.fail(function() { // not allowed
 		if (var_slice_cancel == null) {
-			window.location.replace("/");
+// 			window.location.replace("/");
+			clearInterval(var_slice_interval);
+			$('a#cancel_slice_button').attr('onclick','').unbind('click').html('{return_button}');
+			$('#detail_zone').html("{slice_failmsg}");
+			$('a#cancel_slice_button').click(function() { window.location.replace("/"); return false; });
 		}
 //			clearInterval(var_refreshChangeStatus);
 //			$("#print_detail_info").html('<p>{finish_info}</p>');

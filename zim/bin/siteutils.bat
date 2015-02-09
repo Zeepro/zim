@@ -1,8 +1,31 @@
 @echo on
 
-if "%1"=="unload" goto :unload
+SET basepath=%~dp0..\\
+@rem echo %basepath:~0,-1%
+echo %0
 
-exit 0;
+cd %basepath:~0,-1%
+
+if "%1"=="unload" goto :unload
+@rem if "%1"=="_remote_slice" goto :goRemoteSlice
+if "%1"=="remote_slice" goto :remoteSlice
+if "%1"=="remote_slice_stop" goto :remoteSliceStop
+
+exit 0
+
+@rem :goRemoteSlice
+@rem ping -n 11 127.0.0.1 > nul
+@rem echo {"state":"request"} > ./tmp/remote_slice.json
+@rem goto :EOF
+
+:remoteSlice
+echo {"state":"working","extended":"0=edit ./tmp/remote_slice.json for test"} > ./tmp/remote_slice.json
+@rem start /B %0 _remote_slice
+goto :EOF
+
+:remoteSliceStop
+del .\tmp\remote_slice.json
+goto :EOF
 
 :unload
 echo "in unloading"

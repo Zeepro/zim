@@ -194,9 +194,7 @@ class Printerstoring extends MY_Controller {
 			$display_printlist[] = array(
 					'name'	=> $model_data['name'],
 					'id'	=> $model_data['id'],
-//					'image'	=> $model_data['imglink'],
-					'image'	=> "/printerstoring/getpicture?id=" . $model_data['id'] . "&type=stl",
-					'creation_date' => $model_data['creation_date']
+					'creation_date' => $model_data[PRINTERSTORING_TITLE_CREATE_DATE],
 			);
 		}
 		if (isset($display_printlist)) {
@@ -297,11 +295,9 @@ class Printerstoring extends MY_Controller {
 			$display_printlist[] = array(
 					'modelname'			=> $model_data['name'],
 					'mid'				=> $model_data['id'],
-//					'image'	=> $model_data['imglink'],
-// 					'image'	=> "/printerstoring/getpicture?id=" . $model_data['id'] . "&type=gcode",
 					'presetname'		=> $preset_name,
-					'creation_date'		=> strtotime($model_data['creation_date']), //date('d-M-Y', strtotime($model_data['creation_date']))
-					'creation_datestr'	=> $model_data['creation_date'] //date('d-M-Y', strtotime($model_data['creation_date']))
+					'creation_date'		=> $model_data[PRINTERSTORING_TITLE_CREATE_TIME],
+					'creation_datestr'	=> date('Y-m-d H:i:s', $model_data[PRINTERSTORING_TITLE_CREATE_TIME]),
 			);
 		}
 
@@ -525,9 +521,11 @@ class Printerstoring extends MY_Controller {
 		$cr = Printer_getFileFromModel(PRINTER_TYPE_GCODELIB, $id_model, $gcode_path);
 		if ($cr == ERROR_OK) {
 			if (file_exists($gcode_path)) {
-				$this->load->helper('file');
-				
-				$this->output->set_content_type(get_mime_by_extension($gcode_path))->set_output(@file_get_contents($gcode_path));
+// 				$this->load->helper('file');
+// 				$this->output->set_content_type(get_mime_by_extension($gcode_path))->set_output(@file_get_contents($gcode_path));
+// 				$this->load->helper('download');
+// 				force_download('library.gcode', @file_get_contents($gcode_path));
+				$this->_sendFileContent($gcode_path, 'library.gcode');
 				
 				return;
 			}
