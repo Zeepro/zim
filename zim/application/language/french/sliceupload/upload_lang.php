@@ -15,9 +15,9 @@ $lang['select_hint_multi']
 $lang['upload_button']
 	= 'Charger';
 $lang['button_goto_slice']
-	= 'Modèle précédant';
+	= 'Modèle chargé précédent';
 $lang['button_goto_result']
-	= 'Modèle slicé précédant';
+	= 'Modèle slicé précédent';
 $lang['header_single']
 	= 'Charger un fichier unique';
 $lang['header_multi']

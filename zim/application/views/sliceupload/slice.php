@@ -66,9 +66,7 @@
 var var_stage = "{current_stage}";
 var var_preview;
 var var_slice;
-var var_slice_status;
 var var_slice_status_lock = false;
-var var_slice_interval;
 var var_model_change;
 var var_current_rho = {value_rho};
 var var_current_delta = {value_delta};
@@ -131,8 +129,6 @@ function getPreview() {
 	else {
 		var_slice_status_lock = true;
 	}
-	
-	var_control = typeof var_control !== 'undefined' ? var_control : true;
 	
 	$("a#slice_button").addClass("ui-disabled");
 	var_preview = $.ajax({
@@ -439,11 +435,8 @@ function startSlice(var_restart) {
 		cache: false,
 	})
 	.done(function(html) {
-		// html => link to image
 		var_slice_status_lock = false;
 		window.location.href='/sliceupload/slicestatus';
-// 		checkSlice(); // launch checking directly
-// 		var_slice_interval = setInterval(checkSlice, 3000);
 	})
 	.fail(function() { // not allowed
 		alert("failed slice");
@@ -453,47 +446,6 @@ function startSlice(var_restart) {
 		var_slice_status_lock = false;
 	});
 }
-
-// function checkSlice() {
-// 	if (var_slice_status_lock == true) {
-// 		return;
-// 	}
-// 	else {
-// 		var_slice_status_lock = true;
-// 	}
-	
-// 	var_slice_status = $.ajax({
-// 		url: "/sliceupload/slice_status_ajax",
-// 		type: "GET",
-// 		cache: false,
-// 	})
-// 	.done(function(html) {
-// 		if (var_slice_status.status == 202) { // finished checking, wait user to input
-// 			clearInterval(var_slice_interval);
-// // 			$("#preview_zone").show();
-// // 			getPreview(false);
-// 			$("#detail_zone").html(html);
-// 		}
-// 		else if (var_slice_status.status == 200) { // in checking
-// 			// html => percentage
-// 			$("#detail_zone").html("{wait_in_slice} " + html);
-// 		}
-// 	})
-// 	.fail(function() { // not allowed
-// 		window.location.replace("/");
-// //			clearInterval(var_refreshChangeStatus);
-// //			$("#print_detail_info").html('<p>{finish_info}</p>');
-// //			$('button#print_action').click(function(){window.location.href='/'; return false;});
-// //			$('button#print_action').parent().find('span.ui-btn-text').text('{return_button}');
-// //			$('button#print_action').html('{return_button}');
-// //			alert("failed");
-// 	})
-// 	.always(function() {
-// 		var_slice_status_lock = false;
-// 	});
-	
-// 	return;
-// }
 
 function getSlice() {
 	var_slice_status = $.ajax({
@@ -519,18 +471,11 @@ function getSlice() {
 		}
 		else if (var_slice_status.status == 200) { // in checking
 			$("#detail_zone").html("{wait_in_slice} " + html);
-// 			var_slice_status_lock = false;
-// 			getPreview(false); // redo previewing for changing color to cartridge's one
 		}
 	})
 	.fail(function() { // not allowed
 		window.location.replace("/");
-//			clearInterval(var_refreshChangeStatus);
-//			$("#print_detail_info").html('<p>{finish_info}</p>');
-//			$('button#print_action').click(function(){window.location.href='/'; return false;});
-//			$('button#print_action').parent().find('span.ui-btn-text').text('{return_button}');
-//			$('button#print_action').html('{return_button}');
-//			alert("failed");
+//		alert("failed");
 	})
 	.always(function() {
 		var_slice_status_lock = false;

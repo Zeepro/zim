@@ -289,7 +289,11 @@ function Slicer_slice($remote_slice = TRUE) {
 	if ($remote_slice == TRUE) {
 		$path_model = NULL;
 		$path_config = NULL;
-		$command = 'sudo ' . $CI->config->item('siteutil') . SLICER_CMD_PRM_REMOTE_LAUNCH; // use root to avoid permission problem
+		$command = $CI->config->item('siteutil') . SLICER_CMD_PRM_REMOTE_LAUNCH; // use root to avoid permission problem
+		
+		if (!DectectOS_checkWindows()) {
+			$command = 'sudo ' . $command;
+		}
 		
 		// request export all to launch remote slicing
 		$ret_val = Slicer_exportAll($path_model, $path_config);
@@ -343,7 +347,11 @@ function Slicer_sliceHalt($force_remote = FALSE) {
 		// remote slicing
 		$output = array();
 		$CI = &get_instance();
-		$command = 'sudo ' . $CI->config->item('siteutil') . SLICER_CMD_PRM_REMOTE_STOP;
+		$command = $CI->config->item('siteutil') . SLICER_CMD_PRM_REMOTE_STOP;
+		
+		if (!DectectOS_checkWindows()) {
+			$command = 'sudo ' . $command;
+		}
 		
 		$action_remote = TRUE;
 		exec($command, $output, $ret_val);

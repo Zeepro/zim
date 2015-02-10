@@ -40,7 +40,17 @@
 <!-- 						<div id="slider-horizontal"></div> -->
 						<div id="rendering_layerslider_container" style="display: none;">
 							<h3>{layer_number}</h3>
-							<input type="range" id="rendering_layerslider" name="layer" value="1" min="1" max="100" />
+							<div id="rendering_layerslider_display_container" style="margin: 0;">
+								<div style="width:10%; float:left; text-align:center;">
+									<a data-role="button" data-inline="true" data-mini="true" onclick="javascript: rendering_ui_changeLayer('-');">-</a>
+								</div>
+								<div style="width:80%; float:left;">
+									<input type="range" id="rendering_layerslider" name="layer" value="1" min="1" max="100" />
+								</div>
+								<div style="width:10%; float:left; text-align:center;">
+									<a data-role="button" data-inline="true" data-mini="true" onclick="javascript: rendering_ui_changeLayer('+');">+</a>
+								</div>
+							</div>
 						</div>
 						<div id="rendering_rangeslider_container" style="display: none;">
 							<h3>{layer_flow}</h3>
@@ -118,6 +128,37 @@ function gcode_hide_wait_spinner() {
 	$('div#rendering_layerslider_container').show();
 	$('div#rendering_option_container').show();
 // 	$('div#rendering_option_container').trigger('create');
+}
+
+function rendering_ui_changeLayer(var_direction) {
+	if (typeof var_direction == 'undefined') {
+		return;
+	}
+
+	switch (var_direction) {
+	case '+':
+		var_max = parseInt($('#rendering_layerslider').attr('max'));
+		var_now = parseInt($('#rendering_layerslider').val());
+		if (++var_now <= var_max) {
+			$('#rendering_layerslider').val(var_now);
+			$('#rendering_layerslider').slider('refresh');
+		}
+		break;
+
+	case '-':
+		var_min = parseInt($('#rendering_layerslider').attr('min'));
+		var_now = parseInt($('#rendering_layerslider').val());
+		if (--var_now >= var_min) {
+			$('#rendering_layerslider').val(var_now);
+			$('#rendering_layerslider').slider('refresh');
+		}
+		break;
+
+	default:
+		break;
+	}
+
+	return;
 }
 
 // function rendering_change_layerNb_display(layerNb) {
