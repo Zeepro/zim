@@ -1244,9 +1244,6 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) 
 		case CORESTATUS_VALUE_CANCEL:
 			// jump out if it's a simulator or when cancelling is finished
 			if ($CI->config->item('simulator') || !file_exists(PRINTERSTATE_FILE_STOPFILE)) {
-				$stats_info = array();
-				
-				//TODO trigger a special gcode to get filament consumption
 				$stats_info = PrinterState_prepareStatsPrintLabel();
 				PrinterLog_statsPrint(PRINTERLOG_STATS_ACTION_CANCEL, $stats_info);
 				
@@ -1267,10 +1264,12 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) 
 			$ret_val = Slicer_checkSlice($progress, $message, $array_slicer);
 			if ($ret_val != ERROR_OK) {
 				$error_message = NULL;
+				$url_remote = NULL;
 				$stats_info = array();
 				
 				// handle error for slicing
 				$CI->load->helper('printerlog');
+				$url_remote = PRINTERLOG_STATS_VALUE_LOCAL;
 				
 				$array_data[PRINTERSTATE_TITLE_LASTERROR] = $ret_val;
 				$status_current = CORESTATUS_VALUE_IDLE;
@@ -1290,6 +1289,7 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) 
 						
 					case ERROR_REMOTE_SLICE:
 						$error_message = 'remote slicer error';
+						$url_remote = $message;
 						break;
 						
 					default:
@@ -1305,11 +1305,13 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) 
 				// stats info
 				$stats_info = PrinterState_prepareStatsSliceLabel();
 				$stats_info[PRINTERLOG_STATS_SLICE_ERROR] = $error_message;
+				$stats_info[PRINTERLOG_STATS_SLICE_SERVER] = $url_remote;
 				PrinterLog_statsSlice(PRINTERLOG_STATS_ACTION_ERROR, $stats_info);
 				
 				return TRUE;
 			}
 			elseif ($progress == 100) {
+				$url_remote = NULL;
 				$stats_info = array();
 				
 				// set temp json file for every service
@@ -1327,6 +1329,17 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) 
 				// stats info
 				$CI->load->helper('printerlog');
 				$stats_info = PrinterState_prepareStatsSliceLabel(TRUE);
+				//detect remote slicing
+				if (file_exists(SLICER_FILE_REMOTE_REQUEST_URL)) {
+					$url_remote = @file_get_contents(SLICER_FILE_REMOTE_REQUEST_URL);
+					if (is_null($url_remote)) {
+						$url_remote = PRINTERLOG_STATS_VALUE_REMOTE;
+					}
+				}
+				else {
+					$url_remote = PRINTERLOG_STATS_VALUE_LOCAL;
+				}
+				$stats_info[PRINTERLOG_STATS_SLICE_SERVER] = $url_remote;
 				PrinterLog_statsSlice(PRINTERLOG_STATS_ACTION_END, $stats_info);
 				
 				return TRUE;
@@ -2292,6 +2305,8 @@ function PrinterState_getInfoAsArray() {
 			PRINTERSTATE_TITLE_HOSTNAME		=> $hostname,
 			ZIMAPI_TITLE_IP					=> ($cr == ERROR_OK && !is_null($network_data[ZIMAPI_TITLE_IP]))
 					 ? $network_data[ZIMAPI_TITLE_IP] : 'N/A',
+			ZIMAPI_TITLE_IPV6				=> ($cr == ERROR_OK && !is_null($network_data[ZIMAPI_TITLE_IPV6]))
+					 ? $network_data[ZIMAPI_TITLE_IPV6] : 'N/A',
 	);
 	
 	foreach ($platform_size as $key => $value) {

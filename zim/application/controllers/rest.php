@@ -1597,22 +1597,20 @@ class Rest extends MY_Controller {
 				}
 			}
 			
-			$cr = Slicer_exportAMF($path_amf, $color_array['r'], $color_array['l']);
-			if ($cr == ERROR_OK) {
-				if (file_exists($path_amf)) {
-					$this->load->helper('file');
-					
-					$this->output->set_content_type(get_mime_by_extension($path_amf))->set_output(@file_get_contents($path_amf));
-					
-					return;
-				}
-				else {
-					$cr = ERROR_INTERNAL;
-				}
-			}
 		}
-		else {
-			$cr = ERROR_EMPTY_PLATFORM;
+		
+		$cr = Slicer_exportAMF($path_amf, $color_array['r'], $color_array['l']);
+		if ($cr == ERROR_OK) {
+			if (file_exists($path_amf)) {
+// 				$this->load->helper('file');
+// 				$this->output->set_content_type(get_mime_by_extension($path_amf))->set_output(@file_get_contents($path_amf));
+				$this->_sendFileContent($path_amf, 'rendering.amf');
+				
+				return;
+			}
+			else {
+				$cr = ERROR_INTERNAL;
+			}
 		}
 		
 		$this->_return_cr($cr);

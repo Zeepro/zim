@@ -39,5 +39,5 @@ $lang['nozzles_adjustments']
 	= 'Ajustement du décalage des buses';
 $lang['support']
 	= 'Support & FAQ';
-$lang['statistic']
-	= 'Partager usage statistique';
+// $lang['statistic']
+// 	= 'Partager usage statistique';

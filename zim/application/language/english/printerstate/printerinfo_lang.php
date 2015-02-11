@@ -25,6 +25,8 @@ $lang['Home']
 	= 'Home';
 $lang['ip_address']
 	= 'Local IP';
+$lang['ip_address_v6']
+	= 'Local IPv6';
 $lang['sso_name']
 	= 'zim name';
 $lang['printer_no_sso']

@@ -33,6 +33,7 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_TITLE_MEDIUM',	'medium');
 	define('ZIMAPI_TITLE_SSID',		'ssid');
 	define('ZIMAPI_TITLE_IP',		'ip');
+	define('ZIMAPI_TITLE_IPV6',		'ipv6');
 	define('ZIMAPI_TITLE_GATEWAY',	'gateway');
 	define('ZIMAPI_TITLE_DNS',		'dns');
 	define('ZIMAPI_TITLE_MAC',		'mac');
@@ -189,6 +190,7 @@ function ZimAPI_getNetworkInfoAsArray(&$array_data) {
 		$output = NULL;
 		$ret_val = 0;
 		$line_output_ip = 0;
+		$line_output_ipv6 = 0;
 		$array_temp = NULL;
 		
 		// detect OS type, if windows, just do simulation
@@ -198,12 +200,14 @@ function ZimAPI_getNetworkInfoAsArray(&$array_data) {
 // 					'MODE: pEth',
 // 					'IP Config:',
 // 					'addr:192.168.1.99  Bcast:192.168.1.255  Mask:255.255.255.0',
+// 					'addr6: fe80::f60e:11ff:fe80:1a/64 Scope:Link',
 // 					'MAC: 0c:82:68:21:69:57',
 // 			);
 // 			$output = array(
 // 					'MODE: cEth',
 // 					'IP Config:',
 // 					'addr:192.168.1.99  Bcast:192.168.1.255  Mask:255.255.255.0',
+// 					'addr6: fe80::f60e:11ff:fe80:1a/64 Scope:Link',
 // 					'MAC: 0c:82:68:21:69:57',
 // 			);
 // 			$output = array(
@@ -212,6 +216,7 @@ function ZimAPI_getNetworkInfoAsArray(&$array_data) {
 // 					'PASSWORD:',
 // 					'IP Config:',
 // 					'addr:10.0.0.1  Bcast:10.255.255.255  Mask:255.0.0.0',
+// 					'addr6: fe80::f60e:11ff:fe80:1a/64 Scope:Link',
 // 					'MAC: 0c:82:68:21:69:57',
 // 			);
 			$output = array(
@@ -219,6 +224,7 @@ function ZimAPI_getNetworkInfoAsArray(&$array_data) {
 					'ACCESS POINT: ssid="freebox_zeepro"',
 					'IP Config:',
 					'addr:192.168.1.41  Bcast:192.168.1.255  Mask:255.255.255.0',
+					'addr6: fe80::f60e:11ff:fe80:1a/64 Scope:Link',
 					'MAC: 0c:82:68:21:69:57',
 			);
 		}
@@ -253,28 +259,32 @@ function ZimAPI_getNetworkInfoAsArray(&$array_data) {
 		// get ip, mask and mac
 		if ($array_data[ZIMAPI_TITLE_MEDIUM] == ZIMAPI_VALUE_ETH) {
 			$line_output_ip = 2;
-			if (count($output) != 4) {
+			if (count($output) != 5) {
 				throw new Exception('network setting error in eth mode');
 			}
 		}
 		else if ($array_data[ZIMAPI_TITLE_TOPOLOGY] == ZIMAPI_VALUE_NETWORK) {
 			$line_output_ip = 3;
 			$array_data[ZIMAPI_TITLE_SSID] = substr($output[1], strpos($output[1], 'ssid=') + 6, -1);
-			if (count($output) != 5) {
+			if (count($output) != 6) {
 				throw new Exception('network setting error in cwifi mode');
 			}
 		}
 		else { // mode sWifi
 			$line_output_ip = 4;
 			$array_data[ZIMAPI_TITLE_SSID] = substr($output[1], strpos($output[1], 'SSID:') + 6);
-			if (count($output) != 6) {
+			if (count($output) != 7) {
 				throw new Exception('network setting error in swifi mode');
 			}
 		}
+		$line_output_ipv6 = $line_output_ip + 1;
+		
 		$array_temp = explode(' ', str_replace('  ', ' ', $output[$line_output_ip]));
 		$array_data[ZIMAPI_TITLE_IP] = substr($array_temp[0], 5);
 		$array_data[ZIMAPI_TITLE_MASK] = substr($array_temp[2], 5);
-		$array_data[ZIMAPI_TITLE_MAC] = substr($output[$line_output_ip + 1], 5);
+		$array_temp = explode(' ', str_replace('  ', ' ', $output[$line_output_ipv6]));
+		$array_data[ZIMAPI_TITLE_IPV6] = trim($array_temp[1]);
+		$array_data[ZIMAPI_TITLE_MAC] = substr($output[$line_output_ipv6 + 1], 5);
 		
 		// get gateway if not P2P
 		if ($array_data[ZIMAPI_TITLE_TOPOLOGY] == ZIMAPI_VALUE_NETWORK) {

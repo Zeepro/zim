@@ -431,7 +431,7 @@ class Printerstate extends MY_Controller {
 // 		$this->changecartridge();
 		$this->load->library('parser');
 		$this->lang->load('printerstate/index', $this->config->item('language'));
-
+		
 		// parse the main body
 		$template_data = array(
 				'reset_network'			=> t('reset_network'),
@@ -446,11 +446,11 @@ class Printerstate extends MY_Controller {
 				'upgrade'				=> t('upgrade'),
 				'tromboning'			=> t('tromboning'),
 				'remote_control'		=> t('remote_control'),
-				'statistic'				=> t('statistic'),
+// 				'statistic'				=> t('statistic'),
 				'function_on'			=> t('function_on'),
 				'function_off'			=> t('function_off'),
 				'nozzles_adjustments'	=> t('nozzles_adjustments'),
-				'support'				=> t('support')
+				'support'				=> t('support'),
 		);
 		
 		// parse all page
@@ -517,6 +517,10 @@ class Printerstate extends MY_Controller {
 				array(
 						'title' => t('ip_address'),
 						'value'	=> $temp_info[ZIMAPI_TITLE_IP],
+				),
+				array(
+						'title' => t('ip_address_v6'),
+						'value'	=> $temp_info[ZIMAPI_TITLE_IPV6],
 				),
 				array(
 						'title'	=> t('remote_control'),

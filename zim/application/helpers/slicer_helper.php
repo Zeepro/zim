@@ -64,9 +64,11 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 		define('SLICER_FILE_REMOTE_STATUS',	'/tmp/remote_slice.json');
 		define('SLICER_FILE_REMOTE_LOG',	'/var/log/remoteSlice');
 	}
+	define('SLICER_FILE_REMOTE_REQUEST_URL',	$CI->config->item('temp') . 'remote_slice_url.txt');
 	
 	define('SLICER_TITLE_REMOTE_STATE',		'state');
 	define('SLICER_TITLE_REMOTE_EXTENDED',	'extended');
+	define('SLICER_TITLE_REMOTE_URL',		'URL');
 	
 	define('SLICER_VALUE_REMOTE_STATE_INITIAL',		'initial');
 	define('SLICER_VALUE_REMOTE_STATE_REQUEST',		'request');
@@ -316,20 +318,23 @@ function Slicer_slice($remote_slice = TRUE) {
 		$ret_val = Slicer__requestSlicer(SLICER_URL_SLICE);
 	}
 	
-	if ($ret_val == SLICER_RESPONSE_OK) {
-		if (CoreStatus_setInSlicing()) {
-			$stats_info = array();
-			
-			// stats info
-			$CI->load->helper(array('printerstate', 'printerlog'));
-			$stats_info = PrinterState_prepareStatsSliceLabel();
-			PrinterLog_statsSlice(PRINTERLOG_STATS_ACTION_START, $stats_info);
+// 	if ($ret_val == SLICER_RESPONSE_OK) {
+	if ($ret_val == SLICER_RESPONSE_OK && CoreStatus_setInSlicing()) {
+// 		if (CoreStatus_setInSlicing()) {
+			if ($remote_slice == TRUE) {
+				// stats info (only do it in remote slicing - first time when we pass)
+				$stats_info = array();
+				
+				$CI->load->helper(array('printerstate', 'printerlog'));
+				$stats_info = PrinterState_prepareStatsSliceLabel();
+				PrinterLog_statsSlice(PRINTERLOG_STATS_ACTION_START, $stats_info);
+			}
 			
 			$cr = ERROR_OK;
-		}
-		else {
-			$cr = ERROR_INTERNAL;
-		}
+// 		}
+// 		else {
+// 			$cr = ERROR_INTERNAL;
+// 		}
 	}
 	else {
 		$cr = ERROR_INTERNAL;
@@ -342,12 +347,25 @@ function Slicer_sliceHalt($force_remote = FALSE) {
 	$cr = 0;
 	$ret_val = 0;
 	$action_remote = FALSE;
+	$url_remote = NULL;
+	$CI = &get_instance();
+	
+	$CI->load->helper('printerlog');
 	
 	if (file_exists(SLICER_FILE_REMOTE_STATUS) || $force_remote = TRUE) {
 		// remote slicing
 		$output = array();
-		$CI = &get_instance();
+		$json_status = array();
 		$command = $CI->config->item('siteutil') . SLICER_CMD_PRM_REMOTE_STOP;
+		
+		$CI->load->helper('json');
+		$json_status = json_read(SLICER_FILE_REMOTE_STATUS, TRUE);
+		if (!isset($json_status['error']) && isset($json_status['json'][SLICER_TITLE_REMOTE_URL])) {
+			$url_remote = $json_status['json'][SLICER_TITLE_REMOTE_URL];
+		}
+		else {
+			$url_remote = PRINTERLOG_STATS_VALUE_REMOTE;
+		}
 		
 		if (!DectectOS_checkWindows()) {
 			$command = 'sudo ' . $command;
@@ -367,16 +385,16 @@ function Slicer_sliceHalt($force_remote = FALSE) {
 	else {
 		// local slicing
 		$ret_val = Slicer__requestSlicer(SLICER_URL_SLICE_HALT);
+		$url_remote = PRINTERLOG_STATS_VALUE_LOCAL;
 	}
 	
 	if ($ret_val == SLICER_RESPONSE_OK) {
-		$CI = &get_instance();
-		$CI->load->helper(array('corestatus', 'printerlog'));
+		$CI->load->helper('corestatus');
 		
 		CoreStatus_setInIdle();
 		
 		// stats info
-		PrinterLog_statsSlice(PRINTERLOG_STATS_ACTION_CANCEL, NULL);
+		PrinterLog_statsSlice(PRINTERLOG_STATS_ACTION_CANCEL, array(PRINTERLOG_STATS_SLICE_SERVER => $url_remote));
 		
 		$cr = ERROR_OK;
 		if ($action_remote == FALSE) {
@@ -435,18 +453,34 @@ function Slicer_checkSlice(&$progress, &$message = NULL, &$array_extruder = arra
 					
 				case SLICER_VALUE_REMOTE_STATE_REQUEST:
 					$progress = 0;
-					$message = 'state_request_remote'; // " Connecting / Connexion en cours "
+					$message = 'state_request_remote';
 					break;
 					
 				case SLICER_VALUE_REMOTE_STATE_UPLOAD:
 					$progress = 0;
-					$message = 'state_upload_remote'; // " Uploading / Transfert "
+					$message = 'state_upload_remote';
 					break;
 					
 				case SLICER_VALUE_REMOTE_STATE_WORKING:
 					// use default value for error cases (phrasing extended failed, etc.)
 					$progress = 0;
 					$message = 'state_working_remote';
+					
+					$CI->load->helper('printerlog');
+					if (!file_exists(PRINTERLOG_STATS_TMPFILE_SLICE_UPLOAD_END)) {
+						$stats_info = array();
+						$fp = fopen(PRINTERLOG_STATS_TMPFILE_SLICE_UPLOAD_END, 'w');
+						
+						if ($fp) {
+							fwrite($fp, 'upload_end');
+							fclose($fp);
+						}
+						
+						// stats info
+						$stats_info[PRINTERLOG_STATS_SLICE_SERVER] = isset($status_array[SLICER_TITLE_REMOTE_URL])
+								? $status_array[SLICER_TITLE_REMOTE_URL] : PRINTERLOG_STATS_VALUE_REMOTE;
+						PrinterLog_statsSlice(PRINTERLOG_STATS_ACTION_UPLOADED, $stats_info);
+					}
 					
 					if (isset($status_array[SLICER_TITLE_REMOTE_EXTENDED])) {
 						if ($status_array[SLICER_TITLE_REMOTE_EXTENDED] == SLICER_MSG_REMOTE_INITIAL) {
@@ -469,7 +503,23 @@ function Slicer_checkSlice(&$progress, &$message = NULL, &$array_extruder = arra
 					
 				case SLICER_VALUE_REMOTE_STATE_DOWNLOAD:
 					$progress = 99;
-					$message = 'state_download_remote'; // " Downloading / Téléchargement "
+					$message = 'state_download_remote';
+					
+					$CI->load->helper('printerlog');
+					if (!file_exists(PRINTERLOG_STATS_TMPFILE_SLICE_DOWNLOAD_START)) {
+						$stats_info = array();
+						$fp = fopen(PRINTERLOG_STATS_TMPFILE_SLICE_DOWNLOAD_START, 'w');
+						
+						if ($fp) {
+							fwrite($fp, 'download_start');
+							fclose($fp);
+						}
+						
+						// stats info
+						$stats_info[PRINTERLOG_STATS_SLICE_SERVER] = isset($status_array[SLICER_TITLE_REMOTE_URL])
+								? $status_array[SLICER_TITLE_REMOTE_URL] : PRINTERLOG_STATS_VALUE_REMOTE;
+						PrinterLog_statsSlice(PRINTERLOG_STATS_ACTION_DOWNLOAD, $stats_info);
+					}
 					break;
 					
 				case SLICER_VALUE_REMOTE_STATE_LOCAL:
@@ -485,6 +535,9 @@ function Slicer_checkSlice(&$progress, &$message = NULL, &$array_extruder = arra
 						$CI->load->helper('printerlog');
 						PrinterLog_logError('unknown remote slicing status', __FILE__, __LINE__);
 					}
+					// use message as remote server url
+					$message = isset($status_array[SLICER_TITLE_REMOTE_URL])
+							? $status_array[SLICER_TITLE_REMOTE_URL] : PRINTERLOG_STATS_VALUE_REMOTE;
 					
 					$cr = ERROR_REMOTE_SLICE;
 					break;

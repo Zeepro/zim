@@ -142,6 +142,7 @@ class Test_log extends CI_Controller {
 			case 'statslog':
 				$this->load->helper('printerlog');
 				$path_file = PRINTERLOG_STATS_FILEPATH_LOG;
+				break;
 				
 			case 'remoteslice':
 				$this->load->helper('slicer');

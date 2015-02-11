@@ -27,6 +27,7 @@ if (!defined('PRINTERLOG_STATS_TITLE_SERIAL')) {
 	define('PRINTERLOG_STATS_NAVIG_URL',		'URL');
 	define('PRINTERLOG_STATS_NAVIG_AGENT',		'user_agent');
 	define('PRINTERLOG_STATS_NAVIG_REMOTE',		'tromboning');
+	define('PRINTERLOG_STATS_SLICE_SERVER',		'server');
 	
 	define('PRINTERLOG_STATS_CATEGORY_PRINTER',		'printer');
 	define('PRINTERLOG_STATS_CATEGORY_PRINT',		'print');
@@ -47,6 +48,8 @@ if (!defined('PRINTERLOG_STATS_TITLE_SERIAL')) {
 	define('PRINTERLOG_STATS_ACTION_CLICK',		'click');
 	define('PRINTERLOG_STATS_ACTION_REQUEST',	'request');
 	define('PRINTERLOG_STATS_ACTION_RESIZE',	'resize');
+	define('PRINTERLOG_STATS_ACTION_UPLOADED',	'uploaded');
+	define('PRINTERLOG_STATS_ACTION_DOWNLOAD',	'download');
 	
 	define('PRINTERLOG_STATS_LABEL_EMAIL',		'email');
 	define('PRINTERLOG_STATS_LABEL_YOUTUBE',	'youtube');
@@ -60,10 +63,15 @@ if (!defined('PRINTERLOG_STATS_TITLE_SERIAL')) {
 	
 	define('PRINTERLOG_STATS_VALUE_ON',		'on');
 	define('PRINTERLOG_STATS_VALUE_OFF',	'off');
+	define('PRINTERLOG_STATS_VALUE_LOCAL',	'local');
+	define('PRINTERLOG_STATS_VALUE_REMOTE',	'remote');
 	
 	define('PRINTERLOG_STATS_TEMPFILE_FOLDER',	'php_stats');
 	define('PRINTERLOG_STATS_TEMPFILE_PREFIX',	'st_');
 	define('PRINTERLOG_STATS_SITEUTILS_CMD',	' stats ');
+	
+	define('PRINTERLOG_STATS_TMPFILE_SLICE_UPLOAD_END',		$CI->config->item('temp') . '/remote_slice/upload_end');
+	define('PRINTERLOG_STATS_TMPFILE_SLICE_DOWNLOAD_START',	$CI->config->item('temp') . '/remote_slice/download_start');
 	
 	if (DectectOS_checkWindows()) {
 		define('PRINTERLOG_STATS_FILEPATH_OFF',	$CI->config->item('conf') . 'stats_off');

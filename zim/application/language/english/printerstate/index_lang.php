@@ -39,5 +39,5 @@ $lang['nozzles_adjustments']
 	= 'Nozzles offset adjustments';
 $lang['support']
 	= 'Support & FAQ';
-$lang['statistic']
-	= 'Share statistics usage';
+// $lang['statistic']
+// 	= 'Share statistics usage';
