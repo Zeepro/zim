@@ -152,7 +152,7 @@ function ModelList_add($data_array) {
 // 			if (isset($data_array['d'])) {
 			foreach($tmp_array as $lang => $model_desp) {
 // 				$model_desp = $data_array['d'];
-				if (strlen($model_desp) > 255) { // || strlen($model_name) == 0 //already check isset()
+				if (strlen($model_desp) > 512) { // || strlen($model_name) == 0 //already check isset()
 					return ERROR_WRONG_PRM;
 				}
  			}
