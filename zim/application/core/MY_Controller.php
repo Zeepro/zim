@@ -50,13 +50,14 @@ class MY_Controller extends CI_Controller {
 			header('Cache-Control: must-revalidate');
 			header('Pragma: public');
 // 			header('Content-Length: ' . filesize($file_path));
-			header('Vary: Accept-Encoding');
-			header('Content-Encoding: gzip');
 			
 			if ($support_compress) {
 				$compress_prms = array('level' => 6, 'window' => 15, 'memory' => 9);
 				$fp = fopen('php://output', 'w');
 				stream_filter_append($fp, 'zlib.deflate', STREAM_FILTER_WRITE, $compress_prms);
+				
+				header('Vary: Accept-Encoding');
+				header('Content-Encoding: gzip');
 			}
 			
 			readfile($file_path);
