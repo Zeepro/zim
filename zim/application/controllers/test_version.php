@@ -27,7 +27,28 @@ class Test_version extends CI_Controller {
 		
 		return;
 	}
-
+	
+	public function test_port() {
+		$cr = 500;
+		$port = (int) $this->input->get('v');
+		
+		if ($port <= 0) {
+			$cr = 403;
+		}
+		else if (FALSE === @file_get_contents("http://portquiz.net:" . $port)) {
+			$cr = 404;
+		}
+		else {
+			$cr = 200;
+		}
+		
+		$this->load->library('parser');
+		$this->output->set_status_header($cr);
+		$this->parser->parse('plaintxt', array('display' => 'test'));
+		
+		return;
+	}
+	
 	public function index() {
 		$template_data = array();
 		$body_page = NULL;
@@ -40,6 +61,7 @@ class Test_version extends CI_Controller {
 		$this->load->helper(array('printerstate', 'zimapi'));
 		$this->load->library('parser');
 		$this->lang->load('printerstate/printerinfo', $this->config->item('language'));
+		$this->lang->load('test_version', $this->config->item('language'));
 		ZimAPI_getPrinterSSOName($sso_name);
 		ZimAPI_getUpgradeMode($upgrade_mode, $profile_link);
 		
@@ -81,7 +103,15 @@ class Test_version extends CI_Controller {
 		
 		// parse the main body
 		$template_data = array(
-				'array_info'	=> $array_info,
+				'array_info'		=> $array_info,
+				'port_test_title'	=> t('port_test_title'),
+				'port_test_ok'		=> t('port_test_ok'),
+				'port_test_ko'		=> t('port_test_ko'),
+				'port_test_r80'		=> t('port_test_printer', array(80)),
+				'port_test_r443'	=> t('port_test_printer', array(443)),
+				'port_test_r4443'	=> t('port_test_printer', array(4443)),
+				'port_test_l80'		=> t('port_test_client', array(80)),
+				'port_test_l443'	=> t('port_test_client', array(443)),
 		);
 		
 		$body_page = $this->parser->parse('test_version', $template_data, TRUE);

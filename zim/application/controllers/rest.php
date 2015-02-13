@@ -1563,6 +1563,69 @@ class Rest extends MY_Controller {
 		return;
 	}
 	
+	function rendering() {
+		$cr = 0;
+		$path_image = NULL;
+		$display = NULL;
+		$rho = $this->input->get('r');
+		$theta = $this->input->get('t');
+		$delta = $this->input->get('d');
+		$color1 = $this->input->get('c1');
+		$color2 = $this->input->get('c2');
+		
+		// check color input
+		if (!preg_match('/^#[0-9A-Fa-f]{6}$/', $color1)) {
+			$color1 = NULL;
+		}
+		if (!preg_match('/^#[0-9A-Fa-f]{6}$/', $color2)) {
+			$color2 = NULL;
+		}
+		// assign default value if necessary
+		$this->load->helper('zimapi');
+		if ($theta === FALSE) {
+			$theta = ZIMAPI_VALUE_DEFAULT_THETA;
+		}
+		if ($delta === FALSE) {
+			$delta = ZIMAPI_VALUE_DEFAULT_DELTA;
+		}
+		if ($rho === FALSE) {
+			$rho = ZIMAPI_VALUE_DEFAULT_RHO;
+		}
+		
+		if ((int)$rho < 0) {
+			$cr = ERROR_WRONG_PRM;
+		}
+		else {
+			$file_info = array();
+			$file_cartridge = NULL;
+			
+			$this->load->helper('slicer');
+			$cr = Slicer_rendering((int)$rho, (int)$theta, (int)$delta, $path_image, $color1, $color2);
+			
+			if ($cr == ERROR_OK) {
+				//TODO add the possibility of making path everywhere, but not only in /var/www/tmp/
+				$this->load->helper('file');
+				$file_info = get_file_info(realpath($path_image), array('name'));
+				$display = '/tmp/' . $file_info['name'] . '?' . time();
+			}
+		}
+		
+		if ($cr != ERROR_OK) {
+			$display = $cr . " " . t(MyERRMSG($cr));
+		}
+		else if (!file_exists(realpath($path_image))) {
+			// in the case: $cr == ERROR_OK 
+			$cr = ERROR_INTERNAL;
+			$display = 'preview image unavailable';
+		}
+		$this->output->set_status_header($cr, ($cr != ERROR_OK) ? $display : 'ok');
+		$this->output->set_content_type('txt_u');
+		$this->load->library('parser');
+		$this->parser->parse('plaintxt', array('display' => $display));
+		
+		return;
+	}
+	
 	//==========================================================
 	//client side rendering web service
 	//==========================================================
