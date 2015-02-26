@@ -33,7 +33,7 @@
 					<li>Zim's initial warranty will void if the G-code feature is used
 						at least once.</li>
 				</ul>
-				Please enter your zim serial number (it could be find under the printer or on the About page):
+				Enter the serial number of your Zim, which is on the bottom of the printer. You can also find it by clicking on the "About my Zim" button in the main menu.
 				<form method="post"
 					accept-charset="utf-8">
 					<input type="text" name="serial" id="serial">
