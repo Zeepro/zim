@@ -253,7 +253,7 @@
 					</div>
 				</div>
 			</div> <!-- infill -->
-			<div data-role="collapsible">
+			<div data-role="collapsible" id="collapsible_speed">
 				<h4>{speed_title}</h4>
 				<div data-role="collapsible" data-collapsed="false" data-theme="d">
 					<h4>{speed_subtitle1}</h4>
@@ -267,15 +267,16 @@
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="small_perimeter_speed">{small_perimeter_speed}</label>
 						</div></div>
-						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
+						
+						<div class="ui-block-b"><div class="ui-bar ui-bar-f"><a rel="small_perimeter_speed" data-role="none">
 							<input type="text" style="text-align:right;" data-clear-btn="false" name="small_perimeter_speed" id="small_perimeter_speed" value="{small_perimeter_speed_value}">
-						</div></div>
+						</a></div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="external_perimeter_speed">{external_perimeter_speed}</label>
 						</div></div>
-						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
+						<div class="ui-block-b"><div class="ui-bar ui-bar-f"><a rel="external_perimeter_speed" data-role="none">
 							<input type="text" style="text-align:right;" data-clear-btn="false" name="external_perimeter_speed" id="external_perimeter_speed" value="{external_perimeter_speed_value}">
-						</div></div>
+						</a></div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="infill_speed">{infill_speed}</label>
 						</div></div>
@@ -285,15 +286,15 @@
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="solid_infill_speed">{solid_infill_speed}</label>
 						</div></div>
-						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
+						<div class="ui-block-b"><div class="ui-bar ui-bar-f"><a rel="solid_infill_speed" data-role="none">
 							<input type="text" style="text-align:right;" data-clear-btn="false" name="solid_infill_speed" id="solid_infill_speed" value="{solid_infill_speed_value}">
-						</div></div>
+						</a></div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="top_solid_infill_speed">{top_solid_infill_speed}</label>
 						</div></div>
-						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
+						<div class="ui-block-b"><div class="ui-bar ui-bar-f"><a rel="top_solid_infill_speed" data-role="none">
 							<input type="text" style="text-align:right;" data-clear-btn="false" name="top_solid_infill_speed" id="top_solid_infill_speed" value="{top_solid_infill_speed_value}">
-						</div></div>
+						</a></div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="support_material_speed">{support_material_speed}</label>
 						</div></div>
@@ -303,9 +304,9 @@
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="support_material_interface_speed">{support_material_interface_speed}</label>
 						</div></div>
-						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
+						<div class="ui-block-b"><div class="ui-bar ui-bar-f"><a rel="top_solid_infill_speed" data-role="none">
 							<input type="text" style="text-align:right;" data-clear-btn="false" name="support_material_interface_speed" id="support_material_interface_speed" value="{support_material_interface_speed_value}" min="10" max="200">
-						</div></div>
+						</a></div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="bridge_speed">{bridge_speed}</label>
 						</div></div>
@@ -337,9 +338,9 @@
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="first_layer_speed">{first_layer_speed}</label>
 						</div></div>
-						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
+						<div class="ui-block-b"><div class="ui-bar ui-bar-f"><a rel="top_solid_infill_speed" data-role="none">
 							<input type="text" style="text-align:right;" data-clear-btn="false" name="first_layer_speed" id="first_layer_speed" value="{first_layer_speed_value}">
-						</div></div>
+						</a></div></div>
 					</div>
 				</div>
 			</div> <!-- speed -->
@@ -637,7 +638,7 @@
 					</div>
 				</div>
 			</div> <!-- Fan -->
-			<div data-role="collapsible">
+			<div data-role="collapsible" id="collapsible_advanced">
 				<h4>{advanced_title}</h4>
 				<div data-role="collapsible" data-collapsed="false" data-theme="d">
 					<h4>{advanced_subtitle1}</h4>
@@ -645,45 +646,45 @@
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="extrusion_width">{extrusion_width}</label>
 						</div></div>
-						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
+						<div class="ui-block-b"><div class="ui-bar ui-bar-f"><a rel="extrusion_width" data-role="none">
 							<input type="text" style="text-align:right;" data-clear-btn="false" name="extrusion_width" id="extrusion_width" value="{extrusion_width_value}">
-						</div></div>
+						</a></div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="first_layer_extrusion_width">{first_layer_extrusion_width}</label>
 						</div></div>
-						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
+						<div class="ui-block-b"><div class="ui-bar ui-bar-f"><a rel="first_layer_extrusion_width" data-role="none">
 							<input type="text" style="text-align:right;" data-clear-btn="false" name="first_layer_extrusion_width" id="first_layer_extrusion_width" value="{first_layer_extrusion_width_value}">
-						</div></div>
+						</a></div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="perimeter_extrusion_width">{perimeter_extrusion_width}</label>
 						</div></div>
-						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
+						<div class="ui-block-b"><div class="ui-bar ui-bar-f"><a rel="perimeter_extrusion_width" data-role="none">
 							<input type="text" style="text-align:right;" data-clear-btn="false" name="perimeter_extrusion_width" id="perimeter_extrusion_width" value="{perimeter_extrusion_width_value}">
-						</div></div>
+						</a></div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="infill_extrusion_width">{infill_extrusion_width}</label>
 						</div></div>
-						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
+						<div class="ui-block-b"><div class="ui-bar ui-bar-f"><a rel="infill_extrusion_width" data-role="none">
 							<input type="text" style="text-align:right;" data-clear-btn="false" name="infill_extrusion_width" id="infill_extrusion_width" value="{infill_extrusion_width_value}">
-						</div></div>
+						</a></div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="solid_infill_extrusion_width">{solid_infill_extrusion_width}</label>
 						</div></div>
-						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
+						<div class="ui-block-b"><div class="ui-bar ui-bar-f"><a rel="solid_infill_extrusion_width" data-role="none">
 							<input type="text" style="text-align:right;" data-clear-btn="false" name="solid_infill_extrusion_width" id="solid_infill_extrusion_width" value="{solid_infill_extrusion_width_value}">
-						</div></div>
+						</a></div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="top_infill_extrusion_width">{top_infill_extrusion_width}</label>
 						</div></div>
-						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
+						<div class="ui-block-b"><div class="ui-bar ui-bar-f"><a rel="top_infill_extrusion_width" data-role="none">
 							<input type="text" style="text-align:right;" data-clear-btn="false" name="top_infill_extrusion_width" id="top_infill_extrusion_width" value="{top_infill_extrusion_width_value}">
-						</div></div>
+						</a></div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="support_material_extrusion_width">{support_material_extrusion_width}</label>
 						</div></div>
-						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
+						<div class="ui-block-b"><div class="ui-bar ui-bar-f"><a rel="support_material_extrusion_width" data-role="none">
 							<input type="text" style="text-align:right;" data-clear-btn="false" name="support_material_extrusion_width" id="support_material_extrusion_width" value="{support_material_extrusion_width_value}">
-						</div></div>
+						</a></div></div>
 					</div>
 				</div>
 				<div data-role="collapsible" data-collapsed="false" data-theme="d">
@@ -715,11 +716,16 @@
 		</div>
 	</div>
 	<script>
-	console.log('{disable_all}');
+// 	console.log('{disable_all}');
 		if ({disable_all} == true)
 		{
 			$("input").attr('disabled', 'disabled');
 			$("select").attr('disabled', 'disabled');
+		}
+		
+		function expand_allErrorCollapsibles() {
+			$('div#collapsible_speed').collapsible('expand');
+			$('div#collapsible_advanced').collapsible('expand');
 		}
 	</script>
 </div>

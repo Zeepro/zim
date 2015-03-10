@@ -52,3 +52,5 @@ $lang['resize_button']
 	= 'Ok';
 $lang['cancel_button']
 	= 'Cancel';
+$lang['fail_message_tooBig']
+	= 'The original model size is too big to reduce.';

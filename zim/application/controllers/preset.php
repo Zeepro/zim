@@ -211,6 +211,7 @@ class Preset extends MY_Controller {
 			}
 			else {
 				$overwrite_confirm = $this->input->post('save_overwrite');
+				$error_parameter = array();
 				
 				if ((int)$overwrite_confirm == 1) {
 					$overwrite_confirm = TRUE;
@@ -307,7 +308,7 @@ class Preset extends MY_Controller {
 				
 				if ($new_preset) {
 					if ($this->input->post('save_as')) {
-						$ret_val = ZimAPI_setPresetSetting($id_preset, $array_input, $name_preset, $overwrite_confirm);
+						$ret_val = ZimAPI_setPresetSetting($id_preset, $array_input, $error_parameter, $name_preset, $overwrite_confirm);
 					}
 					else {
 						$ret_val = ERROR_MISS_PRM;
@@ -323,7 +324,7 @@ class Preset extends MY_Controller {
 						$error = t('overwrite_system_preset');
 					}
 					else if ($ret_val == ERROR_WRONG_PRM || $ret_val == ERROR_OK) {
-						$ret_val = ZimAPI_setPresetSetting($id_preset, $array_input, $name_preset, $overwrite_confirm);
+						$ret_val = ZimAPI_setPresetSetting($id_preset, $array_input, $error_parameter, $name_preset, $overwrite_confirm);
 						
 						if ($ret_val == ERROR_OK && $system_preset == FALSE) { // system_preset will never be true normally
 							$ret_val = ZimAPI_deletePreset($id_preset);
@@ -331,7 +332,7 @@ class Preset extends MY_Controller {
 					}
 				}
 				else {
-					$ret_val = ZimAPI_setPresetSetting($id_preset, $array_input);
+					$ret_val = ZimAPI_setPresetSetting($id_preset, $array_input, $error_parameter);
 				}
 				
 				if ($ret_val == ERROR_FULL_PRTLST) {
@@ -341,6 +342,20 @@ class Preset extends MY_Controller {
 				if ($ret_val == ERROR_OK) {
 					$this->output->set_header('Location: /preset/listpreset');
 					return;
+				}
+				// display position and hint of wrong parameter
+				else if ($ret_val == ERROR_WRONG_PRM && count($error_parameter) && !array_key_exists('input', $error_parameter)) {
+					$error = t('wrong_parameter_prefix');
+					foreach ($error_parameter as $title => $hint) {
+						$error .= t('wrong_parameter_element', array($title, t('err_title_' . $title), $hint));
+					}
+					// assign correct user input setting into temporary form
+					foreach ($array_input as $title => $value) {
+						// for this moment, we also assign wrong input
+// 						if (!array_key_exists($title, $error_parameter)) {
+							$array_setting[$title] = $value;
+// 						}
+					}
 				}
 				else if (strlen($error) == 0) {
 					$error = t('errorcode' . $ret_val); // test

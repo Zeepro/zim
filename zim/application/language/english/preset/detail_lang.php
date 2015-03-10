@@ -294,3 +294,34 @@ $lang['resolution']
 	= 'Resolution (mm)';
 $lang['Home']
 	= 'Home';
+
+$lang['wrong_parameter_prefix']
+	= 'Wrong parameter:<br/>';
+$lang['wrong_parameter_element']
+	= ' <a href="#%s" data-ajax="false" onclick="javascript: expand_allErrorCollapsibles();">%s</a> has passed limit: %s<br/>';
+$lang['err_title_small_perimeter_speed']
+	= 'Speed for small perimeters';
+$lang['err_title_external_perimeter_speed']
+	= 'Speed for external perimeters';
+$lang['err_title_solid_infill_speed']
+	= 'Speed for solid infill';
+$lang['err_title_top_solid_infill_speed']
+	= 'Speed for top solid infill';
+$lang['err_title_first_layer_speed']
+	= 'First layer speed';
+$lang['err_title_support_material_interface_speed']
+	= 'Speed for support material interface';
+$lang['err_title_extrusion_width']
+	= 'Default extrusion width';
+$lang['err_title_first_layer_extrusion_width']
+	= 'Extrusion width for first layer';
+$lang['err_title_perimeter_extrusion_width']
+	= 'Extrusion width for perimeters';
+$lang['err_title_infill_extrusion_width']
+	= 'Extrusion width for infill';
+$lang['err_title_solid_infill_extrusion_width']
+	= 'Extrusion width for solid infill';
+$lang['err_title_top_infill_extrusion_width']
+	= 'Extrusion width for top solid infill';
+$lang['err_title_support_material_extrusion_width']
+	= 'Extrusion width for support material';

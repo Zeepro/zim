@@ -1266,7 +1266,7 @@ function ZimAPI_getPresetListAsArray($set_localization = TRUE, $user_only = FALS
 				if ($ret_val != ERROR_OK) {
 					continue;
 				}
-				else if (ERROR_OK != ZimAPI_setPresetSetting($preset_id, $array_settings, $tmp_array['json'][ZIMAPI_TITLE_PRESET_NAME], TRUE)) {
+				else if (ERROR_OK != ZimAPI_setPresetSetting($preset_id, $array_settings, array(), $tmp_array['json'][ZIMAPI_TITLE_PRESET_NAME], TRUE)) {
 					// we let setPresetSetting function to correct and write json file, and ignore preset in error
 					continue;
 				}
@@ -1900,6 +1900,7 @@ function ZimAPI_getPresetInfoAsArray($preset_id, &$array_info, &$system_preset =
 
 function ZimAPI_getPresetSettingAsArray($id_preset, &$array_setting) {
 	$preset_basepath = '';
+	$error_parameter = array();
 	
 	// check if preset exists
 	if (!ZimAPI_checkPreset($id_preset, $preset_basepath)) {
@@ -1910,7 +1911,7 @@ function ZimAPI_getPresetSettingAsArray($id_preset, &$array_setting) {
 	if ($array_setting == FALSE) {
 		return ERROR_INTERNAL; // read ini file error
 	}
-	if (!ZimAPI_checkPresetSetting($array_setting, FALSE)) {
+	if (!ZimAPI_checkPresetSetting($array_setting, $error_parameter, FALSE)) {
 		return ERROR_INTERNAL; // internal settings file error
 	}
 	
@@ -1929,7 +1930,7 @@ function ZimAPI_codePresetHash($raw_name) {
 	}
 }
 
-function ZimAPI_setPresetSetting($id_preset, $array_input, $name_preset = NULL, $overwrite = FALSE) {
+function ZimAPI_setPresetSetting($id_preset, $array_input, &$error_parameter, $name_preset = NULL, $overwrite = FALSE) {
 	// $name_preset is NULL when creating preset from an old id
 	$ret_val = 0;
 	$array_setting = array();
@@ -1982,7 +1983,7 @@ function ZimAPI_setPresetSetting($id_preset, $array_input, $name_preset = NULL, 
 		$preset_path .= '/' . $id_preset . '/';
 	}
 	
-	$ret_val = ZimAPI_checkPresetSetting($array_input);
+	$ret_val = ZimAPI_checkPresetSetting($array_input, $error_parameter);
 	if ($ret_val != TRUE) {
 		$CI->load->helper('printerlog');
 		PrinterLog_logError('user input preset setting has wrong parameter');
@@ -2119,7 +2120,7 @@ function ZimAPI_checkPreset($id_preset, &$preset_basepath = NULL, &$system_prese
 	return FALSE;
 }
 
-function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
+function ZimAPI_checkPresetSetting(&$array_setting, &$errors = array(), $input = TRUE) {
 	// check no any extra settings for user input preset setting only
 	if ($input == TRUE) {
 		$array_check = array(
@@ -2207,6 +2208,7 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 		);
 		foreach ($array_check as $value) {
 			if (!array_key_exists($value, $array_setting)) {
+				$errors['input'] = $value;
 				return FALSE;
 				break; // never reach here
 			}
@@ -2308,7 +2310,8 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 20 || substr($tmp, 0, $pos) > 100))
 				|| ($pos === FALSE && ($tmp < 10 || $tmp > 200)))
 		{
-			return (FALSE);
+			$errors['small_perimeter_speed'] = '[20,100] OR [10%,200%]';
+// 			return FALSE;
 		}
 	}
 	if (!array_key_exists('external_perimeter_speed', $array_setting)) {
@@ -2321,7 +2324,8 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 20 || substr($tmp, 0, $pos) > 100))
 				|| ($pos === FALSE && ($tmp < 10 || $tmp > 200)))
 		{
-			return (FALSE);
+			$errors['external_perimeter_speed'] = '[20,100] OR [10%,200%]';
+// 			return FALSE;
 		}
 	}
 	if (!array_key_exists('infill_speed', $array_setting)) {
@@ -2337,7 +2341,8 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 20 || substr($tmp, 0, $pos) > 100))
 				|| ($pos === FALSE && ($tmp < 10 || $tmp > 200)))
 		{
-			return (FALSE);
+			$errors['solid_infill_speed'] = '[20,100] OR [10%,200%]';
+// 			return FALSE;
 		}
 	}
 	if (!array_key_exists('top_solid_infill_speed', $array_setting)) {
@@ -2350,7 +2355,8 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 20 || substr($tmp, 0, $pos) > 100))
 				|| ($pos === FALSE && ($tmp < 10 || $tmp > 200)))
 		{
-			return (FALSE);
+			$errors['top_solid_infill_speed'] = '[20,100] OR [10%,200%]';
+// 			return FALSE;
 		}
 	}
 	if (!array_key_exists('support_material_speed', $array_setting)) {
@@ -2375,7 +2381,8 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 20 || substr($tmp, 0, $pos) > 100))
 				|| ($pos === FALSE && ($tmp < 10 || $tmp > 200)))
 		{
-			return (FALSE);
+			$errors['first_layer_speed'] = '[20,100] OR [10%,200%]';
+// 			return FALSE;
 		}
 	}
 	if (!array_key_exists('support_material_interface_speed', $array_setting)) {
@@ -2388,7 +2395,8 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 20 || substr($tmp, 0, $pos) > 100))
 				|| ($pos === FALSE && ($tmp < 10 || $tmp > 200)))
 		{
-			return (FALSE);
+			$errors['support_material_interface_speed'] = '[20,100] OR [10%,200%]';
+// 			return FALSE;
 		}
 	}
 	// skirt and brim
@@ -2499,7 +2507,8 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 50 || substr($tmp, 0, $pos) > 300))
 				|| ($pos === FALSE && ($tmp != 0 && ($tmp < 0.25 || $tmp > 0.5))))
 		{
-			return (FALSE);
+			$errors['extrusion_width'] = '[0.25,0.5] OR [50%,300%]';
+// 			return FALSE;
 		}
 	}
 	if (!array_key_exists('first_layer_extrusion_width', $array_setting)) {
@@ -2512,7 +2521,8 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 50 || substr($tmp, 0, $pos) > 300))
 				|| ($pos === FALSE && ($tmp != 0 && ($tmp < 0.25 || $tmp > 0.5))))
 		{
-			return (FALSE);
+			$errors['first_layer_extrusion_width'] = '[0.25,0.5] OR [50%,300%]';
+// 			return FALSE;
 		}
 	}
 	if (!array_key_exists('perimeter_extrusion_width', $array_setting)) {
@@ -2525,7 +2535,8 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 25 || substr($tmp, 0, $pos) > 150))
 				|| ($pos === FALSE && ($tmp != 0 && ($tmp < 0.25 || $tmp > 0.5))))
 		{
-			return (FALSE);
+			$errors['perimeter_extrusion_width'] = '[0.25,0.5] OR [50%,150%]';
+// 			return FALSE;
 		}
 	}
 	if (!array_key_exists('infill_extrusion_width', $array_setting)) {
@@ -2538,7 +2549,8 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 50 || substr($tmp, 0, $pos) > 150))
 				|| ($pos === FALSE && ($tmp != 0 && ($tmp < 0.25 || $tmp > 0.5))))
 		{
-			return (FALSE);
+			$errors['infill_extrusion_width'] = '[0.25,0.5] OR [50%,150%]';
+// 			return FALSE;
 		}
 	}
 	if (!array_key_exists('solid_infill_extrusion_width', $array_setting)) {
@@ -2548,10 +2560,11 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 	{
 		$tmp = $array_setting['solid_infill_extrusion_width'];
 		$pos = strpos($tmp, "%");
-		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 50 || substr($tmp, 0, $pos) > 150))
+		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 50 || substr($tmp, 0, $pos) > 300))
 				|| ($pos === FALSE && ($tmp != 0 && ($tmp < 0.25 || $tmp > 0.5))))
 		{
-			return (FALSE);
+			$errors['solid_infill_extrusion_width'] = '[0.25,0.5] OR [50%,300%]';
+// 			return FALSE;
 		}
 	}
 	if (!array_key_exists('top_infill_extrusion_width', $array_setting)) {
@@ -2564,7 +2577,8 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 25 || substr($tmp, 0, $pos) > 150))
 				|| ($pos === FALSE && ($tmp != 0 && ($tmp < 0.25 || $tmp > 0.5))))
 		{
-			return (FALSE);
+			$errors['top_infill_extrusion_width'] = '[0.25,0.5] OR [50%,150%]';
+// 			return FALSE;
 		}
 	}
 	if (!array_key_exists('support_material_extrusion_width', $array_setting)) {
@@ -2577,7 +2591,8 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 		if (($pos !== FALSE && (substr($tmp, 0, $pos) < 50 || substr($tmp, 0, $pos) > 150))
 				|| ($pos === FALSE && ($tmp != 0 && ($tmp < 0.25 || $tmp > 0.5))))
 		{
-			return (FALSE);
+			$errors['support_material_extrusion_width'] = '[0.25,0.5] OR [50%,150%]';
+// 			return FALSE;
 		}
 	}
 	if (!array_key_exists('bridge_flow_ratio', $array_setting)) {
@@ -2585,6 +2600,11 @@ function ZimAPI_checkPresetSetting(&$array_setting, $input = TRUE) {
 	}
 	if (!array_key_exists('resolution', $array_setting)) {
 		$array_setting['resolution'] = 0;
+	}
+	
+	// return false if error
+	if (count($errors)) {
+		return FALSE;
 	}
 	
 	return TRUE;

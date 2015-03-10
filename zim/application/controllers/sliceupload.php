@@ -347,7 +347,24 @@ class Sliceupload extends MY_Controller {
 		$xsize = 0;
 		$ysize = 0;
 		$zsize = 0;
-		$scalemax = 0;
+		$scalemax = NULL;
+		
+		if (FALSE !== $this->input->get('error')) {
+			$this->load->library('parser');
+			$this->lang->load('sliceupload/upload', $this->config->item('language'));
+			
+			$template_data = array(
+					'home'				=> t('home'),
+					'back'				=> t('back'),
+					'fail_message'		=> t('fail_message_tooBig'),
+					'return_button'		=> t('return_button'),
+			);
+			
+			$this->_parseBaseTemplate(t('sliceupload_slice_pagetitle'),
+					$this->parser->parse('sliceupload/reducesize_fail', $template_data, TRUE));
+			
+			return;
+		}
 		
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$scale_set = (int) $this->input->post('sizepercentage');
@@ -356,23 +373,32 @@ class Sliceupload extends MY_Controller {
 			$xsize = (float) $this->input->post('x');
 			$ysize = (float) $this->input->post('y');
 			$zsize = (float) $this->input->post('z');
-			$scalemax = (float) $this->input->post('ms');
-			
-			
+			$scalemax = $this->input->post('ms');
 		}
 		else {
 			$id = (int) $this->input->get('id');
 			$xsize = (float) $this->input->get('x');
 			$ysize = (float) $this->input->get('y');
 			$zsize = (float) $this->input->get('z');
-			$scalemax = (float) $this->input->get('ms');
+			$scalemax = $this->input->get('ms');
 		}
 		
-		$scalemax = floor($scalemax);
-		// simple check of passing value
-		if ($xsize * $ysize * $zsize * $scalemax == 0) {
+		if ($scalemax === FALSE) {
 			$this->output->set_header('Location: /sliceupload/upload');
 			return;
+		}
+		
+		// simple check of passing value
+		if ($scalemax === FALSE || $xsize * $ysize * $zsize == 0) {
+			$this->output->set_header('Location: /sliceupload/upload');
+			return;
+		}
+		else {
+			$scalemax = floor((float) $scalemax);
+			if ($scalemax < 1) {
+				$this->output->set_header('Location: /sliceupload/reducesize?error');
+				return;
+			}
 		}
 		
 		$this->load->library('parser');
@@ -844,6 +870,15 @@ class Sliceupload extends MY_Controller {
 				'r'	=> $array_data['l'][PRINTERSTATE_TITLE_NEED_L],
 		))) {
 			$template_data['enable_exchange'] = NULL; // enable exchange if verification is passed
+		}
+		// display not enough even if filament is unused (in mono-color model)
+		else if ($array_need['r'] == 'false' || $array_need['l'] == 'false') {
+			if ($array_data['l'][PRINTERSTATE_TITLE_NEED_L] == 0) {
+				$template_data['state_f_l'] = t('filament_not_enough');
+			}
+			else { // ($array_data['r'][PRINTERSTATE_TITLE_NEED_L] == 0)
+				$template_data['state_f_r'] = t('filament_not_enough');
+			}
 		}
 // 		if (ERROR_OK == PrinterState_checkFilament('l', $array_data['r'][PRINTERSTATE_TITLE_NEED_L])
 // 		&& ERROR_OK == PrinterState_checkFilament('r', $array_data['l'][PRINTERSTATE_TITLE_NEED_L])) {

@@ -294,3 +294,34 @@ $lang['resolution']
 	= 'Résolution (mm)';
 $lang['Home']
 	= 'Accueil';
+
+$lang['wrong_parameter_prefix']
+	= 'Paramètre incorrect :<br/>';
+$lang['wrong_parameter_element']
+	= ' <a href="#%s" data-ajax="false" onclick="javascript: expand_allErrorCollapsibles();">%s</a> a passé la limite : %s<br/>';
+$lang['err_title_small_perimeter_speed']
+	= 'Vitesse de périmètres';
+$lang['err_title_external_perimeter_speed']
+	= 'Vitesse de périmètres externes';
+$lang['err_title_solid_infill_speed']
+	= 'Vitesse de couches de renfort';
+$lang['err_title_top_solid_infill_speed']
+	= 'Vitesse de surfaces';
+$lang['err_title_first_layer_speed']
+	= 'Vitesse de première couche';
+$lang['err_title_support_material_interface_speed']
+	= 'Vitesse d\'interface des matériaux de support';
+$lang['err_title_extrusion_width']
+	= 'Largeur d\'extrusion par défaut';
+$lang['err_title_first_layer_extrusion_width']
+	= 'Largeur d\'extrusion de premier niveau';
+$lang['err_title_perimeter_extrusion_width']
+	= 'Largeur d\'extrusion de périmètres';
+$lang['err_title_infill_extrusion_width']
+	= 'Largeur d\'extrusion de remplissage';
+$lang['err_title_solid_infill_extrusion_width']
+	= 'Largeur d\'extrusion de surfaces';
+$lang['err_title_top_infill_extrusion_width']
+	= 'Largeur d\'extrusion de renforts';
+$lang['err_title_support_material_extrusion_width']
+	= 'Largeur d\'extrusion de supports';
