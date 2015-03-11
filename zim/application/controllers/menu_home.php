@@ -17,6 +17,7 @@ class Menu_home extends MY_Controller {
 	
 		$this->load->library('parser');
 		$this->lang->load('menu_home', $this->config->item('language'));
+		$this->lang->load('my_3d_print_with_zeepro', $this->config->item('language'));
 		$this->load->helper('zimapi');
 		
 		if (!ZimAPI_cameraOff()) {
@@ -37,6 +38,7 @@ class Menu_home extends MY_Controller {
 				'upload'			=> t('upload'),
 				'about'				=> t('about'),
 				'library_visible'	=> ($this->config->item('use_sdcard') == TRUE) ? 'block' : 'none',
+				'non_accessible'	=> t('non_accessible'),
 		);
 		
 		// parse all page
