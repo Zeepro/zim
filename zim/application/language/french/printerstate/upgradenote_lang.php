@@ -10,7 +10,7 @@ $lang['releasenote_title']
 $lang['whatsnew_title']
 	= 'Quelle est la nouvelle dans cette version ?';
 $lang['releasenote_reboot']
-	= 'Redémarrez à installer';
+	= 'Redémarrez pour installer';
 $lang['ui_button']
 	= 'Mode de Mobile UI';
 $lang['note_hint']
