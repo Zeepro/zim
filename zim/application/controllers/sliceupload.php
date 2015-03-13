@@ -210,29 +210,29 @@ class Sliceupload extends MY_Controller {
 				);
 			}
 			usort($list_display, 'ZimAPI_usortComparePreset');
+		}
+		
+		try {
+			$tmp_string = NULL;
+			$tmp_array = NULL;
 			
-			try {
-				$tmp_string = NULL;
-				$tmp_array = NULL;
-				
-// 				$this->load->helper('slicer');
-				$ret_val = Slicer_listModel($tmp_string);
-				$tmp_array = json_decode($tmp_string, TRUE);
-				
-				if ($ret_val == ERROR_OK && count($tmp_array)) {
-					$current_scale = $tmp_array[0][SLICER_PRM_SCALE];
-					$current_xrot = $tmp_array[0][SLICER_PRM_XROT];
-					$current_yrot = $tmp_array[0][SLICER_PRM_YROT];
-					$current_zrot = $tmp_array[0][SLICER_PRM_ZROT];
-					$current_xsize = number_format($tmp_array[0][SLICER_TITLE_XSIZE], 1);
-					$current_ysize = number_format($tmp_array[0][SLICER_TITLE_YSIZE], 1);
-					$current_zsize = number_format($tmp_array[0][SLICER_TITLE_ZSIZE], 1);
-					$current_scale_max = floor($tmp_array[0][SLICER_TITLE_MAXSCALE]);
-				}
-			} catch (Exeception $e) {
-				$this->load->helper('printerlog');
-				PrinterLog_logError('synchronize slicer model info error', __FILE__, __LINE__);
+// 			$this->load->helper('slicer');
+			$ret_val = Slicer_listModel($tmp_string);
+			$tmp_array = json_decode($tmp_string, TRUE);
+			
+			if ($ret_val == ERROR_OK && count($tmp_array)) {
+				$current_scale = $tmp_array[0][SLICER_PRM_SCALE];
+				$current_xrot = $tmp_array[0][SLICER_PRM_XROT];
+				$current_yrot = $tmp_array[0][SLICER_PRM_YROT];
+				$current_zrot = $tmp_array[0][SLICER_PRM_ZROT];
+				$current_xsize = number_format($tmp_array[0][SLICER_TITLE_XSIZE], 1);
+				$current_ysize = number_format($tmp_array[0][SLICER_TITLE_YSIZE], 1);
+				$current_zsize = number_format($tmp_array[0][SLICER_TITLE_ZSIZE], 1);
+				$current_scale_max = floor($tmp_array[0][SLICER_TITLE_MAXSCALE]);
 			}
+		} catch (Exeception $e) {
+			$this->load->helper('printerlog');
+			PrinterLog_logError('synchronize slicer model info error', __FILE__, __LINE__);
 		}
 		
 		$this->load->library('parser');
@@ -283,7 +283,16 @@ class Sliceupload extends MY_Controller {
 		);
 		
 		$this->_parseBaseTemplate(t('sliceupload_slice_pagetitle'),
-				$this->parser->parse('sliceupload/slice', $template_data, TRUE));
+				$this->parser->parse('sliceupload/slice', $template_data, TRUE),
+				'<!-- client rendering part -->
+				<script type="text/javascript" src="/assets/rendering/ivmatrix3d.js"></script>
+				<script type="text/javascript" src="/assets/rendering/ivwindow3d.js"></script>
+				<script type="text/javascript" src="/assets/rendering/ivspace3d.js"></script>
+				<script type="text/javascript" src="/assets/rendering/ivmtl3d.js"></script>
+				<script type="text/javascript" src="/assets/rendering/ivmesh3d.js"></script>
+				<script type="text/javascript" src="/assets/rendering/ivnode3d.js"></script>
+				<script type="text/javascript" src="/assets/rendering/ivextra.js"></script>
+				<script type="text/javascript" src="/assets/rendering/zpviewer.js"></script>');
 		
 		return;
 	}
@@ -565,6 +574,9 @@ class Sliceupload extends MY_Controller {
 		// start slice command after checking filament
 		if ($cr == ERROR_OK) {
 			// we prefer to slice remotely except modified AMF
+			if ($this->config->item('simulator')) {
+				$custom_change = TRUE; // force local slicing for simulator
+			}
 			$cr = Slicer_slice(!$custom_change);
 		}
 		
@@ -672,6 +684,7 @@ class Sliceupload extends MY_Controller {
 		$option_selected = 'selected="selected"';
 		$select_disable = 'disabled="disabled"';
 		$array_need = array('r' => 'false', 'l' => 'false');
+		$key_suggest_temper = 'suggest_temperature';
 		
 		$this->load->helper(array('printerstate', 'slicer'));
 		$this->load->library('parser');
@@ -726,7 +739,13 @@ class Sliceupload extends MY_Controller {
 							PRINTERSTATE_TITLE_EXT_TEMPER	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER],
 							PRINTERSTATE_TITLE_EXT_TEMP_1	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1],
 							PRINTERSTATE_TITLE_NEED_L		=> $volume_need,
+							$key_suggest_temper				=> 0,
 					);
+					
+					// set suggest temperature if pla
+					if ($data_cartridge[PRINTERSTATE_TITLE_MATERIAL] == PRINTERSTATE_DESP_MATERIAL_PLA) {
+						$array_data[$abb_filament][$key_suggest_temper] = PRINTERSTATE_VALUE_FILAMENT_PLA_PRINT_TEMPER;
+					}
 				}
 				else {
 					$array_data[$abb_filament] = array(
@@ -734,6 +753,7 @@ class Sliceupload extends MY_Controller {
 							PRINTERSTATE_TITLE_EXT_TEMPER	=> SLICER_VALUE_DEFAULT_TEMPER,
 							PRINTERSTATE_TITLE_EXT_TEMP_1	=> SLICER_VALUE_DEFAULT_FIRST_TEMPER,
 							PRINTERSTATE_TITLE_NEED_L		=> $volume_need,
+							$key_suggest_temper				=> 0,
 					);
 				}
 				
@@ -833,7 +853,9 @@ class Sliceupload extends MY_Controller {
 				'need_filament_l'	=> $array_data['l'][PRINTERSTATE_TITLE_NEED_L],
 				'need_filament_r'	=> $array_data['r'][PRINTERSTATE_TITLE_NEED_L],
 				'temper_l'			=> $array_data['l'][PRINTERSTATE_TITLE_EXT_TEMPER],
+				'temper_suggest_l'	=> $array_data['l'][$key_suggest_temper],
 				'temper_r'			=> $array_data['r'][PRINTERSTATE_TITLE_EXT_TEMPER],
+				'temper_suggest_r'	=> $array_data['r'][$key_suggest_temper],
 // 				'real_temper_l'		=> isset($array_data['l']) ? $array_data['l'][$array_key_real_temper] : 200,
 // 				'real_temper_r'		=> isset($array_data['r']) ? $array_data['r'][$array_key_real_temper] : 200,
 				'print_button'		=> t('print_button'),
@@ -874,10 +896,10 @@ class Sliceupload extends MY_Controller {
 		// display not enough even if filament is unused (in mono-color model)
 		else if ($array_need['r'] == 'false' || $array_need['l'] == 'false') {
 			if ($array_data['l'][PRINTERSTATE_TITLE_NEED_L] == 0) {
-				$template_data['state_f_l'] = t('filament_not_enough');
+				$template_data['state_f_l'] = t('filament_not_enough_for_switch');
 			}
 			else { // ($array_data['r'][PRINTERSTATE_TITLE_NEED_L] == 0)
-				$template_data['state_f_r'] = t('filament_not_enough');
+				$template_data['state_f_r'] = t('filament_not_enough_for_switch');
 			}
 		}
 // 		if (ERROR_OK == PrinterState_checkFilament('l', $array_data['r'][PRINTERSTATE_TITLE_NEED_L])

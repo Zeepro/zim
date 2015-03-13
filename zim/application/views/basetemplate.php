@@ -2,14 +2,12 @@
 <html lang="{lang}">
 	<head>
 		<meta charset="utf-8" />
-<!-- 		<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE9" /> -->
-		<meta http-equiv="X-UA-Compatible" content="IE=10; IE=9" />
+		<meta http-equiv="X-UA-Compatible" content="IE=11; IE=10; IE=9" />
 		<meta http-equiv="cache-control" content="max-age=0" />
 		<meta http-equiv="cache-control" content="no-cache" />
 		<meta http-equiv="expires" content="-1" /> <!-- use -1 instead of 0, http://support.microsoft.com/kb/234067 vs http://stackoverflow.com/questions/11357430 -->
 		<meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
 		<meta http-equiv="pragma" content="no-cache" />
-		{headers}
 		<link rel="stylesheet" href="/styles/jquery.mobile-1.4.0.min.css" />
 		<link rel="stylesheet" href="/styles/Custom-zim.min.css" />
 		<script src="/scripts/jquery-1.9.1.min.js"></script>
@@ -29,6 +27,7 @@
 					$('div#link_logo').click(function(){window.location.href='/'; return false;});
 			});
 		</script>
+		{headers}
 	</head>
 	<body>
 		<noscript>

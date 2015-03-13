@@ -13,10 +13,11 @@
 					<button id="preview_near_button" data-inline="true" data-icon="plus" data-iconpos="left" onclick="javascript: getPreviewNear();" class="ui-btn-hidden" data-disabled="false">{near_button}</button>
 					<button id="preview_far_button" data-inline="true" data-icon="minus" data-iconpos="left" onclick="javascript: getPreviewFar();" class="ui-btn-hidden" data-disabled="false">{far_button}</button>
 				</div>
-				<div id="preview_image_zone">{wait_preview}</div>
+				<div id="preview_image_zone"><canvas id="ivwindow3d" width="500px" height="500px" class="zeeprocanvas"></canvas></div>
+				
 			</div>
 			<div id="detail_zone" style="clear: both; text-align: center; display: none;">
-				<div id="model_coordinate_info" style="font-size: small;">
+				<div id="model_coordinate_info" style="font-size: small;" class="slicer_printer_rendering">
 					X = <span id="model_xsize_info">{model_xsize}</span>mm x 
 					Y = <span id="model_ysize_info">{model_ysize}</span>mm x 
 					Z = <span id="model_zsize_info">{model_zsize}</span>mm
@@ -24,21 +25,32 @@
 				<div id="control_modify_group">
 					<div data-role="collapsible" data-collapsed="true">
 						<h4>{scale_rotate_title}</h4>
-						<ul data-role="listview" data-inset="true">
+						<div id="control_modify_mini_group" style="display: none;">
+							<div data-role="navbar" style="margin-bottom: 1em;">
+								<ul>
+									<li><a id="slicer_mini_size" href="#" onclick="javascript: onMiniSliderSwitched('s');" class="ui-btn-active">{scale_title}</a></li>
+									<li><a id="slicer_mini_rotate_x" href="#" onclick="javascript: onMiniSliderSwitched('x');">{rotate_x_title}</a></li>
+									<li><a id="slicer_mini_rotate_y" href="#" onclick="javascript: onMiniSliderSwitched('y');">{rotate_y_title}</a></li>
+									<li><a id="slicer_mini_rotate_z" href="#" onclick="javascript: onMiniSliderSwitched('z');">{rotate_z_title}</a></li>
+								</ul>
+								<input type="range" name="slicer_mini_control" id="slicer_mini_control" value="{model_scale}" min="1" max="{model_smax}" oninput="onMiniSliderChanged(this.value);" onchange="onMiniSliderChanged(this.value);" />
+							</div>
+						</div>
+						<ul data-role="listview" data-inset="true" id="control_modify_sliders">
 							<li data-role="list-divider">{scale_title}</li> <!-- <label for="slicer_size"></label> -->
 							<li>
-								<input type="range" name="slicer_size" id="slicer_size" value="{model_scale}" min="1" max="{model_smax}" />
-								<input type="button" id="slicer_set_model_scale_button" value="{set_model_button}">
+								<input type="range" name="slicer_size" id="slicer_size" value="{model_scale}" min="1" max="{model_smax}" oninput="onSliderChanged('s', this.value);" onchange="onSliderChanged('s', this.value);" />
+								<div class="slicer_printer_rendering"><input type="button" id="slicer_set_model_scale_button" value="{set_model_button}"></div>
 							</li>
 							<li data-role="list-divider">{rotate_title}</li>
 							<li>
 								<label for="slicer_rotate_x">{rotate_x_title}</label>
-								<input type="range" name="slicer_rotate_x" id="slicer_rotate_x" value="{model_xrot}" min="-180" max="180" />
+								<input type="range" name="slicer_rotate_x" id="slicer_rotate_x" value="{model_xrot}" min="-180" max="180" oninput="onSliderChanged('x', this.value);" onchange="onSliderChanged('x', this.value);" />
 								<label for="slicer_rotate_y">{rotate_y_title}</label>
-								<input type="range" name="slicer_rotate_y" id="slicer_rotate_y" value="{model_yrot}" min="-180" max="180" />
+								<input type="range" name="slicer_rotate_y" id="slicer_rotate_y" value="{model_yrot}" min="-180" max="180" oninput="onSliderChanged('y', this.value);" onchange="onSliderChanged('y', this.value);" />
 								<label for="slicer_rotate_z">{rotate_z_title}</label>
-								<input type="range" name="slicer_rotate_z" id="slicer_rotate_z" value="{model_zrot}" min="-180" max="180" />
-								<input type="button" id="slicer_set_model_rotate_button" value="{set_model_button}">
+								<input type="range" name="slicer_rotate_z" id="slicer_rotate_z" value="{model_zrot}" min="-180" max="180" oninput="onSliderChanged('z', this.value);" onchange="onSliderChanged('z', this.value);" />
+								<div class="slicer_printer_rendering"><input type="button" id="slicer_set_model_rotate_button" value="{set_model_button}"></div>
 							</li>
 						</ul>
 						<input type="button" id="slicer_reset_model_button" value="{reset_model_button}">
@@ -82,6 +94,9 @@ var var_model_xrot = {model_xrot};
 var var_model_yrot = {model_yrot};
 
 var var_wait_preview = false;
+var var_webgl_support = true;
+var var_webgl_initialized = false;
+var var_mini_control_slider_type = 's'; // scale as default
 
 
 $(document).ready(prepareDisplay());
@@ -98,15 +113,21 @@ function prepareDisplay() {
 				}
 			}
 		});
-		$("input#slicer_set_model_scale_button").click(function() {
-			changeModel('scale');
-		});
-		$("input#slicer_set_model_rotate_button").click(function() {
-			changeModel('rotate');
-		});
 		$("input#slicer_reset_model_button").click(function() {
 			resetModel();
 		});
+		if (var_webgl_support == false) {
+			$("input#slicer_set_model_scale_button").click(function() {
+				changeModel('scale');
+			});
+			$("input#slicer_set_model_rotate_button").click(function() {
+				changeModel('rotate');
+			});
+		}
+		else if (document.body.clientHeight < 750) {
+			$("ul#control_modify_sliders").hide();
+			$("div#control_modify_mini_group").show();
+		}
 	}
 	else if (var_stage == "wait_print") {
 		// try to get sliced info
@@ -122,7 +143,108 @@ function prepareDisplay() {
 	return;
 }
 
+function onWebGL_finalized() {
+	// change model by current coordinates after loading model
+	onSliderChanged('s', var_model_scale);
+	onSliderChanged('x', var_model_xrot);
+	onSliderChanged('y', var_model_yrot);
+	onSliderChanged('z', var_model_zrot);
+	
+	if (var_stage == "wait_slice") { // add case (var_mini_control_slider_type == 's') if necessary
+		$("input#slicer_mini_control").attr("max", $("input#slicer_size").attr("max"));
+		$("input#slicer_mini_control").slider("refresh");
+	}
+	return;
+}
+
+function onMiniSliderSwitched(type) {
+	if (typeof(type) == 'undefined') return;
+	
+	var var_minToChange = null;
+	var var_maxToChange = null;
+	var var_valToChange = null;
+	var var_typeToChange = null;
+	
+	$("#overlay").addClass("gray-overlay");
+	$(".ui-loader").css("display", "block");
+	
+	switch (type) {
+		case 's':
+			var_minToChange = 1;
+			var_maxToChange = $("input#slicer_size").attr("max");
+			var_valToChange = $("input#slicer_size").val();
+			var_typeToChange = 's';
+			break;
+			
+		case 'x':
+			var_typeToChange = 'x';
+			var_valToChange = $("input#slicer_rotate_x").val();
+		case 'y':
+			if (var_typeToChange == null) var_typeToChange = 'y';
+			if (var_valToChange == null) var_valToChange = $("input#slicer_rotate_y").val();
+		case 'z':
+			if (var_typeToChange == null) var_typeToChange = 'z';
+			if (var_valToChange == null) var_valToChange = $("input#slicer_rotate_z").val();
+			var_minToChange = -180;
+			var_maxToChange = 180;
+			break;
+			
+		default:
+			return;
+			break;
+	}
+	
+	$("input#slicer_mini_control").attr("max", var_maxToChange);
+	$("input#slicer_mini_control").attr("min", var_minToChange);
+	$("input#slicer_mini_control").val(var_valToChange);
+	var_mini_control_slider_type = var_typeToChange;
+	$("input#slicer_mini_control").slider("refresh");
+	$("#overlay").removeClass("gray-overlay");
+	$(".ui-loader").css("display", "none");
+	
+	return;
+}
+
+function onMiniSliderChanged(value) {
+// 	debugger;
+	switch (var_mini_control_slider_type) {
+		case 's':
+			$("input#slicer_size").val(value);
+			$("input#slicer_size").slider("refresh");
+			break;
+			
+		case 'x':
+		case 'y':
+		case 'z':
+			$("input#slicer_rotate_" + var_mini_control_slider_type).val(value);
+			$("input#slicer_rotate_" + var_mini_control_slider_type).slider("refresh");
+			break;
+			
+		default:
+			break;
+	}
+	
+	return;
+}
+
 function getPreview() {
+	// try client rendering firstly
+	if (var_webgl_initialized == false) {
+		zpInit3d(document.getElementById('ivwindow3d'), '/rest/getamfv1');
+		var_webgl_initialized = true;
+	}
+	if (var_webgl_support == true) {
+		$("div.slicer_printer_rendering").hide();
+		$("div#detail_zone").show();
+		$("a#slice_button").removeClass("ui-disabled");
+		
+		return;
+	}
+	else {
+		console.log('WebGL initialization failed, fallback to printer rendering');
+		$("#preview_image_zone").html("{wait_preview}");
+	}
+	
 	if (var_slice_status_lock == true) {
 		return;
 	}
@@ -179,6 +301,7 @@ function getPreview() {
 	return;
 }
 
+// printer rendering function
 function getPreviewNear() {
 	var_current_rho = var_current_rho - var_interval_rho;
 	if (var_current_rho < 0) {
@@ -189,6 +312,7 @@ function getPreviewNear() {
 	return;
 }
 
+//printer rendering function
 function getPreviewFar() {
 	var_current_rho = var_current_rho + var_interval_rho;
 	if (var_current_rho > 5000) {
@@ -199,6 +323,7 @@ function getPreviewFar() {
 	return;
 }
 
+//printer rendering function
 function changeModel(changeType) {
 	var var_model_id = 0;
 	var var_ajax_data = {id: var_model_id};
@@ -322,6 +447,12 @@ function changeModel(changeType) {
 }
 
 function resetModel() {
+	if (var_webgl_support == true) {
+		view3d.cm_reset();
+		onMiniSliderSwitched(var_mini_control_slider_type);
+		return;
+	}
+	
 	var var_model_id = 0;
 	
 	if (var_slice_status_lock == true) {
@@ -344,7 +475,7 @@ function resetModel() {
 		type: "GET",
 		cache: false,
 		data: {
-			id:		var_model_id,
+			id:	var_model_id,
 		},
 		beforeSend: function() {
 			$("#overlay").addClass("gray-overlay");
@@ -416,6 +547,40 @@ function startSlice(var_restart) {
 	}
 	else {
 		var_slice_status_lock = true;
+	}
+	
+	if (var_webgl_support == true) {
+		var_model_change = $.ajax({
+			url: "/rest/setmodelv1",
+			type: "GET",
+			cache: false,
+			async: false,
+			data: {
+				s:		$("input#slicer_size").val(),
+				xrot:	$("input#slicer_rotate_x").val(),
+				yrot:	$("input#slicer_rotate_y").val(),
+				zrot:	$("input#slicer_rotate_z").val(),
+			},
+			beforeSend: function() {
+				$("#overlay").addClass("gray-overlay");
+				$(".ui-loader").css("display", "block");
+			},
+			complete: function() {
+				if (var_wait_preview == false) {
+					$("#overlay").removeClass("gray-overlay");
+					$(".ui-loader").css("display", "none");
+				}
+			},
+		})
+		.fail(function() { // not allowed
+			alert("{setmodel_fail}");
+			view3d.cm_reset(); // reset slider and rendering
+			var_slice_status_lock = false;
+		});
+		
+		if (var_slice_status_lock == false) {
+			return;
+		}
 	}
 	
 	var_restart = typeof var_restart !== 'undefined' ? var_restart : false;

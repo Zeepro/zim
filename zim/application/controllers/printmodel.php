@@ -75,6 +75,8 @@ class Printmodel extends MY_Controller {
 		$change_right_filament = '';
 		$temper_left_filament = 0;
 		$temper_right_filament = 0;
+		$temper_left_suggest = 0;
+		$temper_right_suggest = 0;
 		$time_estimation = '';
 		$body_page = NULL;
 		$mono_color = FALSE;
@@ -153,6 +155,11 @@ class Printmodel extends MY_Controller {
 		if (($cr != ERROR_MISS_RIGT_CART) && ($cr != ERROR_INTERNAL)) {
 			$color_right_filament = $cartridge_data[PRINTERSTATE_TITLE_COLOR];
 			$temper_right_filament = $cartridge_data[PRINTERSTATE_TITLE_EXT_TEMPER];
+			
+			// set suggest temperature if pla
+			if ($cartridge_data[PRINTERSTATE_TITLE_MATERIAL] == PRINTERSTATE_DESP_MATERIAL_PLA) {
+				$temper_right_suggest = PRINTERSTATE_VALUE_FILAMENT_PLA_PRINT_TEMPER;
+			}
 		}
 		else {
 			$color_right_filament = PRINTERSTATE_VALUE_DEFAULT_COLOR;
@@ -202,6 +209,11 @@ class Printmodel extends MY_Controller {
 			if (($cr != ERROR_MISS_LEFT_CART) && ($cr != ERROR_INTERNAL)) {
 				$color_left_filament = $cartridge_data[PRINTERSTATE_TITLE_COLOR];
 				$temper_left_filament = $cartridge_data[PRINTERSTATE_TITLE_EXT_TEMPER];
+				
+				// set suggest temperature if pla
+				if ($cartridge_data[PRINTERSTATE_TITLE_MATERIAL] == PRINTERSTATE_DESP_MATERIAL_PLA) {
+					$temper_left_suggest = PRINTERSTATE_VALUE_FILAMENT_PLA_PRINT_TEMPER;
+				}
 			}
 			else {
 				$color_left_filament = PRINTERSTATE_VALUE_DEFAULT_COLOR;
@@ -237,6 +249,7 @@ class Printmodel extends MY_Controller {
 				'need_filament_r'	=> $model_data[PRINTLIST_TITLE_LENG_F1],
 // 				'temper_filament_l'	=> $temper_left_filament,
 				'temper_filament_r'	=> $temper_right_filament,
+				'temper_suggest_r'	=> $temper_right_suggest,
 				'print_model'		=> t('Print'),
 				'back'				=> t('back'),
 				'preview_title'		=> t('Preview'),
@@ -252,6 +265,7 @@ class Printmodel extends MY_Controller {
 				'temper_max'		=> PRINTERSTATE_TEMPER_CHANGE_MAX,
 				'temper_min'		=> PRINTERSTATE_TEMPER_CHANGE_MIN,
 				'temper_delta'		=> PRINTERSTATE_TEMPER_CHANGE_VAL,
+				'random_prefix'		=> $mid . '_' . rand() . '_',
 		);
 		if ($nb_extruder >= 2) {
 			$template_data['state_c_l'] = $color_left_filament;
@@ -259,6 +273,7 @@ class Printmodel extends MY_Controller {
 			$template_data['change_filament_l'] = $change_left_filament;
 			$template_data['temper_filament_l'] = $temper_left_filament;
 			$template_data['exchange_extruder'] = t('exchange_extruder');
+			$template_data['temper_suggest_l'] = $temper_left_suggest;
 			
 			// check if we can inverse filament / exchange extruder or not
 			$cr = PrinterState_checkFilaments(array(

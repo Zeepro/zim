@@ -54,6 +54,8 @@ $lang['filament_not_need']
 	= 'inutilisé';
 $lang['filament_not_enough']
 	= 'insuffisant';
+$lang['filament_not_enough_for_switch']
+	= 'insuffisant pour inverser la cartouche';
 $lang['filament_unloaded']
 	= 'déchargé';
 $lang['filament_empty']
