@@ -946,7 +946,7 @@ class Sliceupload extends MY_Controller {
 				$template_data['exchange_o2_sel']	= $option_selected;
 			}
 		}
-		$this->parser->parse('sliceupload/slice_result_ajax_1color', $template_data);
+		$this->parser->parse('sliceupload/slice_result_ajax', $template_data);
 		
 		$this->output->set_status_header(202);
 		
