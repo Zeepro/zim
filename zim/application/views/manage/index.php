@@ -1,4 +1,4 @@
-<div data-role="page" data-url="/manage">
+<div data-role="page" data-url="/manage" style="overflow-y:hidden;">
 	<style>
 		.round-button
 		{
@@ -168,26 +168,33 @@
 			<div data-role="collapsible">
 				<h4>{filament}</h4>
 				<div class="container_16" style="text-align:center">
-					
-						<a href="#filament_popup" data-rel="popup" class="ui-btn ui-icon-info ui-btn-icon-right ui-corner-all ui-shadow" data-transition="pop">{what}</a>
-						<div id="filament_popup" data-role="popup" class="ui-content">
-							<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right"></a>
-							{filament_text}
-						</div>
-					
-					<div style="text-align:center;display:inline-block;width:45%;margin-left:2%">
-						{left}
+					<a href="#filament_popup" data-rel="popup" class="ui-btn ui-icon-info ui-btn-icon-right ui-corner-all ui-shadow" data-transition="pop">{what}</a>
+					<div id="filament_popup" data-role="popup" class="ui-content">
+						<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right"></a>
+						{filament_text}
 					</div>
-					<div style="text-align:center;display:inline-block;width:45%;margin-left:2%">
-						{right}
+					<div class="widget_bicolor" style="display: none;">
+						<div style="text-align:center;display:inline-block;width:45%;margin-left:2%">
+							{left}
+						</div>
+						<div style="text-align:center;display:inline-block;width:45%;margin-left:2%">
+							{right}
+						</div>
 					</div>
 				</div>
 				<div class="container_16" style="text-align:center">
-					<div id="cartridge_ajax" style="background-color:#f6f6f6;text-align:center;border: 2px solid;border-radius: 53px;display:inline-block;width:45%;margin-left:2%;">
-						<img src="styles/images/ajax-loader.gif" style="opacity: 0.18;" />
+					<div class="widget_monocolor" style="display: none;">
+						<div id="cartridge_ajax_mono" style="background-color:#f6f6f6;text-align:center;border: 2px solid;border-radius: 53px;display:inline-block;width:95%;margin-left:2%;">
+							<img src="styles/images/ajax-loader.gif" style="opacity: 0.18;" />
+						</div>
 					</div>
-					<div id="cartridge_ajax2" style="background-color:#f6f6f6;text-align:center;border: 2px solid;border-radius: 53px;display:inline-block;width:45%;margin-left:2%;">
-						<img src="styles/images/ajax-loader.gif" style="opacity: 0.18;" />
+					<div class="widget_bicolor" style="display: none;">
+						<div id="cartridge_ajax_l" style="background-color:#f6f6f6;text-align:center;border: 2px solid;border-radius: 53px;display:inline-block;width:45%;margin-left:2%;">
+							<img src="styles/images/ajax-loader.gif" style="opacity: 0.18;" />
+						</div>
+						<div id="cartridge_ajax_r" style="background-color:#f6f6f6;text-align:center;border: 2px solid;border-radius: 53px;display:inline-block;width:45%;margin-left:2%;">
+							<img src="styles/images/ajax-loader.gif" style="opacity: 0.18;" />
+						</div>
 					</div>
 				</div>
 				<br />
@@ -231,29 +238,18 @@
 	</div>
 
 <script type="text/javascript">
+var var_bicolor = {bicolor};
+
+if (var_bicolor == true) {
+	$(".widget_bicolor").show();
+}
+else {
+	$(".widget_monocolor").show();
+}
 
 //**************
 //	CARTRIDGE JS
 //**************
-
-var var_manage_filament_l = $.ajax(
-{
-	url: "/manage/filament_ajax/l",
-	cache: false,
-	type: "GET",
-	async: "true",
-})
-.done(function(html)
-{
-	if (var_manage_filament_l.status == 202) {
-		$("#cartridge_ajax").html(html);
-		$("#cartridge_ajax").css('cursor', 'pointer');
-		$("#cartridge_ajax").on('click', function()
-		{
-			window.location.href = '/printerstate/changecartridge?v=l&f=0';
-		});
-	}
-});
 
 var var_manage_filament_r = $.ajax(
 {
@@ -265,14 +261,40 @@ var var_manage_filament_r = $.ajax(
 .done(function(html)
 {
 	if (var_manage_filament_r.status == 202) {
-		$("#cartridge_ajax2").html(html);
-		$("#cartridge_ajax2").css('cursor', 'pointer');
-		$("#cartridge_ajax2").on('click', function()
+		var var_selector_update = "#cartridge_ajax_r";
+		if (var_bicolor != true) {
+			var_selector_update = "#cartridge_ajax_mono";
+		}
+		
+		$(var_selector_update).html(html);
+		$(var_selector_update).css('cursor', 'pointer');
+		$(var_selector_update).on('click', function()
 		{
 			window.location.href = '/printerstate/changecartridge?v=r&f=0';
 		});
 	}
 });
+
+if (var_bicolor == true) {
+	var var_manage_filament_l = $.ajax(
+	{
+		url: "/manage/filament_ajax/l",
+		cache: false,
+		type: "GET",
+		async: "true",
+	})
+	.done(function(html)
+	{
+		if (var_manage_filament_l.status == 202) {
+			$("#cartridge_ajax_l").html(html);
+			$("#cartridge_ajax_l").css('cursor', 'pointer');
+			$("#cartridge_ajax_l").on('click', function()
+			{
+				window.location.href = '/printerstate/changecartridge?v=l&f=0';
+			});
+		}
+	});
+}
 
 $(document).ready(function()
 {

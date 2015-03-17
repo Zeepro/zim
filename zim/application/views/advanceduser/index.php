@@ -251,8 +251,8 @@
 						onclick="startSubmit('form#fileupload_n');">
 				</form>
 				<button
-					class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete"
-					onclick="javascript: window.location.href='/advanceduser/stop';">Stop</button>
+					class="ui-btn ui-shadow ui-corner-all ui-btn-icon-right ui-icon-delete"
+					onclick="javascript: window.location.href='/advanceduser/stop';">Stop print</button>
 			</div>
 			<label for="gcode_detail_info">Output</label>
 			<textarea name="gcode_detail_info" id="gcode_detail_info"
@@ -269,23 +269,6 @@ var var_verifyRFIDInterval = 0;
 
 $(document).ready(checkTemper());
 
-// $("form#fileupload_v, form#fileupload_n").submit(verifyRfid(event));
-
-
-/* 
-function checkTemper() {
-//	refreshCheckTemper();
-	$("#temper_collaspible").bind('expand', function () {
-		if (var_refreshCheckTemper == 0) {
-//			checkTemper();
-			var_refreshCheckTemper = setInterval(refreshCheckTemper, 10000);
-		}
-	}).bind('collapse', function() {
-		clearInterval(var_refreshCheckTemper);
-		var_refreshCheckTemper = 0;
-	});
-}
- */
 function checkTemper() {
 //		refreshCheckTemper();
 		$("#temper_collaspible").collapsible({
@@ -633,15 +616,8 @@ function refreshRfid() {
 
 function verifyRfid() {
 	if (var_checked_rfid == false) {
-// 		var var_option = confirm("Haven't launched checking RFID detected, check it now before start printing?");
-// 		if (var_option == true) {
-			refreshRfid();
-			return true;
-// 		}
-// 		else {
-// 			alert("You have cancelled printing because of RFID");
-// 			return false;
-// 		}
+		refreshRfid();
+		return true;
 	}
 	else {
 		return true;

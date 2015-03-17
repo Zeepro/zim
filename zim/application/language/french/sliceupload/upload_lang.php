@@ -30,6 +30,8 @@ $lang['return_button']
 	= 'Essayer à nouveau';
 $lang['fail_message']
 	= 'Erreur d\'addition de modèle dans sliceur';
+$lang['fail_message_ext']
+	= 'Erreur d\'extension de fichier de modèle';
 $lang['fin_message']
 	= 'Réussi à ajouter le modèle dans sliceur, la page sera changée à celle de sliceur après 3 secondes';
 

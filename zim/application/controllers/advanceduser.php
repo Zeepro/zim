@@ -2,10 +2,6 @@
 if (!defined('BASEPATH'))
 	exit('No direct script access allowed');
 
-if (!defined('PRONTERFACE_EMULATOR_LOG')) {
-	define('PRONTERFACE_EMULATOR_LOG', '_emulator.log');
-}
-
 class Advanceduser extends MY_Controller {
 	function __construct() {
 		parent::__construct ();
@@ -21,27 +17,26 @@ class Advanceduser extends MY_Controller {
 		$this->load->library('parser');
 		
 		if (file_exists($CFG->config['conf'] . '/G-code.json')) {
-			$this->load->helper(array('printerstate', 'zimapi'));
+			$this->load->helper('zimapi');
 			
-			$temp_info = PrinterState_getInfoAsArray();
-			$template_data = array('serial' => $temp_info[PRINTERSTATE_TITLE_SERIAL], 'err_msg' => '');
+			$template_data = array('serial' => ZimAPI_getSerial(), 'err_msg' => '');
 			
-			$this->_parseBaseTemplate('Advanced user', $this->parser->parse('advanceduser', $template_data, TRUE));
+			$this->_parseBaseTemplate('Advanced user', $this->parser->parse('advanceduser/index', $template_data, TRUE));
 		} else {
 			if ($_SERVER['REQUEST_METHOD'] == 'POST')
 			{
-				$this->load->helper(array('printerstate', 'zimapi'));
+				$this->load->helper('zimapi');
 				
-				$temp_info = PrinterState_getInfoAsArray();
+				$temp_serial = ZimAPI_getSerial();
 				
-				if (strtoupper($this->input->post('serial')) != strtoupper($temp_info[PRINTERSTATE_TITLE_SERIAL])) {
+				if (strtoupper($this->input->post('serial')) != strtoupper($temp_serial)) {
 					$template_data = array('err_msg' => 'Incorrect serial number');
 					
-					$this->_parseBaseTemplate('Advanced user', $this->parser->parse('advanceduserregister', $template_data, TRUE));
+					$this->_parseBaseTemplate('Advanced user', $this->parser->parse('advanceduser/register', $template_data, TRUE));
 				} else {
 
 					$url = 'https://stat.service.zeepro.com/log.ashx';
-					$data = array('printersn' => $temp_info[PRINTERSTATE_TITLE_SERIAL], 'version' => '1', 'category' => 'gcode', 'action' => 'register');
+					$data = array('printersn' => $temp_serial, 'version' => '1', 'category' => 'gcode', 'action' => 'register');
 					$options = array('http' => array('header'  => "Content-type: application/x-www-form-urlencoded\r\n",
 							'method'  => 'POST',
 							'content' => http_build_query($data)));
@@ -51,7 +46,7 @@ class Advanceduser extends MY_Controller {
 					if ($result != 200) {
 						$template_data = array('err_msg' => 'Can\'t connect to the Internet');
 						
-						$this->_parseBaseTemplate('Advanced user', $this->parser->parse('advanceduserregister', $template_data, TRUE));
+						$this->_parseBaseTemplate('Advanced user', $this->parser->parse('advanceduser/register', $template_data, TRUE));
 					} else {
 
 						$fp = fopen($CFG->config['conf'] . '/G-code.json', 'w');
@@ -61,18 +56,18 @@ class Advanceduser extends MY_Controller {
 
 							$template_data = array('err_msg' => '');
 
-							$this->_parseBaseTemplate('Advanced user', $this->parser->parse('advanceduser', $template_data, TRUE));
+							$this->_parseBaseTemplate('Advanced user', $this->parser->parse('advanceduser/index', $template_data, TRUE));
 						} else {
 							$template_data = array('err_msg' => 'Internal error');
 							
-							$this->_parseBaseTemplate('Advanced user', $this->parser->parse('advanceduserregister', $template_data, TRUE));
+							$this->_parseBaseTemplate('Advanced user', $this->parser->parse('advanceduser/register', $template_data, TRUE));
 						}
 					}
 				}
 			} else {
 				$template_data = array('err_msg' => '');
 
-				$this->_parseBaseTemplate('Advanced user', $this->parser->parse('advanceduserregister', $template_data, TRUE));
+				$this->_parseBaseTemplate('Advanced user', $this->parser->parse('advanceduser/register', $template_data, TRUE));
 			}
 		}
 		return;
@@ -279,17 +274,17 @@ class Advanceduser extends MY_Controller {
 				
 				$cr = PrinterState_runGcodeFile($gcode['full_path'], $rewrite);
 				if ($cr == TRUE) {
-					$this->_parseBaseTemplate('Advanced user', $this->parser->parse('advanceduserconfirm', array(), TRUE));
+					$this->_parseBaseTemplate('Advanced user', $this->parser->parse('advanceduser/confirm', array(), TRUE));
 				}
 				else {
 					$template_data = array('err_msg' => 'Internal error');
 					
-					$this->_parseBaseTemplate('Advanced user', $this->parser->parse('advanceduser', $template_data, TRUE));
+					$this->_parseBaseTemplate('Advanced user', $this->parser->parse('advanceduser/index', $template_data, TRUE));
 				}
 			} else {
 				$template_data = array('err_msg' => 'Missing file');
 				
-				$this->_parseBaseTemplate('Advanced user', $this->parser->parse('advanceduser', $template_data, TRUE));
+				$this->_parseBaseTemplate('Advanced user', $this->parser->parse('advanceduser/index', $template_data, TRUE));
 			}
 		}
 		else {
@@ -349,86 +344,4 @@ class Advanceduser extends MY_Controller {
 		print json_encode($array_rfid);
 		return;
 	}
-	
-	// not in use
-// 	public function emulator() {
-// 		$cr = 0;
-// 		$gcode = NULL;
-// 		$command = '';
-// 		$output = NULL;
-// 		$ret_val = 0;
-// // 		$path_file = '';
-		
-// 		$this->load->helper(array('detectos', 'printer'));
-// // 		if (DectectOS_checkWindows()) {
-// // 			$command = 'php ' . $this->config->item('bin') . 'GCEmulator.php ' . $this->config->item('temp') . ' ';
-// // 		}
-// // 		else {
-// // 			$command = $this->config->item('bin') . 'GCEmulator.php p=' . $this->config->item('temp') . ' v=';
-// // 		}
-		
-// 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-// 			$upload_config = array (
-// 					'upload_path'	=> $this->config->item('temp'),
-// 					'allowed_types'	=> '*',
-// // 					'allowed_types'	=> 'gcode',
-// 					'overwrite'		=> TRUE,
-// 					'remove_spaces'	=> TRUE,
-// 					'encrypt_name'	=> TRUE,
-// 			);
-// 			$this->load->library('upload', $upload_config);
-			
-// 			if ($this->upload->do_upload('f')) {
-// 				$gcode = $this->upload->data();
-// // 				$path_file = $this->config->item('temp') . PRONTERFACE_EMULATOR_LOG;
-				
-// 				$context = stream_context_create(
-// 						array('http' => array('ignore_errors' => TRUE))
-// 				);
-// 				$url = 'http://localhost:' . $_SERVER['SERVER_PORT'] . '/bin/GCEmulator.php?p='
-// 						. $this->config->item('temp') . '&v=' . $gcode['full_path'];
-				
-// 				Printer_preparePrint();
-// 				$response = @file_get_contents($url, FALSE, $context);
-				
-// 				if ($response === FALSE) {
-// 					$cr = 403;
-// 				}
-// 				else {
-// 					$cr = ERROR_OK;
-// 					$this->output->set_content_type('txt_u');
-// 					$this->load->library('parser');
-// 					$this->parser->parse('plaintxt', array('display' => $response));
-// 				}
-				
-// // 				$command .= $gcode['full_path'] . ' > ' . $path_file;
-// // 				PrinterLog_logArduino($command);
-// // 				system($command, $ret_val);
-// // 				if ($ret_val != ERROR_NORMAL_RC_OK) {
-// // 					$this->output->set_status_header(404);
-// // 				}
-// // 				else if (!file_exists($path_file)) {
-// // 					$this->output->set_status_header(404);
-// // 				} else {
-// // 					$this->load->helper('file');
-// // 					$this->output->set_content_type(get_mime_by_extension($path_file))->set_output(@file_get_contents($path_file));
-// // 				}
-// 			}
-// 			else {
-// 				$cr = 403;
-// 			}
-// 		}
-// 		else {
-// 			$cr = 403;
-// 		}
-		
-// 		if ($cr != ERROR_OK) {
-// 			$this->output->set_status_header($cr);
-// 			$this->output->set_content_type('txt_u');
-// 			$this->load->library('parser');
-// 			$this->parser->parse('plaintxt', array('display' => $cr . MyERRMSG($cr)));
-// 		}
-		
-// 		return;
-// 	}
 }

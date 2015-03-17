@@ -19,11 +19,14 @@ class Extrusion_control extends MY_Controller {
 		global $CFG;
 		$template_data = array();
 		$body_page = NULL;
-
+		
 		$this->load->library('parser');
-
+		
 		// parse the main body
-		$body_page = $this->parser->parse('extrusion_control', array(), TRUE);
+		$template_data = array(
+				'bicolor'	=> ($this->config->item('nb_extruder') >= 2) ? 'true' : 'false',
+		);
+		$body_page = $this->parser->parse('extrusion_control', $template_data, TRUE);
 
 		// parse all page
 		$template_data = array(
@@ -38,11 +41,12 @@ class Extrusion_control extends MY_Controller {
 	}
 	
 	// stop printing (but no access when in printing due to my_controller, why we put here?)
+	// just for stop print in idle mode (asynchronized case)
 	public function stop() {
 		$this->load->helper('printerstate');
 		PrinterState_stopPrinting();
 		$this->output->set_header('Location: /extrusion_control');
-
+		
 		return;
 	}
 	
@@ -94,13 +98,15 @@ class Extrusion_control extends MY_Controller {
 	}
 	
 	public function temper_ajax() {
-		$array_temper = 0;
+		$array_temper = array();
 		
 		$this->load->helper(array('printerstate', 'errorcode'));
 		$array_temper = PrinterState_getExtruderTemperaturesAsArray();
 		if (count($array_temper)) {
 			if (isset($array_temper[PRINTERSTATE_LEFT_EXTRUD])) {
-				$array_temper['left'] = $array_temper[PRINTERSTATE_LEFT_EXTRUD];
+				if ($this->config->item('nb_extruder') >= 2) {
+					$array_temper['left'] = $array_temper[PRINTERSTATE_LEFT_EXTRUD];
+				}
 				unset($array_temper[PRINTERSTATE_LEFT_EXTRUD]);
 			}
 			if (isset($array_temper[PRINTERSTATE_RIGHT_EXTRUD])) {

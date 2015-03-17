@@ -48,6 +48,8 @@ $lang['left_temperature']
 	= 'Left temperature (°C)';
 $lang['right_temperature']
 	= 'Right temperature (°C)';
+$lang['chg_temperature']
+	= 'Temperature (°C)';
 $lang['filament_ok']
 	= 'ok';
 $lang['filament_not_need']

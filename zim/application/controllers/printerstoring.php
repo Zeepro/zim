@@ -340,6 +340,7 @@ class Printerstoring extends MY_Controller {
 		$change_right = NULL;
 		$enable_print = TRUE;
 		$key_suggest_temper = 'suggest_temperature';
+		$bicolor = ($this->config->item('nb_extruder') >= 2);
 		
 		$this->load->helper(array('printerstoring', 'printerstate'));
 		$data_json = PrinterStoring_getInfo('gcode', $gid);
@@ -383,7 +384,14 @@ class Printerstoring extends MY_Controller {
 				$check_right = t('filament_not_need');
 			}
 			
-			$tmp_ret = PrinterState_checkFilament($abb_filament, $volume_need, $data_cartridge);
+			// check mono extruder case (normally, it's not necessary)
+			if ($bicolor == FALSE && $abb_filament == 'l') {
+				$tmp_ret = ERROR_MISS_LEFT_CART;
+			}
+			else {
+				$tmp_ret = PrinterState_checkFilament($abb_filament, $volume_need, $data_cartridge);
+			}
+			
 			if (in_array($tmp_ret, array(
 					ERROR_OK, ERROR_MISS_LEFT_FILA, ERROR_MISS_RIGT_FILA,
 					ERROR_LOW_LEFT_FILA, ERROR_LOW_RIGT_FILA,
@@ -480,37 +488,39 @@ class Printerstoring extends MY_Controller {
 		}
 		
 		$template_data = array(
-				'home'				=> t('home'),
-				'back'				=> t('back'),
-				'id'				=> $gid,
-				'title'				=> $data_json['name'],
-				'photo_title'		=> t('photo_title'),
-				'title_current'		=> t('filament_title'),
-				'error'				=> t('filament_error'),
-				'state_c_l'			=> $array_data['l'][PRINTERSTATE_TITLE_COLOR],
-				'state_c_r'			=> $array_data['r'][PRINTERSTATE_TITLE_COLOR],
-				'state_f_l'			=> $check_left,
-				'state_f_r'			=> $check_right,
-				'need_filament_l'	=> $array_data['l'][PRINTERSTATE_TITLE_NEED_L],
-				'need_filament_r'	=> $array_data['r'][PRINTERSTATE_TITLE_NEED_L],
-				'temper_filament_l'	=> $array_data['l'][PRINTERSTATE_TITLE_EXT_TEMPER],
-				'temper_filament_r'	=> $array_data['r'][PRINTERSTATE_TITLE_EXT_TEMPER],
-				'temper_suggest_l'	=> $array_data['l'][$key_suggest_temper],
-				'temper_suggest_r'	=> $array_data['r'][$key_suggest_temper],
-				'print_button'		=> t('print_button'),
-				'change_filament_l'	=> $change_left,
-				'change_filament_r'	=> $change_right,
-				'enable_print'		=> $enable_print ? 'true' : 'false',
-// 				'needprint_right'	=> $array_need['r'],
-// 				'needprint_left'	=> $array_need['l'],
-				'temp_adjustments_l'=> t('temp_adjustments_l'),
-				'temp_adjustments_r'=> t('temp_adjustments_r'),
-				'advanced'			=> t('advanced'),
-				'gcode_link'		=> t('gcode_link'),
-				'2drender_link'		=> t('2drender_link'),
-				'temper_max'		=> PRINTERSTATE_TEMPER_CHANGE_MAX,
-				'temper_min'		=> PRINTERSTATE_TEMPER_CHANGE_MIN,
-				'temper_delta'		=> PRINTERSTATE_TEMPER_CHANGE_VAL,
+				'home'					=> t('home'),
+				'back'					=> t('back'),
+				'id'					=> $gid,
+				'title'					=> $data_json['name'],
+				'photo_title'			=> t('photo_title'),
+				'title_current'			=> t('filament_title'),
+				'msg_ok'				=> t('filament_ok'),
+				'state_c_l'				=> $array_data['l'][PRINTERSTATE_TITLE_COLOR],
+				'state_c_r'				=> $array_data['r'][PRINTERSTATE_TITLE_COLOR],
+				'state_f_l'				=> $check_left,
+				'state_f_r'				=> $check_right,
+				'need_filament_l'		=> $array_data['l'][PRINTERSTATE_TITLE_NEED_L],
+				'need_filament_r'		=> $array_data['r'][PRINTERSTATE_TITLE_NEED_L],
+				'temper_filament_l'		=> $array_data['l'][PRINTERSTATE_TITLE_EXT_TEMPER],
+				'temper_filament_r'		=> $array_data['r'][PRINTERSTATE_TITLE_EXT_TEMPER],
+				'temper_suggest_l'		=> $array_data['l'][$key_suggest_temper],
+				'temper_suggest_r'		=> $array_data['r'][$key_suggest_temper],
+				'print_button'			=> t('print_button'),
+				'change_filament_l'		=> $change_left,
+				'change_filament_r'		=> $change_right,
+				'enable_print'			=> $enable_print ? 'true' : 'false',
+// 				'needprint_right'		=> $array_need['r'],
+// 				'needprint_left'		=> $array_need['l'],
+				'temp_adjustments_l'	=> t('temp_adjustments_l'),
+				'temp_adjustments_r'	=> t('temp_adjustments_r'),
+				'temp_adjustments'		=> t('temp_adjustments'),
+				'advanced'				=> t('advanced'),
+				'gcode_link'			=> t('gcode_link'),
+				'2drender_link'			=> t('2drender_link'),
+				'temper_max'			=> PRINTERSTATE_TEMPER_CHANGE_MAX,
+				'temper_min'			=> PRINTERSTATE_TEMPER_CHANGE_MIN,
+				'temper_delta'			=> PRINTERSTATE_TEMPER_CHANGE_VAL,
+				'bicolor'				=> $bicolor ? 'true' : 'false',
 		);
 		
 		// parse all page

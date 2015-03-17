@@ -435,7 +435,7 @@ function Printer_printFromFile($gcode_path, $model_id, $need_prime = TRUE, $exch
 			PrinterLog_logError('gcanalyser error', __FILE__, __LINE__);
 			return ERROR_INTERNAL;
 		}
-		$tmp_array = json_decode($output[0]);
+		$tmp_array = json_decode($output[0], TRUE);
 		if ($tmp_array['N'] > $CI->config->item('nb_extruder')) {
 			PrinterLog_logMessage('no enough extruder', __FILE__, __LINE__);
 			return ERROR_INTERNAL;

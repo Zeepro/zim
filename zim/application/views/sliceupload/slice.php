@@ -1,7 +1,6 @@
 <div data-role="page" data-url="/sliceupload/slice">
 	<style>
-		div#slicer_temperature_adjustment_container
-		input[type=number] { display: none !important; }
+		div.slicer_temperature_adjustment_container input[type=number] { display: none !important; }
 		.zeeprocanvas { background-color: rgba(0,0,0,1.0); border: 0px; }
 	</style>
 	<div id="overlay"></div>

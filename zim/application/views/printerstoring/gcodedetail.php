@@ -18,7 +18,16 @@
 			</div>
 			<div data-role="collapsible" data-collapsed="false" style="text-align: center;">
 				<h4>{title_current}</h4>
-				<div style="height:265px">
+				<div style="display: none;" class="widget_monocolor">
+					<div style="width: 75px; height: 75px; background-color: {state_c_r}; margin: 0 auto;">
+						<img src="/images/cartridge.png" style="width: 100%">
+					</div>
+					<p id="state_right">{state_f_r}</p>
+					<a href="/printerstate/changecartridge?v=r&f={need_filament_r}&id=gcode{id}" data-role="button" data-ajax="false" data-iconpos="none" class="ui-shadow ui-corner-all">{change_filament_r}</a>
+					<div>{temp_adjustments}</div>
+					<input type="range" id="slider-mono" value="{temper_filament_r}" min="160" max="260" data-show-value="true">
+				</div>
+				<div style="height:265px; display: none;" class="widget_bicolor">
 					<div class="ui-grid-a">
 						<div class="ui-block-a">
 							<div style="width: 75px; height: 75px; background-color: {state_c_l}; margin: 0 auto;">
@@ -46,10 +55,10 @@
 					<div class="ui-grid-a">
 						<div class="ui-block-a">{temp_adjustments_l}</div>
 						<div class="ui-block-b">{temp_adjustments_r}</div>
-						<div class="ui-block-a" id="div-slider1">
+						<div class="ui-block-a">
 							<input type="range" name="l" id="slider-l" value="{temper_filament_l}" min="160" max="260" data-show-value="true">
 						</div>
-						<div class="ui-block-b" id="div-slider2">
+						<div class="ui-block-b">
 							<input type="range" name="r" id="slider-r" value="{temper_filament_r}" min="160" max="260" data-show-value="true">
 						</div>
 					</div>
@@ -81,70 +90,74 @@ var var_suggest_temper_left = {temper_suggest_l};
 var limit_min_tmp = {temper_min};
 var limit_max_tmp = {temper_max};
 var delta_tmp = {temper_delta};
-var slider_l = "input#slider-l";
-var slider_r = "input#slider-r";
 var error_checked = false;
+var var_bicolor = {bicolor};
+var slider_l = "input#slider-l";
+var slider_r = var_bicolor ? "input#slider-r" : "input#slider-mono";
 
-var tmp = $(slider_r).val();
-var min_tmp = tmp - delta_tmp;
-var max_tmp = parseInt(tmp) + delta_tmp;
-
-$(slider_r).attr('min', (min_tmp < limit_min_tmp) ? limit_min_tmp : min_tmp);
-$(slider_r).attr('max', (max_tmp > limit_max_tmp) ? limit_max_tmp : max_tmp);
-if (var_suggest_temper_right != $(slider_r).val()
-		&& var_suggest_temper_right >= $(slider_r).attr('min')
-		&& var_suggest_temper_right <= $(slider_r).attr('max')) {
-	$(slider_r).val(var_suggest_temper_right);
-}
-
-tmp = $(slider_l).val();
-min_tmp = tmp - delta_tmp;
-max_tmp = parseInt(tmp) + delta_tmp;
-
-$(slider_l).attr('min', (min_tmp < limit_min_tmp) ? limit_min_tmp : min_tmp);
-$(slider_l).attr('max', (max_tmp > limit_max_tmp) ? limit_max_tmp : max_tmp);
-if (var_suggest_temper_left != $(slider_l).val()
-		&& var_suggest_temper_left >= $(slider_l).attr('min')
-		&& var_suggest_temper_left <= $(slider_l).attr('max')) {
-	$(slider_l).val(var_suggest_temper_left);
-}
-
-$("input[type=submit]").on('click', function()
-{
-	$("#overlay").addClass("gray-overlay");
-	$(".ui-loader").css("display", "block");
-});
-
-
-if ("{state_f_r}" == "{error}") {
-	$(slider_r).attr("disabled", "disabled");
-	error_checked = true;
-}
-if ("{state_f_l}" == "{error}") {
-	$(slider_l).attr("disabled", "disabled");
-	error_checked = true;
-}
-if (error_checked == false) {
-	if ({need_filament_l} <= 0) {
-		$(slider_l).attr("disabled", "disabled");
-	}
-	if ({need_filament_r} <= 0) {
-		$(slider_r).attr("disabled", "disabled");
-	}
-}
-
-
-// if ("{state_f_l}" != "ok" || "{state_f_r}" != "ok")
-// {
-// 	$("input[type=submit]").attr("disabled", "disabled");
-// }
 $(document).on("pagecreate",function() {
+	if (var_bicolor == true) {
+		$(".widget_bicolor").show();
+	}
+	else {
+		$(".widget_monocolor").show();
+		$(slider_r).change(function() {
+			$("input#slider-r").val($(slider_r).val());
+		});
+	}
+	
 	if (var_enable_print == false) {
-// 		$("input[type=submit]").attr("disabled", "disabled");
 		$("input[type=submit]").button("disable");
+	}
+	
+	var tmp = $(slider_r).val();
+	var min_tmp = tmp - delta_tmp;
+	var max_tmp = parseInt(tmp) + delta_tmp;
+	
+	$(slider_r).attr('min', (min_tmp < limit_min_tmp) ? limit_min_tmp : min_tmp);
+	$(slider_r).attr('max', (max_tmp > limit_max_tmp) ? limit_max_tmp : max_tmp);
+	if (var_suggest_temper_right != $(slider_r).val()
+			&& var_suggest_temper_right >= $(slider_r).attr('min')
+			&& var_suggest_temper_right <= $(slider_r).attr('max')) {
+		$(slider_r).val(var_suggest_temper_right);
+	}
+	$(slider_r).slider("refresh");
+	
+	tmp = $(slider_l).val();
+	min_tmp = tmp - delta_tmp;
+	max_tmp = parseInt(tmp) + delta_tmp;
+	
+	$(slider_l).attr('min', (min_tmp < limit_min_tmp) ? limit_min_tmp : min_tmp);
+	$(slider_l).attr('max', (max_tmp > limit_max_tmp) ? limit_max_tmp : max_tmp);
+	if (var_suggest_temper_left != $(slider_l).val()
+			&& var_suggest_temper_left >= $(slider_l).attr('min')
+			&& var_suggest_temper_left <= $(slider_l).attr('max')) {
+		$(slider_l).val(var_suggest_temper_left);
+	}
+	$(slider_l).slider("refresh");
+	
+	$("input[type=submit]").on('click', function()
+	{
+		$("#overlay").addClass("gray-overlay");
+		$(".ui-loader").css("display", "block");
+	});
+	
+	if ("{state_f_r}" != "{msg_ok}") {
+		$(slider_r).slider({disabled: true});
+		error_checked = true;
+	}
+	if ("{state_f_l}" != "{msg_ok}") {
+		$(slider_l).slider({disabled: true});
+		error_checked = true;
+	}
+	if (error_checked == false) {
+		if ({need_filament_l} <= 0) {
+			$(slider_l).slider({disabled: true});
+		}
+		if ({need_filament_r} <= 0) {
+			$(slider_r).slider({disabled: true});
+		}
 	}
 });
 </script>
 </div>
-
-<?php //TODO exchange also filament quantity in change cartridge link - need to create new javascript function instead of a fixed link ?>

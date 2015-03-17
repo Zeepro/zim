@@ -153,11 +153,21 @@ function CoreStatus_initialFile() {
 	
 	if (!file_exists($state_file)) {
 		// prepare data array
+		$CI->load->helper('printerstate');
+		
 		$data_json = array(
-				CORESTATUS_TITLE_VERSION	=> '1.0',
-				CORESTATUS_TITLE_STATUS		=> CORESTATUS_VALUE_IDLE,
-				CORESTATUS_TITLE_LASTERROR	=> NULL,
-				CORESTATUS_TITLE_MESSAGE	=> NULL,
+				CORESTATUS_TITLE_VERSION		=> '1.0',
+				CORESTATUS_TITLE_STATUS			=> CORESTATUS_VALUE_IDLE,
+				CORESTATUS_TITLE_LASTERROR		=> NULL,
+				CORESTATUS_TITLE_MESSAGE		=> NULL,
+				CORESTATUS_TITLE_SUBSTATUS		=> NULL,
+				CORESTATUS_TITLE_PRINTMODEL		=> CORESTATUS_VALUE_MID_CALIBRATION,
+				CORESTATUS_TITLE_ELAPSED_TIME	=> 0,
+				CORESTATUS_TITLE_P_TEMPER_L		=> 0,
+				CORESTATUS_TITLE_P_TEMPER_R		=> 0,
+				CORESTATUS_TITLE_P_EXCH_BUS		=> 0,
+				CORESTATUS_TITLE_FILA_MAT		=> PRINTERSTATE_DESP_MATERIAL_PLA,
+				CORESTATUS_TITLE_GUID			=> random_string('numeric', CORESTATUS_VALUE_RAND_STRING_LENGTH),
 		);
 		
 		// write json file
@@ -546,8 +556,14 @@ function CoreStatus_checkCallSlicing(&$url_redirect = '') {
 }
 
 function CoreStatus_checkCallDebug() {
-	// test_log & test_video & test_cartridge controller is not in My_controller's control
-	return CoreStatus__checkCallController(array('gcode', 'pronterface'));
+	// test_log & test_video & test_cartridge & test_version & test_production
+	//  controller is not in My_controller's control (always pass)
+	return CoreStatus__checkCallController(array(
+			'advanceduser',
+// 			'extrusion_control',
+			'test_endstop',
+			'zeepronterface',
+	));
 }
 
 function CoreStatus_checkCallNoBlockREST() {

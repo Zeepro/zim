@@ -103,7 +103,7 @@ $("#{random_prefix}printModel_detailPage").on("pagecreate",function() {
 	
 	$(slider_r).attr('min', (min_tmp < limit_min_tmp) ? limit_min_tmp : min_tmp);
 	$(slider_r).attr('max', (max_tmp > limit_max_tmp) ? limit_max_tmp : max_tmp);
-	$("input#slider-r").slider("refresh");
+	$(slider_r).slider("refresh");
 	
 	tmp = $(slider_l).val();
 	min_tmp = tmp - delta_tmp;
@@ -111,7 +111,7 @@ $("#{random_prefix}printModel_detailPage").on("pagecreate",function() {
 	
 	$(slider_l).attr('min', (min_tmp < limit_min_tmp) ? limit_min_tmp : min_tmp);
 	$(slider_l).attr('max', (max_tmp > limit_max_tmp) ? limit_max_tmp : max_tmp);
-	$("input#slider-l").slider("refresh");
+	$(slider_l).slider("refresh");
 	
 	$("input[type=submit]").on('click', function()
 	{

@@ -66,6 +66,8 @@ class Test_version extends CI_Controller {
 		ZimAPI_getUpgradeMode($upgrade_mode, $profile_link);
 		
 		$temp_info = PrinterState_getInfoAsArray();
+		// config variable is set in MY_controller, so we need to correct number of extruder by ourselves
+		$temp_info[PRINTERSTATE_TITLE_NB_EXTRUD] = PrinterState_getNbExtruder();
 		$array_info = array(
 				array(
 						'title'	=> t('profile_title'),

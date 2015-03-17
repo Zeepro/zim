@@ -669,7 +669,17 @@ class Printdetail extends MY_Controller {
 				);
 			}
 			
-			if (array_key_exists(CORESTATUS_TITLE_P_TEMPER_L, $array_status)
+			if ($this->config->item('nb_extruder') < 2
+					&& array_key_exists(CORESTATUS_TITLE_P_TEMPER_R, $array_status)
+					&& $array_status[CORESTATUS_TITLE_P_TEMPER_R] > 0) {
+				$array_info[] = array(
+						'title'	=> t('timelapse_info_temperature_title'),
+						'value'	=> t('timelapse_info_temperature_value_mono', array(
+								$array_status[CORESTATUS_TITLE_P_TEMPER_R],
+						)),
+				);
+			}
+			else if (array_key_exists(CORESTATUS_TITLE_P_TEMPER_L, $array_status)
 					&& $array_status[CORESTATUS_TITLE_P_TEMPER_L] > 0
 					&& array_key_exists(CORESTATUS_TITLE_P_TEMPER_R, $array_status)
 					&& $array_status[CORESTATUS_TITLE_P_TEMPER_R] > 0) {
@@ -762,6 +772,7 @@ class Printdetail extends MY_Controller {
 // 		$status_current = NULL;
 		$array_status = array();
 		$reload_player_times = 0;
+		$bicolor = ($this->config->item('nb_extruder') >= 2);
 		
 		$this->load->helper(array('printer', 'timedisplay'));
 		$this->load->library('parser');
@@ -835,9 +846,11 @@ class Printdetail extends MY_Controller {
 				'print_remain'	=> $time_remain,
 				'print_passed'	=> $time_passed,
 				'hold_temper'	=> $hold_temper,
-				'print_temperL'	=> t('Temperature of the left extruder: %d °C', array($temper_l)),
-				'print_temperR'	=> t('Temperature of the right extruder: %d °C', array($temper_r)),
-				'value_temperL'	=> $temper_l,
+				'print_temperL'	=> $bicolor ? t('Temperature of the left extruder: %d °C', array($temper_l)) : NULL,
+				'print_temperR'	=> $bicolor
+						? t('Temperature of the right extruder: %d °C', array($temper_r))
+						: t('print_temper_msg_mono', array($temper_r)),
+				'value_temperL'	=> $bicolor ? $temper_l : 'null',
 				'value_temperR'	=> $temper_r,
 				'in_finish'		=> $finish_hint,
 				'reload_player'	=> $reload_player_times,

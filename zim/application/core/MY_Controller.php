@@ -166,6 +166,11 @@ class MY_Controller extends CI_Controller {
 			else if (CoreStatus_checkCallUSB()) {
 				$url_redirect = '/';
 			}
+			// check debug interface
+			else if (CoreStatus_checkCallDebug()) {
+				// we always let these interfaces go for debug
+				return;
+			}
 			// check connection issue
 			else if (CoreStatus_checkInConnection()) {
 				if (CoreStatus_checkCallNoBlockPageInConnection()) {
@@ -177,11 +182,6 @@ class MY_Controller extends CI_Controller {
 			}
 			else if (CoreStatus_checkCallConnection()) {
 				$url_redirect = '/';
-			}
-			// check we are in runGcode debug interface
-			else if (CoreStatus_checkCallDebug()) {
-				// we always let these interfaces go for debug
-				return;
 			}
 			// check working issue
 			else if (!CoreStatus_checkInIdle($status_current, $array_status)) {

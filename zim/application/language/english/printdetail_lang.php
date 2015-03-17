@@ -58,6 +58,8 @@ $lang['Temperature of the left extruder: %d °C']
 	= 'Temperature of the left extruder: <span id="print_detail_info_temper_l_value">%d</span> °C';
 $lang['Temperature of the right extruder: %d °C']
 	= 'Temperature of the right extruder: <span id="print_detail_info_temper_r_value">%d</span> °C';
+$lang['print_temper_msg_mono']
+	= 'Temperature of extruder: <span id="print_detail_info_temper_r_value">%d</span> °C';
 $lang['Printing details']
 	= 'Printing details';
 $lang['Congratulation, your printing is complete!']
@@ -150,6 +152,8 @@ $lang['timelapse_info_temperature_value_r']
 	= 'Right: %d °C';
 $lang['timelapse_info_temperature_value_l']
 	= 'Left: %d °C';
+$lang['timelapse_info_temperature_value_mono']
+	= '%d °C';
 $lang['storegcode_err_cfm']
 	= 'Save print failed, do you still want to go to the homepage?';
 $lang['storegcode_title']

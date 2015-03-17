@@ -451,6 +451,7 @@ class Printerstate extends MY_Controller {
 				'function_off'			=> t('function_off'),
 				'nozzles_adjustments'	=> t('nozzles_adjustments'),
 				'support'				=> t('support'),
+				'bicolor'				=> ($this->config->item('nb_extruder') >= 2) ? 'true' : 'false', 
 		);
 		
 		// parse all page

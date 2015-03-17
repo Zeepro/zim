@@ -48,6 +48,7 @@ class Sliceupload extends MY_Controller {
 		$error = NULL;
 		$response = 0;
 		$button_goto_slice = NULL;
+		$bicolor = ($this->config->item('nb_extruder') >= 2);
 		
 		$this->load->library('parser');
 		$this->load->helper('slicer');
@@ -63,30 +64,51 @@ class Sliceupload extends MY_Controller {
 			);
 			$this->load->library('upload', $upload_config);
 			
-// 			if (!empty($_FILES['file']))
-// 				$ret = $this->upload->do_upload('file');
-// 			else
-// 				$ret = $this->upload->do_upload('file_c1') && $this->upload->do_upload('file_c2');
-			
 			if ($this->upload->do_upload('file'))
 			{
 				$model = $this->upload->data();
-				$array_model[] = $model['file_name'];
+				$model_ext = strtolower($model['file_ext']);
+				// we just let xml pass to check amf.xml by slicer itself
+				$array_check = $bicolor ? array('.stl', '.amf', '.obj', '.xml') : array('.stl');
+				
+				if (!is_null($model_ext) && !in_array($model_ext, $array_check)) {
+					// we can treat extension error differently
+					$error = t('fail_message_ext');
+				}
+				else {
+					$array_model[] = $model['file_name'];
+				}
 			}
 			else if ($this->upload->do_upload('file_c1')) {
 				$first_combine = TRUE;
 				$model = $this->upload->data();
-				$array_model[] = $model['file_name'];
+				$model_ext = strtolower($model['file_ext']);
 				
-				foreach (array('file_c2') as $file_key) {
-					if ($this->upload->do_upload($file_key)) {
-						$first_combine = FALSE;
-						$model = $this->upload->data();
-						$array_model[] = $model['file_name'];
-					}
-					else if ($first_combine == TRUE) {
-						$error = t('fail_message');
-						break;
+				if (!is_null($model_ext) && $model_ext != '.stl') {
+					// we can treat extension error differently
+					$error = t('fail_message_ext');
+				}
+				else {
+					$array_model[] = $model['file_name'];
+					
+					foreach (array('file_c2') as $file_key) {
+						if ($this->upload->do_upload($file_key)) {
+							$first_combine = FALSE;
+							$model = $this->upload->data();
+							$model_ext = strtolower($model['file_ext']);
+							
+							if (!is_null($model_ext) && $model_ext != '.stl') {
+								// we can treat extension error differently
+								$error = t('fail_message_ext');
+							}
+							else {
+								$array_model[] = $model['file_name'];
+							}
+						}
+						else if ($first_combine == TRUE) {
+							$error = t('fail_message');
+							break;
+						}
 					}
 				}
 			}
@@ -149,14 +171,15 @@ class Sliceupload extends MY_Controller {
 		
 		// parse the main body
 		$template_data = array(
-				'back'			=> t('back'),
-				'select_hint'	=> t('select_hint'),
+				'back'				=> t('back'),
+				'select_hint'		=> t('select_hint'),
 				'select_hint_multi'	=> t('select_hint_multi'),
-				'header_single' => t('header_single'),
-				'header_multi'	=> t('header_multi'),
-				'upload_button'	=> t('upload_button'),
-				'goto_slice'	=> $button_goto_slice,
-				'error'			=> $error,
+				'header_single' 	=> t('header_single'),
+				'header_multi'		=> t('header_multi'),
+				'upload_button'		=> t('upload_button'),
+				'goto_slice'		=> $button_goto_slice,
+				'error'				=> $error,
+				'bicolor'			=> $bicolor ? 'true' : 'false',
 		);
 		
 		$this->_parseBaseTemplate(t('sliceupload_upload_pagetitle'),
@@ -683,6 +706,7 @@ class Sliceupload extends MY_Controller {
 		$option_selected = 'selected="selected"';
 		$select_disable = 'disabled="disabled"';
 		$array_need = array('r' => 'false', 'l' => 'false');
+		$bicolor = ($this->config->item('nb_extruder') >= 2);
 		
 		$this->load->helper(array('printerstate', 'slicer'));
 		$this->load->library('parser');
@@ -726,8 +750,15 @@ class Sliceupload extends MY_Controller {
 				else { // $abb_filament == 'r'
 					$state_f_r = t('filament_not_need');
 				}
+
+				// check mono extruder case (normally, it's not necessary)
+				if ($bicolor == FALSE && $abb_filament == 'l') {
+					$tmp_ret = ERROR_MISS_LEFT_CART;
+				}
+				else {
+					$tmp_ret = PrinterState_checkFilament($abb_filament, $volume_need, $data_cartridge);
+				}
 				
-				$tmp_ret = PrinterState_checkFilament($abb_filament, $volume_need, $data_cartridge);
 				if (in_array($tmp_ret, array(
 						ERROR_OK, ERROR_MISS_LEFT_FILA, ERROR_MISS_RIGT_FILA,
 						ERROR_LOW_LEFT_FILA, ERROR_LOW_RIGT_FILA,
@@ -853,6 +884,7 @@ class Sliceupload extends MY_Controller {
 				'print_button'		=> t('print_button'),
 				'left_temperature'	=> t('left_temperature'),
 				'right_temperature'	=> t('right_temperature'),
+				'chg_temperature'	=> t('chg_temperature'),
 				'change_left'		=> $change_left,
 				'change_right'		=> $change_right,
 				'enable_print'		=> ($cr == ERROR_OK) ? 'true' : 'false',
@@ -877,6 +909,7 @@ class Sliceupload extends MY_Controller {
 				'temper_max'		=> PRINTERSTATE_TEMPER_CHANGE_MAX,
 				'temper_min'		=> PRINTERSTATE_TEMPER_CHANGE_MIN,
 				'temper_delta'		=> PRINTERSTATE_TEMPER_CHANGE_VAL,
+				'bicolor_printer'	=> $bicolor ? 'true' : 'false',
 		);
 		
 		if (ERROR_OK == PrinterState_checkFilaments(array(
@@ -901,7 +934,7 @@ class Sliceupload extends MY_Controller {
 		
 		if ($array_need['r'] == 'true' && $array_need['l'] == 'true') {
 			$template_data['bicolor_model'] = 'true';
-			$this->parser->parse('sliceupload/slice_result_ajax_2color', $template_data);
+// 			$this->parser->parse('sliceupload/slice_result_ajax_2color', $template_data);
 		}
 		else {
 			$template_data['exchange_o1']		= t('exchange_left');
@@ -912,8 +945,8 @@ class Sliceupload extends MY_Controller {
 				$template_data['exchange_o2_val']	= 0;
 				$template_data['exchange_o2_sel']	= $option_selected;
 			}
-			$this->parser->parse('sliceupload/slice_result_ajax_1color', $template_data);
 		}
+		$this->parser->parse('sliceupload/slice_result_ajax_1color', $template_data);
 		
 		$this->output->set_status_header(202);
 		

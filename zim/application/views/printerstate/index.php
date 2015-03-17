@@ -40,8 +40,9 @@
 				<li><a href="/preset/listpreset">
 					<h2>{set_preset}</h2></a>
 				</li>
-				<li><a href="printerstate/nozzles_adjustment">
+				<li class="widget_bicolor" style="display: none;"><a href="printerstate/nozzles_adjustment">
 					<h2>{nozzles_adjustments}</h2></a>
+				</li>
 				<li><a href="/printerstate/resetnetwork">
 					<h2>{reset_network}</h2></a>
 				</li>
@@ -57,6 +58,11 @@
 	
 <script type="text/javascript">
 var var_ajax;
+var var_bicolor = {bicolor};
+
+if (var_bicolor == true) {
+	$(".widget_bicolor").show();
+}
 
 $("#upgrade").change(function() {
 	var var_state = $("#upgrade").val().toString();

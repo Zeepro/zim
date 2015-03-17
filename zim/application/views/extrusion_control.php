@@ -7,7 +7,19 @@
 		<div id="container">
 			<div data-role="collapsible" data-collapsed="true" style="align: center;" id="temper_collaspible">
 				<h4>Temperature</h4>
-				<div class="ui-grid-a">
+				<div class="widget_monocolor" style="display: none;">
+					<label for="temper_l">Mono</label>
+					<div style="width:40px;float:left;margin-right:10px;">
+						<input type="text" data-clear-btn="false" name="temper_l_current" id="temper_mono_current" value="0" disabled>
+					</div>
+					<div style="width:60px;float:left;margin-right:10px;">
+						<input type="number" style="text-align:right;" data-clear-btn="false" name="temper_l" id="temper_mono" value="200">
+					</div>
+					<a href="#" data-role="button" data-icon="check" data-iconpos="left" data-inline="true" onclick="heat('r');">Set</a>
+					<a href="#" data-role="button" data-icon="delete" data-iconpos="left" data-inline="true" onclick="heat('r', 0);">Stop</a>
+					<a href="#" data-role="button" data-icon="refresh" data-iconpos="left" data-inline="true" onclick="refreshCheckTemper();">Refresh</a>
+				</div>
+				<div class="ui-grid-a widget_bicolor" style="display: none;">
 					<div class="ui-block-a">
 						<div class="ui-bar ui-bar-f">
 							<label for="temper_l">Left</label>
@@ -40,7 +52,19 @@
 			</div>
 			<div data-role="collapsible" data-collapsed="true" style="align: center;">
 				<h4>Filament</h4>
-				<div class="ui-grid-a">
+				<div class="widget_monocolor" style="display: none; height: 120px;">
+					<label for="temper_l">Mono</label>
+					<br style="clear:left;" />
+					<div style="width:60px;float:left;margin-right:10px;">
+						<input type="number" style="text-align:right;" data-clear-btn="false" name="extrude_l" id="extrude_mono" value="20"> mm
+					</div>
+					<div style="width:60px;float:left;margin-right:10px;">
+						<input type="number" style="text-align:right;" data-clear-btn="false" name="speed_l" id="speed_mono" value="100"> mm/min
+					</div>
+					<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" data-inline="true" onclick="extrude('r', '-');">Reverse</a>
+					<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" data-inline="true" onclick="extrude('r', '+');">Extrude</a>
+				</div>
+				<div class="ui-grid-a widget_bicolor" style="display: none;">
 					<div class="ui-block-a">
 						<div class="ui-bar ui-bar-f">
 							<label for="temper_l">Left</label>
@@ -76,7 +100,7 @@
 				<label for="oneline_v">Verbatim one line G-code</label>
 				<input type="text" name="oneline_v" id="oneline_v" value="">
 				<a href="#" data-role="button" data-icon="arrow-r" data-iconpos="right" onclick="runGcodeGet();">Send</a>
-				<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete" onclick="javascript: window.location.href='/pronterface/stop';">Stop</button>
+				<button class="ui-btn ui-shadow ui-corner-all ui-btn-icon-right ui-icon-delete" onclick="javascript: window.location.href='/exrusion_control/stop';">Stop print</button>
 			</div>
 			<label for="gcode_detail_info">Output</label>
 			<textarea name="gcode_detail_info" id="gcode_detail_info" style="height: 300px !important;" disabled></textarea>
@@ -90,6 +114,23 @@ var var_refreshCheckTemper = 0;
 var var_ajax_lock = false;
 var var_checked_rfid = false;
 var var_verifyRFIDInterval = 0;
+var var_bicolor = {bicolor};
+
+if (var_bicolor == true) {
+	$("div.widget_bicolor").show();
+}
+else {
+	$("div.widget_monocolor").show();
+	$("input#temper_mono").change(function() {
+		$("input#temper_r").val($("input#temper_mono").val());
+	});
+	$("input#extrude_mono").change(function() {
+		$("input#extrude_r").val($("input#extrude_mono").val());
+	});
+	$("input#temper_mono").change(function() {
+		$("input#speed_r").val($("input#speed_mono").val());
+	});
+}
 
 $(document).ready(checkTemper());
 
@@ -153,6 +194,7 @@ function refreshCheckTemper() {
 		var response = JSON.parse(html);
 		$("#temper_l_current").val(response.left);
 		$("#temper_r_current").val(response.right);
+		$("#temper_mono_current").val(response.right);
 	})
 	.fail(function() {
 		$("#gcode_detail_info").html('ERROR');

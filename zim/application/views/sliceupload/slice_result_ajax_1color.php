@@ -1,12 +1,31 @@
 
 				<form action="/printdetail/printslice_temp" method="POST" data-ajax="false">
-					<div id="exchange_container" class="ui-bar ui-bar-f switch-larger" style="height:3em;">
-						<select name="exchange_interface" id="exchange_extruder" data-role="slider" data-track-theme="a" data-theme="a" {enable_exchange}>
-							<option value="{exchange_o1_val}">{exchange_o1}</option>
-							<option value="{exchange_o2_val}" {exchange_o2_sel}>{exchange_o2}</option>
-						</select>
+					<div id="exchange_container" class="ui-bar ui-bar-f widget_bicolor" style="height:3em; display: none;">
+						<div class="widget_monomodel" style="display: none;">
+							<select id="exchange_extruder_m" data-role="slider" data-track-theme="a" data-theme="a" {enable_exchange}>
+								<option value="{exchange_o1_val}">{exchange_o1}</option>
+								<option value="{exchange_o2_val}" {exchange_o2_sel}>{exchange_o2}</option>
+							</select>
+						</div>
+						<div class="widget_bimodel" style="display: none;">
+							<label>
+								<input type="checkbox" id="exchange_extruder_b" value="1" {enable_exchange}>{exchange_extruder}
+							</label>
+						</div>
 					</div>
-					<div class="ui-grid-a">
+					<div class="widget_monocolor" style="display: none;">
+						<div id="mono_cartridge">
+							<div style="width: 75px; height: 75px; background-color: {cartridge_c_r}; margin: 0 auto;">
+								<img src="/images/cartridge.png" style="width: 100%">
+							</div>
+							<p id="state_f_mono">{state_f_r}</p>
+						</div>
+						<div class="slicer_temperature_adjustment_container">
+							<label>{chg_temperature}</label>
+							<input type="range" id="slider_mono" value="{temper_r}" min="160" max="260" data-show-value="true" />
+						</div>
+					</div>
+					<div class="ui-grid-a widget_bicolor" style="display: none;">
 						<div class="ui-block-a"><div id="left_cartridge" class="ui-bar ui-bar-f">
 							<div style="width: 75px; height: 75px; background-color: {cartridge_c_l}; margin: 0 auto;">
 								<img src="/images/cartridge.png" style="width: 100%">
@@ -21,33 +40,33 @@
 						</div></div>
 					</div>
 					<p style="text-align: left;">{error_msg}</p>
-					<div class="ui-grid-a" id="slicer_temperature_adjustment_container">
-						<div class="ui-block-a"><div id="left_cartridge" class="ui-bar ui-bar-f">
+					<div class="ui-grid-a slicer_temperature_adjustment_container widget_bicolor" style="display: none;">
+						<div class="ui-block-a"><div id="left_cartridge_temper" class="ui-bar ui-bar-f">
 							<label>{left_temperature}</label>
 							<div id="temper_l">
 								<input type="range" id="slider_left" name="l" value="{temper_l}" min="160" max="260" data-show-value="true" />
 							</div>
 						</div></div>
-						<div class="ui-block-b"><div id="right_cartridge" class="ui-bar ui-bar-f">
+						<div class="ui-block-b"><div id="right_cartridge_temper" class="ui-bar ui-bar-f">
 							<label>{right_temperature}</label>
 							<div id="temper_r">
 								<input type="range" id="slider_right" name="r" value="{temper_r}" min="160" max="260" data-show-value="true" />
 							</div>
 						</div></div>
-						<input type="hidden" name="exchange" id="exchange_extruder_hidden" value="0">
-						<div data-role="collapsible" style="clear: both;">
-							<h4>{advanced}</h4>
-							<div class="ui-grid-a">
-								<div class="ui-block-a">
-									<a data-role="button" onclick='javascript: window.location.href="/gcode/slice/display"'>{gcode_link}</a>
-								</div>
-								<div class="ui-block-b">
-									<a data-role="button" onclick='javascript: window.location.href="/gcode/slice/render"'>{2drender_link}</a>
-								</div>
+					</div>
+					<input type="hidden" name="exchange" id="exchange_extruder_hidden" value="0">
+					<div data-role="collapsible" style="clear: both;">
+						<h4>{advanced}</h4>
+						<div class="ui-grid-a">
+							<div class="ui-block-a">
+								<a data-role="button" onclick='javascript: window.location.href="/gcode/slice/display"'>{gcode_link}</a>
+							</div>
+							<div class="ui-block-b">
+								<a data-role="button" onclick='javascript: window.location.href="/gcode/slice/render"'>{2drender_link}</a>
 							</div>
 						</div>
-						<input type="submit" id="print_slice" value="{print_button}" />
 					</div>
+					<input type="submit" id="print_slice" value="{print_button}" />
 				</form>
 
 <script type="text/javascript">
@@ -57,20 +76,41 @@ var var_need_refresh_preview = false;
 var var_need_print_right = {needprint_right};
 var var_need_print_left = {needprint_left};
 var var_bicolor_model = {bicolor_model};
+var var_bicolor_printer = {bicolor_printer};
 var slider_l = "input#slider_left";
-var slider_r = "input#slider_right";
+var slider_r = var_bicolor_printer ? "input#slider_right" : "input#slider_mono";
+var widget_exchange = var_bicolor_model ? "input#exchange_extruder_b" : "select#exchange_extruder_m";
+
+if (var_bicolor_model == true) {
+	$(".widget_bimodel").show();
+}
+else {
+	$(".widget_monomodel").show();
+	$('#exchange_container').addClass("switch-larger");
+}
+
+if (var_bicolor_printer == true) {
+	$(".widget_bicolor").show();
+	
+	$('<div>').appendTo('#left_cartridge')
+	.attr({'id': 'change_left', 'data-icon': 'refresh', 'data-iconpos':'right', 'onclick': 'javascript: window.location.href="/printerstate/changecartridge?v=l&f={need_filament_l}&id=slice";'}).html('{change_left}')
+	.button().button('refresh');
+	$('<div>').appendTo('#right_cartridge')
+	.attr({'id': 'change_right', 'data-icon': 'refresh', 'data-iconpos':'right', 'onclick': 'javascript: window.location.href="/printerstate/changecartridge?v=r&f={need_filament_r}&id=slice";'}).html('{change_right}')
+	.button().button('refresh');
+}
+else {
+	$(".widget_monocolor").show();
+	$('<div>').appendTo('#mono_cartridge')
+	.attr({'id': 'change_right', 'data-icon': 'refresh', 'data-iconpos':'right', 'onclick': 'javascript: window.location.href="/printerstate/changecartridge?v=r&f={need_filament_r}&id=slice";'}).html('{change_right}')
+	.button().button('refresh');
+}
 
 $("input[type=submit]").on('click', function()
 {
 	$("#overlay").addClass("gray-overlay");
 	$(".ui-loader").css("display", "block");
 });
-$('<div>').appendTo('#left_cartridge')
-.attr({'id': 'change_left', 'data-icon': 'refresh', 'data-iconpos':'right', 'onclick': 'javascript: window.location.href="/printerstate/changecartridge?v=l&f={need_filament_l}&id=slice";'}).html('{change_left}')
-.button().button('refresh');
-$('<div>').appendTo('#right_cartridge')
-.attr({'id': 'change_right', 'data-icon': 'refresh', 'data-iconpos':'right', 'onclick': 'javascript: window.location.href="/printerstate/changecartridge?v=r&f={need_filament_r}&id=slice";'}).html('{change_right}')
-.button().button('refresh');
 
 var limit_min_tmp = {temper_min};
 var limit_max_tmp = {temper_max};
@@ -107,6 +147,12 @@ if (var_reslice == true) {
 	.button().button('refresh');
 }
 
+if (var_bicolor_printer != true) {
+	$(slider_r).change(function() { // must done after trigger of create
+		$("input#slider_right").val($(slider_r).val());
+	});
+}
+
 // assign new preview color
 var_color_right = '{cartridge_c_r}';
 var_color_left = '{cartridge_c_l}';
@@ -117,11 +163,11 @@ $("#preview_zone").show();
 // }
 
 // assign trigger for exchange extruder
-$("select#exchange_extruder").change(function() {
+$(widget_exchange).change(function() {
 	// switch print on and exchange off in some special cases
 	if (var_enable_print == false) {
-		$("select#exchange_extruder").slider({disabled: true});
-		$("select#exchange_extruder").slider('refresh');
+		$(widget_exchange).slider({disabled: true});
+		$(widget_exchange).slider("refresh");
 		$("#print_slice").button("enable");
 	}
 	
@@ -158,6 +204,17 @@ $("select#exchange_extruder").change(function() {
 		getPreview(true);
 	}
 	
-	$("input#exchange_extruder_hidden").val($("select#exchange_extruder").val());
+	var hidden_input_exchange = "input#exchange_extruder_hidden";
+	if (var_bicolor_model == true) {
+		if ($(widget_exchange).is(":checked")) {
+			$(hidden_input_exchange).val("1");
+		}
+		else {
+			$(hidden_input_exchange).val("0");
+		}
+	}
+	else {
+		$(hidden_input_exchange).val($(widget_exchange).val());
+	}
 });
 </script>
