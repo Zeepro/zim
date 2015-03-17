@@ -22,10 +22,10 @@
 					<p style="text-align: left;">{error_msg}</p>
 					<div class="ui-grid-a" id="slicer_temperature_adjustment_container">
 						<div class="ui-block-a"><div id="left_cartridge" class="ui-bar ui-bar-f">
-						<label>{left_temperature}</label>
-						<div id="temper_l">
-							<input type="range" id="slider_left" name="l" value="{temper_l}" min="160" max="260" data-show-value="true" />
-						</div>
+							<label>{left_temperature}</label>
+							<div id="temper_l">
+								<input type="range" id="slider_left" name="l" value="{temper_l}" min="160" max="260" data-show-value="true" />
+							</div>
 						</div></div>
 						<div class="ui-block-b"><div id="right_cartridge" class="ui-bar ui-bar-f">
 							<label>{right_temperature}</label>
@@ -33,11 +33,6 @@
 								<input type="range" id="slider_right" name="r" value="{temper_r}" min="160" max="260" data-show-value="true" />
 							</div>
 						</div></div>
-<!-- 						<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;"> -->
-<!-- 							<label for="exchange_extruder"><h2>{exchange_extruder}</h2></label> -->
-<!-- 						</div></div> -->
-<!-- 						<div class="ui-block-b"> -->
-<!-- 						</div> -->
 						<input type="hidden" name="exchange" id="exchange_extruder_hidden" value="0">
 						<div data-role="collapsible" style="clear: both;">
 							<h4>{advanced}</h4>
@@ -50,7 +45,7 @@
 								</div>
 							</div>
 						</div>
-						<input type="submit" id="print_slice" value="{print_button}">
+						<input type="submit" id="print_slice" value="{print_button}" />
 					</div>
 				</form>
 
@@ -73,9 +68,6 @@ $('<div>').appendTo('#left_cartridge')
 $('<div>').appendTo('#right_cartridge')
 .attr({'id': 'change_right', 'data-icon': 'refresh', 'data-iconpos':'right', 'onclick': 'javascript: window.location.href="/printerstate/changecartridge?v=r&f={need_filament_r}&id=slice";'}).html('{change_right}')
 .button().button('refresh');
-// $('<button>').appendTo('#detail_zone')
-// .attr({'id': 'print_slice', 'onclick': 'javascript: window.location.href="/printdetail/printslice";'}).html('{print_button}')
-// .button().button('refresh');
 
 var limit_min_tmp = {temper_min};
 var limit_max_tmp = {temper_max};
@@ -120,18 +112,9 @@ if (var_bicolor_model == false) {
 var_color_right = '{cartridge_c_r}';
 var_color_left = '{cartridge_c_l}';
 
-// if (var_color_right != '{cartridge_c_r}') {
-// 	var_color_right = '{cartridge_c_r}';
-// 	var_need_refresh_preview = true;
-// }
-// if (var_color_left != '{cartridge_c_l}') {
-// 	var_color_left = '{cartridge_c_l}';
-// 	var_need_refresh_preview = true;
-// }
-
 $("#preview_zone").show();
 // if (var_need_refresh_preview) {
-	getPreview(false);
+	getPreview();
 // }
 
 // assign trigger for exchange extruder
@@ -173,7 +156,7 @@ $("input#exchange_extruder").change(function() {
 		
 		var_color_right = var_color_left;
 		var_color_left = temp_color;
-		getPreview(false);
+		getPreview(true);
 	}
 	
 	if ($("input#exchange_extruder").is(":checked")) {

@@ -88,6 +88,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_ASSIGN_FILA_L',	' -1 ');
 	define('PRINTERSTATE_ASSIGN_FILA_R',	' -0 ');
 	define('PRINTERSTATE_GET_CONSUMPTION',	' M1907');
+	define('PRINTERSTATE_CHECK_LEFT_SIDE',	' M1625');
 	
 	global $CFG;
 	if ($CFG->config['simulator']) {
@@ -334,7 +335,7 @@ function PrinterState_getTemperature(&$val_temperature, $type = 'e', $abb_extrud
 // 				return $ret_val;
 // 			}
 			else if ($abb_extruder == 'l') {
-				if (PrinterState_getNbExtruder() <= 1) {
+				if ($CFG->config['nb_extruder'] <= 1) {
 					return ERROR_WRONG_PRM; //ERROR_INTERNAL
 				}
 				$command = $arcontrol_fullpath . PRINTERSTATE_GET_TEMPEREXT_L;
@@ -963,12 +964,13 @@ function PrinterState_setCartridgeAsArray($abb_cartridge, $data_json = array(), 
 }
 
 function PrinterState_checkFilaments($array_filament = array(), &$data_json_array = array()) {
+	global $CFG;
 	$ret_val = 0;
 	$need_filament = 0;
 	$data_json = array();
 	$array_abb = array();
 	
-	switch (PrinterState_getNbExtruder()) {
+	switch ($CFG->config['nb_extruder']) {
 		case 1:
 			$array_abb = array('r');
 			break;
@@ -2200,26 +2202,64 @@ function PrinterState_filterOutput(&$output, $command = '', $trim_ok = TRUE) {
 
 function PrinterState_getNbExtruder() {
 	global $CFG;
-	$tmp_array = array();
-	$printerinfo_fullpath = $CFG->config['hardconf'] . PRINTERSTATE_JSON_PRINTER;
+	$arcontrol_fullpath = $CFG->config['arcontrol_c'];
+	$command = '';
+	$ret_val = 0;
+	$output = array();
+	$nb_extruder = 0;
 	
-	$CI= &get_instance();
-	$CI->load->helper('json');
-	
-	try {
-		$tmp_array = json_read($printerinfo_fullpath, TRUE);
-		if ($tmp_array['error']) {
-			throw new Exception('read json error');
+	$command = $arcontrol_fullpath . PRINTERSTATE_CHECK_LEFT_SIDE;
+	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output, $command)) {
+		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
+		return $nb_extruder;
+	}
+	PrinterLog_logArduino($command, $output);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		PrinterLog_logError('check left side command failed', __FILE__, __LINE__);
+	}
+	else if (count($output)) {
+		$left_status = (int) $output[0];
+		switch ($left_status) {
+			case 1:
+				$nb_extruder = 2;
+				break;
+				
+			case -1:
+				$nb_extruder = 1;
+				break;
+				
+			default:
+				// error cases
+				break;
 		}
-	} catch (Exception $e) {
-		$CI = &get_instance();
-		$CI->load->helper('printerlog');
-		PrinterLog_logError('read printer json error', __FILE__, __LINE__);
-		return 0;
 	}
 	
-	return $tmp_array['json'][PRINTERSTATE_TITLE_JSON_NB_EXTRUD];
+	return $nb_extruder;
 }
+
+// function PrinterState_getNbExtruder() {
+// 	global $CFG;
+// 	$tmp_array = array();
+// 	$printerinfo_fullpath = $CFG->config['hardconf'] . PRINTERSTATE_JSON_PRINTER;
+	
+// 	$CI= &get_instance();
+// 	$CI->load->helper('json');
+	
+// 	try {
+// 		$tmp_array = json_read($printerinfo_fullpath, TRUE);
+// 		if ($tmp_array['error']) {
+// 			throw new Exception('read json error');
+// 		}
+// 	} catch (Exception $e) {
+// 		$CI = &get_instance();
+// 		$CI->load->helper('printerlog');
+// 		PrinterLog_logError('read printer json error', __FILE__, __LINE__);
+// 		return 0;
+// 	}
+	
+// 	return $tmp_array['json'][PRINTERSTATE_TITLE_JSON_NB_EXTRUD];
+// }
 
 function PrinterState_getPrintSize(&$size_array) {
 	$tmp_array = array();
@@ -2301,7 +2341,7 @@ function PrinterState_getInfoAsArray() {
 			PRINTERSTATE_TITLE_VERSION_N	=> ZimAPI_getVersion(TRUE),
 			PRINTERSTATE_TITLE_TYPE			=> ZimAPI_getType(),
 			PRINTERSTATE_TITLE_SERIAL		=> ZimAPI_getSerial(),
-			PRINTERSTATE_TITLE_NB_EXTRUD	=> PrinterState_getNbExtruder(),
+			PRINTERSTATE_TITLE_NB_EXTRUD	=> $CI->config->item('nb_extruder'),
 			PRINTERSTATE_TITLE_VER_MARLIN	=> $version_marlin,
 			PRINTERSTATE_TITLE_HOSTNAME		=> $hostname,
 			ZIMAPI_TITLE_IP					=> ($cr == ERROR_OK && !is_null($network_data[ZIMAPI_TITLE_IP]))

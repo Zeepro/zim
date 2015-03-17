@@ -598,7 +598,7 @@ class Rest extends MY_Controller {
 					}
 					else if (!($has_e === FALSE) && !($has_v === FALSE)) {
 						// refuse getting data not existed for mono extruder
-						if ($has_v == 'l' && PrinterState_getNbExtruder() == 1) {
+						if ($has_v == 'l' && $this->config->item('nb_extruder') == 1) {
 							$cr = ERROR_WRONG_PRM;
 						}
 						else if (in_array($has_v, array('l', 'r'))) {
@@ -622,7 +622,7 @@ class Rest extends MY_Controller {
 				case PRINTERSTATE_PRM_CARTRIDGE:
 					$api_prm = $this->input->get('v');
 					// refuse getting data not existed for mono extruder
-					if ($api_prm == 'l' && PrinterState_getNbExtruder() == 1) {
+					if ($api_prm == 'l' && $this->config->item('nb_extruder') == 1) {
 						$cr = ERROR_WRONG_PRM;
 					}
 					else {
@@ -666,7 +666,7 @@ class Rest extends MY_Controller {
 					$value = NULL;
 					$api_prm = $this->input->get('v');
 					// refuse getting data not existed for mono extruder
-					if ($api_prm == 'l' && PrinterState_getNbExtruder() == 1) {
+					if ($api_prm == 'l' && $this->config->item('nb_extruder') == 1) {
 						$cr = ERROR_WRONG_PRM;
 					}
 					else if ($api_prm) {
@@ -859,7 +859,7 @@ class Rest extends MY_Controller {
 					
 					if ($api_prm) {
 						// refuse getting data not existed for mono extruder
-						if ($api_prm == 'l' && PrinterState_getNbExtruder() == 1) {
+						if ($api_prm == 'l' && $this->config->item('nb_extruder') == 1) {
 							$cr = ERROR_WRONG_PRM;
 						}
 						else {

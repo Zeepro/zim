@@ -455,10 +455,10 @@ fileAMF.prototype.makeScene=function(view)
 	var scene=view.space;
 	var root=scene.root.newNode();
 	view.amfObject=root;
-	var mtl=new material3d(scene);
-	mtl.load({"diffuse":{"color":[0.3,0.3,0.3]},"specular":{"color":[0.7,0.7,0.7]},"emissive":{"color":[0.1,0.1,0.1]},"phong":16});
-	//mtl.load({"name":"Metal","diffuse":{"color":0xFFB27F},"specular":{"color":[0.4,0.4,0.4]},"emissive":{"color":[0.01,0.01,0.01]},"reflection":{"texture":"white_.jpg","type":"cube","amount":0.3},"phong":32});
-	scene.materials.push(mtl);
+	var mtl1=view.fileMaterial1;
+	var mtl2=view.fileMaterial2;
+	scene.materials.push(mtl1);
+	scene.materials.push(mtl2);
 
 	for(var iMesh=0;iMesh<this.meshes.length;iMesh++)
 	{
@@ -469,6 +469,10 @@ fileAMF.prototype.makeScene=function(view)
 			var normals=generateNormals(mesh.vertices,volume.triangles);
 			var n=root.newNode();
 
+			//DIY crossover material for several parts
+			// var mtl=i?mtl2:mtl1;
+			var mtl = (i%2) ? mtl2 : mtl1;
+			//DIY end - PNI
 			if((normals.length/3)<65535)
 			{
 				var m=new mesh3d(scene.gl);
@@ -491,6 +495,8 @@ fileAMF.prototype.makeScene=function(view)
 	//view.amfScaleBase=this.scale;
 	view.amfBBox=root.getBoundingBox(null,null);
 	this.setInitialScale(view);
+	var node=scene.root.getNodeById("wait");
+	if(node)node.state&=~3;// hide wait cursor
 
 	onPosChanged();
 }
@@ -506,19 +512,14 @@ fileAMF.prototype.setInitialScale=function(view)
 	var kz=sz/view.paneZ;
 	if(ky>kx)kx=ky;
 	if(kz>kx)kx=kz;
+	var _kx=100/kx;
 	if(kx>1)
 	{
-		kx=100/kx;
-		view.transform_0.scale=kx;
-		view.transform_E.scale=kx;
-		view.transform_C.scale=kx;
+		view.transform_0.scale=_kx;
+		view.transform_E.scale=_kx;
+		view.transform_C.scale=_kx;
 	}
-	//DIY always change kx
-	else {
-		kx=100/kx;
-	}
-	//DIY end - PNI
-	var maxScale=kx*2;
+	var maxScale=_kx*2;
 	var slider=document.getElementById("slicer_size");
 	maxScale=Math.ceil(maxScale/10)*10;
 	thumb=null;
@@ -568,6 +569,10 @@ function zpLoadAMF(view,file)
 {
 	var path;
 	var request = CreateRequest(file,path);
+	//DIY timeout
+	request.timeout = 120000;
+	request.ontimeout = function() {alert("timeout");}
+	//DIY end - PNI
 	request.ivwnd=view;
 	request.onreadystatechange = function () {
 		if (this.readyState == 4 && this.status==200) {
@@ -579,7 +584,7 @@ function zpLoadAMF(view,file)
 			//DIY end - PNI
 		}
 	}
-	request.overrideMimeType("text/xml")
+	request.overrideMimeType("text/xml");
 	request.send();
 }
 
@@ -776,6 +781,18 @@ function onResize3D()
 function zponDataReady(space)
 {
 	onResize3D();
+
+	var w=space.window;
+	w.setDefView();
+	w.handleVPRotate(100,0);// rotate left/right
+	w.handleVPRotate(0,60);// rotate up/down
+
+	// keep changed data - 
+	var v=space.view;
+	v.org=w.viewFrom.slice();
+	v.target=w.viewTo.slice();
+	v.up=w.viewUp.slice();
+	zpLoadAMF(w,w.fileToLoad);
 }
 
 // IOS antialiasing
@@ -858,7 +875,8 @@ function ivWindow3dMydrawScene(){
 	var f=this.frame;
 	gl.viewport(0, 0, f.rttFb.width, f.rttFb.height);
 	
-	gl.clearColor(1,1,1,1);
+	// gl.clearColor(1,1,1,1);
+	gl.clearColor(0.875,0.875,0.875,1);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 	mat4.lookAt(this.viewFrom, this.viewTo, this.getUpVector(),this.mvMatrix);
@@ -902,10 +920,41 @@ function ivWindow3dMydrawScene(){
 	this.timer=false;
 }
 
+function hex2rgb(hex) {
+	var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	// in principle, we need to / 255, but we just use 64 for interface
+	return result ? {
+		r: parseInt(result[1], 16)/64,
+		g: parseInt(result[2], 16)/64,
+		b: parseInt(result[3], 16)/64
+	} : null;
+}
+
+function exchangeRenderColor(channelName) {
+	var tmpChannel1;
+	var tmpChannel2;
+	var tmpColor;
+	
+	tmpChannel1 = view3d.fileMaterial1.getChannel(channelName);
+	tmpChannel2 = view3d.fileMaterial2.getChannel(channelName);
+	if (tmpChannel1 && tmpChannel2) {
+		tmpColor = tmpChannel1.color;
+		tmpChannel1.color = tmpChannel2.color;
+		tmpChannel2.color = tmpColor;
+	}
+}
+
+function exchangeRenderColors() {
+	exchangeRenderColor("diffuse");
+	exchangeRenderColor("specular");
+	exchangeRenderColor("emissive");
+	
+	view3d.invalidate();
+}
 
 // Init 3D View
 // cnv - canvas, file URL to AMF file
-function zpInit3d(cnv,file)
+function zpInit3d(cnv,file,color1,color2)
 {
 	// background color 0xe0e0e0, "view" in "tree.json" controls camera (from, to, up system)
 	var view=new ivwindow3d(cnv,"tree.json",0xe0e0e0,"/assets/rendering/platform/");
@@ -931,8 +980,29 @@ function zpInit3d(cnv,file)
 		view.handleVPRotate=ivMyhandleVPRotate;
 		//DIY ignore no file parameter passing case
 		// if(!file)file="horseshoe.amf";
-		// zpLoadAMF(view,file);
-		if (file) zpLoadAMF(view,file);
+		if (file) {
+			view.fileToLoad=file;
+			var mtl=new material3d(view.space);
+			// mtl.load({"diffuse":{"color":[0.3,0.3,0.3]},"specular":{"color":[0.7,0.7,0.7]},"emissive":{"color":[0.1,0.1,0.1]},"phong":16});
+			var rgb = hex2rgb(color1);
+			if (rgb != null) {
+				mtl.load({"diffuse":{"color":[0.3*rgb.r,0.3*rgb.g,0.3*rgb.b]},"specular":{"color":[0.7*rgb.r,0.7*rgb.g,0.7*rgb.b]},"emissive":{"color":[0.1*rgb.r,0.1*rgb.g,0.1*rgb.b]},"phong":16});
+			}
+			else {
+				mtl.load({"diffuse":{"color":[0.3,0.3,0.3]},"specular":{"color":[0.7,0.7,0.7]},"emissive":{"color":[0.1,0.1,0.1]},"phong":16});
+			}
+			view.fileMaterial1=mtl;
+			mtl=new material3d(view.space);
+			// mtl.load({"diffuse":{"color":[1.0,0.3,0.3]},"specular":{"color":[0.8,0.7,0.7]},"emissive":{"color":[0.2,0.1,0.1]},"phong":16});
+			rgb = hex2rgb(color2);
+			if (rgb != null) {
+				mtl.load({"diffuse":{"color":[0.3*rgb.r,0.3*rgb.g,0.3*rgb.b]},"specular":{"color":[0.7*rgb.r,0.7*rgb.g,0.7*rgb.b]},"emissive":{"color":[0.1*rgb.r,0.1*rgb.g,0.1*rgb.b]},"phong":16});
+			}
+			else {
+				mtl.load({"diffuse":{"color":[0.6,0.6,0.6]},"specular":{"color":[0.9,0.9,0.9]},"emissive":{"color":[0.3,0.3,0.3]},"phong":16});
+			}
+			view.fileMaterial2=mtl;
+		}
 		//DIY end - PNI
 		onResize3D();
 		return view;

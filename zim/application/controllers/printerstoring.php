@@ -339,6 +339,7 @@ class Printerstoring extends MY_Controller {
 		$change_left = NULL;
 		$change_right = NULL;
 		$enable_print = TRUE;
+		$key_suggest_temper = 'suggest_temperature';
 		
 		$this->load->helper(array('printerstoring', 'printerstate'));
 		$data_json = PrinterStoring_getInfo('gcode', $gid);
@@ -392,7 +393,13 @@ class Printerstoring extends MY_Controller {
 						PRINTERSTATE_TITLE_EXT_TEMPER	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER],
 						PRINTERSTATE_TITLE_MATERIAL		=> $data_cartridge[PRINTERSTATE_TITLE_MATERIAL],
 						PRINTERSTATE_TITLE_NEED_L		=> $volume_need,
+						$key_suggest_temper				=> 0,
 				);
+					
+				// set default temperature if pla
+				if ($data_cartridge[PRINTERSTATE_TITLE_MATERIAL] == PRINTERSTATE_DESP_MATERIAL_PLA) {
+					$array_data[$abb_filament][PRINTERSTATE_TITLE_EXT_TEMPER] = PRINTERSTATE_VALUE_FILAMENT_PLA_PRINT_TEMPER;
+				}
 			}
 			else {
 				$array_data[$abb_filament] = array(
@@ -400,6 +407,7 @@ class Printerstoring extends MY_Controller {
 						PRINTERSTATE_TITLE_EXT_TEMPER	=> 0,
 						PRINTERSTATE_TITLE_MATERIAL		=> NULL,
 						PRINTERSTATE_TITLE_NEED_L		=> $volume_need,
+						$key_suggest_temper				=> 0,
 				);
 			}
 			
@@ -487,6 +495,8 @@ class Printerstoring extends MY_Controller {
 				'need_filament_r'	=> $array_data['r'][PRINTERSTATE_TITLE_NEED_L],
 				'temper_filament_l'	=> $array_data['l'][PRINTERSTATE_TITLE_EXT_TEMPER],
 				'temper_filament_r'	=> $array_data['r'][PRINTERSTATE_TITLE_EXT_TEMPER],
+				'temper_suggest_l'	=> $array_data['l'][$key_suggest_temper],
+				'temper_suggest_r'	=> $array_data['r'][$key_suggest_temper],
 				'print_button'		=> t('print_button'),
 				'change_filament_l'	=> $change_left,
 				'change_filament_r'	=> $change_right,

@@ -226,7 +226,7 @@ class Zeepronterface extends MY_Controller {
 		$array_cmd = array();
 		
 		$this->load->helper(array('printerstate', 'errorcode'));
-		if (PrinterState_getNbExtruder() >= 2) {
+		if ($this->config->item('nb_extruder') >= 2) {
 			$array_cmd['left'] = 'l';
 		}
 		$array_cmd['right'] = 'r';

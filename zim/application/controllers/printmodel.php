@@ -26,6 +26,8 @@ class Printmodel extends MY_Controller {
 // 		curl_init('http://example.com');
 		$display_printlist = array();
 		$template_data = array();
+		$json_data = array();
+		$nb_extruder = $this->config->item('nb_extruder');
 		
 		$this->load->helper('printlist');
 		$this->load->library('parser');
@@ -36,6 +38,11 @@ class Printmodel extends MY_Controller {
 		// prepare display data
 		foreach ($json_data[PRINTLIST_TITLE_MODELS] as $model_data) {
 			$nb_image = count($model_data[PRINTLIST_TITLE_PIC]);
+			
+			// ignore bi-color model in mono-extruder mode
+			if ($nb_extruder < 2 && $model_data[PRINTLIST_TITLE_LENG_F2] > 0) {
+				continue;
+			}
 			
 			$display_printlist[] = array(
 					'name'	=> $model_data[PRINTLIST_TITLE_NAME],
@@ -75,8 +82,6 @@ class Printmodel extends MY_Controller {
 		$change_right_filament = '';
 		$temper_left_filament = 0;
 		$temper_right_filament = 0;
-		$temper_left_suggest = 0;
-		$temper_right_suggest = 0;
 		$time_estimation = '';
 		$body_page = NULL;
 		$mono_color = FALSE;
@@ -116,7 +121,7 @@ class Printmodel extends MY_Controller {
 		}
 		
 		// get number of extruder
-		$nb_extruder = PrinterState_getNbExtruder();
+		$nb_extruder = $this->config->item('nb_extruder');
 		
 		// check quantity of filament and get cartridge information (color)
 		// color1 => right, color2 => left
@@ -156,9 +161,9 @@ class Printmodel extends MY_Controller {
 			$color_right_filament = $cartridge_data[PRINTERSTATE_TITLE_COLOR];
 			$temper_right_filament = $cartridge_data[PRINTERSTATE_TITLE_EXT_TEMPER];
 			
-			// set suggest temperature if pla
+			// set default temperature if pla
 			if ($cartridge_data[PRINTERSTATE_TITLE_MATERIAL] == PRINTERSTATE_DESP_MATERIAL_PLA) {
-				$temper_right_suggest = PRINTERSTATE_VALUE_FILAMENT_PLA_PRINT_TEMPER;
+				$temper_right_filament = PRINTERSTATE_VALUE_FILAMENT_PLA_PRINT_TEMPER;
 			}
 		}
 		else {
@@ -210,9 +215,9 @@ class Printmodel extends MY_Controller {
 				$color_left_filament = $cartridge_data[PRINTERSTATE_TITLE_COLOR];
 				$temper_left_filament = $cartridge_data[PRINTERSTATE_TITLE_EXT_TEMPER];
 				
-				// set suggest temperature if pla
+				// set default temperature if pla
 				if ($cartridge_data[PRINTERSTATE_TITLE_MATERIAL] == PRINTERSTATE_DESP_MATERIAL_PLA) {
-					$temper_left_suggest = PRINTERSTATE_VALUE_FILAMENT_PLA_PRINT_TEMPER;
+					$temper_left_filament = PRINTERSTATE_VALUE_FILAMENT_PLA_PRINT_TEMPER;
 				}
 			}
 			else {
@@ -249,7 +254,6 @@ class Printmodel extends MY_Controller {
 				'need_filament_r'	=> $model_data[PRINTLIST_TITLE_LENG_F1],
 // 				'temper_filament_l'	=> $temper_left_filament,
 				'temper_filament_r'	=> $temper_right_filament,
-				'temper_suggest_r'	=> $temper_right_suggest,
 				'print_model'		=> t('Print'),
 				'back'				=> t('back'),
 				'preview_title'		=> t('Preview'),
@@ -273,7 +277,6 @@ class Printmodel extends MY_Controller {
 			$template_data['change_filament_l'] = $change_left_filament;
 			$template_data['temper_filament_l'] = $temper_left_filament;
 			$template_data['exchange_extruder'] = t('exchange_extruder');
-			$template_data['temper_suggest_l'] = $temper_left_suggest;
 			
 			// check if we can inverse filament / exchange extruder or not
 			$cr = PrinterState_checkFilaments(array(

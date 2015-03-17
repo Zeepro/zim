@@ -19,7 +19,7 @@ function ivwindow3d(canvas,file,color,path)
 	this.viewFrom=[0, 0, 6];
 	this.viewTo=[0, 0, 0];
 	this.viewUp=[0, 1, 0];
-	this.viewFar=100;this.viewNear=0.1;
+	this.viewFar=100,viewNear=0.1;
 	this.fov=90;
 	this.LX = null;
 	this.LY = null;
@@ -525,12 +525,4 @@ ivwindow3d.prototype.invalidate=function(flags) {
 	setTimeout(this.drawScene.bind(this),1);
 }
 
-ivwindow3d.prototype.setView =function(index)
-{
-	if(this.space && this.space.views && index>=0 && index<this.space.views.length)
-	{
-		var v=this.space.views[index];
-		if(v)this.setViewImp(v);
-	}
-}
 

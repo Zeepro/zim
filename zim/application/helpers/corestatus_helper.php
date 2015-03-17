@@ -66,6 +66,7 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_FILE_LEVEL_ERROR',	'_Level_Error.tmp');
 	define('CORESTATUS_FILE_LEVEL_NONE',	'_Level_None.tmp');
 	define('CORESTATUS_FILENAME_PAUSE',		'_Printer_inPause.tmp');
+	define('CORESTATUS_FILE_NB_EXTRUDER',	'_NbExtruder.tmp');
 	
 	define('CORESTATUS_GLOBAL_URL_RDV',		'zeepro.com');
 	
@@ -77,6 +78,7 @@ function CoreStatus_initialFile() {
 	$state_file = NULL;
 	$sdcard = FALSE;
 	$check_onboot = FALSE;
+	$nb_extruder = 0;
 	
 	// for the first time, check if we can use all files in sdcard instead of config partition
 	// then save the choice in a status file in the temp to remember it
@@ -190,6 +192,30 @@ function CoreStatus_initialFile() {
 		$CI->config->set_item('log_level', 1);
 	} else if (file_exists($CI->config->item('temp') . CORESTATUS_FILE_LEVEL_NONE)) {
 		$CI->config->set_item('log_level', 0);
+	}
+	
+	// extruder number
+	$state_file = $CI->config->item('temp') . CORESTATUS_FILE_NB_EXTRUDER;
+	if (file_exists($state_file)) {
+		$nb_extruder = (int) @file_get_contents($state_file);
+	}
+	if ($nb_extruder == 0) { // check again if status file indicate 0 extruder
+		$CI->load->helper('printerstate');
+		$nb_extruder = PrinterState_getNbExtruder();
+		
+		// write status file
+		$fp = fopen($state_file, 'w');
+		if ($fp) {
+			fwrite($fp, $nb_extruder);
+			fclose($fp);
+			chmod($state_file, 0777);
+		}
+		else {
+			return FALSE;
+		}
+	}
+	if ($nb_extruder != 0) { // set printer in default mode (2) if error (0 extruder detected)
+		$CI->config->set_item('nb_extruder', $nb_extruder);
 	}
 	
 	return TRUE;

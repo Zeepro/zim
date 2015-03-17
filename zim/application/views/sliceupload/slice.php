@@ -1,5 +1,9 @@
 <div data-role="page" data-url="/sliceupload/slice">
-	<style> div#slicer_temperature_adjustment_container input[type=number] { display : none !important; } </style>
+	<style>
+		div#slicer_temperature_adjustment_container
+		input[type=number] { display: none !important; }
+		.zeeprocanvas { background-color: rgba(0,0,0,1.0); border: 0px; }
+	</style>
 	<div id="overlay"></div>
 	<header data-role="header" class="page-header">
 		<a href="#" data-icon="back" data-ajax="false" style="visibility:hidden">{back}</a>
@@ -154,6 +158,7 @@ function onWebGL_finalized() {
 		$("input#slicer_mini_control").attr("max", $("input#slicer_size").attr("max"));
 		$("input#slicer_mini_control").slider("refresh");
 	}
+	
 	return;
 }
 
@@ -227,16 +232,21 @@ function onMiniSliderChanged(value) {
 	return;
 }
 
-function getPreview() {
+function getPreview(exchange) {
 	// try client rendering firstly
 	if (var_webgl_initialized == false) {
-		zpInit3d(document.getElementById('ivwindow3d'), '/rest/getamfv1');
+		zpInit3d(document.getElementById('ivwindow3d'), '/rest/getamfv1', var_color_right, var_color_left);
 		var_webgl_initialized = true;
 	}
 	if (var_webgl_support == true) {
 		$("div.slicer_printer_rendering").hide();
 		$("div#detail_zone").show();
 		$("a#slice_button").removeClass("ui-disabled");
+		
+		// change color possiblity
+		if (typeof(exchange) != 'undefined' && exchange == true) {
+			exchangeRenderColors();
+		}
 		
 		return;
 	}

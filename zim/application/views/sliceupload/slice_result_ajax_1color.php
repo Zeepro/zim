@@ -34,11 +34,6 @@
 								<input type="range" id="slider_right" name="r" value="{temper_r}" min="160" max="260" data-show-value="true" />
 							</div>
 						</div></div>
-<!-- 						<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;"> -->
-<!-- 							<label for="exchange_extruder"><h2>{exchange_extruder}</h2></label> -->
-<!-- 						</div></div> -->
-<!-- 						<div class="ui-block-b"> -->
-<!-- 						</div> -->
 						<input type="hidden" name="exchange" id="exchange_extruder_hidden" value="0">
 						<div data-role="collapsible" style="clear: both;">
 							<h4>{advanced}</h4>
@@ -62,6 +57,8 @@ var var_need_refresh_preview = false;
 var var_need_print_right = {needprint_right};
 var var_need_print_left = {needprint_left};
 var var_bicolor_model = {bicolor_model};
+var slider_l = "input#slider_left";
+var slider_r = "input#slider_right";
 
 $("input[type=submit]").on('click', function()
 {
@@ -74,34 +71,31 @@ $('<div>').appendTo('#left_cartridge')
 $('<div>').appendTo('#right_cartridge')
 .attr({'id': 'change_right', 'data-icon': 'refresh', 'data-iconpos':'right', 'onclick': 'javascript: window.location.href="/printerstate/changecartridge?v=r&f={need_filament_r}&id=slice";'}).html('{change_right}')
 .button().button('refresh');
-// $('<button>').appendTo('#detail_zone')
-// .attr({'id': 'print_slice', 'onclick': 'javascript: window.location.href="/printdetail/printslice";'}).html('{print_button}')
-// .button().button('refresh');
 
 var limit_min_tmp = {temper_min};
 var limit_max_tmp = {temper_max};
 var delta_tmp = {temper_delta};
-var tmp = $("#slider_right").val();
+var tmp = $(slider_r).val();
 var min_tmp = tmp - delta_tmp;
 var max_tmp = parseInt(tmp) + delta_tmp;
 
-$("#slider_right").attr('min', (min_tmp < limit_min_tmp) ? limit_min_tmp : min_tmp); 
-$("#slider_right").attr('max', (max_tmp > limit_max_tmp) ? limit_max_tmp : max_tmp);
+$(slider_r).attr('min', (min_tmp < limit_min_tmp) ? limit_min_tmp : min_tmp); 
+$(slider_r).attr('max', (max_tmp > limit_max_tmp) ? limit_max_tmp : max_tmp);
 
-tmp = $("#slider_left").val();
+tmp = $(slider_l).val();
 min_tmp = tmp - delta_tmp;
 max_tmp = parseInt(tmp) + delta_tmp;
 
-$("#slider_left").attr('min', (min_tmp < limit_min_tmp) ? limit_min_tmp : min_tmp); 
-$("#slider_left").attr('max', (max_tmp > limit_max_tmp) ? limit_max_tmp : max_tmp);
+$(slider_l).attr('min', (min_tmp < limit_min_tmp) ? limit_min_tmp : min_tmp); 
+$(slider_l).attr('max', (max_tmp > limit_max_tmp) ? limit_max_tmp : max_tmp);
 
 $('#detail_zone').trigger("create");
 
 if (var_need_print_right == false) {
-	$('input#slider_right').slider({disabled: true});
+	$(slider_r).slider({disabled: true});
 }
 if (var_need_print_left == false) {
-	$('input#slider_left').slider({disabled: true});
+	$(slider_l).slider({disabled: true});
 }
 	
 if (var_enable_print == false) {
@@ -117,18 +111,9 @@ if (var_reslice == true) {
 var_color_right = '{cartridge_c_r}';
 var_color_left = '{cartridge_c_l}';
 
-// if (var_color_right != '{cartridge_c_r}') {
-// 	var_color_right = '{cartridge_c_r}';
-// 	var_need_refresh_preview = true;
-// }
-// if (var_color_left != '{cartridge_c_l}') {
-// 	var_color_left = '{cartridge_c_l}';
-// 	var_need_refresh_preview = true;
-// }
-
 $("#preview_zone").show();
 // if (var_need_refresh_preview) {
-	getPreview(false);
+	getPreview();
 // }
 
 // assign trigger for exchange extruder
@@ -143,16 +128,16 @@ $("select#exchange_extruder").change(function() {
 	// switch temperature slider and state message if it's mono-color model
 	if (var_bicolor_model == false) {
 		if (var_need_print_right) {
-			$('input#slider_right').slider({disabled: true});
-			$('input#slider_left').slider({disabled: false});
+			$(slider_r).slider({disabled: true});
+			$(slider_l).slider({disabled: false});
 			$("p#state_f_l").html('{filament_ok}');
 			$("p#state_f_r").html('{filament_not_need}');
 			var_need_print_right = false;
 			var_need_print_left = true;
 		}
 		else { // var_need_print_left
-			$('input#slider_right').slider({disabled: false});
-			$('input#slider_left').slider({disabled: true});
+			$(slider_r).slider({disabled: false});
+			$(slider_l).slider({disabled: true});
 			$("p#state_f_r").html('{filament_ok}');
 			$("p#state_f_l").html('{filament_not_need}');
 			var_need_print_left = false;
@@ -170,7 +155,7 @@ $("select#exchange_extruder").change(function() {
 		
 		var_color_right = var_color_left;
 		var_color_left = temp_color;
-		getPreview(false);
+		getPreview(true);
 	}
 	
 	$("input#exchange_extruder_hidden").val($("select#exchange_extruder").val());

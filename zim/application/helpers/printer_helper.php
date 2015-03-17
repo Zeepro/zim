@@ -426,7 +426,7 @@ function Printer_printFromFile($gcode_path, $model_id, $need_prime = TRUE, $exch
 // 	}
 	
 	// check extruder number
-	if (PrinterState_getNbExtruder() < 2) {
+	if ($CI->config->item('nb_extruder') < 2) {
 		$tmp_array = array();
 		
 		$command = $CFG->config['gcanalyser'] . $gcode_path;
@@ -436,7 +436,7 @@ function Printer_printFromFile($gcode_path, $model_id, $need_prime = TRUE, $exch
 			return ERROR_INTERNAL;
 		}
 		$tmp_array = json_decode($output[0]);
-		if ($tmp_array['N'] > PrinterState_getNbExtruder()) {
+		if ($tmp_array['N'] > $CI->config->item('nb_extruder')) {
 			PrinterLog_logMessage('no enough extruder', __FILE__, __LINE__);
 			return ERROR_INTERNAL;
 		}
@@ -1028,7 +1028,7 @@ function Printer__changeGcode(&$gcode_path, $array_filament = array(), $exchange
 		$array_temper['r'] = $temp_r;
 	}
 	
-	if (PrinterState_getNbExtruder() >= 2) {
+	if ($CI->config->item('nb_extruder') >= 2) {
 		// make it possible to change temperature not according to cartridge
 		if (array_key_exists('l', $array_temper) && $array_temper['l'] > 0) {
 			$temp_l = $array_temper['l'];

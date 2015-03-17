@@ -120,7 +120,6 @@ if(this.object!=obj)
 }
 node3d.prototype.load = function(d,info)
 {
-var i,j;
 	if(d.name!==undefined)this.name=d.name;
 	if(d.meta!==undefined)this.meta=d.meta;
 	if(d.object!=undefined)
@@ -149,7 +148,7 @@ var i,j;
 	if(d.i)
 	{
 		var n=d.i;
-		for(i=0;i<n.length;i++)
+		for(var i=0;i<n.length;i++)
 		{
 			var node=this.newNode();
 			node.load(n[i],info);
@@ -311,7 +310,7 @@ mesh3d.prototype.onMeshReady = function(space,buffer)
 	if(flags&8){this.lineMode=true;nF*=2;}else nF*=3;
 
 	// vertices
-	var v=new Float32Array(n3);
+	v=new Float32Array(n3);
 	var voffset=offset;
 	offset+=24;
 	var index=0,i;
@@ -352,7 +351,7 @@ mesh3d.prototype.onMeshReady = function(space,buffer)
 				offset+=4;
 			}
 		var bs=new ivBitStream(data,offset);
-		i=0;var j=0,ibits=0;
+		i=0;var j=0,bits=0;
 		while(i<numPoints)
 		{
 			var cd=bs.Read(1);
@@ -462,6 +461,14 @@ ivwindow3d.prototype.showNodeById = function(id,bShow,bUpdate)
 	}
 }
 
+ivwindow3d.prototype.setView =function(index)
+{
+	if(this.space && this.space.views && index>=0 && index<this.space.views.length)
+	{
+		var v=this.space.views[index];
+		if(v)this.setViewImp(v);
+	}
+}
 node3d.prototype.enableTM = function()
 {
 	if(!this.tm)this.tm=mat4.identity(mat4.create());

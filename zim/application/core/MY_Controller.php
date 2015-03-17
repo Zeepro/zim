@@ -40,7 +40,7 @@ class MY_Controller extends CI_Controller {
 	
 	protected function _sendFileContent($file_path = NULL, $client_name = 'download.bin') {
 		if (file_exists($file_path)) {
-			$encoding_header = isset($_SERVER['HTTP_ACCEPT_ENCODING1']) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : NULL;
+			$encoding_header = isset($_SERVER['HTTP_ACCEPT_ENCODING']) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : NULL;
 			$support_compress = strpos($encoding_header, 'gzip') !== FALSE;
 			
 			header('Content-Description: File Transfer');
@@ -51,13 +51,9 @@ class MY_Controller extends CI_Controller {
 			header('Pragma: public');
 // 			header('Content-Length: ' . filesize($file_path));
 			
-			if ($support_compress) {
-				$compress_prms = array('level' => 6, 'window' => 15, 'memory' => 9);
-				$fp = fopen('php://output', 'w');
-				stream_filter_append($fp, 'zlib.deflate', STREAM_FILTER_WRITE, $compress_prms);
-				
-				header('Vary: Accept-Encoding');
-				header('Content-Encoding: gzip');
+			if ($support_compress && extension_loaded('zlib')
+					&& (ini_get('output_handler') != 'ob_gzhandler')) {
+				ini_set("zlib.output_compression", 1);
 			}
 			
 			readfile($file_path);

@@ -679,12 +679,10 @@ class Sliceupload extends MY_Controller {
 		$change_left = '';
 		$change_right = '';
 		$data_json = array();
-// 		$array_key_real_temper = 'real_temperature'; //TODO think about if we need to declare this key name in helper or not
 		$error = NULL;
 		$option_selected = 'selected="selected"';
 		$select_disable = 'disabled="disabled"';
 		$array_need = array('r' => 'false', 'l' => 'false');
-		$key_suggest_temper = 'suggest_temperature';
 		
 		$this->load->helper(array('printerstate', 'slicer'));
 		$this->load->library('parser');
@@ -739,12 +737,11 @@ class Sliceupload extends MY_Controller {
 							PRINTERSTATE_TITLE_EXT_TEMPER	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER],
 							PRINTERSTATE_TITLE_EXT_TEMP_1	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1],
 							PRINTERSTATE_TITLE_NEED_L		=> $volume_need,
-							$key_suggest_temper				=> 0,
 					);
 					
-					// set suggest temperature if pla
+					// set default temperature if pla
 					if ($data_cartridge[PRINTERSTATE_TITLE_MATERIAL] == PRINTERSTATE_DESP_MATERIAL_PLA) {
-						$array_data[$abb_filament][$key_suggest_temper] = PRINTERSTATE_VALUE_FILAMENT_PLA_PRINT_TEMPER;
+						$array_data[$abb_filament][PRINTERSTATE_TITLE_EXT_TEMPER] = PRINTERSTATE_VALUE_FILAMENT_PLA_PRINT_TEMPER;
 					}
 				}
 				else {
@@ -753,7 +750,6 @@ class Sliceupload extends MY_Controller {
 							PRINTERSTATE_TITLE_EXT_TEMPER	=> SLICER_VALUE_DEFAULT_TEMPER,
 							PRINTERSTATE_TITLE_EXT_TEMP_1	=> SLICER_VALUE_DEFAULT_FIRST_TEMPER,
 							PRINTERSTATE_TITLE_NEED_L		=> $volume_need,
-							$key_suggest_temper				=> 0,
 					);
 				}
 				
@@ -853,11 +849,7 @@ class Sliceupload extends MY_Controller {
 				'need_filament_l'	=> $array_data['l'][PRINTERSTATE_TITLE_NEED_L],
 				'need_filament_r'	=> $array_data['r'][PRINTERSTATE_TITLE_NEED_L],
 				'temper_l'			=> $array_data['l'][PRINTERSTATE_TITLE_EXT_TEMPER],
-				'temper_suggest_l'	=> $array_data['l'][$key_suggest_temper],
 				'temper_r'			=> $array_data['r'][PRINTERSTATE_TITLE_EXT_TEMPER],
-				'temper_suggest_r'	=> $array_data['r'][$key_suggest_temper],
-// 				'real_temper_l'		=> isset($array_data['l']) ? $array_data['l'][$array_key_real_temper] : 200,
-// 				'real_temper_r'		=> isset($array_data['r']) ? $array_data['r'][$array_key_real_temper] : 200,
 				'print_button'		=> t('print_button'),
 				'left_temperature'	=> t('left_temperature'),
 				'right_temperature'	=> t('right_temperature'),

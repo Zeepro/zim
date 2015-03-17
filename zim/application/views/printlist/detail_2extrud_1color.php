@@ -86,8 +86,6 @@
 var var_enable_print = {enable_print};
 var var_need_print_right = ({need_filament_r} > 0) ? true : false;
 var var_need_print_left = ({need_filament_l} > 0) ? true : false;
-var var_suggest_temper_right = {temper_suggest_r};
-var var_suggest_temper_left = {temper_suggest_l};
 var limit_min_tmp = {temper_min};
 var limit_max_tmp = {temper_max};
 var delta_tmp = {temper_delta};
@@ -101,11 +99,6 @@ $("#{random_prefix}printModel_detailPage").on("pagecreate",function() {
 	
 	$(slider_r).attr('min', (min_tmp < limit_min_tmp) ? limit_min_tmp : min_tmp);
 	$(slider_r).attr('max', (max_tmp > limit_max_tmp) ? limit_max_tmp : max_tmp);
-	if (var_suggest_temper_right != $(slider_r).val()
-			&& var_suggest_temper_right >= $(slider_r).attr('min')
-			&& var_suggest_temper_right <= $(slider_r).attr('max')) {
-		$(slider_r).val(var_suggest_temper_right);
-	}
 	$("input#slider-r").slider("refresh");
 	
 	tmp = $(slider_l).val();
@@ -114,11 +107,6 @@ $("#{random_prefix}printModel_detailPage").on("pagecreate",function() {
 	
 	$(slider_l).attr('min', (min_tmp < limit_min_tmp) ? limit_min_tmp : min_tmp);
 	$(slider_l).attr('max', (max_tmp > limit_max_tmp) ? limit_max_tmp : max_tmp);
-	if (var_suggest_temper_left != $(slider_l).val()
-			&& var_suggest_temper_left >= $(slider_l).attr('min')
-			&& var_suggest_temper_left <= $(slider_l).attr('max')) {
-		$(slider_l).val(var_suggest_temper_left);
-	}
 	$("input#slider-l").slider("refresh");
 	
 	$("input[type=submit]").on('click', function()

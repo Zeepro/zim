@@ -395,7 +395,7 @@ shader3d.prototype.collectTextures=function(ch)
 shader3d.prototype.readyTextures = function(bSet)
 {
 	var c=0;
-	for(var i=0;i<this.textures.length;i++)
+	for(i=0;i<this.textures.length;i++)
 	{
 		var t=this.textures[i];
 		if(t.txt.ivready)

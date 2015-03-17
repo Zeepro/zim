@@ -97,6 +97,7 @@ use constant CMD_GET_OFFSET_Y        => 'M1662';
 use constant CMD_SET_OFFSET          => 'M1660';
 use constant CMD_GET_POSITION        => 'M114';
 use constant CMD_GET_CONSUMPTION     => 'M1907';
+use constant CMD_CHECK_LEFT_SIDE     => 'M1625';
 
 use constant CMD_STOP_PRINT    => 'M1000';
 use constant CMD_RESET_PRINTER => 'M1100';
@@ -1147,6 +1148,11 @@ else {
 
 		#cmd: move / extrude / special g99
 		show_endstops();
+	}
+	elsif ( $command eq CMD_CHECK_LEFT_SIDE ) {
+
+		#cmd: check left side
+		print "1\n";
 	}
 	elsif ( $command eq CMD_START_SD_WRITE
 			|| $command eq CMD_STOP_SD_WRITE

@@ -47,10 +47,10 @@
 						<div class="ui-block-a">{temp_adjustments_l}</div>
 						<div class="ui-block-b">{temp_adjustments_r}</div>
 						<div class="ui-block-a" id="div-slider1">
-							<input type="range" name="l" id="slider-1" value="{temper_filament_l}" min="160" max="260" data-show-value="true">
+							<input type="range" name="l" id="slider-l" value="{temper_filament_l}" min="160" max="260" data-show-value="true">
 						</div>
 						<div class="ui-block-b" id="div-slider2">
-							<input type="range" name="r" id="slider-2" value="{temper_filament_r}" min="160" max="260" data-show-value="true">
+							<input type="range" name="r" id="slider-r" value="{temper_filament_r}" min="160" max="260" data-show-value="true">
 						</div>
 					</div>
 				</div>
@@ -76,22 +76,38 @@
 
 <script>
 var var_enable_print = {enable_print};
+var var_suggest_temper_right = {temper_suggest_r};
+var var_suggest_temper_left = {temper_suggest_l};
 var limit_min_tmp = {temper_min};
 var limit_max_tmp = {temper_max};
 var delta_tmp = {temper_delta};
-var tmp = $("#slider-2").val();
+var slider_l = "input#slider-l";
+var slider_r = "input#slider-r";
+var error_checked = false;
+
+var tmp = $(slider_r).val();
 var min_tmp = tmp - delta_tmp;
 var max_tmp = parseInt(tmp) + delta_tmp;
 
-$("#slider-2").attr('min', (min_tmp < limit_min_tmp) ? limit_min_tmp : min_tmp);
-$("#slider-2").attr('max', (max_tmp > limit_max_tmp) ? limit_max_tmp : max_tmp);
+$(slider_r).attr('min', (min_tmp < limit_min_tmp) ? limit_min_tmp : min_tmp);
+$(slider_r).attr('max', (max_tmp > limit_max_tmp) ? limit_max_tmp : max_tmp);
+if (var_suggest_temper_right != $(slider_r).val()
+		&& var_suggest_temper_right >= $(slider_r).attr('min')
+		&& var_suggest_temper_right <= $(slider_r).attr('max')) {
+	$(slider_r).val(var_suggest_temper_right);
+}
 
-tmp = $("#slider-1").val();
+tmp = $(slider_l).val();
 min_tmp = tmp - delta_tmp;
 max_tmp = parseInt(tmp) + delta_tmp;
 
-$("#slider-1").attr('min', (min_tmp < limit_min_tmp) ? limit_min_tmp : min_tmp);
-$("#slider-1").attr('max', (max_tmp > limit_max_tmp) ? limit_max_tmp : max_tmp);
+$(slider_l).attr('min', (min_tmp < limit_min_tmp) ? limit_min_tmp : min_tmp);
+$(slider_l).attr('max', (max_tmp > limit_max_tmp) ? limit_max_tmp : max_tmp);
+if (var_suggest_temper_left != $(slider_l).val()
+		&& var_suggest_temper_left >= $(slider_l).attr('min')
+		&& var_suggest_temper_left <= $(slider_l).attr('max')) {
+	$(slider_l).val(var_suggest_temper_left);
+}
 
 $("input[type=submit]").on('click', function()
 {
@@ -99,18 +115,24 @@ $("input[type=submit]").on('click', function()
 	$(".ui-loader").css("display", "block");
 });
 
-if ("{state_f_l}" == "{error}" || "{state_f_r}" == "{error}")
-{
-	$("#slider-" + ("{state_f_l}" == "{error}" ? "1" : "2")).attr("disabled", "disabled");
+
+if ("{state_f_r}" == "{error}") {
+	$(slider_r).attr("disabled", "disabled");
+	error_checked = true;
 }
-else {
+if ("{state_f_l}" == "{error}") {
+	$(slider_l).attr("disabled", "disabled");
+	error_checked = true;
+}
+if (error_checked == false) {
 	if ({need_filament_l} <= 0) {
-		$("#slider-1").attr("disabled", "disabled");
+		$(slider_l).attr("disabled", "disabled");
 	}
 	if ({need_filament_r} <= 0) {
-		$("#slider-2").attr("disabled", "disabled");
+		$(slider_r).attr("disabled", "disabled");
 	}
 }
+
 
 // if ("{state_f_l}" != "ok" || "{state_f_r}" != "ok")
 // {
