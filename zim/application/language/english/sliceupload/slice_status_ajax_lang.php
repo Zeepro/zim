@@ -74,10 +74,6 @@ $lang['reslice_button']
 	= 'Reslice';
 $lang['exchange_extruder']
 	= 'Switch colors';
-$lang['exchange_straight']
-	= 'Straight';
-$lang['exchange_crossover']
-	= 'Crossover';
 $lang['exchange_right']
 	= 'Right cartridge';
 $lang['exchange_left']
@@ -88,3 +84,5 @@ $lang['gcode_link']
 	= 'G-code';
 $lang['2drender_link']
 	= '2D Rendering';
+$lang['result_title']
+	= 'Filament';

@@ -74,10 +74,6 @@ $lang['reslice_button']
 	= 'Slicer à nouveau';
 $lang['exchange_extruder']
 	= 'Inversion de couleur';
-$lang['exchange_straight']
-	= 'Droit';
-$lang['exchange_crossover']
-	= 'Croisé';
 $lang['exchange_right']
 	= 'Cartouche droite';
 $lang['exchange_left']
@@ -88,3 +84,5 @@ $lang['gcode_link']
 	= 'G-code';
 $lang['2drender_link']
 	= '2D Rendering';
+$lang['result_title']
+	= 'Filament';

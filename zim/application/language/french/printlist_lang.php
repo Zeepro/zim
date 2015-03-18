@@ -18,6 +18,8 @@ $lang['temp_adjustments_l']
 	= "Température gauche (°C)";
 $lang['temp_adjustments_r']
 	= "Température droite (°C)";
+$lang['chg_temperature']
+	= 'Température (°C)';
 $lang['color_suggestion']
 	= "Suggestion de couleur :";
 $lang['unknown']
@@ -50,11 +52,9 @@ $lang['filament_not_need']
 	= 'inutilisé';
 $lang['exchange_extruder']
 	= 'Inversion de couleur';
-$lang['exchange_straight']
-	= 'Droit';
-$lang['exchange_crossover']
-	= 'Croisé';
 $lang['exchange_right']
 	= 'Cartouche droite';
 $lang['exchange_left']
 	= 'Cartouche gauche';
+$lang['filament_not_enough_for_switch']
+	= 'insuffisant pour inverser la cartouche';

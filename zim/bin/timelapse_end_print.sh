@@ -120,3 +120,5 @@ fi
 # clean temporary file and release camera
 /etc/init.d/ffmpeg clean_tl
 rm -fv $CAMERAINF
+rm -fv /var/www/tmp/*.m3u8
+rm -fv /var/www/tmp/*.ts

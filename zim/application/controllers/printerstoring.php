@@ -400,8 +400,6 @@ class Printerstoring extends MY_Controller {
 						PRINTERSTATE_TITLE_COLOR		=> $data_cartridge[PRINTERSTATE_TITLE_COLOR],
 						PRINTERSTATE_TITLE_EXT_TEMPER	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER],
 						PRINTERSTATE_TITLE_MATERIAL		=> $data_cartridge[PRINTERSTATE_TITLE_MATERIAL],
-						PRINTERSTATE_TITLE_NEED_L		=> $volume_need,
-						$key_suggest_temper				=> 0,
 				);
 					
 				// set default temperature if pla
@@ -414,10 +412,10 @@ class Printerstoring extends MY_Controller {
 						PRINTERSTATE_TITLE_COLOR		=> PRINTERSTATE_VALUE_DEFAULT_COLOR,
 						PRINTERSTATE_TITLE_EXT_TEMPER	=> 0,
 						PRINTERSTATE_TITLE_MATERIAL		=> NULL,
-						PRINTERSTATE_TITLE_NEED_L		=> $volume_need,
-						$key_suggest_temper				=> 0,
 				);
 			}
+			$array_data[$abb_filament][PRINTERSTATE_TITLE_NEED_L]	= $volume_need;
+			$array_data[$abb_filament][$key_suggest_temper]			= 0;
 			
 			if ($volume_need > 0 && $data_json[$key_material] != $array_data[$abb_filament][PRINTERSTATE_TITLE_MATERIAL]) {
 				$required_material = t('require_' . $data_json[$key_material]);

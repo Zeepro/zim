@@ -692,21 +692,19 @@ class Sliceupload extends MY_Controller {
 	}
 	
 	function slice_result_ajax() {
-		//FIXME need to rewrite this function to read always two cartridges and treat with temporary sliced model information
 		$template_data = array();
-		$ret_val = 0;
-		$array_data = array();
 		$cr = ERROR_OK;
-		$state_f_l = NULL;
-		$state_f_r = NULL;
-		$change_left = '';
-		$change_right = '';
+		$array_data = array();
+		$check_filament = array();
+		$change_filament = array();
 		$data_json = array();
 		$error = NULL;
+		$bicolor_model = FALSE;
+		$exchange_select_snd = FALSE;
+		$bicolor_printer = ($this->config->item('nb_extruder') >= 2);
+		$enable_print = 'false';
+		$enable_exchange = 'disabled="disabled"'; // select disable
 		$option_selected = 'selected="selected"';
-		$select_disable = 'disabled="disabled"';
-		$array_need = array('r' => 'false', 'l' => 'false');
-		$bicolor = ($this->config->item('nb_extruder') >= 2);
 		
 		$this->load->helper(array('printerstate', 'slicer'));
 		$this->load->library('parser');
@@ -725,9 +723,8 @@ class Sliceupload extends MY_Controller {
 		else {
 			$material = NULL;
 			
-			//TODO treat mono color and mono extruder case
-			$state_f_l = $state_f_r = t('filament_ok');
-			$change_left = $change_right = t('change_filament');
+			$check_filament = array('l' => t('filament_ok'), 'r' => t('filament_ok'));
+			$change_filament = array('l' => t('change_filament'), 'r' => t('change_filament'));
 			
 			foreach (array('r', 'l') as $abb_filament) {
 				$data_cartridge = array();
@@ -739,20 +736,14 @@ class Sliceupload extends MY_Controller {
 					$data_slice = $data_json[$abb_filament];
 					if (isset($data_slice[PRINTERSTATE_TITLE_NEED_L])) {
 						$volume_need = $data_slice[PRINTERSTATE_TITLE_NEED_L];
-						if ($volume_need > 0) {
-							$array_need[$abb_filament] = 'true';
-						}
 					}
 				}
-				else if ($abb_filament == 'l') {
-					$state_f_l = t('filament_not_need');
+				else {
+					$check_filament[$abb_filament] = t('filament_not_need');
 				}
-				else { // $abb_filament == 'r'
-					$state_f_r = t('filament_not_need');
-				}
-
+				
 				// check mono extruder case (normally, it's not necessary)
-				if ($bicolor == FALSE && $abb_filament == 'l') {
+				if ($bicolor_printer == FALSE && $abb_filament == 'l') {
 					$tmp_ret = ERROR_MISS_LEFT_CART;
 				}
 				else {
@@ -767,7 +758,6 @@ class Sliceupload extends MY_Controller {
 							PRINTERSTATE_TITLE_COLOR		=> $data_cartridge[PRINTERSTATE_TITLE_COLOR],
 							PRINTERSTATE_TITLE_EXT_TEMPER	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMPER],
 							PRINTERSTATE_TITLE_EXT_TEMP_1	=> $data_cartridge[PRINTERSTATE_TITLE_EXT_TEMP_1],
-							PRINTERSTATE_TITLE_NEED_L		=> $volume_need,
 					);
 					
 					// set default temperature if pla
@@ -780,9 +770,9 @@ class Sliceupload extends MY_Controller {
 							PRINTERSTATE_TITLE_COLOR		=> PRINTERSTATE_VALUE_DEFAULT_COLOR,
 							PRINTERSTATE_TITLE_EXT_TEMPER	=> SLICER_VALUE_DEFAULT_TEMPER,
 							PRINTERSTATE_TITLE_EXT_TEMP_1	=> SLICER_VALUE_DEFAULT_FIRST_TEMPER,
-							PRINTERSTATE_TITLE_NEED_L		=> $volume_need,
 					);
 				}
+				$array_data[$abb_filament][PRINTERSTATE_TITLE_NEED_L] = $volume_need;
 				
 				// treat error
 				switch ($tmp_ret) {
@@ -791,44 +781,40 @@ class Sliceupload extends MY_Controller {
 						break;
 						
 					case ERROR_LOW_RIGT_FILA:
-						$state_f_r = t('filament_not_enough');
+						
+						$check_filament['r'] = t('filament_not_enough');
 						break;
 							
 					case ERROR_MISS_RIGT_FILA:
-						$state_f_r = t('filament_unloaded');
-						$change_right = t('load_filament');
+						$check_filament['r'] = t('filament_unloaded');
+						$change_filament['r'] = t('load_filament');
 						break;
 							
 					case ERROR_MISS_RIGT_CART:
-						$state_f_r = t('filament_empty');
-						$change_right = t('load_filament');
+						$check_filament['r'] = t('filament_empty');
+						$change_filament['r'] = t('load_filament');
 						break;
 							
 					case ERROR_LOW_LEFT_FILA:
-						$state_f_l = t('filament_not_enough');
+						$check_filament['l'] = t('filament_not_enough');
 						break;
 							
 					case ERROR_MISS_LEFT_FILA:
-						$state_f_l = t('filament_unloaded');
-						$change_left = t('load_filament');
+						$check_filament['l'] = t('filament_unloaded');
+						$change_filament['l'] = t('load_filament');
 						break;
 							
 					case ERROR_MISS_LEFT_CART:
-						$state_f_l = t('filament_empty');
-						$change_left = t('load_filament');
+						$check_filament['l'] = t('filament_empty');
+						$change_filament['l'] = t('load_filament');
 						break;
 							
 					default:
 						$this->load->helper('printerlog');
-						PrinterLog_logError('unexpected return when generating slicing result: ' . $cr, __FILE__, __LINE__);
+						PrinterLog_logError('unexpected return when generating slicing result: ' . $tmp_ret, __FILE__, __LINE__);
 						
 						// assign error message if necessary
-						if ($abb_filament == 'l') {
-							$state_f_l = t('filament_error');
-						}
-						else { // $abb_filament == 'r'
-							$state_f_r = t('filament_error');
-						}
+						$check_filament[$abb_filament] = t('filament_error');
 						break;
 				}
 				// assign $cr only when status is ok (acts like a flag of error)
@@ -870,13 +856,43 @@ class Sliceupload extends MY_Controller {
 			if (!is_null($error)) {
 				$error .= t('suggest_reslice');
 			}
+			
+			// check enable print
+			if ($cr == ERROR_OK) {
+				$enable_print = 'true';
+			}
+			
+			// check bicolor model
+			if ($array_data['r'][PRINTERSTATE_TITLE_NEED_L] > 0 && $array_data['l'][PRINTERSTATE_TITLE_NEED_L] > 0) {
+				$bicolor_model = TRUE;
+			}
+			else if ($array_data['r'][PRINTERSTATE_TITLE_NEED_L] > 0) {
+				$exchange_select_snd = TRUE;
+			}
+			
+			// check exchange possiblity
+			if (ERROR_OK == PrinterState_checkFilaments(array(
+					'l'	=> $array_data['r'][PRINTERSTATE_TITLE_NEED_L],
+					'r'	=> $array_data['l'][PRINTERSTATE_TITLE_NEED_L],
+			))) {
+				$enable_exchange = NULL; // enable exchange if verification is passed
+			}
+			// display not enough even if filament is unused (in mono-color model)
+			else if ($bicolor_model == FALSE) {
+				if ($array_data['l'][PRINTERSTATE_TITLE_NEED_L] == 0) {
+					$check_filament['l'] = t('filament_not_enough_for_switch');
+				}
+				else { // ($array_data['r'][PRINTERSTATE_TITLE_NEED_L] == 0)
+					$check_filament['r'] = t('filament_not_enough_for_switch');
+				}
+			}
 		}
 		
 		$template_data = array(
 				'cartridge_c_l'		=> $array_data['l'][PRINTERSTATE_TITLE_COLOR],
 				'cartridge_c_r'		=> $array_data['r'][PRINTERSTATE_TITLE_COLOR],
-				'state_f_l'			=> $state_f_l,
-				'state_f_r'			=> $state_f_r,
+				'state_f_l'			=> $check_filament['l'],
+				'state_f_r'			=> $check_filament['r'],
 				'need_filament_l'	=> $array_data['l'][PRINTERSTATE_TITLE_NEED_L],
 				'need_filament_r'	=> $array_data['r'][PRINTERSTATE_TITLE_NEED_L],
 				'temper_l'			=> $array_data['l'][PRINTERSTATE_TITLE_EXT_TEMPER],
@@ -885,67 +901,31 @@ class Sliceupload extends MY_Controller {
 				'left_temperature'	=> t('left_temperature'),
 				'right_temperature'	=> t('right_temperature'),
 				'chg_temperature'	=> t('chg_temperature'),
-				'change_left'		=> $change_left,
-				'change_right'		=> $change_right,
-				'enable_print'		=> ($cr == ERROR_OK) ? 'true' : 'false',
+				'change_left'		=> $change_filament['l'],
+				'change_right'		=> $change_filament['r'],
 				'error_msg'			=> $error,
-				'enable_reslice'	=> $error ? 'true' : 'false',
 				'reslice_button'	=> t('reslice_button'),
 				'exchange_extruder'	=> t('exchange_extruder'),
-				'exchange_o1_val'	=> 0,
-				'exchange_o2_val'	=> 1,
-				'exchange_o2_sel'	=> NULL,
-				'exchange_o1'		=> t('exchange_straight'),
-				'exchange_o2'		=> t('exchange_crossover'),
+				'exchange_o1_val'	=> $exchange_select_snd ? 1 : 0,
+				'exchange_o2_val'	=> $exchange_select_snd ? 0 : 1,
+				'exchange_o2_sel'	=> $exchange_select_snd ? $option_selected : NULL,
+				'exchange_o1'		=> t('exchange_left'),
+				'exchange_o2'		=> t('exchange_right'),
 				'advanced'			=> t('advanced'),
 				'gcode_link'		=> t('gcode_link'),
 				'2drender_link'		=> t('2drender_link'),
-				'bicolor_model'		=> 'false',
-				'needprint_right'	=> $array_need['r'],
-				'needprint_left'	=> $array_need['l'],
-				'enable_exchange'	=> $select_disable,
 				'filament_not_need'	=> t('filament_not_need'),
 				'filament_ok'		=> t('filament_ok'),
+				'result_title' 		=> t('result_title'),
 				'temper_max'		=> PRINTERSTATE_TEMPER_CHANGE_MAX,
 				'temper_min'		=> PRINTERSTATE_TEMPER_CHANGE_MIN,
 				'temper_delta'		=> PRINTERSTATE_TEMPER_CHANGE_VAL,
-				'bicolor_printer'	=> $bicolor ? 'true' : 'false',
+				'enable_print'		=> $enable_print,
+				'enable_exchange'	=> $enable_exchange,
+				'enable_reslice'	=> $error ? 'true' : 'false',
+				'bicolor_printer'	=> $bicolor_printer ? 'true' : 'false',
+				'bicolor_model'		=> $bicolor_model ? 'true' : 'false',
 		);
-		
-		if (ERROR_OK == PrinterState_checkFilaments(array(
-				'l'	=> $array_data['r'][PRINTERSTATE_TITLE_NEED_L],
-				'r'	=> $array_data['l'][PRINTERSTATE_TITLE_NEED_L],
-		))) {
-			$template_data['enable_exchange'] = NULL; // enable exchange if verification is passed
-		}
-		// display not enough even if filament is unused (in mono-color model)
-		else if ($array_need['r'] == 'false' || $array_need['l'] == 'false') {
-			if ($array_data['l'][PRINTERSTATE_TITLE_NEED_L] == 0) {
-				$template_data['state_f_l'] = t('filament_not_enough_for_switch');
-			}
-			else { // ($array_data['r'][PRINTERSTATE_TITLE_NEED_L] == 0)
-				$template_data['state_f_r'] = t('filament_not_enough_for_switch');
-			}
-		}
-// 		if (ERROR_OK == PrinterState_checkFilament('l', $array_data['r'][PRINTERSTATE_TITLE_NEED_L])
-// 		&& ERROR_OK == PrinterState_checkFilament('r', $array_data['l'][PRINTERSTATE_TITLE_NEED_L])) {
-// 			$template_data['enable_exchange'] = NULL; // enable exchange if verification is passed
-// 		}
-		
-		if ($array_need['r'] == 'true' && $array_need['l'] == 'true') {
-			$template_data['bicolor_model'] = 'true';
-// 			$this->parser->parse('sliceupload/slice_result_ajax_2color', $template_data);
-		}
-		else {
-			$template_data['exchange_o1']		= t('exchange_left');
-			$template_data['exchange_o2']		= t('exchange_right');
-			
-			if ($array_need['r'] == 'true') {
-				$template_data['exchange_o1_val']	= 1;
-				$template_data['exchange_o2_val']	= 0;
-				$template_data['exchange_o2_sel']	= $option_selected;
-			}
-		}
 		$this->parser->parse('sliceupload/slice_result_ajax', $template_data);
 		
 		$this->output->set_status_header(202);

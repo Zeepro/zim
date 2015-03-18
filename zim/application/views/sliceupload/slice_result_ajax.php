@@ -1,58 +1,61 @@
 
 				<form action="/printdetail/printslice_temp" method="POST" data-ajax="false">
-					<div id="exchange_container" class="ui-bar ui-bar-f widget_bicolor" style="height:3em; display: none;">
-						<div class="widget_monomodel" style="display: none;">
-							<select id="exchange_extruder_m" data-role="slider" data-track-theme="a" data-theme="a" {enable_exchange}>
-								<option value="{exchange_o1_val}">{exchange_o1}</option>
-								<option value="{exchange_o2_val}" {exchange_o2_sel}>{exchange_o2}</option>
-							</select>
+					<div data-role="collapsible" data-collapsed="false" style="clear: both;">
+						<h4>{result_title}</h4>
+						<div id="exchange_container" class="ui-bar ui-bar-f widget_bicolor" style="height:3em; display: none;">
+							<div class="widget_monomodel" style="display: none;">
+								<select id="exchange_extruder_m" data-role="slider" data-track-theme="a" data-theme="a" {enable_exchange}>
+									<option value="{exchange_o1_val}">{exchange_o1}</option>
+									<option value="{exchange_o2_val}" {exchange_o2_sel}>{exchange_o2}</option>
+								</select>
+							</div>
+							<div class="widget_bimodel" style="display: none;">
+								<label>
+									<input type="checkbox" id="exchange_extruder_b" value="1" {enable_exchange}>{exchange_extruder}
+								</label>
+							</div>
 						</div>
-						<div class="widget_bimodel" style="display: none;">
-							<label>
-								<input type="checkbox" id="exchange_extruder_b" value="1" {enable_exchange}>{exchange_extruder}
-							</label>
+						<div class="widget_monocolor" style="display: none;">
+							<div id="mono_cartridge">
+								<div style="width: 75px; height: 75px; background-color: {cartridge_c_r}; margin: 0 auto;">
+									<img src="/images/cartridge.png" style="width: 100%">
+								</div>
+								<p id="state_f_mono">{state_f_r}</p>
+							</div>
+							<div class="slicer_temperature_adjustment_container">
+								<label>{chg_temperature}</label>
+								<input type="range" id="slider_mono" value="{temper_r}" min="160" max="260" data-show-value="true" />
+							</div>
 						</div>
-					</div>
-					<div class="widget_monocolor" style="display: none;">
-						<div id="mono_cartridge">
-							<div style="width: 75px; height: 75px; background-color: {cartridge_c_r}; margin: 0 auto;">
-								<img src="/images/cartridge.png" style="width: 100%">
-							</div>
-							<p id="state_f_mono">{state_f_r}</p>
+						<div class="ui-grid-a widget_bicolor" style="display: none;">
+							<div class="ui-block-a"><div id="left_cartridge" class="ui-bar ui-bar-f">
+								<div style="width: 75px; height: 75px; background-color: {cartridge_c_l}; margin: 0 auto;">
+									<img src="/images/cartridge.png" style="width: 100%">
+								</div>
+								<p id="state_f_l">{state_f_l}</p>
+							</div></div>
+							<div class="ui-block-b"><div id="right_cartridge" class="ui-bar ui-bar-f">
+								<div style="width: 75px; height: 75px; background-color: {cartridge_c_r}; margin: 0 auto;">
+									<img src="/images/cartridge.png" style="width: 100%">
+								</div>
+								<p id="state_f_r">{state_f_r}</p>
+							</div></div>
 						</div>
-						<div class="slicer_temperature_adjustment_container">
-							<label>{chg_temperature}</label>
-							<input type="range" id="slider_mono" value="{temper_r}" min="160" max="260" data-show-value="true" />
+						<p style="text-align: left;">{error_msg}</p>
+						<div class="ui-grid-a slicer_temperature_adjustment_container widget_bicolor" style="display: none;">
+							<div class="ui-block-a"><div id="left_cartridge_temper" class="ui-bar ui-bar-f">
+								<label>{left_temperature}</label>
+								<div id="temper_l">
+									<input type="range" id="slider_left" name="l" value="{temper_l}" min="160" max="260" data-show-value="true" />
+								</div>
+							</div></div>
+							<div class="ui-block-b"><div id="right_cartridge_temper" class="ui-bar ui-bar-f">
+								<label>{right_temperature}</label>
+								<div id="temper_r">
+									<input type="range" id="slider_right" name="r" value="{temper_r}" min="160" max="260" data-show-value="true" />
+								</div>
+							</div></div>
 						</div>
-					</div>
-					<div class="ui-grid-a widget_bicolor" style="display: none;">
-						<div class="ui-block-a"><div id="left_cartridge" class="ui-bar ui-bar-f">
-							<div style="width: 75px; height: 75px; background-color: {cartridge_c_l}; margin: 0 auto;">
-								<img src="/images/cartridge.png" style="width: 100%">
-							</div>
-							<p id="state_f_l">{state_f_l}</p>
-						</div></div>
-						<div class="ui-block-b"><div id="right_cartridge" class="ui-bar ui-bar-f">
-							<div style="width: 75px; height: 75px; background-color: {cartridge_c_r}; margin: 0 auto;">
-								<img src="/images/cartridge.png" style="width: 100%">
-							</div>
-							<p id="state_f_r">{state_f_r}</p>
-						</div></div>
-					</div>
-					<p style="text-align: left;">{error_msg}</p>
-					<div class="ui-grid-a slicer_temperature_adjustment_container widget_bicolor" style="display: none;">
-						<div class="ui-block-a"><div id="left_cartridge_temper" class="ui-bar ui-bar-f">
-							<label>{left_temperature}</label>
-							<div id="temper_l">
-								<input type="range" id="slider_left" name="l" value="{temper_l}" min="160" max="260" data-show-value="true" />
-							</div>
-						</div></div>
-						<div class="ui-block-b"><div id="right_cartridge_temper" class="ui-bar ui-bar-f">
-							<label>{right_temperature}</label>
-							<div id="temper_r">
-								<input type="range" id="slider_right" name="r" value="{temper_r}" min="160" max="260" data-show-value="true" />
-							</div>
-						</div></div>
 					</div>
 					<input type="hidden" name="exchange" id="exchange_extruder_hidden" value="0">
 					<div data-role="collapsible" style="clear: both;">
@@ -69,17 +72,51 @@
 					<input type="submit" id="print_slice" value="{print_button}" />
 				</form>
 
-<script type="text/javascript">
+<script>
 var var_enable_print = {enable_print};
 var var_reslice = {enable_reslice};
 var var_need_refresh_preview = false;
-var var_need_print_right = {needprint_right};
-var var_need_print_left = {needprint_left};
 var var_bicolor_model = {bicolor_model};
 var var_bicolor_printer = {bicolor_printer};
 var slider_l = "input#slider_left";
 var slider_r = var_bicolor_printer ? "input#slider_right" : "input#slider_mono";
 var widget_exchange = var_bicolor_model ? "input#exchange_extruder_b" : "select#exchange_extruder_m";
+var var_need_filament_r = {need_filament_r};
+var var_need_filament_l = {need_filament_l};
+var var_need_print_right = (var_need_filament_r > 0) ? true : false;
+var var_need_print_left = (var_need_filament_l > 0) ? true : false;
+
+function changecartridge(side) {
+	if (typeof(side) == 'undefined') {
+		console.log("changecartridge call api error");
+		return;
+	}
+	else {
+		var quantity = null;
+		switch (side) {
+			case 'r':
+				quantity = var_need_filament_r;
+				if (var_need_print_right == false) {
+					quantity = var_need_filament_l;
+				}
+				
+			case 'l':
+				if (quantity === null) {
+					quantity = var_need_filament_l;
+					if (var_need_print_left == false) {
+						quantity = var_need_filament_r;
+					}
+				}
+				window.location.href="/printerstate/changecartridge?v=" + side + "&f=" + quantity + "&id=slice";
+				break;
+				
+			default:
+				console.log("unknown side of cartridge");
+				break;
+		}
+	}
+	return;
+}
 
 if (var_bicolor_model == true) {
 	$(".widget_bimodel").show();
@@ -93,16 +130,16 @@ if (var_bicolor_printer == true) {
 	$(".widget_bicolor").show();
 	
 	$('<div>').appendTo('#left_cartridge')
-	.attr({'id': 'change_left', 'data-icon': 'refresh', 'data-iconpos':'right', 'onclick': 'javascript: window.location.href="/printerstate/changecartridge?v=l&f={need_filament_l}&id=slice";'}).html('{change_left}')
+	.attr({'id': 'change_left', 'data-icon': 'refresh', 'data-iconpos':'right', 'onclick': 'javascript: changecartridge("l");'}).html('{change_left}')
 	.button().button('refresh');
 	$('<div>').appendTo('#right_cartridge')
-	.attr({'id': 'change_right', 'data-icon': 'refresh', 'data-iconpos':'right', 'onclick': 'javascript: window.location.href="/printerstate/changecartridge?v=r&f={need_filament_r}&id=slice";'}).html('{change_right}')
+	.attr({'id': 'change_right', 'data-icon': 'refresh', 'data-iconpos':'right', 'onclick': 'javascript: changecartridge("r");'}).html('{change_right}')
 	.button().button('refresh');
 }
 else {
 	$(".widget_monocolor").show();
 	$('<div>').appendTo('#mono_cartridge')
-	.attr({'id': 'change_right', 'data-icon': 'refresh', 'data-iconpos':'right', 'onclick': 'javascript: window.location.href="/printerstate/changecartridge?v=r&f={need_filament_r}&id=slice";'}).html('{change_right}')
+	.attr({'id': 'change_right', 'data-icon': 'refresh', 'data-iconpos':'right', 'onclick': 'javascript: changecartridge("r");'}).html('{change_right}')
 	.button().button('refresh');
 }
 
@@ -164,6 +201,14 @@ $("#preview_zone").show();
 
 // assign trigger for exchange extruder
 $(widget_exchange).change(function() {
+	var hidden_input_exchange = "input#exchange_extruder_hidden";
+	var tmp_quantity = 0;
+	
+	// exchange quantity for changing cartridge
+	tmp_quantity = var_need_filament_r;
+	var_need_filament_r = var_need_filament_l;
+	var_need_filament_l = tmp_quantity;
+	
 	// switch print on and exchange off in some special cases
 	if (var_enable_print == false) {
 		$(widget_exchange).slider({disabled: true});
@@ -204,7 +249,6 @@ $(widget_exchange).change(function() {
 		getPreview(true);
 	}
 	
-	var hidden_input_exchange = "input#exchange_extruder_hidden";
 	if (var_bicolor_model == true) {
 		if ($(widget_exchange).is(":checked")) {
 			$(hidden_input_exchange).val("1");
