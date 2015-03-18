@@ -3414,6 +3414,7 @@ function PrinterState__updateCartridge(&$code_cartridge, $abb_cartridge) {
 		$temp_code = NULL;
 		
 		try {
+			$CI->load->helper('json');
 			$tmp_array = @json_read($file_path, TRUE);
 			if ($tmp_array['error']) {
 				throw new Exception('read json error');
@@ -3462,13 +3463,3 @@ function PrinterState__updateCartridge(&$code_cartridge, $abb_cartridge) {
 	
 	return;
 }
-
-// function PrinterState__checkLine($line) {
-// 	$line = str_replace(array("\n", "\r"), '', $line);
-// 	if ($line == '') {
-// 		return FALSE;
-// 	}
-// 	else {
-// 		return TRUE;
-// 	}
-// }

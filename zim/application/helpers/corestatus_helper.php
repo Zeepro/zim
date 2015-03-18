@@ -218,7 +218,6 @@ function CoreStatus_initialFile() {
 		if ($fp) {
 			fwrite($fp, $nb_extruder);
 			fclose($fp);
-			chmod($state_file, 0777);
 		}
 		else {
 			return FALSE;
