@@ -263,5 +263,3 @@ $("#{random_prefix}printModel_detailPage").on("pagecreate",function() {
 });
 </script>
 </div>
-
-<?php //TODO exchange also filament quantity in change cartridge link - need to create new javascript function instead of a fixed link ?>
