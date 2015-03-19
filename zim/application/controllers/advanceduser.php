@@ -11,21 +11,30 @@ class Advanceduser extends MY_Controller {
 		) );
 	}
 	
+	private function _display_controlIndex($err_msg = '') {
+		$template_data = array();
+		
+		$this->load->helper('zimapi');
+		$this->load->library('parser');
+		
+		$template_data = array(
+				'serial'	=> ZimAPI_getSerial(),
+				'err_msg'	=> $err_msg,
+				'bicolor'	=> ($this->config->item('nb_extruder') >= 2) ? 'true' : 'false',
+		);
+		
+		$this->_parseBaseTemplate('Advanced user', $this->parser->parse('advanceduser/index', $template_data, TRUE));
+		
+		return;
+	}
+	
 	public function index() {
 		global $CFG;
 
 		$this->load->library('parser');
 		
 		if (file_exists($CFG->config['conf'] . '/G-code.json')) {
-			$this->load->helper('zimapi');
-			
-			$template_data = array(
-					'serial'	=> ZimAPI_getSerial(),
-					'err_msg'	=> '',
-					'bicolor'	=> ($this->config->item('nb_extruder') >= 2) ? 'true' : 'false',
-			);
-			
-			$this->_parseBaseTemplate('Advanced user', $this->parser->parse('advanceduser/index', $template_data, TRUE));
+			$this->_display_controlIndex();
 		} else {
 			if ($_SERVER['REQUEST_METHOD'] == 'POST')
 			{
@@ -38,7 +47,7 @@ class Advanceduser extends MY_Controller {
 					
 					$this->_parseBaseTemplate('Advanced user', $this->parser->parse('advanceduser/register', $template_data, TRUE));
 				} else {
-
+					
 					$url = 'https://stat.service.zeepro.com/log.ashx';
 					$data = array('printersn' => $temp_serial, 'version' => '1', 'category' => 'gcode', 'action' => 'register');
 					$options = array('http' => array('header'  => "Content-type: application/x-www-form-urlencoded\r\n",
@@ -52,15 +61,12 @@ class Advanceduser extends MY_Controller {
 						
 						$this->_parseBaseTemplate('Advanced user', $this->parser->parse('advanceduser/register', $template_data, TRUE));
 					} else {
-
 						$fp = fopen($CFG->config['conf'] . '/G-code.json', 'w');
 						if ($fp) {
 							fwrite($fp, json_encode(array('register' => date("c"))));
 							fclose($fp);
-
-							$template_data = array('err_msg' => '');
-
-							$this->_parseBaseTemplate('Advanced user', $this->parser->parse('advanceduser/index', $template_data, TRUE));
+							
+							$this->_display_controlIndex();
 						} else {
 							$template_data = array('err_msg' => 'Internal error');
 							
@@ -281,14 +287,10 @@ class Advanceduser extends MY_Controller {
 					$this->_parseBaseTemplate('Advanced user', $this->parser->parse('advanceduser/confirm', array(), TRUE));
 				}
 				else {
-					$template_data = array('err_msg' => 'Internal error');
-					
-					$this->_parseBaseTemplate('Advanced user', $this->parser->parse('advanceduser/index', $template_data, TRUE));
+					$this->_display_controlIndex('Internal error');
 				}
 			} else {
-				$template_data = array('err_msg' => 'Missing file');
-				
-				$this->_parseBaseTemplate('Advanced user', $this->parser->parse('advanceduser/index', $template_data, TRUE));
+				$this->_display_controlIndex('Missing file');
 			}
 		}
 		else {

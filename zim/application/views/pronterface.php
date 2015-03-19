@@ -30,7 +30,7 @@
 								<a href="#" data-role="button" data-icon="arrow-l" data-iconpos="left" onclick="move('X', -10);">10</a>
 							</div>
 							<div class="grid_4">
-								<input type="number" style="text-align:right;" data-clear-btn="false" name="xy_speed" id="xy_speed" value="2000" />
+								<input type="number" style="text-align:right;" data-clear-btn="false" name="xy_speed" id="xy_speed_mobile" value="2000" />
 								<p style="text-align: center;">mm/min</p>
 							</div>
 							<div class="grid_4 prefix_1 suffix_1">
@@ -69,7 +69,7 @@
 								<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" onclick="move('Z', -50);">50</a>
 							</div>
 							<div class="grid_4 prefix_6 suffix_6">
-								<input type="number" style="text-align:right;" data-clear-btn="false" name="z_speed" id="z_speed" value="500"/>
+								<input type="number" style="text-align:right;" data-clear-btn="false" name="z_speed" id="z_speed_mobile" value="500"/>
 								<p style="text-align: center;">mm/min</p>
 							</div>
 							<div class="grid_4 prefix_6 suffix_6">
@@ -272,14 +272,14 @@
 				<textarea name="severalline_n" id="severalline_n" style="max-height:200px;"></textarea>
 				<a href="#" data-role="button" data-icon="arrow-r" data-iconpos="right" onclick="runGcodePOST('#severalline_n');">Send</a>
 				<form id="fileupload_v" action="/rest/gcodefile" method="post" enctype="multipart/form-data" data-ajax="false">
-					<label for="fileupload_v">Verbatim file upload</label>
+					<label for="file_v">Verbatim file upload</label>
 					<input type="file" data-clear-btn="true" name="f" id="file_v">
 					<input type="hidden" name="mode" value="verbatim">
 					<input type="button" value="Send" data-icon="arrow-r" data-iconpos="right" onclick="startSubmit('form#fileupload_v');">
 				</form>
 <!-- 				<a href="#" data-role="button" data-icon="arrow-r" data-iconpos="right">Send</a> -->
 				<form id="fileupload_n" action="/rest/gcodefile" method="post" enctype="multipart/form-data" data-ajax="false">
-					<label for="fileupload_n">File upload</label>
+					<label for="file_n">File upload</label>
 					<input type="file" data-clear-btn="true" name="f" id="file_n">
 					<input type="button" value="Send" data-icon="arrow-r" data-iconpos="right" onclick="startSubmit('form#fileupload_n');">
 				</form>
@@ -304,6 +304,7 @@ var var_ajax_lock = false;
 var var_checked_rfid = false;
 var var_verifyRFIDInterval = 0;
 var var_bicolor = {bicolor};
+var var_mobile_display = false;
 
 if (var_bicolor == true) {
 	$("div.widget_bicolor").show();
@@ -323,6 +324,7 @@ else {
 
 if ($(document).width() < 960) {
 	$(".mobile_widget").show();
+	var_mobile_display = true;
 }
 else {
 	$(".desktop_widget").show();
@@ -459,10 +461,10 @@ function move(var_axis, var_value) {
 	}
 	else {
 		if (var_axis == 'Z') {
-			var_speed = $("#z_speed").val();
+			var_speed = $(var_mobile_display ? "#z_speed_mobile" : "#z_speed").val();
 		}
 		else {
-			var_speed = $("#xy_speed").val();
+			var_speed = $(var_mobile_display ? "#xy_speed_mobile" : "#xy_speed").val();
 		}
 		var_url = "/zeepronterface/move";
 	}
