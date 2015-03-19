@@ -19,7 +19,11 @@ class Advanceduser extends MY_Controller {
 		if (file_exists($CFG->config['conf'] . '/G-code.json')) {
 			$this->load->helper('zimapi');
 			
-			$template_data = array('serial' => ZimAPI_getSerial(), 'err_msg' => '');
+			$template_data = array(
+					'serial'	=> ZimAPI_getSerial(),
+					'err_msg'	=> '',
+					'bicolor'	=> ($this->config->item('nb_extruder') >= 2) ? 'true' : 'false',
+			);
 			
 			$this->_parseBaseTemplate('Advanced user', $this->parser->parse('advanceduser/index', $template_data, TRUE));
 		} else {

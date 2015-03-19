@@ -8,12 +8,12 @@
 			<div data-role="collapsible" data-collapsed="true" style="align: center;" id="temper_collaspible">
 				<h4>Temperature</h4>
 				<div class="widget_monocolor" style="display: none;">
-					<label for="temper_l">Mono</label>
+					<label for="temper_mono">Mono</label>
 					<div style="width:40px;float:left;margin-right:10px;">
-						<input type="text" data-clear-btn="false" name="temper_l_current" id="temper_mono_current" value="0" disabled>
+						<input type="text" data-clear-btn="false" name="temper_mono_current" id="temper_mono_current" value="0" disabled>
 					</div>
 					<div style="width:60px;float:left;margin-right:10px;">
-						<input type="number" style="text-align:right;" data-clear-btn="false" name="temper_l" id="temper_mono" value="200">
+						<input type="number" style="text-align:right;" data-clear-btn="false" name="temper_mono" id="temper_mono" value="200">
 					</div>
 					<a href="#" data-role="button" data-icon="check" data-iconpos="left" data-inline="true" onclick="heat('r');">Set</a>
 					<a href="#" data-role="button" data-icon="delete" data-iconpos="left" data-inline="true" onclick="heat('r', 0);">Stop</a>
@@ -53,13 +53,13 @@
 			<div data-role="collapsible" data-collapsed="true" style="align: center;">
 				<h4>Filament</h4>
 				<div class="widget_monocolor" style="display: none; height: 120px;">
-					<label for="temper_l">Mono</label>
+					<label for="extrude_mono">Mono</label>
 					<br style="clear:left;" />
 					<div style="width:60px;float:left;margin-right:10px;">
-						<input type="number" style="text-align:right;" data-clear-btn="false" name="extrude_l" id="extrude_mono" value="20"> mm
+						<input type="number" style="text-align:right;" data-clear-btn="false" name="extrude_mono" id="extrude_mono" value="20"> mm
 					</div>
 					<div style="width:60px;float:left;margin-right:10px;">
-						<input type="number" style="text-align:right;" data-clear-btn="false" name="speed_l" id="speed_mono" value="100"> mm/min
+						<input type="number" style="text-align:right;" data-clear-btn="false" name="speed_mono" id="speed_mono" value="100"> mm/min
 					</div>
 					<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" data-inline="true" onclick="extrude('r', '-');">Reverse</a>
 					<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" data-inline="true" onclick="extrude('r', '+');">Extrude</a>
@@ -67,7 +67,7 @@
 				<div class="ui-grid-a widget_bicolor" style="display: none;">
 					<div class="ui-block-a">
 						<div class="ui-bar ui-bar-f">
-							<label for="temper_l">Left</label>
+							<label for="extrude_l">Left</label>
 							<br style="clear:left;" />
 							<div style="width:60px;float:left;margin-right:10px;">
 								<input type="number" style="text-align:right;" data-clear-btn="false" name="extrude_l" id="extrude_l" value="20"> mm
@@ -81,7 +81,7 @@
 					</div>
 					<div class="ui-block-b">
 						<div class="ui-bar ui-bar-f">
-							<label for="temper_r">Right</label>
+							<label for="extrude_r">Right</label>
 							<br style="clear:left;" />
 							<div style="width:60px;float:left;margin-right:10px;">
 								<input type="number" style="text-align:right;" data-clear-btn="false" name="extrude_r" id="extrude_r" value="20"> mm
@@ -134,25 +134,7 @@ else {
 
 $(document).ready(checkTemper());
 
-// $("form#fileupload_v, form#fileupload_n").submit(verifyRfid(event));
-
-
-/* 
 function checkTemper() {
-//	refreshCheckTemper();
-	$("#temper_collaspible").bind('expand', function () {
-		if (var_refreshCheckTemper == 0) {
-//			checkTemper();
-			var_refreshCheckTemper = setInterval(refreshCheckTemper, 10000);
-		}
-	}).bind('collapse', function() {
-		clearInterval(var_refreshCheckTemper);
-		var_refreshCheckTemper = 0;
-	});
-}
- */
-function checkTemper() {
-//		refreshCheckTemper();
 		$("#temper_collaspible").collapsible({
 			expand: function(event, ui) {
 				if (var_refreshCheckTemper == 0) {
@@ -362,11 +344,6 @@ function runGcodeGet() {
 	});
 
 	return false;
-}
-
-function spinnerStart() {
-	$("#overlay").addClass("gray-overlay");
-	$(".ui-loader").css("display", "block");
 }
 
 </script>

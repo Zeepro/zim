@@ -18,11 +18,15 @@ class Zeepronterface extends MY_Controller {
 	public function index() {
 		global $CFG;
 		$template_data = array();
-
+		
 		$this->load->library('parser');
-
-		$this->_parseBaseTemplate('Pronterface#', $this->parser->parse('pronterface', array(), TRUE));
-
+		
+		$template_data = array(
+				'bicolor'	=> ($this->config->item('nb_extruder') >= 2) ? 'true' : 'false',
+		);
+		$this->_parseBaseTemplate('Pronterface#', $this->parser->parse('pronterface', $template_data, TRUE),
+				'<link rel="stylesheet" href="/assets/jquery-mobile-fluid960.min.css">');
+		
 		return;
 	}
 	
@@ -30,7 +34,7 @@ class Zeepronterface extends MY_Controller {
 		$this->load->helper('printerstate');
 		PrinterState_stopPrinting();
 		$this->output->set_header('Location: /zeepronterface');
-
+		
 		return;
 	}
 	

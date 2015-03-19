@@ -1,13 +1,5 @@
 <div data-role="page" data-url="/manage" style="overflow-y:hidden;">
-	<style>
-		.round-button
-		{
-			width: 15% !important;
-			height: 42% !important;
-			border-radius: 50% !important;
-		}
-		
-	</style>
+	<style> .round-button { width: 15% !important; height: 42% !important; border-radius: 50% !important; } </style>
 	<div id="overlay"></div>
 	<header data-role="header" class="page-header">
 		<a href="javascript:history.back();" data-icon="back" data-ajax="false" class="back-button">{back}</a>
@@ -17,19 +9,16 @@
 		<div id="container">
 			<div data-role="collapsible">
 				<h4>{platform_view_title}</h4>
-				<div class="container_16">
-					<script type="text/javascript" src="/assets/jwplayer/jwplayer.js"></script>
-	 				<script type="text/javascript">jwplayer.key="Jh6aqwb1m2vKLCoBtS7BJxRWHnF/Qs3LMjnt13P9D6A=";</script>
-	 				<style type="text/css">div#myVideo_wrapper {margin: 0 auto;}</style>
-					<div id="myVideo">{loading_player}</div>
-				</div>
+				<script type="text/javascript" src="/assets/jwplayer/jwplayer.js"></script>
+ 				<script type="text/javascript">jwplayer.key="Jh6aqwb1m2vKLCoBtS7BJxRWHnF/Qs3LMjnt13P9D6A=";</script>
+ 				<style type="text/css">div#myVideo_wrapper {margin: 0 auto;}</style>
+				<div id="myVideo">{loading_player}</div>
 			</div>
 			<div data-role="collapsible">
 				<h4>{lighting_title}</h4>
-				<div class="container_16">
-					<div class="ui-grid-a">
+				<div class="ui-grid-a">
 					<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;">
-						<label for="slider"><h2>{strip_led}</h2></label>
+						<label for="strip_led">{strip_led}</label>
 					</div></div>
 					<div class="ui-block-b"><div class="ui-bar ui-bar-f" style="height:3em;">
 						<select name="strip_led" id="strip_led" data-role="slider" data-track-theme="a" data-theme="a">
@@ -38,28 +27,26 @@
 						</select>
 					</div></div>
 					<div class="ui-block-a"><div class="ui-bar ui-bar-f" style="height:3em;">
-						<label for="slider"><h2>{head_led}</h2></label>
+						<label for="head_led">{head_led}</label>
 					</div></div>
 					<div class="ui-block-b">
 						<div class="ui-bar ui-bar-f" style="height:3em;">
 							<select name="head_led" id="head_led" data-role="slider" data-track-theme="a" data-theme="a">
 								<option value="off" id="head_off">{led_off}</option>
-								<option value="on" id="head_on"{head_led_on}>{led_on}</option>
+								<option value="on" id="head_on" {head_led_on}>{led_on}</option>
 							</select>
 						</div>
 					</div>
-				</div>
 				</div>
 			</div>
 			<div data-role="collapsible" style="align: center;">
 				<h4>{reset}</h4>
 				<div class="container_16">
-					
-						<a href="#home_popup" data-rel="popup" class="ui-btn ui-icon-info ui-btn-icon-right ui-corner-all ui-shadow" data-transition="pop">{what}</a>
-						<div id="home_popup" data-role="popup" class="ui-content">
-							<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right"></a>
-							{home_text}
-						</div>
+					<a href="#home_popup" data-rel="popup" class="ui-btn ui-icon-info ui-btn-icon-right ui-corner-all ui-shadow" data-transition="pop">{what}</a>
+					<div id="home_popup" data-role="popup" class="ui-content">
+						<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right"></a>
+						{home_text}
+					</div>
 					
 					<div class="grid_6 prefix_5 suffix_5">
 						<a href="#" data-role="button" data-icon="home" data-iconpos="left" onclick="home();">XYZ</a>
@@ -78,12 +65,11 @@
 			<div data-role="collapsible" style="align: center;">
 				<h4>{head}</h4>
 				<div class="container_16">
-					
-						<a href="#head_popup" data-rel="popup" class="ui-btn ui-icon-info ui-btn-icon-right ui-corner-all ui-shadow" data-transition="pop">{what}</a>
-						<div id="head_popup" data-role="popup" class="ui-content">
-							<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right"></a>
-							{head_text}
-						</div>
+					<a href="#head_popup" data-rel="popup" class="ui-btn ui-icon-info ui-btn-icon-right ui-corner-all ui-shadow" data-transition="pop">{what}</a>
+					<div id="head_popup" data-role="popup" class="ui-content">
+						<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right"></a>
+						{head_text}
+					</div>
 					
 					<div class="grid_4 prefix_6 suffix_6">
 						<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" onclick="move('Y', 1);">1</a>
@@ -129,12 +115,11 @@
 			<div data-role="collapsible" style="align: center;">
 				<h4>{platform}</h4>
 				<div class="container_16">
-					
-						<a href="#platform_popup" data-rel="popup" class="ui-btn ui-icon-info ui-btn-icon-right ui-corner-all ui-shadow" data-transition="pop">{what}</a>
-						<div id="platform_popup" data-role="popup" class="ui-content">
-							<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right"></a>
-							{platform_text}
-						</div>
+					<a href="#platform_popup" data-rel="popup" class="ui-btn ui-icon-info ui-btn-icon-right ui-corner-all ui-shadow" data-transition="pop">{what}</a>
+					<div id="platform_popup" data-role="popup" class="ui-content">
+						<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right"></a>
+						{platform_text}
+					</div>
 					
 					<div class="grid_4 prefix_6 suffix_6">
 						<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" onclick="move('Z', -0.1);">0.1</a>
@@ -167,34 +152,29 @@
 			</div>
 			<div data-role="collapsible">
 				<h4>{filament}</h4>
-				<div class="container_16" style="text-align:center">
-					<a href="#filament_popup" data-rel="popup" class="ui-btn ui-icon-info ui-btn-icon-right ui-corner-all ui-shadow" data-transition="pop">{what}</a>
-					<div id="filament_popup" data-role="popup" class="ui-content">
-						<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right"></a>
-						{filament_text}
-					</div>
-					<div class="widget_bicolor" style="display: none;">
-						<div style="text-align:center;display:inline-block;width:45%;margin-left:2%">
-							{left}
-						</div>
-						<div style="text-align:center;display:inline-block;width:45%;margin-left:2%">
-							{right}
-						</div>
+				<a href="#filament_popup" data-rel="popup" class="ui-btn ui-icon-info ui-btn-icon-right ui-corner-all ui-shadow" data-transition="pop">{what}</a>
+				<div id="filament_popup" data-role="popup" class="ui-content">
+					<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right"></a>
+					{filament_text}
+				</div>
+				
+				<div class="widget_monocolor" style="display: none;">
+					<div id="cartridge_ajax_mono" style="background-color:#f6f6f6;text-align:center;border: 2px solid;border-radius: 53px;display:inline-block;width:95%;margin-left:2%;">
+						<img src="styles/images/ajax-loader.gif" style="opacity: 0.18;" />
 					</div>
 				</div>
-				<div class="container_16" style="text-align:center">
-					<div class="widget_monocolor" style="display: none;">
-						<div id="cartridge_ajax_mono" style="background-color:#f6f6f6;text-align:center;border: 2px solid;border-radius: 53px;display:inline-block;width:95%;margin-left:2%;">
-							<img src="styles/images/ajax-loader.gif" style="opacity: 0.18;" />
-						</div>
+				<div class="widget_bicolor" style="display: none;">
+					<div style="text-align:center;display:inline-block;width:45%;margin-left:2%">
+						{left}
 					</div>
-					<div class="widget_bicolor" style="display: none;">
-						<div id="cartridge_ajax_l" style="background-color:#f6f6f6;text-align:center;border: 2px solid;border-radius: 53px;display:inline-block;width:45%;margin-left:2%;">
-							<img src="styles/images/ajax-loader.gif" style="opacity: 0.18;" />
-						</div>
-						<div id="cartridge_ajax_r" style="background-color:#f6f6f6;text-align:center;border: 2px solid;border-radius: 53px;display:inline-block;width:45%;margin-left:2%;">
-							<img src="styles/images/ajax-loader.gif" style="opacity: 0.18;" />
-						</div>
+					<div style="text-align:center;display:inline-block;width:45%;margin-left:2%">
+						{right}
+					</div>
+					<div id="cartridge_ajax_l" style="background-color:#f6f6f6;text-align:center;border: 2px solid;border-radius: 53px;display:inline-block;width:45%;margin-left:2%;">
+						<img src="styles/images/ajax-loader.gif" style="opacity: 0.18;" />
+					</div>
+					<div id="cartridge_ajax_r" style="background-color:#f6f6f6;text-align:center;border: 2px solid;border-radius: 53px;display:inline-block;width:45%;margin-left:2%;">
+						<img src="styles/images/ajax-loader.gif" style="opacity: 0.18;" />
 					</div>
 				</div>
 				<br />
@@ -202,12 +182,11 @@
 			<div data-role="collapsible">
 				<h4>{bed_title}</h4>
 				<div id="bed_container" class="container_16" style="height:480px; text-align: center">
-					
-						<a href="#bed_popup" data-rel="popup" class="ui-btn ui-icon-info ui-btn-icon-right ui-corner-all ui-shadow" data-transition="pop">{what}</a>
-						<div id="bed_popup" data-role="popup" class="ui-content">
-							<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right"></a>
-							{bed_text}
-						</div>
+					<a href="#bed_popup" data-rel="popup" class="ui-btn ui-icon-info ui-btn-icon-right ui-corner-all ui-shadow" data-transition="pop">{what}</a>
+					<div id="bed_popup" data-role="popup" class="ui-content">
+						<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right"></a>
+						{bed_text}
+					</div>
 					
 					<br />
 					<table style="border: 2px solid;width:100%;background-color:silver;margin:0 auto;max-width:400px;max-height:400px">

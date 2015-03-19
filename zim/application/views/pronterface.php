@@ -7,88 +7,172 @@
 		<div id="container">
 			<div data-role="collapsible" data-collapsed="false" style="align: center;">
 				<h4>Position</h4>
-				<table style="text-align:center;margin:0 auto;">
-				<tr>
-					<td><a href="#" data-role="button" data-icon="home" data-iconpos="left" data-inline="true" onclick="home();">XYZ</a></td>
-					<td colspan="2"></td>
-					<td><a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" data-inline="true" onclick="move('Y', 50);">50</a></td>
-					<td colspan="3"></td>
-					<td><a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" data-inline="true" onclick="move('Z', -50);">50</a></td>
-				</tr>
-				<tr>
-					<td colspan="3"></td>
-					<td><a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" data-inline="true" onclick="move('Y', 10);">10</a></td>
-					<td colspan="3"></td>
-					<td><a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" data-inline="true" onclick="move('Z', -10);">10</a></td>
-				</tr>
-				<tr>
-					<td colspan="3"></td>
-					<td><a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" data-inline="true" onclick="move('Y', 1);">1</a></td>
-					<td colspan="3"></td>
-					<td>
-						<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" data-inline="true" onclick="move('Z', -1);">1</a>
-						<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" data-inline="true" onclick="move('Z', -0.1);">0.1</a>
-					</td>
-				</tr>
-				<tr>
-					<td><a href="#" data-role="button" data-icon="arrow-l" data-iconpos="left" data-inline="true" onclick="move('X', -50);">50</a></td>
-					<td><a href="#" data-role="button" data-icon="arrow-l" data-iconpos="left" data-inline="true" onclick="move('X', -10);">10</a></td>
-					<td><a href="#" data-role="button" data-icon="arrow-l" data-iconpos="left" data-inline="true" onclick="move('X', -1);">1</a></td>
-					<td><input type="number" style="text-align:right;" data-clear-btn="false" name="xy_speed" id="xy_speed" value="2000"></td>
-					<td><a href="#" data-role="button" data-icon="arrow-r" data-iconpos="left" data-inline="true" onclick="move('X', 1);">1</a></td>
-					<td><a href="#" data-role="button" data-icon="arrow-r" data-iconpos="left" data-inline="true" onclick="move('X', 10);">10</a></td>
-					<td><a href="#" data-role="button" data-icon="arrow-r" data-iconpos="left" data-inline="true" onclick="move('X', 50);">50</a></td>
-					<td><input type="number" style="text-align:right;" data-clear-btn="false" name="z_speed" id="z_speed" value="500"></td>
-				</tr>
-				<tr>
-					<td><a href="#" data-role="button" data-icon="home" data-iconpos="left" data-inline="true" onclick="home('X');">X</a></td>
-					<td colspan="2"></td>
-					<td><a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" data-inline="true" onclick="move('Y', -1);">1</a></td>
-					<td colspan="3"></td>
-					<td>
-						<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" data-inline="true" onclick="move('Z', 1);">1</a>
-						<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" data-inline="true" onclick="move('Z', 0.1);">0.1</a>
-					</td>
-				</tr>
-				<tr>
-					<td colspan="3"></td>
-					<td><a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" data-inline="true" onclick="move('Y', -10);">10</a></td>
-					<td colspan="3"></td>
-					<td><a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" data-inline="true" onclick="move('Z', 10);">10</a></td>
-				</tr>
-				<tr>
-					<td colspan="3"></td>
-					<td><a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" data-inline="true" onclick="move('Y', -50);">50</a></td>
-					<td><a href="#" data-role="button" data-icon="home" data-iconpos="left" data-inline="true" onclick="home('Y');">Y</a></td>
-					<td></td>
-					<td><a href="#" data-role="button" data-icon="home" data-iconpos="left" data-inline="true" onclick="home('Z');">Z</a></td>
-					<td><a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" data-inline="true" onclick="move('Z', 50);">50</a></td>
-				</tr>
-				</table>
-				<div data-role="collapsible" data-collapsed="true" style="align: center;">
-					<h4>Leveling</h4>
+				<div class="mobile_widget" style="display:none;">
+					<div data-role="collapsible" data-collapsed="true" style="align: center;">
+						<h4>Head</h4>
+						<div class="container_16">
+							<div class="grid_4 prefix_6 suffix_6">
+								<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" onclick="move('Y', 1);">1</a>
+							</div>
+							<div class="grid_4 prefix_6 suffix_6">
+								<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" onclick="move('Y', 10);">10</a>
+							</div>
+							<div class="grid_4 prefix_6 suffix_6">
+								<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" onclick="move('Y', 50);">50</a>
+							</div>
+							<div class="grid_4 prefix_1 suffix_3" style="margin-bottom:13px;">
+								<a href="#" data-role="button" data-icon="arrow-l" data-iconpos="left" onclick="move('X', -1);">1</a>
+							</div>
+							<div class="grid_4 prefix_3 suffix_1" style="margin-bottom:13px;">
+								<a href="#" data-role="button" data-icon="arrow-r" data-iconpos="left" onclick="move('X', 1);">1</a>
+							</div>
+							<div class="grid_4 prefix_1 suffix_1">
+								<a href="#" data-role="button" data-icon="arrow-l" data-iconpos="left" onclick="move('X', -10);">10</a>
+							</div>
+							<div class="grid_4">
+								<input type="number" style="text-align:right;" data-clear-btn="false" name="xy_speed" id="xy_speed" value="2000" />
+								<p style="text-align: center;">mm/min</p>
+							</div>
+							<div class="grid_4 prefix_1 suffix_1">
+								<a href="#" data-role="button" data-icon="arrow-r" data-iconpos="left" onclick="move('X', 10);">10</a>
+							</div>
+							<div class="grid_4 prefix_1 suffix_3">
+								<a href="#" data-role="button" data-icon="arrow-l" data-iconpos="left" onclick="move('X', -50);">50</a>
+							</div>
+							<div class="grid_4 prefix_3 suffix_1">
+								<a href="#" data-role="button" data-icon="arrow-r" data-iconpos="left" onclick="move('X', 50);">50</a>
+							</div>
+							<div class="grid_4 prefix_6 suffix_6">
+								<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" onclick="move('Y', -1);">1</a>
+							</div>
+							<div class="grid_4 prefix_6 suffix_6">
+								<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" onclick="move('Y', -10);">10</a>
+							</div>
+							<div class="grid_4 prefix_6 suffix_6">
+								<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" onclick="move('Y', -50);">50</a>
+							</div>
+						</div>
+					</div>
+					<div data-role="collapsible" data-collapsed="true" style="align: center;">
+						<h4>Platform</h4>
+						<div class="container_16">
+							<div class="grid_4 prefix_6 suffix_6">
+								<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" onclick="move('Z', -0.1);">0.1</a>
+							</div>
+							<div class="grid_4 prefix_6 suffix_6">
+								<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" onclick="move('Z', -1);">1</a>
+							</div>
+							<div class="grid_4 prefix_6 suffix_6">
+								<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" onclick="move('Z', -10);">10</a>
+							</div>
+							<div class="grid_4 prefix_6 suffix_6">
+								<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" onclick="move('Z', -50);">50</a>
+							</div>
+							<div class="grid_4 prefix_6 suffix_6">
+								<input type="number" style="text-align:right;" data-clear-btn="false" name="z_speed" id="z_speed" value="500"/>
+								<p style="text-align: center;">mm/min</p>
+							</div>
+							<div class="grid_4 prefix_6 suffix_6">
+								<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" onclick="move('Z', 0.1);">0.1</a>
+							</div>
+							<div class="grid_4 prefix_6 suffix_6">
+								<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" onclick="move('Z', 1);">1</a>
+							</div>
+							<div class="grid_4 prefix_6 suffix_6">
+								<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" onclick="move('Z', 10);">10</a>
+							</div>
+							<div class="grid_4 prefix_6 suffix_6">
+								<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" onclick="move('Z', 50);">50</a>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="desktop_widget" style="display: none;">
 					<table style="text-align:center;margin:0 auto;">
 					<tr>
-						<td><a href="#" data-role="button" data-icon="grid" data-iconpos="left" data-inline="true" onclick="level('xmin_ymax');">Move</a></td>
-						<td></td>
-						<td><a href="#" data-role="button" data-icon="grid" data-iconpos="left" data-inline="true" onclick="level('xmax_ymax');">Move</a></td>
+						<td><a href="#" data-role="button" data-icon="home" data-iconpos="left" data-inline="true" onclick="home();">XYZ</a></td>
+						<td colspan="2"></td>
+						<td><a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" data-inline="true" onclick="move('Y', 50);">50</a></td>
+						<td colspan="3"></td>
+						<td><a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" data-inline="true" onclick="move('Z', -50);">50</a></td>
 					</tr>
 					<tr>
-						<td></td>
-						<td><a href="#" data-role="button" data-icon="grid" data-iconpos="left" data-inline="true" onclick="level('center');">Move</a></td>
-						<td></td>
+						<td colspan="3"></td>
+						<td><a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" data-inline="true" onclick="move('Y', 10);">10</a></td>
+						<td colspan="3"></td>
+						<td><a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" data-inline="true" onclick="move('Z', -10);">10</a></td>
 					</tr>
 					<tr>
-						<td><a href="#" data-role="button" data-icon="grid" data-iconpos="left" data-inline="true" onclick="level('xmin_ymin');">Move</a></td>
+						<td colspan="3"></td>
+						<td><a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" data-inline="true" onclick="move('Y', 1);">1</a></td>
+						<td colspan="3"></td>
+						<td>
+							<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" data-inline="true" onclick="move('Z', -1);">1</a>
+							<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" data-inline="true" onclick="move('Z', -0.1);">0.1</a>
+						</td>
+					</tr>
+					<tr>
+						<td><a href="#" data-role="button" data-icon="arrow-l" data-iconpos="left" data-inline="true" onclick="move('X', -50);">50</a></td>
+						<td><a href="#" data-role="button" data-icon="arrow-l" data-iconpos="left" data-inline="true" onclick="move('X', -10);">10</a></td>
+						<td><a href="#" data-role="button" data-icon="arrow-l" data-iconpos="left" data-inline="true" onclick="move('X', -1);">1</a></td>
+						<td><input type="number" style="text-align:right;" data-clear-btn="false" name="xy_speed" id="xy_speed" value="2000"></td>
+						<td><a href="#" data-role="button" data-icon="arrow-r" data-iconpos="left" data-inline="true" onclick="move('X', 1);">1</a></td>
+						<td><a href="#" data-role="button" data-icon="arrow-r" data-iconpos="left" data-inline="true" onclick="move('X', 10);">10</a></td>
+						<td><a href="#" data-role="button" data-icon="arrow-r" data-iconpos="left" data-inline="true" onclick="move('X', 50);">50</a></td>
+						<td><input type="number" style="text-align:right;" data-clear-btn="false" name="z_speed" id="z_speed" value="500"></td>
+					</tr>
+					<tr>
+						<td><a href="#" data-role="button" data-icon="home" data-iconpos="left" data-inline="true" onclick="home('X');">X</a></td>
+						<td colspan="2"></td>
+						<td><a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" data-inline="true" onclick="move('Y', -1);">1</a></td>
+						<td colspan="3"></td>
+						<td>
+							<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" data-inline="true" onclick="move('Z', 1);">1</a>
+							<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" data-inline="true" onclick="move('Z', 0.1);">0.1</a>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="3"></td>
+						<td><a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" data-inline="true" onclick="move('Y', -10);">10</a></td>
+						<td colspan="3"></td>
+						<td><a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" data-inline="true" onclick="move('Z', 10);">10</a></td>
+					</tr>
+					<tr>
+						<td colspan="3"></td>
+						<td><a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" data-inline="true" onclick="move('Y', -50);">50</a></td>
+						<td><a href="#" data-role="button" data-icon="home" data-iconpos="left" data-inline="true" onclick="home('Y');">Y</a></td>
 						<td></td>
-						<td><a href="#" data-role="button" data-icon="grid" data-iconpos="left" data-inline="true" onclick="level('xmax_ymin');">Move</a></td>
+						<td><a href="#" data-role="button" data-icon="home" data-iconpos="left" data-inline="true" onclick="home('Z');">Z</a></td>
+						<td><a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" data-inline="true" onclick="move('Z', 50);">50</a></td>
 					</tr>
 					</table>
+				</div>
+				<div data-role="collapsible" data-collapsed="true">
+					<h4>Leveling</h4>
+					<div class="container_12" style="text-align: center;">
+						<div class="grid_6"><a href="#" data-role="button" data-icon="grid" data-iconpos="left" data-inline="true" onclick="level('xmin_ymax');">Move</a></div>
+						<div class="grid_6"><a href="#" data-role="button" data-icon="grid" data-iconpos="left" data-inline="true" onclick="level('xmax_ymax');">Move</a></div>
+						<div class="grid_6 prefix_3 suffix_3"><a href="#" data-role="button" data-icon="grid" data-iconpos="left" data-inline="true" onclick="level('center');">Move</a></div>
+						<div class="grid_6"><a href="#" data-role="button" data-icon="grid" data-iconpos="left" data-inline="true" onclick="level('xmin_ymin');">Move</a></div>
+						<div class="grid_6"><a href="#" data-role="button" data-icon="grid" data-iconpos="left" data-inline="true" onclick="level('xmax_ymin');">Move</a></div>
+					</div>
 				</div>
 			</div>
 			<div data-role="collapsible" data-collapsed="true" style="align: center;" id="temper_collaspible">
 				<h4>Temperature</h4>
-				<div class="ui-grid-a">
+				<div class="widget_monocolor" style="display: none;">
+					<label for="temper_mono">Mono</label>
+					<div style="width:40px;float:left;margin-right:10px;">
+						<input type="text" data-clear-btn="false" name="temper_mono_current" id="temper_mono_current" value="0" disabled>
+					</div>
+					<div style="width:60px;float:left;margin-right:10px;">
+						<input type="number" style="text-align:right;" data-clear-btn="false" name="temper_mono" id="temper_mono" value="200">
+					</div>
+					<a href="#" data-role="button" data-icon="check" data-iconpos="left" data-inline="true" onclick="heat('r');">Set</a>
+					<a href="#" data-role="button" data-icon="delete" data-iconpos="left" data-inline="true" onclick="heat('r', 0);">Stop</a>
+					<a href="#" data-role="button" data-icon="refresh" data-iconpos="left" data-inline="true" onclick="refreshCheckTemper();">Refresh</a>
+				</div>
+				<div class="ui-grid-a widget_bicolor" style="display: none;">
 					<div class="ui-block-a">
 						<div class="ui-bar ui-bar-f">
 							<label for="temper_l">Left</label>
@@ -121,10 +205,26 @@
 			</div>
 			<div data-role="collapsible" data-collapsed="true" style="align: center;">
 				<h4>Filament</h4>
-				<div class="ui-grid-a">
+				<div class="widget_monocolor" style="display:none;height:170px;">
+					<label for="extrude_mono">Mono</label>
+					<div style="width:350px;float:left;margin-right:10px;">
+						<input type="text" data-clear-btn="false" name="rfid_mono_current" id="rfid_mono_current" value="NEED REFRESH" disabled>
+					</div>
+					<a href="#" data-role="button" data-icon="refresh" data-iconpos="left" data-inline="true" onclick="refreshRfid();">Refresh</a>
+					<br style="clear:left;" />
+					<div style="width:60px;float:left;margin-right:10px;">
+						<input type="number" style="text-align:right;" data-clear-btn="false" name="extrude_mono" id="extrude_mono" value="20"> mm
+					</div>
+					<div style="width:60px;float:left;margin-right:10px;">
+						<input type="number" style="text-align:right;" data-clear-btn="false" name="speed_mono" id="speed_mono" value="100"> mm/min
+					</div>
+					<a href="#" data-role="button" data-icon="arrow-u" data-iconpos="left" data-inline="true" onclick="extrude('r', '-');">Reverse</a>
+					<a href="#" data-role="button" data-icon="arrow-d" data-iconpos="left" data-inline="true" onclick="extrude('r', '+');">Extrude</a>
+				</div>
+				<div class="ui-grid-a widget_bicolor" style="display: none;">
 					<div class="ui-block-a">
 						<div class="ui-bar ui-bar-f">
-							<label for="temper_l">Left</label>
+							<label for="extrude_l">Left</label>
 							<div style="width:350px;float:left;margin-right:10px;">
 								<input type="text" data-clear-btn="false" name="rfid_l_current" id="rfid_l_current" value="NEED REFRESH" disabled>
 							</div>
@@ -142,7 +242,7 @@
 					</div>
 					<div class="ui-block-b">
 						<div class="ui-bar ui-bar-f">
-							<label for="temper_r">Right</label>
+							<label for="extrude_r">Right</label>
 							<div style="width:350px;float:left;margin-right:10px;">
 								<input type="text" data-clear-btn="false" name="rfid_r_current" id="rfid_r_current" value="NEED REFRESH" disabled>
 							</div>
@@ -203,6 +303,30 @@ var var_refreshCheckTemper = 0;
 var var_ajax_lock = false;
 var var_checked_rfid = false;
 var var_verifyRFIDInterval = 0;
+var var_bicolor = {bicolor};
+
+if (var_bicolor == true) {
+	$("div.widget_bicolor").show();
+}
+else {
+	$("div.widget_monocolor").show();
+	$("input#temper_mono").change(function() {
+		$("input#temper_r").val($("input#temper_mono").val());
+	});
+	$("input#extrude_mono").change(function() {
+		$("input#extrude_r").val($("input#extrude_mono").val());
+	});
+	$("input#temper_mono").change(function() {
+		$("input#speed_r").val($("input#speed_mono").val());
+	});
+}
+
+if ($(document).width() < 960) {
+	$(".mobile_widget").show();
+}
+else {
+	$(".desktop_widget").show();
+}
 
 $(document).ready(checkTemper());
 
@@ -266,6 +390,7 @@ function refreshCheckTemper() {
 		var response = JSON.parse(html);
 		$("#temper_l_current").val(response.left);
 		$("#temper_r_current").val(response.right);
+		$("#temper_mono_current").val(response.right);
 	})
 	.fail(function() {
 		$("#gcode_detail_info").html('ERROR');
@@ -556,6 +681,7 @@ function refreshRfid() {
 		var response = JSON.parse(html);
 		$("#rfid_l_current").val(response.left);
 		$("#rfid_r_current").val(response.right);
+		$("#rfid_mono_current").val(response.right);
 		var_checked_rfid = true;
 	})
 	.fail(function() {
@@ -595,9 +721,8 @@ function runGcodeGet() {
 	}
 
 	if (var_gcode.indexOf('M109') != -1
-			|| var_gcode.indexOf('M1606') != -1
-			|| var_gcode.indexOf('M1607') != -1) {
-		alert("M109 / M1606 / M1607 include!");
+			|| var_gcode.indexOf('M190') != -1) {
+		alert("M109 / M190 include!");
 		return false;
 	}
 	var_ajax = $.ajax({
