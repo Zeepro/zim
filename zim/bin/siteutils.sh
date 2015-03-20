@@ -179,6 +179,14 @@ case "$1" in
 		/sbin/reboot -i
 		;;
 		
+	upgrade_url)
+		/bin/mount /fab -o remount,rw,noatime
+		echo "$2" > /fab/profile.txt
+		rc_url=$?
+		/bin/mount /fab -o remount,ro,noatime
+		exit $rc_url
+		;;
+		
 	*)
 		echo "Usage: $0 {force_reco|start_tomboning|stop_romboning|status_tomboning|restart_arcontrol|start_slic3r|unload|unload_pva|stats|remote_slice|remote_slice_stop|*}"
 		exit 1

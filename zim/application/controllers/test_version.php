@@ -12,6 +12,45 @@ class Test_version extends CI_Controller {
 		) );
 	}
 	
+	private function _bindUpgradeURL($profile_link) {
+		$profile_name = NULL;
+		
+		$profile_link = trim($profile_link);
+		switch ($profile_link) {
+			case 'http://repo.zeepro.com/upgrade/prod-b.profile':
+			case 'http://repo.zeepro.com/upgrade/profile/prod-b.profile':
+				$profile_name = 'prod-b';
+				break;
+				
+			case 'http://repo.zeepro.com/upgrade/prod-a.profile':
+			case 'http://repo.zeepro.com/upgrade/profile/prod-a.profile':
+				$profile_name = 'prod-a';
+				break;
+				
+			case 'http://repo.zeepro.com/upgrade/preprod.profile':
+			case 'http://repo.zeepro.com/upgrade/profile/preprod.profile':
+				$profile_name = 'preprod';
+				break;
+				
+			case 'http://repo.zeepro.com/upgrade/profile/beta.profile':
+			case 'http://repo.zeepro.com/upgrade/profile/preprod_test.profile':
+				$profile_name = 'beta';
+				break;
+				
+			case 'http://repo.zeepro.com/upgrade/profile/dev.profile':
+			case 'http://repo.zeepro.com/upgrade/profile/preprod_dev.profile':
+			case 'http://repo.zeepro.com/upgrade/profile/preprod_test_dev.profile':
+				$profile_name = 'dev';
+				break;
+				
+			default:
+				return 'unknown: ' . $profile_link;
+				break;
+		}
+		
+		return $profile_name;
+	}
+	
 	public function ssh() {
 		$output = array();
 		$ret_val = 0;
@@ -24,6 +63,43 @@ class Test_version extends CI_Controller {
 				'ret_code'	=> $ret_val,
 				'output'	=> $output,
 		));
+		
+		return;
+	}
+	
+	public function branch() {
+		$url = $this->input->post('url');
+		if ($url) {
+			if (FALSE !== @file_get_contents($url) || $this->input->post('force')) {
+				$cr = 0;
+				
+				$this->load->helper('errorcode');
+				if ($this->input->post('permanent')) {
+					$ret_val = 0;
+					$output = array();
+					
+					exec('sudo ' . $this->config->item('siteutil') . ' upgrade_url "' . $url . '"', $output, $ret_val);
+					if ($ret_val != ERROR_NORMAL_RC_OK) {
+						$cr = ERROR_WRONG_PRM;
+					}
+					else {
+						$cr = ERROR_OK;
+					}
+				}
+				else {
+					$this->load->helper('zimapi');
+					$cr = ZimAPI_setUpgradeMode('change', $url);
+				}
+				
+				$this->load->library('parser');
+				$this->output->set_status_header($cr, MyERRMSG($cr));
+				$this->parser->parse('plaintxt', array('display' => MyERRMSG($cr)));
+			}
+		}
+		else {
+			$this->load->helper('form');
+			$this->load->view('template/branch_switch');
+		}
 		
 		return;
 	}
@@ -64,6 +140,7 @@ class Test_version extends CI_Controller {
 		$this->lang->load('test_version', $this->config->item('language'));
 		ZimAPI_getPrinterSSOName($sso_name);
 		ZimAPI_getUpgradeMode($upgrade_mode, $profile_link);
+		$profile_link = $this->_bindUpgradeURL($profile_link);
 		
 		$temp_info = PrinterState_getInfoAsArray();
 		// config variable is set in MY_controller, so we need to correct number of extruder by ourselves

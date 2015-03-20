@@ -784,6 +784,9 @@ class Rest extends MY_Controller {
 					else {
 						$cr = ERROR_INTERNAL;
 					}
+					if ($display != 'off') {
+						$display = 'on';
+					}
 					break;
 					
 				case ZIMAPI_PRM_PROXY:
