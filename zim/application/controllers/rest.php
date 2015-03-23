@@ -141,6 +141,22 @@ class Rest extends MY_Controller {
 		return;
 	}
 	
+	public function cleantimelapse() {
+		$cr = ERROR_OK;
+		
+		$this->load->helper('zimapi');
+		if (!CoreStatus_checkInPrinted()) {
+			$cr = 403;
+		}
+		else if (!ZimAPI_removeTimelapse()) {
+			$cr = ERROR_INTERNAL;
+		}
+		
+		$this->_return_cr($cr);
+		
+		return;
+	}
+	
 	
 	//==========================================================
 	//network web service
@@ -1421,6 +1437,10 @@ class Rest extends MY_Controller {
 		$cr = ERROR_OK;
 		$model = NULL;
 		
+		// cleanup old upload temporary files
+		$this->load->helper('slicer');
+		Slicer_cleanUploadFolder($this->config->item('temp'));
+		
 		if (FALSE !== $this->input->get('noresize')) {
 			$resize = 'noresize';
 		}
@@ -1466,7 +1486,6 @@ class Rest extends MY_Controller {
 			}
 			
 			if ($cr == ERROR_OK) {
-				$this->load->helper('slicer');
 				if ($resize != 'noresize') {
 					$cr = Slicer_addModel($array_model);
 				}
@@ -1632,49 +1651,93 @@ class Rest extends MY_Controller {
 	//==========================================================
 	//client side rendering web service
 	//==========================================================
-	public function getamfv1() {
+	public function getrenderv1() {
 		$cr = 0;
-		$path_amf = NULL;
+		$path_model = NULL;
 		$status_array = array();
 		$color_array = array('r' => NULL, 'l' => NULL);
 		
 		$this->load->helper(array('printerstate', 'slicer'));
 		
-		$status_array = PrinterState_checkStatusAsArray();
+// 		$status_array = PrinterState_checkStatusAsArray();
 		
-		// check if we are in sliced status, assign colors if so
-		if ($status_array[PRINTERSTATE_TITLE_STATUS] == CORESTATUS_VALUE_SLICED
-				&& array_key_exists(PRINTERSTATE_TITLE_EXTEND_PRM, $status_array)) {
-			// check all extruders
-			foreach (array('r' => PRINTERSTATE_TITLE_EXT_LENG_R, 'l' => PRINTERSTATE_TITLE_EXT_LENG_L)
-					as $abb_cartridge => $status_length) {
-				// check if we use selected extruder
-				if (array_key_exists($status_length, $status_array[PRINTERSTATE_TITLE_EXTEND_PRM])) {
-					$json_cartridge = array();
-					$ret_val = PrinterState_getCartridgeAsArray($json_cartridge, $abb_cartridge);
+// 		// check if we are in sliced status, assign colors if so
+// 		if ($status_array[PRINTERSTATE_TITLE_STATUS] == CORESTATUS_VALUE_SLICED
+// 				&& array_key_exists(PRINTERSTATE_TITLE_EXTEND_PRM, $status_array)) {
+// 			// check all extruders
+// 			foreach (array('r' => PRINTERSTATE_TITLE_EXT_LENG_R, 'l' => PRINTERSTATE_TITLE_EXT_LENG_L)
+// 					as $abb_cartridge => $status_length) {
+// 				// check if we use selected extruder
+// 				if (array_key_exists($status_length, $status_array[PRINTERSTATE_TITLE_EXTEND_PRM])) {
+// 					$json_cartridge = array();
+// 					$ret_val = PrinterState_getCartridgeAsArray($json_cartridge, $abb_cartridge);
 					
-					// check if cartridge info is all right
-					if (in_array($ret_val, array(
-							ERROR_OK, ERROR_MISS_LEFT_FILA, ERROR_MISS_RIGT_FILA,
-							ERROR_LOW_LEFT_FILA, ERROR_LOW_RIGT_FILA,
-					))) {
-						$color_array[$abb_cartridge] = $json_cartridge[PRINTERSTATE_TITLE_COLOR];
-					}
-				}
+// 					// check if cartridge info is all right
+// 					if (in_array($ret_val, array(
+// 							ERROR_OK, ERROR_MISS_LEFT_FILA, ERROR_MISS_RIGT_FILA,
+// 							ERROR_LOW_LEFT_FILA, ERROR_LOW_RIGT_FILA,
+// 					))) {
+// 						$color_array[$abb_cartridge] = $json_cartridge[PRINTERSTATE_TITLE_COLOR];
+// 					}
+// 				}
+// 			}
+// 		}
+		
+		// check existed file for time-saving
+		foreach (array(SLICER_FILE_PREVIEW_M, SLICER_FILE_PREVIEW_S) as $filename) {
+			$path_model = $this->config->item('temp') . $filename;
+			if (file_exists($path_model)) {
+				$cr = ERROR_OK;
+				break;
 			}
-			
+		}
+		if ($cr != ERROR_OK) {
+			$cr = Slicer_exportRenderModel($path_model, $color_array['r'], $color_array['l']);
 		}
 		
-		$cr = Slicer_exportAMF($path_amf, $color_array['r'], $color_array['l']);
 		if ($cr == ERROR_OK) {
-			if (file_exists($path_amf)) {
-// 				$this->load->helper('file');
-// 				$this->output->set_content_type(get_mime_by_extension($path_amf))->set_output(@file_get_contents($path_amf));
-				$this->_sendFileContent($path_amf, 'rendering.amf');
+			if (file_exists($path_model)) {
+				// check mobile device and assign max filesize limit
+				@include_once BASEPATH . '/../assets/mobile_detect.php';
 				
-				return;
+				// check system only if class is well loaded, ignore limit if loading error
+				if (class_exists('Mobile_Detect')) {
+					$detect_os = new Mobile_Detect;
+					$size_limit = NULL;
+					
+					if ($detect_os->isiOS()) {
+						$size_limit = 9437184; // 9M
+					}
+					else if ($detect_os->isAndroidOS()) {
+						$size_limit = 83886080; // 80M
+					}
+					
+					if ($size_limit && $size_limit < filesize($path_model)) {
+						$cr = ERROR_WRONG_PRM;
+					}
+				}
+				
+				if ($cr == ERROR_OK) {
+					$fileinfo = pathinfo($path_model);
+					$fileext = NULL;
+					
+					if (is_array($fileinfo) && isset($fileinfo['extension'])
+							&& in_array(strtolower($fileinfo['extension']), array('stl', 'amf'))) {
+						$fileext = strtolower($fileinfo['extension']);
+					}
+					else {
+						$fileext = 'bin';
+					}
+					
+					$this->_sendFileContent($path_model, 'rendering.' . $fileext);
+					
+					return;
+				}
 			}
 			else {
+				$this->load->helper('printerlog');
+				PrinterLog_logError('export render model function returns ok, but file not found', __FILE__, __LINE__);
+				
 				$cr = ERROR_INTERNAL;
 			}
 		}

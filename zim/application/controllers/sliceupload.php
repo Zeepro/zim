@@ -11,33 +11,6 @@ class Sliceupload extends MY_Controller {
 		) );
 	}
 	
-	private function _clean_upload_folder() {
-		$upload_dir = array();
-		$current_time = time();
-		$upload_path = $this->config->item('temp');
-		
-		$this->load->helper('file');
-		
-		$upload_dir = @get_dir_file_info($upload_path);
-		
-		foreach($upload_dir as $file) {
-			$fileinfo = pathinfo($file['server_path']);
-			if (is_array($fileinfo) && array_key_exists('extension', $fileinfo)
-					&& in_array(strtolower($fileinfo['extension']), array('stl', 'amf', 'obj'))) {
-				$alive_time = $file['date'] + 172800; // 48 hours alive duration (3600*48)
-				
-				if ($alive_time <= $current_time) {
-					@unlink($file['server_path']);
-					
-					$this->load->helper('printerlog');
-					PrinterLog_logDebug('deleted old model file: ' . $file['server_path']);
-				}
-			}
-		}
-		
-		return;
-	}
-	
 	public function index() {
 		$this->output->set_header('Location: /sliceupload/upload');
 		return;
@@ -148,7 +121,7 @@ class Sliceupload extends MY_Controller {
 		}
 		
 		// cleanup old upload temporary files
-		$this->_clean_upload_folder();
+		Slicer_cleanUploadFolder($this->config->item('temp'));
 		
 		if (ERROR_OK == Slicer_listModel($response) && $response != "[]"
 				&& ERROR_OK == Slicer_checkPlatformModel()) {
@@ -202,6 +175,7 @@ class Sliceupload extends MY_Controller {
 		$current_xsize = 0;
 		$current_ysize = 0;
 		$current_zsize = 0;
+		$multi_part = FALSE;
 		
 		// redirect the client when in slicing
 		$this->load->helper('corestatus');
@@ -252,7 +226,12 @@ class Sliceupload extends MY_Controller {
 				$current_ysize = number_format($tmp_array[0][SLICER_TITLE_YSIZE], 1);
 				$current_zsize = number_format($tmp_array[0][SLICER_TITLE_ZSIZE], 1);
 				$current_scale_max = floor($tmp_array[0][SLICER_TITLE_MAXSCALE]);
+				
+				if (count($tmp_array[0][SLICER_TITLE_COLOR]) > 1) {
+					$multi_part = TRUE;
+				}
 			}
+			
 		} catch (Exeception $e) {
 			$this->load->helper('printerlog');
 			PrinterLog_logError('synchronize slicer model info error', __FILE__, __LINE__);
@@ -291,6 +270,7 @@ class Sliceupload extends MY_Controller {
 				'set_model_button'		=> t('set_model_button'),
 				'reset_model_button'	=> t('reset_model_button'),
 				'preset_title'			=> t('preset_title'),
+				'slice_risk_confirm'	=> t('slice_risk_confirm'),
 				'model_key_smax'		=> SLICER_TITLE_MAXSCALE,
 				'model_key_xsize'		=> SLICER_TITLE_XSIZE,
 				'model_key_ysize'		=> SLICER_TITLE_YSIZE,
@@ -303,6 +283,7 @@ class Sliceupload extends MY_Controller {
 				'model_ysize'			=> $current_ysize,
 				'model_zsize'			=> $current_zsize,
 				'model_smax'			=> $current_scale_max,
+				'multi_part'			=> $multi_part ? 'true' : 'false',
 		);
 		
 		$this->_parseBaseTemplate(t('sliceupload_slice_pagetitle'),
@@ -315,6 +296,7 @@ class Sliceupload extends MY_Controller {
 				<script type="text/javascript" src="/assets/rendering/ivmesh3d.js"></script>
 				<script type="text/javascript" src="/assets/rendering/ivnode3d.js"></script>
 				<script type="text/javascript" src="/assets/rendering/ivextra.js"></script>
+				<script type="text/javascript" src="/assets/rendering/stl.js"></script>
 				<script type="text/javascript" src="/assets/rendering/zpviewer.js"></script>');
 		
 		return;

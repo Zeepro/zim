@@ -31,10 +31,10 @@
 						<div id="control_modify_mini_group" style="display: none;">
 							<div data-role="navbar" style="margin-bottom: 1em;">
 								<ul>
-									<li><a id="slicer_mini_size" href="#" onclick="javascript: onMiniSliderSwitched('s');" class="ui-btn-active">{scale_title}</a></li>
-									<li><a id="slicer_mini_rotate_x" href="#" onclick="javascript: onMiniSliderSwitched('x');">{rotate_x_title}</a></li>
-									<li><a id="slicer_mini_rotate_y" href="#" onclick="javascript: onMiniSliderSwitched('y');">{rotate_y_title}</a></li>
-									<li><a id="slicer_mini_rotate_z" href="#" onclick="javascript: onMiniSliderSwitched('z');">{rotate_z_title}</a></li>
+									<li><a id="slicer_mini_size" href="#" onclick="javascript: onMiniSliderSwitched('s');" class="ui-btn-active">%</a></li>
+									<li><a id="slicer_mini_rotate_x" href="#" onclick="javascript: onMiniSliderSwitched('x');">X</a></li>
+									<li><a id="slicer_mini_rotate_y" href="#" onclick="javascript: onMiniSliderSwitched('y');">Y</a></li>
+									<li><a id="slicer_mini_rotate_z" href="#" onclick="javascript: onMiniSliderSwitched('z');">Z</a></li>
 								</ul>
 								<input type="range" name="slicer_mini_control" id="slicer_mini_control" value="{model_scale}" min="1" max="{model_smax}" oninput="onMiniSliderChanged(this.value);" onchange="onMiniSliderChanged(this.value);" />
 							</div>
@@ -87,9 +87,9 @@ var var_current_rho = {value_rho};
 var var_current_delta = {value_delta};
 var var_current_theta = {value_theta};
 var var_interval_rho = 100;
-// var var_color_inverse = 0;
 var var_color_right = '{color_default}';
 var var_color_left = '{color_default}';
+var var_printer_preview_failed = false;
 
 var var_model_scale = {model_scale};
 var var_model_zrot = {model_zrot};
@@ -100,6 +100,7 @@ var var_wait_preview = false;
 var var_webgl_support = true;
 var var_webgl_initialized = false;
 var var_mini_control_slider_type = 's'; // scale as default
+var var_multi_part = {multi_part};
 
 
 $(document).ready(prepareDisplay());
@@ -127,7 +128,7 @@ function prepareDisplay() {
 				changeModel('rotate');
 			});
 		}
-		else if (document.body.clientHeight < 750) {
+		else { // if (document.body.clientHeight < 750)
 			$("ul#control_modify_sliders").hide();
 			$("div#control_modify_mini_group").show();
 		}
@@ -147,6 +148,9 @@ function prepareDisplay() {
 }
 
 function onWebGL_finalized() {
+	$("div#detail_zone").show();
+	$("a#slice_button").removeClass("ui-disabled");
+	
 	// change model by current coordinates after loading model
 	onSliderChanged('s', var_model_scale);
 	onSliderChanged('x', var_model_xrot);
@@ -157,6 +161,19 @@ function onWebGL_finalized() {
 		$("input#slicer_mini_control").attr("max", $("input#slicer_size").attr("max"));
 		$("input#slicer_mini_control").slider("refresh");
 	}
+	
+	return;
+}
+
+function onWebGLRequest_rollback() {
+	var_printer_preview_failed = true;
+	var_webgl_initialized = true;
+	var_webgl_support = false;
+	$("div.slicer_printer_rendering").show();
+	$("ul#control_modify_sliders").show();
+	$("div#control_modify_mini_group").hide();
+	
+	getPreview();
 	
 	return;
 }
@@ -231,16 +248,24 @@ function onMiniSliderChanged(value) {
 	return;
 }
 
+function onPrinterPreviewMinorError_rollback() {
+//	alert("{preview_fail}");
+	$("#preview_zone").html("{preview_fail}");
+	$("div#detail_zone").show();
+	$("div#control_modify_group").hide();
+	$("a#slice_button").removeClass("ui-disabled");
+	
+	return;
+}
+
 function getPreview(exchange) {
 	// try client rendering firstly
 	if (var_webgl_initialized == false) {
-		zpInit3d(document.getElementById('ivwindow3d'), '/rest/getamfv1', var_color_right, var_color_left);
+		zpInit3d(document.getElementById('ivwindow3d'), '/rest/getrenderv1', var_color_right, var_color_left);
 		var_webgl_initialized = true;
 	}
 	if (var_webgl_support == true) {
 		$("div.slicer_printer_rendering").hide();
-		$("div#detail_zone").show();
-		$("a#slice_button").removeClass("ui-disabled");
 		
 		// change color possiblity
 		if (typeof(exchange) != 'undefined' && exchange == true) {
@@ -269,7 +294,6 @@ function getPreview(exchange) {
 			rho: var_current_rho,
 			delta: var_current_delta,
 			theta: var_current_theta,
-// 			inverse: var_color_inverse,
 			color_right: var_color_right,
 			color_left: var_color_left,
 		},
@@ -287,9 +311,7 @@ function getPreview(exchange) {
 	})
 	.done(function(html) {
 		if (var_preview.status == 202) {
-// 			alert("{preview_fail}");
-			$("#preview_zone").html("{preview_fail}");
-			$("a#slice_button").removeClass("ui-disabled");
+			onPrinterPreviewMinorError_rollback();
 			
 			return;
 		}
@@ -299,9 +321,14 @@ function getPreview(exchange) {
 		$("div#detail_zone").show();
 		$("a#slice_button").removeClass("ui-disabled");
 	})
-	.fail(function() { // not allowed
-		alert("failed preview");
-		$("#preview_zone").html("failed");
+	.fail(function() {
+		if (var_preview.status == 433) { // allow to slice only in managed rendering fail case
+			onPrinterPreviewMinorError_rollback();
+		}
+		else {
+			alert("failed preview");
+			$("#preview_zone").html("fatal failed");
+		}
 	})
 	.always(function() {
 		var_slice_status_lock = false;
@@ -588,6 +615,14 @@ function startSlice(var_restart) {
 		});
 		
 		if (var_slice_status_lock == false) {
+			return;
+		}
+	}
+	else if (var_printer_preview_failed == true) {
+		var slicer_risk_confirm = confirm("{slice_risk_confirm}");
+		if (slicer_risk_confirm == false) {
+			var_slice_status_lock = false;
+			
 			return;
 		}
 	}

@@ -1661,7 +1661,11 @@ function ZimAPI_getUpgradeNote(&$note_html = '') {
 	$article_children = NULL;
 	
 	try {
-		include_once BASEPATH . '/../assets/simple_html_dom.php'; // use include instead of required to avoid fatal error
+		@include_once BASEPATH . '/../assets/simple_html_dom.php'; // use include instead of required to avoid fatal error
+		
+		if (!function_exists('file_get_html')) {
+			throw new Exception('include html parser failed');
+		}
 		
 		$note_html = ''; // initialization of text
 		$html = file_get_html(ZIMAPI_VALUE_RELEASENOTE_URL);
@@ -2206,9 +2210,9 @@ function ZimAPI_checkPresetSetting(&$array_setting, &$errors = array(), $input =
 				'bridge_flow_ratio',
 				'resolution',
 		);
-		foreach ($array_check as $value) {
-			if (!array_key_exists($value, $array_setting)) {
-				$errors['input'] = $value;
+		foreach ($array_setting as $key => $value) {
+			if (!in_array($key, $array_check)) {
+				$errors['input'] = $key;
 				return FALSE;
 				break; // never reach here
 			}

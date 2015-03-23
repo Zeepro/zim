@@ -97,6 +97,7 @@ class Test_version extends CI_Controller {
 			}
 		}
 		else {
+			//TODO change load view into parser?
 			$this->load->helper('form');
 			$this->load->view('template/branch_switch');
 		}

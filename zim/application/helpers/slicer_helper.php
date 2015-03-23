@@ -20,7 +20,7 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 	define('SLICER_URL_ADD_STATUS',		'addstatus');
 	define('SLICER_URL_SETPARAMETER',	'setparameter?');
 	define('SLICER_URL_CHECKSIZES',		'checksizes');
-	define('SLICER_URL_EXPORT_AMF',		'exportamf');
+	define('SLICER_URL_EXPORT_RENDER',	'export2render');
 	define('SLICER_URL_RESET_MODEL',	'resetmodel?id=');
 	define('SLICER_URL_EXPORT_ALL',		'export2slice');
 	
@@ -54,6 +54,8 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 // 	define('SLICER_FILE_RENDERING',	'preview.png');
 	define('SLICER_FILE_TEMP_DATA',	'_sliced_info.json');
 	define('SLICER_FILE_HTTP_PORT',	'Slic3rPort.txt');
+	define('SLICER_FILE_PREVIEW_M',	'_slicer_preview.amf');
+	define('SLICER_FILE_PREVIEW_S',	'_slicer_preview.stl');
 	
 	define('SLICER_FILE_SLICELOG',	'/var/log/slic3r');
 	if (DectectOS_checkWindows()) {
@@ -99,11 +101,78 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 	define('SLICER_CMD_PRM_PREVIEW_FILE',	'preview.png');
 	define('SLICER_CMD_PRM_REMOTE_LAUNCH',	' remote_slice ');
 	define('SLICER_CMD_PRM_REMOTE_STOP',	' remote_slice_stop');
+	define('SLICER_CMD_PRM_CLEAN_SLICED',	' clean_sliced');
+	define('SLICER_CMD_PRM_CLEAN_SLICER',	' clean_slicerfiles');
 	
 	define('SLICER_MSG_EXPORTING_MODEL',	'Exporting G-code');
 	define('SLICER_MSG_REMOTE_INITIAL',		'Loading');
 	
 // 	define('SLICER_FILENAME_ZIPMODEL',	'_model_slicer.zip');
+}
+
+function Slicer_cleanUploadFolder($upload_path) {
+	$upload_dir = array();
+	$current_time = time();
+	$CI = &get_instance();
+	
+	$CI->load->helper(array('file', 'printerlog'));
+	
+	$upload_dir = @get_dir_file_info($upload_path);
+	
+	foreach($upload_dir as $file) {
+		$fileinfo = pathinfo($file['server_path']);
+		if (is_array($fileinfo) && isset($fileinfo['extension'])
+				&& in_array(strtolower($fileinfo['extension']), array('stl', 'amf', 'obj'))) {
+			$alive_time = $file['date'] + 172800; // 48 hours alive duration (3600*48)
+			
+			// check file name to leave system file pass
+			if (in_array($file['name'], array(SLICER_FILE_PREVIEW_M, SLICER_FILE_PREVIEW_S))) {
+				continue;
+			}
+			
+			// check alive time
+			if ($alive_time <= $current_time) {
+				@unlink($file['server_path']);
+				
+				PrinterLog_logDebug('deleted old model file: ' . $file['server_path']);
+			}
+		}
+	}
+	
+	return;
+}
+
+function Slicer_cleanSlicerFiles($include_preview = FALSE) {
+	global $CFG;
+	$command = $CFG->config['siteutil'];
+	
+	if ($include_preview == TRUE) {
+		$command .= SLICER_CMD_PRM_CLEAN_SLICER;
+	}
+	else {
+		$command .= SLICER_CMD_PRM_CLEAN_SLICED;
+	}
+	if (!DectectOS_checkWindows()) {
+		$command = 'sudo ' . $command;
+	}
+	exec($command);
+	
+	return;
+}
+
+function Slicer_checkSlicedModel() {
+	global $CFG;
+	
+	foreach (array(
+					$CFG->config['temp'] . SLICER_FILE_TEMP_DATA,
+					$CFG->config['temp'] . SLICER_FILE_MODEL,
+			) as $filename) {
+		if (!file_exists($filename)) {
+			return FALSE;
+		}
+	}
+	
+	return TRUE;
 }
 
 function Slicer_addModel($models_path, $auto_resize = TRUE, &$array_return = array()) {
@@ -180,17 +249,14 @@ function Slicer_addModel($models_path, $auto_resize = TRUE, &$array_return = arr
 			$cr = ERROR_INTERNAL;
 			break;
 	}
-// 	var_dump($http_response_header);
-// 	var_dump($response);
-	@unlink($CI->config->item('temp') . SLICER_FILE_MODEL);
-	@unlink($CI->config->item('temp') . SLICER_FILE_TEMP_DATA);
+	
+	Slicer_cleanSlicerFiles(TRUE);
 	
 	return $cr;
 }
 
 function Slicer_removeModel($model_id) {
 	$cr = 0;
-	$CI = &get_instance();
 	$ret_val = Slicer__requestSlicer(SLICER_URL_REMOVE_MODEL . $model_id);
 	
 	switch ($ret_val) {
@@ -215,8 +281,7 @@ function Slicer_removeModel($model_id) {
 			break;
 	}
 	
-	@unlink($CI->config->item('temp') . SLICER_FILE_MODEL);
-	@unlink($CI->config->item('temp') . SLICER_FILE_TEMP_DATA);
+	Slicer_cleanSlicerFiles(TRUE);
 	
 	return $cr;
 }
@@ -824,8 +889,7 @@ function Slicer_setModel($array_data, &$response = NULL) {
 		$response = NULL;
 	}
 	
-	@unlink($CI->config->item('temp') . SLICER_FILE_MODEL);
-	@unlink($CI->config->item('temp') . SLICER_FILE_TEMP_DATA);
+	Slicer_cleanSlicerFiles();
 	
 	return $cr;
 }
@@ -868,7 +932,6 @@ function Slicer_resetModel($id, &$response) {
 }
 
 function Slicer_rendering($rho, $theta, $delta, &$path_image, $color1 = NULL, $color2 = NULL) {
-// 	global $CFG;
 	$cr = 0;
 	$ret_val = 0;
 	$response = NULL;
@@ -938,8 +1001,6 @@ function Slicer_rendering($rho, $theta, $delta, &$path_image, $color1 = NULL, $c
 		else {
 			$cr = ERROR_INTERNAL;
 		}
-// 		$path_image = $CFG->config['temp'] . SLICER_FILE_RENDERING;
-// 		$path_image = $response;
 	}
 	
 	return $cr;
@@ -948,7 +1009,6 @@ function Slicer_rendering($rho, $theta, $delta, &$path_image, $color1 = NULL, $c
 function Slicer_changeParameter($array_setting) {
 	$cr = 0;
 	$ret_val = 0;
-	$CI = &get_instance();
 	$url_request = SLICER_URL_SETPARAMETER;
 	
 	if (!is_array($array_setting)) {
@@ -986,8 +1046,7 @@ function Slicer_changeParameter($array_setting) {
 		}
 	}
 	
-	@unlink($CI->config->item('temp') . SLICER_FILE_MODEL);
-	@unlink($CI->config->item('temp') . SLICER_FILE_TEMP_DATA);
+	Slicer_cleanSlicerFiles();
 	
 	return $cr;
 }
@@ -1065,11 +1124,12 @@ function Slicer_reset() {
 }
 
 function Slicer_reloadPreset() {
+	global $CFG;
 	$cr = 0;
 	$CI = &get_instance();
 	$url = SLICER_URL_RELOAD_PRESET;
 	
-	if ($CI->config->item('use_sdcard')) {
+	if ($CFG->config['use_sdcard']) {
 		$url .= '?' . SLICER_PRM_SDCARD . '=1';
 	}
 	$ret_val = Slicer__requestSlicer($url);
@@ -1081,8 +1141,7 @@ function Slicer_reloadPreset() {
 		$cr = ERROR_INTERNAL;
 	}
 	
-	@unlink($CI->config->item('temp') . SLICER_FILE_MODEL);
-	@unlink($CI->config->item('temp') . SLICER_FILE_TEMP_DATA);
+	Slicer_cleanSlicerFiles();
 	
 	return $cr;
 }
@@ -1128,13 +1187,13 @@ function Slicer_checkOnline($restart = TRUE) {
 	return FALSE;
 }
 
-function Slicer_exportAMF(&$path_amf, $color1 = NULL, $color2 = NULL) {
+function Slicer_exportRenderModel(&$path_model, $color1 = NULL, $color2 = NULL) {
 	$cr = 0;
 	$ret_val = 0;
 	$joint_char = '?';
 	$response = NULL;
-	$path_amf = NULL;
-	$url_request = SLICER_URL_EXPORT_AMF;
+	$path_model = NULL;
+	$url_request = SLICER_URL_EXPORT_RENDER;
 	
 	foreach (array(
 			SLICER_PRM_COLOR1	=> $color1,
@@ -1168,12 +1227,12 @@ function Slicer_exportAMF(&$path_amf, $color1 = NULL, $color2 = NULL) {
 	if ($cr == ERROR_OK) {
 		$explode_array = explode("\n", $response);
 		if (isset($explode_array[1])) {
-			$path_amf = $explode_array[1];
+			$path_model = $explode_array[1];
 			
-			if (!file_exists($path_amf)) {
+			if (!file_exists($path_model)) {
 				$CI = &get_instance();
 				$CI->load->helper('printerlog');
-				PrinterLog_logDebug('export amf not found: ' . $path_amf, __FILE__, __LINE__);
+				PrinterLog_logDebug('export model not found: ' . $path_model, __FILE__, __LINE__);
 				
 				$cr = ERROR_INTERNAL;
 			}
@@ -1232,21 +1291,6 @@ function Slicer_exportAll(&$path_model, &$path_config) {
 	}
 	
 	return $cr;
-}
-
-function Slicer_checkSlicedModel() {
-	global $CFG;
-	
-	foreach (array(
-					$CFG->config['temp'] . SLICER_FILE_TEMP_DATA,
-					$CFG->config['temp'] . SLICER_FILE_MODEL,
-			) as $filename) {
-		if (!file_exists($filename)) {
-			return FALSE;
-		}
-	}
-	
-	return TRUE;
 }
 
 //internal function

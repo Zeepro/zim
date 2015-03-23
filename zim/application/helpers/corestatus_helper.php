@@ -685,8 +685,7 @@ function CoreStatus_cleanSliced() {
 	$CI = &get_instance();
 	$CI->load->helper('slicer');
 	
-	@unlink($CI->config->item('temp') . SLICER_FILE_MODEL);
-	@unlink($CI->config->item('temp') . SLICER_FILE_TEMP_DATA);
+	Slicer_cleanSlicerFiles();
 	
 	return TRUE;
 }

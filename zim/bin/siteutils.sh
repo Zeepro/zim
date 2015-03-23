@@ -6,6 +6,8 @@ UNLOAD_SPEED_DEFAULT=150
 UNLOAD_SPEED_PVA=50
 STATUS_FILE_UNLOAD_HEAT=/tmp/printer_unload_heat
 
+PATH=$PATH:/bin
+
 force_reco() {
 	zfw_setenv force_reco 1
 	
@@ -127,6 +129,10 @@ unload_filament() {
 	arcontrol_cli "M104 S0 $gcode_extruder";
 }
 
+clean_sliced() {
+	rm -f /tmp/_sliced_info.json /tmp/_sliced_model.gcode*
+}
+
 
 # main program
 
@@ -180,11 +186,20 @@ case "$1" in
 		;;
 		
 	upgrade_url)
-		/bin/mount /fab -o remount,rw,noatime
+		mount /fab -o remount,rw,noatime
 		echo "$2" > /fab/profile.txt
 		rc_url=$?
-		/bin/mount /fab -o remount,ro,noatime
+		mount /fab -o remount,ro,noatime
 		exit $rc_url
+		;;
+		
+	clean_slicerfiles)
+		rm -f /tmp/_slicer_preview.amf /tmp/_slicer_preview.stl
+		clean_sliced
+		;;
+		
+	clean_sliced)
+		clean_sliced
 		;;
 		
 	*)

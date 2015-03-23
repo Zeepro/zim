@@ -493,6 +493,14 @@ fileAMF.prototype.makeScene=function(view)
 		}
 	}
 	//view.amfScaleBase=this.scale;
+	postCreateObject(view);
+}
+
+
+function postCreateObject(view)
+{
+	var scene=view.space;
+	var root=view.amfObject;
 	view.amfBBox=root.getBoundingBox(null,null);
 	this.setInitialScale(view);
 	var node=scene.root.getNodeById("wait");
@@ -501,7 +509,7 @@ fileAMF.prototype.makeScene=function(view)
 	onPosChanged();
 }
 
-fileAMF.prototype.setInitialScale=function(view)
+function setInitialScale(view)
 {
 	// default scale
 	var sx=view.amfBBox[3]-view.amfBBox[0];
@@ -565,26 +573,51 @@ function ParseAMF(xml)
 	}
 }
 
-function zpLoadAMF(view,file)
+function zpLoadModel(view,file)
 {
 	var path;
 	var request = CreateRequest(file,path);
+	
 	//DIY timeout
 	request.timeout = 120000;
 	request.ontimeout = function() {alert("timeout");}
 	//DIY end - PNI
 	request.ivwnd=view;
+	//DIY make difference between STL and AMF by JS variable (AMF as default)
+	request.isAMF = (typeof(var_multi_part) == 'undefined' || var_multi_part == true) ? true : false;
+	//DIY end - PNI
 	request.onreadystatechange = function () {
-		if (this.readyState == 4 && this.status==200) {
-			ParseAMF(this.responseXML);
-			//DIY trigger a coordinates' setting event
-			if (typeof(onWebGL_finalized) == 'function') {
-				onWebGL_finalized();
+		//DIY trigger file size or internal error rollback
+		if (this.readyState == 4) {
+			if (this.status==200) {
+				if (this.isAMF == true) {
+					ParseAMF(this.responseXML);
+				}
+				else {
+					var arrayBuffer = this.response;
+					STLParse(this.ivwnd,this.response);
+				}
+				
+				if (typeof(onWebGL_finalized) == 'function') {
+					//add to trigger a coordinates' setting event
+					onWebGL_finalized();
+				}
 			}
-			//DIY end - PNI
+			else {
+				// alert("trigger rollback");
+				if (typeof(onWebGLRequest_rollback) == 'function') {
+					onWebGLRequest_rollback();
+				}
+			}
 		}
+		//DIY end - PNI
 	}
-	request.overrideMimeType("text/xml");
+	if (request.isAMF == true) {
+		request.overrideMimeType("text/xml");
+	}
+	else {
+		request.responseType = "arraybuffer"; //binary
+	}
 	request.send();
 }
 
@@ -764,9 +797,9 @@ function onResize3D()
 	var h=cnv.height;
 	var w=p.clientWidth;
 	//DIY add a border to improve mobile pageup/pagedown usage
-	if (document.body.clientHeight < 550) { // leave a bar of (550 - 505)px to operate
+	// if (document.body.clientHeight < 550) { // leave a bar of (550 - 505)px to operate
 		w = w * 0.9;
-	}
+	// }
 	//DIY end - PNI
 	if(w){
 	cnv.width = w;
@@ -792,7 +825,11 @@ function zponDataReady(space)
 	v.org=w.viewFrom.slice();
 	v.target=w.viewTo.slice();
 	v.up=w.viewUp.slice();
-	zpLoadAMF(w,w.fileToLoad);
+	
+	//DIY change function name to support STL and AMF
+	// zpLoadAMF(w,w.fileToLoad);
+	zpLoadModel(w, w.fileToLoad);
+	//DIY end - PNI
 }
 
 // IOS antialiasing

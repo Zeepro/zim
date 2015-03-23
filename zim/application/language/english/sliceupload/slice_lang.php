@@ -58,3 +58,5 @@ $lang['preview_fail']
 	= 'Image unavailable';
 $lang['setmodel_fail']
 	= 'Oops! The item exceeds the available printing surface.';
+$lang['slice_risk_confirm']
+	= 'Slicing may be failed, do you confirm to continue?';
