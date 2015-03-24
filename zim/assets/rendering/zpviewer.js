@@ -502,11 +502,13 @@ function postCreateObject(view)
 	var scene=view.space;
 	var root=view.amfObject;
 	view.amfBBox=root.getBoundingBox(null,null);
+	
 	this.setInitialScale(view);
 	var node=scene.root.getNodeById("wait");
 	if(node)node.state&=~3;// hide wait cursor
 
 	onPosChanged();
+	updateDimensions(view.amfBBox,view.transform_C.scale);
 }
 
 function setInitialScale(view)
@@ -682,9 +684,28 @@ ivwindow3d.prototype.calcObjTM=function(d,tm)
 	var sx=b[3]-b[0];
 	var sy=b[4]-b[1];
 	var sz=b[5]-b[2];
-	return (this.paneX>=sx)&&(this.paneY>=sy)&&(this.paneZ>=sz);
-
+	
+	if((this.paneX>=sx)&&(this.paneY>=sy)&&(this.paneZ>=sz))
+	{
+		updateDimensions(b,100);
+		return true;
+	};
+	return false;
 }
+
+function updateDimensions(box,scale)
+{
+	scale/=100;
+	var x=(box[3]-box[0])*scale;
+	var y=(box[4]-box[1])*scale;
+	var z=(box[5]-box[2])*scale;
+	x=Math.round(x*100)/10;
+	y=Math.round(y*100)/10;
+	z=Math.round(z*100)/10;
+	$("span#model_xsize_info").html(x);
+	$("span#model_ysize_info").html(y);
+	$("span#model_zsize_info").html(z);
+};
 
 ivwindow3d.prototype.cm_reset=function()
 {

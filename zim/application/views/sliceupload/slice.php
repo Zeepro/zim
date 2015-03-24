@@ -20,26 +20,27 @@
 				
 			</div>
 			<div id="detail_zone" style="clear: both; text-align: center; display: none;">
-				<div id="model_coordinate_info" style="font-size: small;" class="slicer_printer_rendering">
+				<div id="model_coordinate_info" style="font-size: small;">
 					X = <span id="model_xsize_info">{model_xsize}</span>mm x 
 					Y = <span id="model_ysize_info">{model_ysize}</span>mm x 
 					Z = <span id="model_zsize_info">{model_zsize}</span>mm
 				</div>
 				<div id="control_modify_group">
-					<div data-role="collapsible" data-collapsed="true">
-						<h4>{scale_rotate_title}</h4>
-						<div id="control_modify_mini_group" style="display: none;">
-							<div data-role="navbar" style="margin-bottom: 1em;">
-								<ul>
-									<li><a id="slicer_mini_size" href="#" onclick="javascript: onMiniSliderSwitched('s');" class="ui-btn-active">%</a></li>
-									<li><a id="slicer_mini_rotate_x" href="#" onclick="javascript: onMiniSliderSwitched('x');">X</a></li>
-									<li><a id="slicer_mini_rotate_y" href="#" onclick="javascript: onMiniSliderSwitched('y');">Y</a></li>
-									<li><a id="slicer_mini_rotate_z" href="#" onclick="javascript: onMiniSliderSwitched('z');">Z</a></li>
-								</ul>
-								<input type="range" name="slicer_mini_control" id="slicer_mini_control" value="{model_scale}" min="1" max="{model_smax}" oninput="onMiniSliderChanged(this.value);" onchange="onMiniSliderChanged(this.value);" />
-							</div>
+					<div id="control_modify_mini_group" style="display: none;">
+						<div data-role="navbar" style="margin-bottom: 1em;">
+							<ul>
+								<li><a id="slicer_mini_size" href="#" onclick="javascript: onMiniSliderSwitched('s');" class="ui-btn-active">%</a></li>
+								<li><a id="slicer_mini_rotate_x" href="#" onclick="javascript: onMiniSliderSwitched('x');">X</a></li>
+								<li><a id="slicer_mini_rotate_y" href="#" onclick="javascript: onMiniSliderSwitched('y');">Y</a></li>
+								<li><a id="slicer_mini_rotate_z" href="#" onclick="javascript: onMiniSliderSwitched('z');">Z</a></li>
+							</ul>
+							<input type="range" name="slicer_mini_control" id="slicer_mini_control" value="{model_scale}" min="1" max="{model_smax}" oninput="onMiniSliderChanged(this.value);" onchange="onMiniSliderChanged(this.value);" />
+							<input type="button" class="slicer_reset_model_button" value="{reset_model_button}">
 						</div>
-						<ul data-role="listview" data-inset="true" id="control_modify_sliders">
+					</div>
+					<div data-role="collapsible" data-collapsed="true" id="control_modify_sliders">
+						<h4>{scale_rotate_title}</h4>
+						<ul data-role="listview" data-inset="true">
 							<li data-role="list-divider">{scale_title}</li> <!-- <label for="slicer_size"></label> -->
 							<li>
 								<input type="range" name="slicer_size" id="slicer_size" value="{model_scale}" min="1" max="{model_smax}" oninput="onSliderChanged('s', this.value);" onchange="onSliderChanged('s', this.value);" />
@@ -56,7 +57,7 @@
 								<div class="slicer_printer_rendering"><input type="button" id="slicer_set_model_rotate_button" value="{set_model_button}"></div>
 							</li>
 						</ul>
-						<input type="button" id="slicer_reset_model_button" value="{reset_model_button}">
+						<input type="button" class="slicer_reset_model_button" value="{reset_model_button}">
 					</div>
 				</div>
 				<div data-role="collapsible" data-collapsed="false">
@@ -117,7 +118,7 @@ function prepareDisplay() {
 				}
 			}
 		});
-		$("input#slicer_reset_model_button").click(function() {
+		$("input.slicer_reset_model_button").click(function() {
 			resetModel();
 		});
 		if (var_webgl_support == false) {
@@ -129,7 +130,7 @@ function prepareDisplay() {
 			});
 		}
 		else { // if (document.body.clientHeight < 750)
-			$("ul#control_modify_sliders").hide();
+			$("div#control_modify_sliders").hide();
 			$("div#control_modify_mini_group").show();
 		}
 	}
@@ -170,7 +171,7 @@ function onWebGLRequest_rollback() {
 	var_webgl_initialized = true;
 	var_webgl_support = false;
 	$("div.slicer_printer_rendering").show();
-	$("ul#control_modify_sliders").show();
+	$("div#control_modify_sliders").show();
 	$("div#control_modify_mini_group").hide();
 	
 	getPreview();
@@ -412,7 +413,7 @@ function changeModel(changeType) {
 			$("#overlay").addClass("gray-overlay");
 			$(".ui-loader").css("display", "block");
 		},
-		complete: function() {	
+		complete: function() {
 			if (var_wait_preview == false) {
 				$("#overlay").removeClass("gray-overlay");
 				$(".ui-loader").css("display", "none");
