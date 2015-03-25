@@ -59,4 +59,4 @@ $lang['preview_fail']
 $lang['setmodel_fail']
 	= "Oops ! Le modèle dépasse la limite du plateau d'impression.";
 $lang['slice_risk_confirm']
-	= 'Slicing sera probablement échoué, êtes-vous sûr de vouloir continuer ?';
+	= 'Le slicing risque d\'échouer, souhaitez-vous continuer ?';
