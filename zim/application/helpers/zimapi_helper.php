@@ -29,6 +29,8 @@ if (!defined('ZIMAPI_CMD_LIST_SSID')) {
 	define('ZIMAPI_CMD_SSH_OFF',		ZIMAPI_CMD_CONFIG_SSH . 'stop');
 	define('ZIMAPI_CMD_SSH_STATUS',		ZIMAPI_CMD_CONFIG_SSH . 'status');
 	
+	define('ZIMAPI_GLOBAL_KEY_SERIAL',	'serial');
+	
 	define('ZIMAPI_TITLE_TOPOLOGY',	'topology');
 	define('ZIMAPI_TITLE_MEDIUM',	'medium');
 	define('ZIMAPI_TITLE_SSID',		'ssid');
@@ -1424,7 +1426,15 @@ function ZimAPI_deletePreset($id_preset) {
 }
 
 function ZimAPI_getSerial() {
+	global $PRINTER;
 	$address_mac = NULL;
+	
+	if (!is_array($PRINTER)) {
+		$PRINTER = array();
+	}
+	elseif (isset($PRINTER[ZIMAPI_GLOBAL_KEY_SERIAL])) {
+		return $PRINTER[ZIMAPI_GLOBAL_KEY_SERIAL];
+	}
 	
 	$CI = &get_instance();
 	$CI->load->helper('detectos');
@@ -1440,6 +1450,7 @@ function ZimAPI_getSerial() {
 		}
 	}
 	$address_mac = strtoupper(str_replace(':', '', $address_mac));
+	$PRINTER[ZIMAPI_GLOBAL_KEY_SERIAL] = $address_mac;
 	
 	return $address_mac;
 }
