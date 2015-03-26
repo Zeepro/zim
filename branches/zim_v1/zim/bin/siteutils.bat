@@ -12,6 +12,7 @@ if "%1"=="remote_slice" goto :remoteSlice
 if "%1"=="remote_slice_stop" goto :remoteSliceStop
 if "%1"=="clean_sliced" goto :cleanSliced
 if "%1"=="clean_slicerfiles" goto :cleanSlicerFiles
+if "%1"=="stats" goto :cleanStats
 
 exit 0
 
@@ -19,6 +20,10 @@ exit 0
 @rem ping -n 11 127.0.0.1 > nul
 @rem echo {"state":"request"} > ./tmp/remote_slice.json
 @rem goto :EOF
+
+:cleanStats
+del %2
+goto :EOF
 
 :cleanSliced
 del .\tmp\_sliced_model.gcode*

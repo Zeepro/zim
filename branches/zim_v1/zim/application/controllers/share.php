@@ -421,16 +421,16 @@ class Share extends MY_Controller
 		$this->load->library('session');
 	
 		$client = new Google_Client();
-		$client->setApplicationName("Test youtube upload");
-		$client->setClientId("607574717756-dki0mh9seat7g8rsj34rtd79aeh47oo3.apps.googleusercontent.com");
-		$client->setClientSecret("yX_irSTlQVjGM5miuHlhaDHg");
+		$client->setApplicationName("Zeepro youtube upload");
+		$client->setClientId("652807238221-vrc4no9o0t9mdb48ltc69v215henenm4.apps.googleusercontent.com");
+		$client->setClientSecret("PPww8vp8cOVcqeHioL7HbCFx");
 		$client->setScopes('https://www.googleapis.com/auth/youtube');
 		$redirect = filter_var('https://sso.zeepro.com/redirect.ashx', FILTER_SANITIZE_URL);
 		$client->setRedirectUri($redirect);
 		$client->setAccessType('offline');
-	
+		
 		$youtube = new Google_Service_YouTube($client);
-	
+		
 		if (isset($_GET['code']))
 		{
 			if (strval($this->session->userdata('state')) !== strval($_GET['state']))
@@ -442,7 +442,7 @@ class Share extends MY_Controller
 			$this->session->set_userdata('token', $client->getAccessToken());
 			$this->session->set_userdata('code', $_GET['code']);
 		}
-	
+		
 		if ($this->session->userdata('token') !== FALSE)
 		{
 			$client->setAccessToken($this->session->userdata('token'));
@@ -461,7 +461,7 @@ class Share extends MY_Controller
 			try
 			{
 				$videoPath = ZIMAPI_FILEPATH_TIMELAPSE;
-	
+				
 				// Create a snippet with title, description, tags and category ID
 				// Create an asset resource and set its snippet metadata and type.
 				// This example sets the video's title, description, keyword tags, and
@@ -470,35 +470,35 @@ class Share extends MY_Controller
 				$snippet->setTitle($this->session->userdata('yt_title'));
 				$snippet->setDescription($this->session->userdata("yt_desc"));
 				$snippet->setTags($this->session->userdata("yt_tags"));
-					
+				
 				// Numeric video category. See https://developers.google.com/youtube/v3/docs/videoCategories/list
 				$snippet->setCategoryId("22");
-					
+				
 				// Set the video's status to "public". Valid statuses are "public", "private" and "unlisted".
 				$status = new Google_Service_YouTube_VideoStatus();
 				$status->privacyStatus = $this->session->userdata('yt_privacy');
-					
+				
 				// Associate the snippet and status objects with a new video resource.
 				$video = new Google_Service_YouTube_Video();
 				$video->setSnippet($snippet);
 				$video->setStatus($status);
-					
+				
 				// Specify the size of each chunk of data, in bytes. Set a higher value for
 				// reliable connection as fewer chunks lead to faster uploads. Set a lower
 				// value for better recovery on less reliable connections.
 				$chunkSizeBytes = 1 * 1024 * 1024;
-					
+				
 				// Setting the defer flag to true tells the client to return a request which can be called
 				// with ->execute(); instead of making the API call immediately.
 				$client->setDefer(true);
-					
+				
 				// Create a request for the API's videos.insert method to create and upload the video.
 				$insertRequest = $youtube->videos->insert("status,snippet", $video);
-					
+				
 				// Create a MediaFileUpload object for resumable uploads.
 				$media = new Google_Http_MediaFileUpload($client, $insertRequest, 'video/mp4', null, true, $chunkSizeBytes);
 				$media->setFileSize(filesize($videoPath));
-	
+				
 				// Read the media file and upload it chunk by chunk.
 				$status = false;
 				$handle = fopen($videoPath, "rb");
@@ -535,7 +535,7 @@ class Share extends MY_Controller
 			$this->load->helper(array('zimapi', 'corestatus'));
 			$prefix = CoreStatus_checkTromboning() ? 'https://' : 'http://';
 			$data = array('printersn' => ZimAPI_getSerial(), 'URL' => $prefix . $_SERVER['HTTP_HOST'] . '/share/video_upload');
-	
+			
 			$options = array('http' => array('header'  => "Content-type: application/x-www-form-urlencoded\r\n",
 					'method'  => 'POST',
 					'content' => http_build_query($data)));
