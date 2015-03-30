@@ -738,7 +738,7 @@ function onSliderChanged(t, v)
 		case "s":view3d.transform_E.scale=v;break;
 		case "x":view3d.transform_E.rx=v;break;
 		case "y":view3d.transform_E.ry=v;break;
-		case "z":view3d.transform_E.rz=v;break;
+		case "z":view3d.transform_E.rz=v-180;break;
 		default:return;
 	}
 	onEditChanged()
