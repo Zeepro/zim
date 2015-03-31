@@ -128,7 +128,7 @@ class Account extends MY_Controller
 		$error = "";
 		$this->load->library('parser');
 		$this->load->helper('url');
-		$this->lang->load('signup_confirmation', $this->config->item('language'));
+		$this->lang->load('activation/signup_confirmation', $this->config->item('language'));
 		$this->lang->load('activation/activation_form', $this->config->item('language'));
 		
 		// try to keep flashdata, but it seems not working
@@ -219,7 +219,7 @@ class Account extends MY_Controller
 		$data['error'] = "";
 
 		$this->load->library('parser');
-		$this->lang->load('signup', $this->config->item('language'));
+		$this->lang->load('activation/signup', $this->config->item('language'));
 		$this->load->helper(array('url','corestatus'));
 		
 		// check network
