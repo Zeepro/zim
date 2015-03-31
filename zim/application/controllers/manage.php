@@ -16,7 +16,7 @@ class Manage extends MY_Controller {
 		$ret_val = 0;
 		
 		$this->load->library('parser');
-		$this->lang->load('manage', $this->config->item('language'));
+		$this->lang->load('manage/index', $this->config->item('language'));
 		$this->lang->load('printerstate/index', $this->config->item('language'));
 		
 		$this->load->helper(array('zimapi', 'printerstate'));
