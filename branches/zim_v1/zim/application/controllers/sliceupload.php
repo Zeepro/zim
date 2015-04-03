@@ -467,7 +467,7 @@ class Sliceupload extends MY_Controller {
 						
 						$this->load->helper('slicer');
 // 						$cr = Slicer_addModel($array_model);
-						$cr = Slicer_addModel($array_model, FALSE, $array_return);
+						$cr = Slicer_addModel($array_model, TRUE, FALSE, $array_return);
 						if ($cr == ERROR_OK) {
 							try {
 								if ($array_return[SLICER_TITLE_MAXSCALE] < 100) {
