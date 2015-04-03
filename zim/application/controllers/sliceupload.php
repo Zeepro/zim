@@ -907,6 +907,13 @@ class Sliceupload extends MY_Controller {
 				'enable_reslice'	=> $error ? 'true' : 'false',
 				'bicolor_printer'	=> $bicolor_printer ? 'true' : 'false',
 				'bicolor_model'		=> $bicolor_model ? 'true' : 'false',
+				'extrud_multiply'	=> t('extrud_multiply'),
+				'left_extrud_mult'	=> t('left_extrud_mult'),
+				'right_extrud_mult'	=> t('right_extrud_mult'),
+				'extrud_r'			=> PRINTERSTATE_EXT_MULTIPLY_DEFAULT,
+				'extrud_l'			=> PRINTERSTATE_EXT_MULTIPLY_DEFAULT,
+				'extrud_min'		=> PRINTERSTATE_EXT_MULTIPLY_MIN,
+				'extrud_max'		=> PRINTERSTATE_EXT_MULTIPLY_MAX,
 		);
 		$this->parser->parse('sliceupload/slice_result_ajax', $template_data);
 		

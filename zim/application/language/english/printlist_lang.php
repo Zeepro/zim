@@ -58,3 +58,11 @@ $lang['exchange_left']
 	= 'Left cartridge';
 $lang['filament_not_enough_for_switch']
 	= 'not enough for inversing cartridge';
+$lang['advanced']
+	= 'Advanced';
+$lang['extrud_multiply']
+	= 'Extrusion multiplier (%%)';
+$lang['left_extrud_mult']
+	= 'Left';
+$lang['right_extrud_mult']
+	= 'Right';
