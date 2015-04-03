@@ -175,7 +175,7 @@ function Slicer_checkSlicedModel() {
 	return TRUE;
 }
 
-function Slicer_addModel($models_path, $auto_resize = TRUE, &$array_return = array()) {
+function Slicer_addModel($models_path, $auto_resize = TRUE, &$array_return = array(), $source = NULL) {
 	$cr = 0;
 	$CI = &get_instance();
 	$ret_val = 0;
@@ -201,7 +201,7 @@ function Slicer_addModel($models_path, $auto_resize = TRUE, &$array_return = arr
 		$file_info = get_file_info(realpath($model_path), array('size'));
 		$total_size += $file_info['size'];
 	}
-	PrinterLog_statsUpload($total_size);
+	PrinterLog_statsUpload($total_size, $source);
 	
 	if ($auto_resize == TRUE) {
 		$ret_val = Slicer__requestSlicer(SLICER_URL_ADD_MODEL . json_encode($models_path), FALSE);

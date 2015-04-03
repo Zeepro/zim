@@ -48,7 +48,7 @@
 					<p id="state_mono">{state_f_r}</p>
 					<a href="#" data-role="button" data-ajax="false" data-iconpos="none" class="ui-shadow ui-corner-all" onclick="javascript: changecartridge('r');">{change_filament_r}</a>
 					{chg_temperature}
-					<input type="range" id="slider-mono" value="{temper_filament_r}" min="160" max="260" data-show-value="true">
+					<input type="range" id="slider-mono" value="{temper_filament_r}" min="{temper_min}" max="{temper_max}" data-show-value="true">
 				</div>
 				<div class="widget_bicolor" style="display: none;">
 					<div class="widget_monomodel switch-larger" style="display: none;">
@@ -94,10 +94,31 @@
 							{temp_adjustments_r}
 						</div>
 						<div class="ui-block-a" id="div-slider1">
-							<input type="range" name="l" id="slider-l" value="{temper_filament_l}" min="160" max="260" data-show-value="true">
+							<input type="range" name="l" id="slider-l" value="{temper_filament_l}" min="{temper_min}" max="{temper_max}" data-show-value="true">
 						</div>
 						<div class="ui-block-b" id="div-slider2">
-							<input type="range" name="r" id="slider-r" value="{temper_filament_r}" min="160" max="260" data-show-value="true">
+							<input type="range" name="r" id="slider-r" value="{temper_filament_r}" min="{temper_min}" max="{temper_max}" data-show-value="true">
+						</div>
+					</div>
+				</div>
+			</div>
+			<div data-role="collapsible" style="text-align: center;">
+				<h4>{advanced}</h4>
+				<p style="font-weight: bold;">{extrud_multiply}</p>
+				<div class="widget_monocolor" style="display: none;">
+					<input type="range" id="slider_mono_em" value="{extrud_r}" min="{extrud_min}" max="{extrud_max}" data-show-value="true" />
+				</div>
+				<div class="widget_bicolor ui-grid-a" style="display: none;">
+					<div class="ui-block-a">
+						<label>{left_extrud_mult}</label>
+						<div id="extrud_l">
+							<input type="range" id="slider_left_em" name="e_l" value="{extrud_l}" min="{extrud_min}" max="{extrud_max}" data-show-value="true" />
+						</div>
+					</div>
+					<div class="ui-block-b">
+						<label>{right_extrud_mult}</label>
+						<div id="extrud_r">
+							<input type="range" id="slider_right_em" name="e_r" value="{extrud_r}" min="{extrud_min}" max="{extrud_max}" data-show-value="true" />
 						</div>
 					</div>
 				</div>
@@ -173,6 +194,9 @@ $("#{random_prefix}printModel_detailPage").on("pagecreate",function() {
 		
 		$(slider_r).change(function() {
 			$("input#slider-r").val($(slider_r).val());
+		});
+		$("input#slider_mono_em").change(function() {
+			$("input#slider_right_em").val($("input#slider_mono_em").val());
 		});
 	}
 	

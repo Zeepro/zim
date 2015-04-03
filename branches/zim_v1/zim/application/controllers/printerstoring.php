@@ -519,6 +519,13 @@ class Printerstoring extends MY_Controller {
 				'temper_min'			=> PRINTERSTATE_TEMPER_CHANGE_MIN,
 				'temper_delta'			=> PRINTERSTATE_TEMPER_CHANGE_VAL,
 				'bicolor'				=> $bicolor ? 'true' : 'false',
+				'extrud_multiply'		=> t('extrud_multiply'),
+				'left_extrud_mult'		=> t('left_extrud_mult'),
+				'right_extrud_mult'		=> t('right_extrud_mult'),
+				'extrud_r'				=> PRINTERSTATE_EXT_MULTIPLY_DEFAULT,
+				'extrud_l'				=> PRINTERSTATE_EXT_MULTIPLY_DEFAULT,
+				'extrud_min'			=> PRINTERSTATE_EXT_MULTIPLY_MIN,
+				'extrud_max'			=> PRINTERSTATE_EXT_MULTIPLY_MAX,
 		);
 		
 		// parse all page

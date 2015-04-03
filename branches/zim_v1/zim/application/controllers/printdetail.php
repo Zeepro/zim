@@ -68,6 +68,24 @@ class Printdetail extends MY_Controller {
 		$temperature_l = 0;
 		
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+			// set extrusion multiply (reset to default if not exist)
+			$extrude_multiply = array();
+			
+			$this->load->helper('printerstate');
+			foreach (array(
+					'r'	=> 'e_r',
+					'l'	=> 'e_l',
+			) as $arraykey => $postkey) {
+				if (FALSE !== $this->input->post($postkey)) {
+					$extrude_multiply[$arraykey] = (int) $this->input->post($postkey);
+				}
+				else {
+					$extrude_multiply[$arraykey] = PRINTERSTATE_EXT_MULTIPLY_DEFAULT;
+				}
+			}
+			PrinterState_setExtrusionMultiply($extrude_multiply); // ignore error case, just send command
+			
+			// get temperature set from interface
 			$temperature_r = (int) $this->input->post('r');
 			$temperature_l = (int) $this->input->post('l');
 			$exchange_extruder = (int) $this->input->post('exchange');

@@ -270,6 +270,14 @@ class Printmodel extends MY_Controller {
 				'enable_print'			=> $enable_print,
 				'bicolor_model'			=> $mono_model ? 'false' : 'true',
 				'bicolor_printer'		=> $bicolor ? 'true' : 'false',
+				'advanced'				=> t('advanced'),
+				'extrud_multiply'		=> t('extrud_multiply'),
+				'left_extrud_mult'		=> t('left_extrud_mult'),
+				'right_extrud_mult'		=> t('right_extrud_mult'),
+				'extrud_r'				=> PRINTERSTATE_EXT_MULTIPLY_DEFAULT,
+				'extrud_l'				=> PRINTERSTATE_EXT_MULTIPLY_DEFAULT,
+				'extrud_min'			=> PRINTERSTATE_EXT_MULTIPLY_MIN,
+				'extrud_max'			=> PRINTERSTATE_EXT_MULTIPLY_MAX,
 		);
 		$this->_parseBaseTemplate(t('ZeePro Personal Printer 21 - Printing details'),
 				$this->parser->parse('printlist/detail', $template_data, TRUE));

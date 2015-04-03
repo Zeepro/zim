@@ -22,9 +22,9 @@
 								</div>
 								<p id="state_f_mono">{state_f_r}</p>
 							</div>
-							<div class="slicer_temperature_adjustment_container">
+							<div class="slicer_slider_adjustment_container">
 								<label>{chg_temperature}</label>
-								<input type="range" id="slider_mono" value="{temper_r}" min="160" max="260" data-show-value="true" />
+								<input type="range" id="slider_mono" value="{temper_r}" min="{temper_min}" max="{temper_max}" data-show-value="true" />
 							</div>
 						</div>
 						<div class="ui-grid-a widget_bicolor" style="display: none;">
@@ -42,19 +42,19 @@
 							</div></div>
 						</div>
 						<p style="text-align: left;">{error_msg}</p>
-						<div class="ui-grid-a slicer_temperature_adjustment_container widget_bicolor" style="display: none;">
-							<div class="ui-block-a"><div id="left_cartridge_temper" class="ui-bar ui-bar-f">
+						<div class="ui-grid-a slicer_slider_adjustment_container widget_bicolor" style="display: none;">
+							<div class="ui-block-a">
 								<label>{left_temperature}</label>
 								<div id="temper_l">
-									<input type="range" id="slider_left" name="l" value="{temper_l}" min="160" max="260" data-show-value="true" />
+									<input type="range" id="slider_left" name="l" value="{temper_l}" min="{temper_min}" max="{temper_max}" data-show-value="true" />
 								</div>
-							</div></div>
-							<div class="ui-block-b"><div id="right_cartridge_temper" class="ui-bar ui-bar-f">
+							</div>
+							<div class="ui-block-b">
 								<label>{right_temperature}</label>
 								<div id="temper_r">
-									<input type="range" id="slider_right" name="r" value="{temper_r}" min="160" max="260" data-show-value="true" />
+									<input type="range" id="slider_right" name="r" value="{temper_r}" min="{temper_min}" max="{temper_max}" data-show-value="true" />
 								</div>
-							</div></div>
+							</div>
 						</div>
 					</div>
 					<input type="hidden" name="exchange" id="exchange_extruder_hidden" value="0">
@@ -66,6 +66,24 @@
 							</div>
 							<div class="ui-block-b">
 								<a data-role="button" onclick='javascript: window.location.href="/gcode/slice/render"'>{2drender_link}</a>
+							</div>
+						</div>
+						<p style="font-weight: bold;">{extrud_multiply}</p>
+						<div class="widget_monocolor slicer_slider_adjustment_container" style="display: none;">
+							<input type="range" id="slider_mono_em" value="{extrud_r}" min="{extrud_min}" max="{extrud_max}" data-show-value="true" />
+						</div>
+						<div class="widget_bicolor ui-grid-a slicer_slider_adjustment_container" style="display: none;">
+							<div class="ui-block-a">
+								<label>{left_extrud_mult}</label>
+								<div id="extrud_l">
+									<input type="range" id="slider_left_em" name="e_l" value="{extrud_l}" min="{extrud_min}" max="{extrud_max}" data-show-value="true" />
+								</div>
+							</div>
+							<div class="ui-block-b">
+								<label>{right_extrud_mult}</label>
+								<div id="extrud_r">
+									<input type="range" id="slider_right_em" name="e_r" value="{extrud_r}" min="{extrud_min}" max="{extrud_max}" data-show-value="true" />
+								</div>
 							</div>
 						</div>
 					</div>
@@ -174,7 +192,7 @@ if (var_need_print_right == false) {
 if (var_need_print_left == false) {
 	$(slider_l).slider({disabled: true});
 }
-	
+
 if (var_enable_print == false) {
 	$("#print_slice").button("disable");
 }
@@ -187,6 +205,9 @@ if (var_reslice == true) {
 if (var_bicolor_printer != true) {
 	$(slider_r).change(function() { // must done after trigger of create
 		$("input#slider_right").val($(slider_r).val());
+	});
+	$("input#slider_mono_em").change(function() {
+		$("input#slider_right_em").val($("input#slider_mono_em").val());
 	});
 }
 

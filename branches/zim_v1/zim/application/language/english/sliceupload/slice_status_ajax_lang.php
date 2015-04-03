@@ -86,3 +86,9 @@ $lang['2drender_link']
 	= '2D Rendering';
 $lang['result_title']
 	= 'Filament';
+$lang['extrud_multiply']
+	= 'Extrusion multiplier (%%)';
+$lang['left_extrud_mult']
+	= 'Left';
+$lang['right_extrud_mult']
+	= 'Right';
