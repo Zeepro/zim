@@ -31,7 +31,7 @@ $lang['return_button']
 $lang['fail_message']
 	= 'Loading error, please check your model and try again.';
 $lang['fail_message_ext']
-	= 'Loading error, please check your file extension and try again.';
+	= 'Incorrect file format';
 $lang['fin_message']
 	= 'Succeeded adding model into slicer, you will be redirected after 3 seconds';
 
