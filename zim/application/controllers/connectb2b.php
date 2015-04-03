@@ -18,23 +18,23 @@ class Connectb2b extends MY_Controller {
 			$this->_exitWithError500('3dslash token format invalid');
 			return;
 		}
-			
+		
 		$this->load->helper(array('printerstoring', 'errorcode', 'slicer', 'printerlog'));
-			
+		
 		$url_3dslash .= hash('sha256', $token_model . '|' . $key_3dslash);
 		$save_path .= PrinterStoring__generateFilename($name_model) . '.stl';
-			
+		
 		// verify slicer online
 		$slicer_ok = Slicer_checkOnline(TRUE);
-			
-		// 			copy($url_3dslash, $save_path);
+		
+// 		copy($url_3dslash, $save_path);
 		$fp = fopen($url_3dslash, 'r');
 		if (!$fp) {
 			$this->_exitWithError500('3dslash remote file initialize failed');
 		}
 		file_put_contents($save_path, $fp);
 		fclose($fp);
-			
+		
 		if ($slicer_ok == FALSE) {
 			// wait slicer to get online if in restarting (only 10s)
 			for ($i=0; $i < 10; ++$i) {
@@ -46,21 +46,21 @@ class Connectb2b extends MY_Controller {
 				}
 			}
 		}
-			
-			
-		$ret_val = Slicer_addModel(array($save_path), TRUE, $slicer_return, PRINTERLOG_STATS_LABEL_3DSLASH);
+		
+		$ret_val = Slicer_addModel(array($save_path), PRINTERLOG_STATS_LABEL_3DSLASH, TRUE, $slicer_return);
 		if ($ret_val != ERROR_OK) {
 			$this->_exitWithError500('3dslash model import failed');
 		}
 		else {
 			$this->output->set_header('Location: /sliceupload/slice');
 		}
+		
+		return;
 	}
 	
 	//TODO manage this function with all busy statuses
 	public function with3dslash() {
-		$name_get = $this->input->get('name');
-		$token_get = $this->input->get('token');
+		$redirect_cookie = $this->input->cookie('redirectData');
 		
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$name_post = $this->input->post('name');
@@ -68,8 +68,15 @@ class Connectb2b extends MY_Controller {
 			
 			$this->_treat3dslash($name_post, $token_post);
 		}
-		else if ($name_get !== FALSE && $token_get !== FALSE) {
-			$this->_treat3dslash($name_get, $token_get);
+		else if ($redirect_cookie !== FALSE) {
+			$array_cookie = json_decode($redirect_cookie, TRUE);
+			
+			if (is_array($array_cookie) && isset($array_cookie['name']) && isset($array_cookie['token'])) {
+				$this->_treat3dslash($array_cookie['name'], $array_cookie['token']);
+			}
+			else {
+				$this->_exitWithError500('3dslash remote redirection data invalid');
+			}
 		}
 		else {
 			$this->load->helper('form');

@@ -112,10 +112,10 @@ function PrinterStoring__generateRendering($f1, $f2) {
 	$CI->load->helper('slicer');
 
 	if ($f2 !== NULL) {
-		Slicer_addModel(array($f1['full_path'], $f2['full_path']));
+		Slicer_addModel(array($f1['full_path'], $f2['full_path']), FALSE);
 	}
 	else {
-		Slicer_addModel(array($f1['full_path']));	
+		Slicer_addModel(array($f1['full_path']), FALSE);
 	}
 
 	$path_image = NULL;
@@ -560,7 +560,7 @@ function PrinterStoring_printStl($id) {
 					//stats info
 					PrinterLog_statsLibrarySTL(PRINTERLOG_STATS_LABEL_PRINT, 2);
 					
-					return Slicer_addModel(array($file_path, $file2_path));
+					return Slicer_addModel(array($file_path, $file2_path), FALSE);
 				}
 				else {
 					$CI->load->helper('printerlog');
@@ -572,7 +572,7 @@ function PrinterStoring_printStl($id) {
 				//stats info
 				PrinterLog_statsLibrarySTL(PRINTERLOG_STATS_LABEL_PRINT, 1);
 				
-				return Slicer_addModel(array($file_path));
+				return Slicer_addModel(array($file_path), FALSE);
 			}
 		}
 		else {

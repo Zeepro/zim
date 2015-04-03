@@ -21,10 +21,20 @@ class Set_cookie extends CI_Controller {
 						&& isset($token_json['redirect']['url'])) {
 					$redirect_url = $token_json['redirect']['url'] . '?from=remote';
 					
+					// treat get parameter
 					if (isset($token_json['redirect']['prm']) && is_array($token_json['redirect']['prm'])) {
 						foreach ($token_json['redirect']['prm'] as $prm_key => $prm_val) {
 							$redirect_url .= '&' . $prm_key . '=' . $prm_val;
 						}
+					}
+					// treat cookie parameter
+					if (isset($token_json['redirect']['cookie']) && is_array($token_json['redirect']['cookie'])) {
+						$array_cookie = array();
+						
+						foreach ($token_json['redirect']['cookie'] as $cookie_key => $cookie_value) {
+							$array_cookie[$cookie_key] = $cookie_value;
+						}
+						$this->input->set_cookie('redirectData', json_encode($array_cookie), 60); // 1 min
 					}
 					
 					// filter outside redirection
