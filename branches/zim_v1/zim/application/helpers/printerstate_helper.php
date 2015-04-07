@@ -1629,13 +1629,11 @@ function PrinterState_checkStatusAsArray($extra_info = TRUE) {
 					= $status_json[CORESTATUS_TITLE_LASTERROR] . ' ' . $status_json[CORESTATUS_TITLE_MESSAGE];
 		}
 	}
-// 	else if ($ret_val == FALSE && $status_current != CORESTATUS_VALUE_PRINT) {
 	else if ($ret_val == FALSE) {
 		$temp_data = array();
 		$status_old = $status_current;
 		
 		PrinterState_checkBusyStatus($status_current, $temp_data);
-// 		if ($status_current == CORESTATUS_VALUE_SLICE) {
 		if (in_array($status_current, array(CORESTATUS_VALUE_SLICE, CORESTATUS_VALUE_PRINT))) {
 			$data_json[PRINTERSTATE_TITLE_PERCENT] = $temp_data[PRINTERSTATE_TITLE_PERCENT];
 		}
@@ -1651,6 +1649,7 @@ function PrinterState_checkStatusAsArray($extra_info = TRUE) {
 		}
 		else if ($status_current == CORESTATUS_VALUE_PRINT) {
 			$print_operation = PRINTERSTATE_VALUE_PRINT_OPERATION_PRINT;
+			$array_status = array();
 			
 			// add temperature
 			if ($extra_info == TRUE && $data_json[PRINTERSTATE_TITLE_PERCENT] != 100) {
@@ -1669,17 +1668,24 @@ function PrinterState_checkStatusAsArray($extra_info = TRUE) {
 			}
 			
 			// try to calculate time remained when percentage is passed offset
-			$ret_val = CoreStatus_getStartTime($time_start);
-			if ($ret_val == ERROR_NORMAL_RC_OK || $time_start) {
-				$time_pass = time() - $time_start;
+			$ret_val = CoreStatus_getStatusArray($array_status);
+			if ($ret_val == TRUE && isset($array_status[CORESTATUS_TITLE_STARTTIME]) && isset($array_status[CORESTATUS_TITLE_ESTIMATE_T])) {
+				$time_pass = time() - $array_status[CORESTATUS_TITLE_STARTTIME];
 				$data_json[PRINTERSTATE_TITLE_PASSTIME] = $time_pass;
 				
 				if (isset($data_json[PRINTERSTATE_TITLE_PERCENT]) &&
 						($time_pass >= PRINTERSTATE_VALUE_OFST_TO_CAL_TIME
 								|| $data_json[PRINTERSTATE_TITLE_PERCENT] >= PRINTERSTATE_VALUE_OFST_TO_CAL_PCT)) {
-					$percentage_finish = $data_json[PRINTERSTATE_TITLE_PERCENT];
+					// rest time = total time - passed time
+					// total time = estimate time (by filament) * (1 - percentage ^ 0.5) + estimate time (by time) * percentage ^ 0.5
+					// estimate time (by time) = passed time / percentage
+// 					$percentage_finish = $data_json[PRINTERSTATE_TITLE_PERCENT] / 100;
+					$calculate_factor = sqrt($data_json[PRINTERSTATE_TITLE_PERCENT] / 100);
+					$time_estimation = $array_status[CORESTATUS_TITLE_ESTIMATE_T];
 					
-					$data_json[PRINTERSTATE_TITLE_DURATION] = (int)($time_pass / $percentage_finish * (100 - $percentage_finish));
+					$data_json[PRINTERSTATE_TITLE_DURATION]
+// 							= (int)($time_estimation * (1 - $calculate_factor) + $time_pass * ($calculate_factor / $percenage_finish - 1));
+							= (int)($time_estimation * (1 - $calculate_factor) + $time_pass * (1 / $calculate_factor - 1));
 				}
 			}
 			

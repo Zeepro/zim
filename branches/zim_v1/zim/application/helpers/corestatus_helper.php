@@ -33,6 +33,8 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_TITLE_P_EXCH_BUS',	'PrintExchangeBus');
 	define('CORESTATUS_TITLE_FILA_MAT',		'FilamentMaterial');
 	define('CORESTATUS_TITLE_GUID',			'RandomGUID');
+	define('CORESTATUS_TITLE_ESTIMATE_T',	'EstimateTime');
+	//TODO use estimate time value to control loading, unloading and printing
 	
 	define('CORESTATUS_VALUE_IDLE',				'idle');
 	define('CORESTATUS_VALUE_PRINT',			'printing');
@@ -691,7 +693,7 @@ function CoreStatus_cleanSliced() {
 }
 
 // function CoreStatus_setInPrinting($model_id, $stop_printing = FALSE) {
-function CoreStatus_setInPrinting($model_id, $exchange_extruder = FALSE, $array_temper = array()) {
+function CoreStatus_setInPrinting($model_id, $time_estimation, $exchange_extruder = FALSE, $array_temper = array()) {
 	$CI = &get_instance();
 	$CI->load->helper('string');
 	
@@ -704,6 +706,7 @@ function CoreStatus_setInPrinting($model_id, $exchange_extruder = FALSE, $array_
 					CORESTATUS_TITLE_P_TEMPER_R		=> array_key_exists('r', $array_temper) ? $array_temper['r'] : NULL,
 					CORESTATUS_TITLE_P_EXCH_BUS		=> $exchange_extruder ? 1 : 0,
 					CORESTATUS_TITLE_GUID			=> random_string('numeric', CORESTATUS_VALUE_RAND_STRING_LENGTH),
+					CORESTATUS_TITLE_ESTIMATE_T		=> $time_estimation,
 			)
 	);
 }
