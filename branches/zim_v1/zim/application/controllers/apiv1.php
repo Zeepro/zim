@@ -19,7 +19,7 @@ class Apiv1 extends MY_Controller {
 		$this->load->helper(array('printerstoring', 'errorcode', 'slicer'));
 		
 		$model_url = filter_var($model_url, FILTER_SANITIZE_URL);
-		$save_path .= PrinterStoring__generateFilename($name_model) . '.stl';
+		$save_path .= PrinterStoring__generateFilename($model_name) . '.stl';
 		
 		// verify slicer online
 		$slicer_ok = Slicer_checkOnline(TRUE);
