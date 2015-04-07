@@ -32,6 +32,35 @@ if (!defined('PRINTER_FN_CHARGE')) {
 // 	define('PRINTER_VALUE_DEFAULT_TEMPER',	230);
 }
 
+function Printer__calculateEstimation($length_filament) {
+	$CI = &get_instance();
+	$CI->load->helper('zimapi');
+	
+	return ($length_filament / ZIMAPI_VALUE_DEFAULT_SPEED + ZIMAPI_VALUE_DEFAULT_TL_OFFSET);
+}
+
+function Printer__getEstimation($array_filament, &$time_estimation) {
+	$length_filament = 0;
+	
+	if (is_array($array_filament)) {
+		foreach($array_filament as $length_cartridge) {
+			$length_filament += $length_cartridge;
+		}
+	}
+	else {
+		$length_filament = $array_filament;
+	}
+	
+	if ($length_filament == 0) {
+		return FALSE;
+	}
+	else {
+		$time_estimation = Printer__calculateEstimation($length_filament);
+	}
+	
+	return TRUE;
+}
+
 function Printer_preparePrint($model_id, $need_prime = TRUE) {
 	$cr = 0;
 	$timelapse_length = 0;
@@ -94,7 +123,7 @@ function Printer_preparePrint($model_id, $need_prime = TRUE) {
 		// timelapse camera switch and prepare script, and write fps info into file
 		if (file_exists(ZIMAPI_FILEPATH_POSTHEAT)) {
 			$script_path = $CI->config->item('temp') . PRINTER_FN_POST_HEAT;
-			$fps = ZIMAPI_VALUE_DEFAULT_TL_LENGTH * 10 / ($timelapse_length / ZIMAPI_VALUE_DEFAULT_SPEED + ZIMAPI_VALUE_DEFAULT_TL_OFFSET);
+			$fps = ZIMAPI_VALUE_DEFAULT_TL_LENGTH * 10 / Printer__calculateEstimation($timelapse_length);
 			$parameter = str_replace('{fps}',
 					min(array(2.5, $fps * 2)), // take the limit value between 2 fps and 2 times of estimate fps
 					ZIMAPI_PRM_CAMERA_PRINTSTART_TIMELAPSE);
@@ -265,7 +294,8 @@ function Printer_printFromPrime($abb_extruder, $first_run = TRUE) {
 			return $ret_val;
 		}
 		
-		$ret_val = Printer_printFromFile($gcode_path, $model_id, FALSE, FALSE, $array_filament, $array_temper);
+		$ret_val = Printer_printFromFile($gcode_path, $model_id, $array[PRINTLIST_TITLE_TIME], FALSE, FALSE,
+				$array_filament, $array_temper);
 	}
 	
 	return $ret_val;
@@ -309,8 +339,8 @@ function Printer_printFromModel($id_model, $model_calibration, $exchange_extrude
 			return $ret_val;
 		}
 		
-		$ret_val = Printer_printFromFile($gcode_path, $id_model, TRUE, $exchange_extruder,
-				$array_filament, $array_temper);
+		$ret_val = Printer_printFromFile($gcode_path, $id_model, $array_info[PRINTLIST_TITLE_TIME], TRUE,
+				$exchange_extruder, $array_filament, $array_temper);
 	}
 	
 	return $ret_val;
@@ -353,7 +383,7 @@ function Printer_printFromSlice($exchange_extruder = FALSE, $array_temper = arra
 		return $ret_val;
 	}
 	
-	$ret_val = Printer_printFromFile($gcode_path, CORESTATUS_VALUE_MID_SLICE, TRUE, $exchange_extruder,
+	$ret_val = Printer_printFromFile($gcode_path, CORESTATUS_VALUE_MID_SLICE, 0, TRUE, $exchange_extruder,
 			$array_filament, $array_temper);
 	
 	return $ret_val;
@@ -385,8 +415,8 @@ function Printer_printFromLibrary($id_gcode, $exchange_extruder = FALSE, $array_
 		}
 		
 		$CI->load->helper('corestatus');
-		$ret_val = Printer_printFromFile($gcode_path, CORESTATUS_VALUE_MID_PREFIXGCODE . $id_gcode, TRUE,
-				$exchange_extruder, $array_filament, $array_temper);
+		$ret_val = Printer_printFromFile($gcode_path, CORESTATUS_VALUE_MID_PREFIXGCODE . $id_gcode, 0,
+				TRUE, $exchange_extruder, $array_filament, $array_temper);
 		
 		// stats info
 		$CI->load->helper('printerlog');
@@ -396,9 +426,8 @@ function Printer_printFromLibrary($id_gcode, $exchange_extruder = FALSE, $array_
 	return $ret_val;
 }
 
-// function Printer_printFromFile($gcode_path, $need_prime = TRUE, $stop_printing = FALSE) {
-function Printer_printFromFile($gcode_path, $model_id, $need_prime = TRUE, $exchange_extruder = FALSE,
-		$array_filament = array(), $array_temper = array()) {
+function Printer_printFromFile($gcode_path, $model_id, $time_estimation, $need_prime = TRUE,
+		$exchange_extruder = FALSE, $array_filament = array(), $array_temper = array()) {
 	global $CFG;
 	$command = '';
 	$output = array();
@@ -448,7 +477,15 @@ function Printer_printFromFile($gcode_path, $model_id, $need_prime = TRUE, $exch
 		return $ret_val;
 	}
 	
-	// prepare subprinting gcode files
+	if ($time_estimation == 0) {
+		$ret_val = Printer__getEstimation($array_filament, $time_estimation);
+		if ($ret_val != TRUE) {
+			PrinterLog_logError('system can not get estimation time');
+			return ERROR_INTERNAL;
+		}
+	}
+	
+	// prepare subprinting gcode files and scripts
 	$ret_val = Printer_preparePrint($model_id, $need_prime);
 	if ($ret_val != ERROR_OK) {
 		return $ret_val;
@@ -473,7 +510,7 @@ function Printer_printFromFile($gcode_path, $model_id, $need_prime = TRUE, $exch
 				$temper_json[$abb_filament] = $array_temper[$abb_filament];
 			}
 		}
-		$ret_val = CoreStatus_setInPrinting($model_id, $exchange_extruder, $temper_json);
+		$ret_val = CoreStatus_setInPrinting($model_id, $time_estimation, $exchange_extruder, $temper_json);
 // 	}
 // 	else {
 // 		$ret_val = CoreStatus_setInCanceling();

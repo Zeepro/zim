@@ -40,6 +40,10 @@
 			</div>
 			<div data-role="collapsible" data-collapsed="false" style="align: center;">
 				<h4>{print_detail}</h4>
+				<div class="ui-grid-a" style="text-align: justify;">
+					<div class="ui-block-a"><div class="ui-bar ui-bar-b">{model_name_title}</div></div>
+					<div class="ui-block-b"><div class="ui-bar ui-bar-b">{model_name_value}</div></div>
+				</div>
 				<div id="print_detail_info">
 					<p>{wait_info}</p>
 				</div>

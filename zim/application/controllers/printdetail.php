@@ -318,6 +318,8 @@ class Printdetail extends MY_Controller {
 		$id = $this->input->get('id');
 		$callback = $this->input->get('cb');
 		$abb_cartridge = $this->input->get('v');
+		$array_status = array();
+		$model_displayname = t('timelapse_info_modelname_unknown');
 		
 		// check if we are in printing or not to continue, do redirection if not
 		$data_status = PrinterState_checkStatusAsArray(FALSE);
@@ -351,6 +353,71 @@ class Printdetail extends MY_Controller {
 			$print_calibration = TRUE;
 		}
 		
+		// get model name
+		CoreStatus_getStatusArray($array_status);
+		if (strpos($array_status[CORESTATUS_TITLE_PRINTMODEL], CORESTATUS_VALUE_MID_PREFIXGCODE) === 0) {
+			// gcode library model
+			$gcode_info = array();
+			$gid = (int) substr($array_status[CORESTATUS_TITLE_PRINTMODEL], strlen(CORESTATUS_VALUE_MID_PREFIXGCODE));
+			
+			$this->load->helper('printerstoring');
+			
+			$gcode_info = PrinterStoring_getInfo("gcode", $gid);
+			if (!is_null($gcode_info) && array_key_exists("name", $gcode_info)) {
+				$model_displayname = $gcode_info["name"];
+			}
+		}
+		else {
+			$model_id = NULL;
+			
+			switch ($array_status[CORESTATUS_TITLE_PRINTMODEL]) {
+				case CORESTATUS_VALUE_MID_SLICE:
+					$preset_id = NULL;
+					$model_filename = array();
+					$preset_name = t('timelapse_info_presetname_unknown');
+					
+					$this->load->helper('slicer');
+					if (ERROR_OK == Slicer_getModelFile(0, $model_filename, TRUE)) {
+						foreach($model_filename as $model_basename) {
+							if (strlen($model_displayname)) {
+								$model_displayname .= ' + ' . $model_basename;
+							}
+							else {
+								$model_displayname = $model_basename;
+							}
+						}
+					}
+					else {
+						$model_displayname = t('timelapse_info_modelname_slice');
+					}
+					break;
+					
+				case CORESTATUS_VALUE_MID_PRIME_R:
+				case CORESTATUS_VALUE_MID_PRIME_L:
+					$model_displayname = t('timelapse_info_modelname_prime');
+					break;
+					
+				case CORESTATUS_VALUE_MID_CALIBRATION:
+					$this->load->helper('printlist');
+					$model_id = ModelList_codeModelHash(PRINTLIST_MODEL_CALIBRATION);
+					// treat as a normal pre-sliced model
+					
+				default:
+					// treat as pre-sliced model
+					$model_data = array();
+					
+					if (is_null($model_id)) {
+						$this->load->helper('printlist');
+						$model_id = $array_status[CORESTATUS_TITLE_PRINTMODEL];
+					}
+					
+					if (ERROR_OK == ModelList__getDetailAsArray($model_id, $model_data, TRUE)) {
+						$model_displayname = $model_data[PRINTLIST_TITLE_NAME];
+					}
+					break;
+			}
+		}
+		
 		// parse the main body
 		$template_data = array(
 				'title'				=> t('Control your printing'),
@@ -377,6 +444,8 @@ class Printdetail extends MY_Controller {
 				'initial_head'		=> ($status_head == TRUE) ? $option_selected : NULL,
 				'video_error'		=> t('video_error'),
 				'loading_player'	=> t('loading_player'),
+				'model_name_title'	=> t('timelapse_info_modelname_title'),
+				'model_name_value'	=> $model_displayname,
 // 				'reloading_player'	=> t('reloading_player'),
 		);
 		
