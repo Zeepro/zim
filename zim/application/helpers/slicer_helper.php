@@ -175,7 +175,7 @@ function Slicer_checkSlicedModel() {
 	return TRUE;
 }
 
-function Slicer_addModel($models_path, $auto_resize = TRUE, &$array_return = array()) {
+function Slicer_addModel($models_path, $source = TRUE, $auto_resize = TRUE, &$array_return = array()) {
 	$cr = 0;
 	$CI = &get_instance();
 	$ret_val = 0;
@@ -187,21 +187,24 @@ function Slicer_addModel($models_path, $auto_resize = TRUE, &$array_return = arr
 		return ERROR_INTERNAL;
 	}
 	
-	// stats info
-	$CI->load->helper(array('printerlog', 'file'));
-	foreach($models_path as $model_path) {
-		$file_info = array();
-		
-		if (!file_exists($model_path)) {
-			PrinterLog_logError('add slicer model file not found: ' . $model_path, __FILE__, __LINE__);
+	if ($source !== FALSE) {
+		// stats info
+		$CI->load->helper(array('printerlog', 'file'));
+		foreach($models_path as $model_path) {
+			$file_info = array();
 			
-			return ERROR_WRONG_PRM;
+			if (!file_exists($model_path)) {
+				PrinterLog_logError('add slicer model file not found: ' . $model_path, __FILE__, __LINE__);
+				
+				return ERROR_WRONG_PRM;
+			}
+			
+			$file_info = get_file_info(realpath($model_path), array('size'));
+			$total_size += $file_info['size'];
 		}
-		
-		$file_info = get_file_info(realpath($model_path), array('size'));
-		$total_size += $file_info['size'];
+		if ($source === TRUE) $source = NULL;
+		PrinterLog_statsUpload($total_size, $source);
 	}
-	PrinterLog_statsUpload($total_size);
 	
 	if ($auto_resize == TRUE) {
 		$ret_val = Slicer__requestSlicer(SLICER_URL_ADD_MODEL . json_encode($models_path), FALSE);

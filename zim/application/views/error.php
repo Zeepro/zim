@@ -9,7 +9,7 @@
 			<br />
 			<br />
 			<br />
-			<a href="/" data-role="button">{home}</a>
+			<a href="/" data-role="button">{button_home}</a>
 		</div>
 	</div>
 </div>

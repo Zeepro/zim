@@ -1,6 +1,6 @@
 <div data-role="page" data-url="/sliceupload/slice">
 	<style>
-		div.slicer_temperature_adjustment_container input[type=number] { display: none !important; }
+		div.slicer_slider_adjustment_container input[type=number] { display: none !important; }
 		.zeeprocanvas { background-color: rgba(0,0,0,1.0); border: 0px; }
 	</style>
 	<div id="overlay"></div>
@@ -167,7 +167,6 @@ function onWebGL_finalized() {
 }
 
 function onWebGLRequest_rollback() {
-	var_printer_preview_failed = true;
 	var_webgl_initialized = true;
 	var_webgl_support = false;
 	$("div.slicer_printer_rendering").show();
@@ -250,6 +249,7 @@ function onMiniSliderChanged(value) {
 }
 
 function onPrinterPreviewMinorError_rollback() {
+	var_printer_preview_failed = true;
 //	alert("{preview_fail}");
 	$("#preview_zone").html("{preview_fail}");
 	$("div#detail_zone").show();

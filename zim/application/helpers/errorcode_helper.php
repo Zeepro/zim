@@ -35,7 +35,8 @@ if (!defined('ERROR_OK')) {
 	define('ERROR_DISK_FULL',		456);
 	define('ERROR_GCODE_NOTFOUND',	457);
 	define('ERROR_IMG_NOTFOUND',	458);
-	
+
+	define('ERROR_AUTHOR_FAIL',		490);
 	define('ERROR_REMOTE_SLICE',	498);
 	define('ERROR_UNDER_CONSTRUCT',	499);
 	define('ERROR_INTERNAL',		500);
@@ -74,6 +75,7 @@ if (!defined('ERROR_OK')) {
 			ERROR_GCODE_NOTFOUND	=> 'G-code file not found',
 			ERROR_IMG_NOTFOUND		=> 'Image file not found',
 			
+			ERROR_AUTHOR_FAIL		=> 'UNAUTHORIZED USER / PRINTER',
 			ERROR_INTERNAL			=> 'Internal API error',
 			ERROR_UNDER_CONSTRUCT	=> 'UNDER CONSTRUCTION',
 			ERROR_REMOTE_SLICE		=> 'REMOTE SLICING ERROR',

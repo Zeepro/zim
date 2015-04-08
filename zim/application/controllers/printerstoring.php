@@ -76,8 +76,8 @@ class Printerstoring extends MY_Controller {
 		}
 		// parse the main body
 		$template_data = array(
-				'back'			=> t('back'),
-				'home'			=> t('home'),
+// 				'back'			=> t('back'),
+// 				'home'			=> t('home'),
 				'select_hint'	=> t('select_hint'),
 				'select_hint_multi'	=> t('select_hint_multi'),
 				'header_single' => t('header_single'),
@@ -102,8 +102,8 @@ class Printerstoring extends MY_Controller {
 		$this->lang->load('printerstoring/libraries', $this->config->item('language'));
 
 		$template_data = array(
-				'back'			=> t('back'),
-				'home'			=> t('home'),
+// 				'back'			=> t('back'),
+// 				'home'			=> t('home'),
 				'libraries_info'		=> t('libraries_info'),
 				'stl_models'		=> t('stl_models'),
 				'gcode_models'		=> t('gcode_models'),
@@ -124,8 +124,8 @@ class Printerstoring extends MY_Controller {
 		$this->lang->load('printerstoring/stllibrary', $this->config->item('language'));
 
 		$template_data = array(
-				'back'				=> t('back'),
-				'home'				=> t('home'),
+// 				'back'				=> t('back'),
+// 				'home'				=> t('home'),
 				'browse_models'		=> t('browse_models'),
 				'add_model'			=> t('add_model')
 		);
@@ -202,8 +202,8 @@ class Printerstoring extends MY_Controller {
 		}
 
 		$template_data = array(
-				'back'			=> t('back'),
-				'home'			=> t('home'),
+// 				'back'			=> t('back'),
+// 				'home'			=> t('home'),
 				'list_info'		=> t('list_info'),
 // 				'print-model'		=> t('print-model'),
 				'delete-model'		=> t('delete-model'),
@@ -306,8 +306,8 @@ class Printerstoring extends MY_Controller {
 // 		}
 
 		$template_data = array(
-				'back'					=> t('back'),
-				'home'					=> t('home'),
+// 				'back'					=> t('back'),
+// 				'home'					=> t('home'),
 				'list_info'				=> t('list_info'),
 				'print-model'			=> t('print-model'),
 				'delete-model'			=> t('delete-model'),
@@ -486,8 +486,8 @@ class Printerstoring extends MY_Controller {
 		}
 		
 		$template_data = array(
-				'home'					=> t('home'),
-				'back'					=> t('back'),
+// 				'home'					=> t('home'),
+// 				'back'					=> t('back'),
 				'id'					=> $gid,
 				'title'					=> $data_json['name'],
 				'photo_title'			=> t('photo_title'),
@@ -519,6 +519,13 @@ class Printerstoring extends MY_Controller {
 				'temper_min'			=> PRINTERSTATE_TEMPER_CHANGE_MIN,
 				'temper_delta'			=> PRINTERSTATE_TEMPER_CHANGE_VAL,
 				'bicolor'				=> $bicolor ? 'true' : 'false',
+				'extrud_multiply'		=> t('extrud_multiply'),
+				'left_extrud_mult'		=> t('left_extrud_mult'),
+				'right_extrud_mult'		=> t('right_extrud_mult'),
+				'extrud_r'				=> PRINTERSTATE_EXT_MULTIPLY_DEFAULT,
+				'extrud_l'				=> PRINTERSTATE_EXT_MULTIPLY_DEFAULT,
+				'extrud_min'			=> PRINTERSTATE_EXT_MULTIPLY_MIN,
+				'extrud_max'			=> PRINTERSTATE_EXT_MULTIPLY_MAX,
 		);
 		
 		// parse all page

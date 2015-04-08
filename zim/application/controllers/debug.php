@@ -2,30 +2,9 @@
 if (!defined('BASEPATH'))
 	exit('No direct script access allowed');
 
-class Debug extends CI_Controller {
-
-	public function __construct() {
-		parent::__construct();
-		
-		$this->load->helper('corestatus');
-		if (!CoreStatus_initialFile()) {
-			$this->load->helper('printerlog');
-			PrinterLog_logError('status files initialisation error when MY_Controller started', __FILE__, __LINE__);
-			
-			// let request failed
-			$protocol = (isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0');
-			header($protocol . ' 500');
-			header('Content-type: text/plain; charset=UTF-8');
-			echo 'file initialisation error';
-			exit;
-		}
-		
-		return;
-	}
-	
+class Debug extends ZP_Controller {
 	public function index() {
 		$template_data = array();
-		$body_page = NULL;
 		$level_log = $this->config->item('log_level');
 		
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -77,16 +56,8 @@ class Debug extends CI_Controller {
 				),
 		);
 		
-		$body_page = $this->parser->parse('debug', $template_data, TRUE);
-		
-		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('debug_index_pagetitle') . '</title>',
-				'contents'		=> $body_page,
-		);
-		
-		$this->parser->parse('basetemplate', $template_data);
+		$this->_parseBaseTemplate(t('debug_index_pagetitle'),
+				$this->parser->parse('debug', $template_data, TRUE));
 		
 		return;
 	}

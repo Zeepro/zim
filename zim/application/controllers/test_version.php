@@ -2,7 +2,7 @@
 if (! defined ( 'BASEPATH' ))
 	exit ( 'No direct script access allowed' );
 
-class Test_version extends CI_Controller {
+class Test_version extends ZP_Controller {
 	function __construct() {
 		parent::__construct ();
 		$this->load->helper( array(
@@ -128,7 +128,6 @@ class Test_version extends CI_Controller {
 	
 	public function index() {
 		$template_data = array();
-		$body_page = NULL;
 		$temp_info = array();
 		$array_info = array();
 		$sso_name = NULL;
@@ -144,8 +143,6 @@ class Test_version extends CI_Controller {
 		$profile_link = $this->_bindUpgradeURL($profile_link);
 		
 		$temp_info = PrinterState_getInfoAsArray();
-		// config variable is set in MY_controller, so we need to correct number of extruder by ourselves
-		$temp_info[PRINTERSTATE_TITLE_NB_EXTRUD] = PrinterState_getNbExtruder();
 		$array_info = array(
 				array(
 						'title'	=> t('profile_title'),
@@ -194,16 +191,8 @@ class Test_version extends CI_Controller {
 				'port_test_l443'	=> t('port_test_client', array(443)),
 		);
 		
-		$body_page = $this->parser->parse('test_version', $template_data, TRUE);
-		
-		// parse all page
-		$template_data = array(
-				'lang'			=> $this->config->item('language_abbr'),
-				'headers'		=> '<title>' . t('printerstate_printerinfo_pagetitle') . '</title>',
-				'contents'		=> $body_page,
-		);
-		
-		$this->parser->parse('basetemplate', $template_data);
+		$this->_parseBaseTemplate(t('printerstate_printerinfo_pagetitle'),
+				$this->parser->parse('test_version', $template_data, TRUE));
 		
 		return;
 	}

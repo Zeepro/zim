@@ -436,7 +436,7 @@ class Printerstate extends MY_Controller {
 		$template_data = array(
 				'reset_network'			=> t('reset_network'),
 				'printer_info'			=> t('printer_info'),
-				'back'					=> t('back'),
+// 				'back'					=> t('back'),
 				'set_hostname'			=> t('set_hostname'),
 				'set_preset'			=> t('set_preset'),
 				'upgrade_on'			=> ($status_upgrade != 'off') ? $option_selected : NULL,
@@ -548,8 +548,8 @@ class Printerstate extends MY_Controller {
 		// parse the main body
 		$template_data = array(
 				'array_info'		=> $array_info,
-				'back'				=> t('back'),
-				'home'				=> t('Home'),
+// 				'back'				=> t('back'),
+// 				'home'				=> t('Home'),
 				'button_sso'		=> (array_key_exists(PRINTERSTATE_TITLE_SSO_NAME, $temp_info)
 						? t('button_rename_sso') : t('button_active_sso')),
 				'button_fqdn'		=> t('button_rename_sso'),
@@ -649,7 +649,7 @@ class Printerstate extends MY_Controller {
 		PrinterLog_statsWebClick(PRINTERLOG_STATS_LABEL_UPGRADE);
 		
 		$template_data = array(
-				'back'				=> t('back'),
+// 				'back'				=> t('back'),
 				'note_title'		=> ($normal_mode == TRUE) ? t('releasenote_title') : t('whatsnew_title'),
 				'note_hint'			=> t('note_hint'),
 				'note_body'			=> $note_html,
@@ -691,10 +691,10 @@ class Printerstate extends MY_Controller {
 		$template_data = array(
 				'title'			=> ($abb_cartridge == 'l') ? t('Left cartridge change') : t('Right cartridge change'),
 				'wait_info'		=> t('Waiting for getting information...'),
-				'home'			=> t('Home'),
+// 				'home'			=> t('Home'),
 				'first_status'	=> PRINTERSTATE_CHANGECART_UNLOAD_F,
 				'insert_status'	=> PRINTERSTATE_CHANGECART_INSERT_C,
-				'back'			=> t('back'),
+// 				'back'			=> t('back'),
 				'abb_cartridge'	=> $abb_cartridge,
 				'need_filament'	=> $need_filament,
 				'id_model'		=> $id_model,
@@ -1253,8 +1253,8 @@ class Printerstate extends MY_Controller {
  				'reset_hint'	=> t('reset_hint'),
 				'reset_button'	=> t('Reset the printer\'s network'),
 				'error'			=> $error,
-				'back'			=> t('back'),
-				'home'			=> t('Home')
+// 				'back'			=> t('back'),
+// 				'home'			=> t('Home')
 		);
 		
 		// parse all page

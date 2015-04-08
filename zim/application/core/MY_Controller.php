@@ -1,43 +1,9 @@
 <?php
 
 if (!defined('BASEPATH'))
-    exit('No direct script access allowed');
+	exit('No direct script access allowed');
 
-class MY_Controller extends CI_Controller {
-	
-	function errorToSSO($level, $msg, $file, $line, $context) {
-		$message = NULL;
-		
-		// do nothing when level is 0 or with @ (we don't care about error)
-		if (0 == ($level & error_reporting())) {
-			return;
-		}
-		
-		//TODO move this log function to printerlog helper
-		$json_context = @json_encode($context);
-		$message = strip_tags($msg . " in " . $file . " at " . $line. " with " . $json_context);
-		$this->load->helper('printerlog');
-		PrinterLog_logDebug('ErrorHandler ' . $level . ': ' . $message);
-		
-		// just display error for simulator (develop staff), and return 503 for ajax call
-		if ($this->config->item('simulator')) {
-			$protocol = (isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0');
-			header($protocol . ' 503');
-			var_dump(array(
-					'level'		=> $level,
-					'message'	=> $message,
-			));
-			die("error");
-		}
-		else {
-			PrinterLog_logSSO($level, 500, $message);
-		}
-		
-		header('Location: /error');
-		
-		exit;
-	}
-	
+class ZP_Controller extends CI_Controller {
 	protected function _sendFileContent($file_path = NULL, $client_name = 'download.bin') {
 		if (file_exists($file_path)) {
 			$encoding_header = isset($_SERVER['HTTP_ACCEPT_ENCODING']) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : NULL;
@@ -52,7 +18,7 @@ class MY_Controller extends CI_Controller {
 // 			header('Content-Length: ' . filesize($file_path));
 			
 			if ($support_compress && extension_loaded('zlib')
-					&& (ini_get('output_handler') != 'ob_gzhandler')) {
+			&& (ini_get('output_handler') != 'ob_gzhandler')) {
 				ini_set("zlib.output_compression", 1);
 			}
 			
@@ -85,11 +51,15 @@ class MY_Controller extends CI_Controller {
 	
 	protected function _parseBaseTemplate($title, $content, $extra_header = NULL) {
 		$this->load->library('parser');
+		$this->lang->load('base', $this->config->item('language'));
 		
 		$template_data = array(
 				'lang'			=> $this->config->item('language_abbr'),
 				'headers'		=> '<title>' . $title . "</title>\n" . $extra_header,
 				'contents'		=> $content,
+				// navigator menu
+				'back'			=> t('back'),
+				'home'			=> t('home'),
 		);
 		
 		$this->parser->parse('basetemplate', $template_data);
@@ -99,10 +69,68 @@ class MY_Controller extends CI_Controller {
 	
 	public function __construct() {
 		global $CFG;
+		global $PRINTER;
+		
+		parent::__construct();
+		
+		$this->load->helper('corestatus');
+		
+		// initialize status files
+		if (!CoreStatus_initialFile()) {
+			$this->load->helper('printerlog');
+			PrinterLog_logError('status files initialisation error when MY_Controller started', __FILE__, __LINE__);
+				
+			// let request failed
+			$this->_exitWithError500('file initialisation error');
+		}
+		
+		// initialize printer variable
+		if (!is_array($PRINTER)) $PRINTER = array();
+		
+		return;
+	}
+}
+
+class MY_Controller extends ZP_Controller {
+	protected function errorToSSO($level, $msg, $file, $line, $context) {
+		$message = NULL;
+		
+		// do nothing when level is 0 or with @ (we don't care about error)
+		if (0 == ($level & error_reporting())) {
+			return;
+		}
+		
+		//TODO move this log function to printerlog helper
+		$json_context = @json_encode($context);
+		$message = strip_tags($msg . " in " . $file . " at " . $line. " with " . $json_context);
+		$this->load->helper('printerlog');
+		PrinterLog_logDebug('ErrorHandler ' . $level . ': ' . $message);
+		
+		// just display error for simulator (develop staff), and return 503 for ajax call
+		if ($this->config->item('simulator')) {
+			$protocol = (isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0');
+			header($protocol . ' 503');
+			var_dump(array(
+					'level'		=> $level,
+					'message'	=> $message,
+			));
+			die("error");
+		}
+		else {
+			PrinterLog_logSSO($level, 500, $message);
+		}
+		
+		header('Location: /error');
+		
+		exit;
+	}
+	
+	public function __construct() {
+		global $CFG;
 		
 		parent::__construct();
 // 		$this->load->helper(array('corestatus', 'url'));
-		$this->load->helper(array('corestatus', 'printerlog'));
+		$this->load->helper(array('corestatus', 'userauth', 'printerlog'));
 		
 		// set proper error handler
 		set_error_handler(array($this, 'errorToSSO'));
@@ -111,15 +139,6 @@ class MY_Controller extends CI_Controller {
 		$this->output->set_header('Pragma: no-cache');
 		$this->output->set_header('Cache-Control: no-cache');
 		
-		// initialisation status files
-		if (!CoreStatus_initialFile()) {
-			$this->load->helper('printerlog');
-			PrinterLog_logError('status files initialisation error when MY_Controller started', __FILE__, __LINE__);
-			
-			// let request failed
-			$this->_exitWithError500('file initialisation error');
-		}
-		
 		// check tromboning autorisation
 		if (CoreStatus_checkTromboning(FALSE)) {
 			$this->load->helper(array('printerlog', 'errorcode'));
@@ -127,6 +146,15 @@ class MY_Controller extends CI_Controller {
 			
 			// let request failed
 			$this->_exitWithError500(ERROR_REMOTE_REFUSE . ' ' . MyERRMSG(ERROR_REMOTE_REFUSE), ERROR_REMOTE_REFUSE);
+		}
+		
+		// initilize user session for authentification
+		if (!UserAuth_initialSession()) {
+			$this->load->helper('printerlog');
+			PrinterLog_logError('user session initialisation error when MY_Controller started', __FILE__, __LINE__);
+			
+			// let request failed
+			$this->_exitWithError500('user session error');
 		}
 		
 		// Workflow management
@@ -143,13 +171,20 @@ class MY_Controller extends CI_Controller {
 			
 			// stats info (do not stats rest, app can initialize cookies in each request)
 			$this->load->library('session');
-			if (FALSE === $this->session->userdata('stats_browserLog')) {
-				$this->session->set_userdata('stats_browserLog', 'ok');
+			if (FALSE === $this->input->cookie('stats_browserLog')) {
+				$this->input->set_cookie('stats_browserLog', 'ok', 2592000); // 30 days for browser stats
 				PrinterLog_statsWebAgent();
 			}
 			
+			// check user authentification
+			if (!UserAuth_checkSessionExist()) {
+				$this->load->helper('printerlog');
+				PrinterLog_logError('Session expired or wrong');
+				
+				$url_redirect = USERAUTH_URL_REDIRECTION;
+			}
 			// check initialization issue
-			if (CoreStatus_checkInInitialization()) {
+			else if (CoreStatus_checkInInitialization()) {
 				if (CoreStatus_checkCallInitialization($url_redirect)) {
 					return; // we are calling the right page
 				}

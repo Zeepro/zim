@@ -89,6 +89,9 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_ASSIGN_FILA_R',	' -0 ');
 	define('PRINTERSTATE_GET_CONSUMPTION',	' M1907');
 	define('PRINTERSTATE_CHECK_LEFT_SIDE',	' M1625');
+	define('PRINTERSTATE_SET_EXT_MULTIPLY',	' M1663\ ');
+	define('PRINTERSTATE_MULTIPLY_L_LABEL',	'\ L');
+	define('PRINTERSTATE_MULTIPLY_R_LABEL',	'\ R');
 	
 	global $CFG;
 	if ($CFG->config['simulator']) {
@@ -121,6 +124,10 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_TEMPER_CHANGE_MAX',	260);
 	define('PRINTERSTATE_TEMPER_CHANGE_MIN',	155);
 	define('PRINTERSTATE_TEMPER_CHANGE_VAL',	20);
+	
+	define('PRINTERSTATE_EXT_MULTIPLY_DEFAULT',	100);
+	define('PRINTERSTATE_EXT_MULTIPLY_MAX',		110);
+	define('PRINTERSTATE_EXT_MULTIPLY_MIN',		90);
 	
 	define('PRINTERSTATE_TITLE_CARTRIDGE',	'type');
 	define('PRINTERSTATE_TITLE_MATERIAL',	'material');
@@ -3408,6 +3415,34 @@ function PrinterState_getConsumption(&$array_filament) {
 	}
 	
 	return ERROR_INTERNAL;
+}
+
+function PrinterState_setExtrusionMultiply($array_multiply) {
+	global $CFG;
+	$output = array();
+	$command = $CFG->config['arcontrol_c'] . PRINTERSTATE_SET_EXT_MULTIPLY;
+	$ret_val = 0;
+	
+	foreach(array('r' => PRINTERSTATE_MULTIPLY_R_LABEL, 'l' => PRINTERSTATE_MULTIPLY_L_LABEL)
+			as $abb_extruder => $prm_extruder) {
+		if (isset($array_multiply[$abb_extruder])
+				&& $array_multiply[$abb_extruder] < PRINTERSTATE_EXT_MULTIPLY_MAX
+				&& $array_multiply[$abb_extruder] > PRINTERSTATE_EXT_MULTIPLY_MIN) {
+			$command .= $prm_extruder . $array_multiply[$abb_extruder];
+		}
+	}
+	
+	exec($command, $output, $ret_val);
+	if (!PrinterState_filterOutput($output, $command)) {
+		PrinterLog_logError('filter arduino output error', __FILE__, __LINE__);
+		return ERROR_INTERNAL;
+	}
+	PrinterLog_logArduino($command, $output);
+	if ($ret_val != ERROR_NORMAL_RC_OK) {
+		return ERROR_INTERNAL;
+	}
+	
+	return ERROR_OK;
 }
 
 //internal function

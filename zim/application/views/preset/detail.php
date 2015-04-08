@@ -464,7 +464,7 @@
 							<label for="support_material_interface_spacing">{support_material_interface_spacing}</label>
 						</div></div>
 						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="number" style="text-align:right;" data-clear-btn="false" name="support_material_interface_spacing" id="support_material_interface_spacing" value="{support_material_interface_spacing_value}" min="0" max="10">
+							<input type="number" style="text-align:right;" data-clear-btn="false" name="support_material_interface_spacing" id="support_material_interface_spacing" value="{support_material_interface_spacing_value}" min="0" max="10" step="0.01">
 						</div></div>
 						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
 							<label for="dont_support_bridges">{dont_support_bridges}</label>

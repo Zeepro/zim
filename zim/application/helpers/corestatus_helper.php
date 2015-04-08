@@ -170,6 +170,7 @@ function CoreStatus_initialFile() {
 				CORESTATUS_TITLE_P_EXCH_BUS		=> 0,
 				CORESTATUS_TITLE_FILA_MAT		=> PRINTERSTATE_DESP_MATERIAL_PLA,
 				CORESTATUS_TITLE_GUID			=> random_string('numeric', CORESTATUS_VALUE_RAND_STRING_LENGTH),
+				CORESTATUS_TITLE_ESTIMATE_T		=> 0,
 		);
 		
 		// write json file

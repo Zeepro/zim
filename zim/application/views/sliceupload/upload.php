@@ -29,7 +29,7 @@
 			<input type="submit" value="{upload_button}" data-icon="arrow-r" data-iconpos="right" onclick='javascript: uploadfile_wait();' />
 			</form>
 			{goto_slice}
-			<span id="upload_error">{error}</span>
+			<span class="zim-error">{error}</span>
 		</div>
 	</div>
 

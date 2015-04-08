@@ -33,7 +33,7 @@ class Share extends MY_Controller
 		}
 		session_save_path($session_path);
 		ini_set('session.gc_probability', 1); // for debian
-		session_start();
+		if (PHP_SESSION_NONE == session_status()) session_start();
 		
 		return;
 	}
@@ -242,7 +242,7 @@ class Share extends MY_Controller
 // 				'fb_desc'				=> '', //htmlspecialchars(t('fb_desc')),
 				'title_label'			=> t('title_label'),
 				'desc_label'			=> t('desc_label'),
-				'back'					=> t('back'),
+// 				'back'					=> t('back'),
 				'upload_to_fb'			=> t('upload_to_fb')
 		);
 		
@@ -384,7 +384,7 @@ class Share extends MY_Controller
 				'desc_label'			=> t('desc_label'),
 				'tags_label'			=> t('tags_label'),
 				'privacy_label'			=> t('privacy_label'),
-				'back'					=> t('back')
+// 				'back'					=> t('back')
 		);
 		
 		$this->_parseBaseTemplate(t('youtube_title'),

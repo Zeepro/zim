@@ -60,6 +60,7 @@ if (!defined('PRINTERLOG_STATS_TITLE_SERIAL')) {
 	define('PRINTERLOG_STATS_LABEL_SUPPORT',	'support');
 	define('PRINTERLOG_STATS_LABEL_UPGRADE',	'upgrade');
 	define('PRINTERLOG_STATS_LABEL_SHOP',		'shop');
+	define('PRINTERLOG_STATS_LABEL_3DSLASH',	'3dslash');
 	
 	define('PRINTERLOG_STATS_VALUE_ON',		'on');
 	define('PRINTERLOG_STATS_VALUE_OFF',	'off');
@@ -254,11 +255,11 @@ function PrinterLog_statsSlice($action, $label) {
 	));
 }
 
-function PrinterLog_statsUpload($filesize) {
+function PrinterLog_statsUpload($filesize, $source = NULL) {
 	return PrinterLog__logStats(array(
 			PRINTERLOG_STATS_TITLE_CATEGORY	=> PRINTERLOG_STATS_CATEGORY_UPLOAD,
 			PRINTERLOG_STATS_TITLE_ACTION	=> PRINTERLOG_STATS_ACTION_MODEL,
-			PRINTERLOG_STATS_TITLE_LABEL	=> NULL,
+			PRINTERLOG_STATS_TITLE_LABEL	=> $source,
 			PRINTERLOG_STATS_TITLE_VALUE	=> $filesize,
 	));
 }

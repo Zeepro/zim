@@ -144,7 +144,7 @@ class Sliceupload extends MY_Controller {
 		
 		// parse the main body
 		$template_data = array(
-				'back'				=> t('back'),
+// 				'back'				=> t('back'),
 				'select_hint'		=> t('select_hint'),
 				'select_hint_multi'	=> t('select_hint_multi'),
 				'header_single' 	=> t('header_single'),
@@ -242,8 +242,8 @@ class Sliceupload extends MY_Controller {
 		
 		// parse the main body
 		$template_data = array(
- 				'home'					=> t('home'),
-				'back'					=> t('back'),
+// 				'home'					=> t('home'),
+// 				'back'					=> t('back'),
 				'slice_button'			=> t('slice_button'),
 				'goto_preset'			=> t('goto_preset'),
 				'value_rho'				=> ZIMAPI_VALUE_DEFAULT_RHO,
@@ -420,8 +420,8 @@ class Sliceupload extends MY_Controller {
 		
 		// parse the main body
 		$template_data = array(
-				'home'				=> t('home'),
-				'back'				=> t('back'),
+// 				'home'				=> t('home'),
+// 				'back'				=> t('back'),
 				'cancel_button'		=> t('cancel_button'),
 				'max_percent'		=> $scalemax,
 				'xsize'				=> $xsize,
@@ -467,7 +467,7 @@ class Sliceupload extends MY_Controller {
 						
 						$this->load->helper('slicer');
 // 						$cr = Slicer_addModel($array_model);
-						$cr = Slicer_addModel($array_model, FALSE, $array_return);
+						$cr = Slicer_addModel($array_model, TRUE, FALSE, $array_return);
 						if ($cr == ERROR_OK) {
 							try {
 								if ($array_return[SLICER_TITLE_MAXSCALE] < 100) {
@@ -907,6 +907,13 @@ class Sliceupload extends MY_Controller {
 				'enable_reslice'	=> $error ? 'true' : 'false',
 				'bicolor_printer'	=> $bicolor_printer ? 'true' : 'false',
 				'bicolor_model'		=> $bicolor_model ? 'true' : 'false',
+				'extrud_multiply'	=> t('extrud_multiply'),
+				'left_extrud_mult'	=> t('left_extrud_mult'),
+				'right_extrud_mult'	=> t('right_extrud_mult'),
+				'extrud_r'			=> PRINTERSTATE_EXT_MULTIPLY_DEFAULT,
+				'extrud_l'			=> PRINTERSTATE_EXT_MULTIPLY_DEFAULT,
+				'extrud_min'		=> PRINTERSTATE_EXT_MULTIPLY_MIN,
+				'extrud_max'		=> PRINTERSTATE_EXT_MULTIPLY_MAX,
 		);
 		$this->parser->parse('sliceupload/slice_result_ajax', $template_data);
 		

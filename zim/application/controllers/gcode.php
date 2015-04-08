@@ -3,10 +3,6 @@ if (!defined('BASEPATH'))
 	exit('No direct script access allowed');
 
 class Gcode extends MY_Controller {
-	function __construct() {
-		parent::__construct();
-	}
-	
 	private function _analyse_gcode($mode = 'display', $gcode_id = NULL) {
 		$back_url = '/sliceupload/slice?callback';
 		$request_url = '/sliceupload/gcode_ajax';
@@ -21,8 +17,8 @@ class Gcode extends MY_Controller {
 		}
 		
 		$template_data = array(
-				'home'					=> t('home'),
-				'back'					=> t('back'),
+// 				'home'					=> t('home'),
+// 				'back'					=> t('back'),
 				'js_render'				=> ($mode == 'display') ? 'false' : 'true',
 				'back_print_url'		=> $back_url,
 				'gcode_request_url'		=> $request_url,

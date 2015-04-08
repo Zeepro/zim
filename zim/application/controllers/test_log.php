@@ -3,23 +3,10 @@
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
-class Test_log extends CI_Controller {
+class Test_log extends ZP_Controller {
 
 	public function index() {
 		$display = '';
-		
-		$this->load->helper('corestatus');
-		if (!CoreStatus_initialFile()) {
-			$this->load->helper('printerlog');
-			PrinterLog_logError('status files initialisation error when MY_Controller started', __FILE__, __LINE__);
-			
-			// let request failed
-			$protocol = (isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0');
-			header($protocol . ' 500');
-			header('Content-type: text/plain; charset=UTF-8');
-			echo 'file initialisation error';
-			exit;
-		}
 		
 // 		$this->output->set_content_type('text/plain; charset=UTF-8');
 		$this->output->set_content_type('txt_u');

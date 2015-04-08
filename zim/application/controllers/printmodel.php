@@ -57,7 +57,7 @@ class Printmodel extends MY_Controller {
 				'search_hint'		=> t('Select a model'),
 				'baseurl_detail'	=> '/printmodel/detail',
 				'model_lists'		=> $display_printlist,
-				'back'				=> t('back'),
+// 				'back'				=> t('back'),
 		);
 		
 		// parse all page
@@ -229,7 +229,7 @@ class Printmodel extends MY_Controller {
 		
 		// show detail page if valid, parse the body of page
 		$template_data = array(
-				'home'					=> t('Home'),
+// 				'home'					=> t('Home'),
 				'title'					=> $model_data[PRINTLIST_TITLE_NAME],
 				'image'					=> $model_data[PRINTLIST_TITLE_PIC][0],
 				'model_c_r'				=> $model_data[PRINTLIST_TITLE_COLOR_F1],
@@ -249,7 +249,7 @@ class Printmodel extends MY_Controller {
 				'temper_filament_l'		=> $array_data['l'][PRINTERSTATE_TITLE_EXT_TEMPER],
 				'temper_filament_r'		=> $array_data['r'][PRINTERSTATE_TITLE_EXT_TEMPER],
 				'print_model'			=> t('Print'),
-				'back'					=> t('back'),
+// 				'back'					=> t('back'),
 				'preview_title'			=> t('Preview'),
 				'desp_title'			=> t('Description'),
 				'color_suggestion'		=> t('color_suggestion'),
@@ -270,6 +270,14 @@ class Printmodel extends MY_Controller {
 				'enable_print'			=> $enable_print,
 				'bicolor_model'			=> $mono_model ? 'false' : 'true',
 				'bicolor_printer'		=> $bicolor ? 'true' : 'false',
+				'advanced'				=> t('advanced'),
+				'extrud_multiply'		=> t('extrud_multiply'),
+				'left_extrud_mult'		=> t('left_extrud_mult'),
+				'right_extrud_mult'		=> t('right_extrud_mult'),
+				'extrud_r'				=> PRINTERSTATE_EXT_MULTIPLY_DEFAULT,
+				'extrud_l'				=> PRINTERSTATE_EXT_MULTIPLY_DEFAULT,
+				'extrud_min'			=> PRINTERSTATE_EXT_MULTIPLY_MIN,
+				'extrud_max'			=> PRINTERSTATE_EXT_MULTIPLY_MAX,
 		);
 		$this->_parseBaseTemplate(t('ZeePro Personal Printer 21 - Printing details'),
 				$this->parser->parse('printlist/detail', $template_data, TRUE));

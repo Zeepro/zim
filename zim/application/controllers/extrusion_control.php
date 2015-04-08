@@ -26,17 +26,10 @@ class Extrusion_control extends MY_Controller {
 		$template_data = array(
 				'bicolor'	=> ($this->config->item('nb_extruder') >= 2) ? 'true' : 'false',
 		);
-		$body_page = $this->parser->parse('extrusion_control', $template_data, TRUE);
-
-		// parse all page
-		$template_data = array(
-				'lang'			=> 'en',
-				'headers'		=> '<title>Extrusion control</title>',
-				'contents'		=> $body_page,
-		);
-
-		$this->parser->parse('basetemplate', $template_data);
-
+		
+		$this->_parseBaseTemplate('Extrusion control',
+				$this->parser->parse('extrusion_control', $template_data, TRUE));
+		
 		return;
 	}
 	

@@ -37,7 +37,7 @@ class Manage extends MY_Controller {
 		
 		//parse the main body
 		$template_data = array(
-				'back'					=> t('back'),
+// 				'back'					=> t('back'),
 				'what'					=> t('what'),
 				'loading_player'		=> t('loading_player'),
 				'platform_view_title'	=> t('platform_view_title'),

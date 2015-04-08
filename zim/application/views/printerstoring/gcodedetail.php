@@ -25,7 +25,7 @@
 					<p id="state_right">{state_f_r}</p>
 					<a href="/printerstate/changecartridge?v=r&f={need_filament_r}&id=gcode{id}" data-role="button" data-ajax="false" data-iconpos="none" class="ui-shadow ui-corner-all">{change_filament_r}</a>
 					<div>{temp_adjustments}</div>
-					<input type="range" id="slider-mono" value="{temper_filament_r}" min="160" max="260" data-show-value="true">
+					<input type="range" id="slider-mono" value="{temper_filament_r}" min="{temper_min}" max="{temper_max}" data-show-value="true">
 				</div>
 				<div style="height:265px; display: none;" class="widget_bicolor">
 					<div class="ui-grid-a">
@@ -56,15 +56,15 @@
 						<div class="ui-block-a">{temp_adjustments_l}</div>
 						<div class="ui-block-b">{temp_adjustments_r}</div>
 						<div class="ui-block-a">
-							<input type="range" name="l" id="slider-l" value="{temper_filament_l}" min="160" max="260" data-show-value="true">
+							<input type="range" name="l" id="slider-l" value="{temper_filament_l}" min="{temper_min}" max="{temper_max}" data-show-value="true">
 						</div>
 						<div class="ui-block-b">
-							<input type="range" name="r" id="slider-r" value="{temper_filament_r}" min="160" max="260" data-show-value="true">
+							<input type="range" name="r" id="slider-r" value="{temper_filament_r}" min="{temper_min}" max="{temper_max}" data-show-value="true">
 						</div>
 					</div>
 				</div>
 			</div>
-			<div data-role="collapsible" style="clear: both;">
+			<div data-role="collapsible" style="clear: both; text-align: center;">
 				<h4>{advanced}</h4>
 				<div class="ui-grid-a">
 					<div class="ui-block-a">
@@ -72,6 +72,24 @@
 					</div>
 					<div class="ui-block-b">
 						<a data-role="button" href="/gcode/library/render?id={id}" data-ajax="false">{2drender_link}</a>
+					</div>
+				</div>
+				<p style="font-weight: bold;">{extrud_multiply}</p>
+				<div class="widget_monocolor slicer_slider_adjustment_container" style="display: none;">
+					<input type="range" id="slider_mono_em" value="{extrud_r}" min="{extrud_min}" max="{extrud_max}" data-show-value="true" />
+				</div>
+				<div class="widget_bicolor ui-grid-a slicer_slider_adjustment_container" style="display: none;">
+					<div class="ui-block-a">
+						<label>{left_extrud_mult}</label>
+						<div id="extrud_l">
+							<input type="range" id="slider_left_em" name="e_l" value="{extrud_l}" min="{extrud_min}" max="{extrud_max}" data-show-value="true" />
+						</div>
+					</div>
+					<div class="ui-block-b">
+						<label>{right_extrud_mult}</label>
+						<div id="extrud_r">
+							<input type="range" id="slider_right_em" name="e_r" value="{extrud_r}" min="{extrud_min}" max="{extrud_max}" data-show-value="true" />
+						</div>
 					</div>
 				</div>
 			</div>
@@ -103,6 +121,9 @@ $(document).on("pagecreate",function() {
 		$(".widget_monocolor").show();
 		$(slider_r).change(function() {
 			$("input#slider-r").val($(slider_r).val());
+		});
+		$("input#slider_mono_em").change(function() {
+			$("input#slider_right_em").val($("input#slider_mono_em").val());
 		});
 	}
 	

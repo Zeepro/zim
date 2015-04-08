@@ -111,7 +111,7 @@ class Account extends MY_Controller
 				'lang'			=> $this->config->item('language_abbr'),
 				'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Home') . '</title>',
 				'contents'		=> $body_page,
-				'back'			=> t('back'),
+// 				'back'			=> t('back'),
 				'give_name'		=> t('give_name'),
 				'errors'		=> $errors,
 				'activate'		=> t('activate'),
@@ -178,7 +178,7 @@ class Account extends MY_Controller
 		}
 		$data = array(
 				'error'			=> $error,
-				'back'			=> t('back'),
+// 				'back'			=> t('back'),
 				'give_name'		=> t('give_name'),
 				'activate'		=> t('activate'),
 				'name_printer'	=> t('name_printer'),
@@ -235,7 +235,7 @@ class Account extends MY_Controller
 						'lang'			=> $this->config->item('language_abbr'),
 						'headers'		=> '<title>' . t('ZeePro Personal Printer 21 - Home') . '</title>',
 						'contents'		=> $body_page,
-						'back'			=> t('back'),
+// 						'back'			=> t('back'),
 						'network_err_msg'=> t('network_err_msg')
 				);
 				$this->parser->parse('basetemplate', $template_data);
@@ -304,7 +304,7 @@ class Account extends MY_Controller
 		$data['skip_title'] = t('button_skip');
 		$data['confirm_skip_text'] = t('confirm_skip_text');
 		$data['still_skip'] = t('still_skip');
-		$data['back'] = t('back');
+// 		$data['back'] = t('back');
 		$data['show_password'] = t('show_password');
 		$data['privacy_policy_link'] = t('privacy_policy_link');
 		$data['optin_title'] = t('optin_title');
