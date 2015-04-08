@@ -294,7 +294,7 @@ function Printer_printFromPrime($abb_extruder, $first_run = TRUE) {
 			return $ret_val;
 		}
 		
-		$ret_val = Printer_printFromFile($gcode_path, $model_id, $array[PRINTLIST_TITLE_TIME], FALSE, FALSE,
+		$ret_val = Printer_printFromFile($gcode_path, $model_id, $array_info[PRINTLIST_TITLE_TIME], FALSE, FALSE,
 				$array_filament, $array_temper);
 	}
 	
