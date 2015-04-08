@@ -374,10 +374,11 @@ class Printdetail extends MY_Controller {
 				case CORESTATUS_VALUE_MID_SLICE:
 					$preset_id = NULL;
 					$model_filename = array();
-					$preset_name = t('timelapse_info_presetname_unknown');
 					
 					$this->load->helper('slicer');
 					if (ERROR_OK == Slicer_getModelFile(0, $model_filename, TRUE)) {
+						$model_displayname = NULL;
+						
 						foreach($model_filename as $model_basename) {
 							if (strlen($model_displayname)) {
 								$model_displayname .= ' + ' . $model_basename;
