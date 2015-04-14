@@ -7,7 +7,7 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
-			<div data-role="collapsible-set">
+			<div data-role="collapsible-set" id="list_printeruser">
 			{userlist}
 				<div data-role="collapsible" id="printeruser_{user_name}_{random_id}">
 					<h3>{user_name}</h3>
@@ -85,7 +85,7 @@
 var var_id_toDelete = null;
 
 function pre_deleteUser(div_id) {
-	if (typeof(div_id) != 'undefined' && $('div#' + div_id)) {
+	if (typeof(div_id) != "undefined" && $("div#" + div_id)) {
 		var_id_toDelete = div_id;
 	}
 	
@@ -93,9 +93,8 @@ function pre_deleteUser(div_id) {
 }
 
 function do_deleteUser() {
-	debugger
 	if (var_id_toDelete != null) {
-		var var_user_email = $('div#' + var_id_toDelete + ' input[type=hidden][name=user_ori_email]').val();
+		var var_user_email = $("div#" + var_id_toDelete + " input[type=hidden][name=user_ori_email]").val();
 		
 		$.ajax({
 				cache: false,
@@ -111,10 +110,11 @@ function do_deleteUser() {
 					$("#overlay").removeClass("gray-overlay");
 				},
 				success: function() {
-					$('div#' + var_id_toDelete).remove();
+					$("div#" + var_id_toDelete).remove();
+					$("div#list_printeruser").collapsibleset("refresh");
 				},
 				error: function (data, textStatus, xhr) {
-					alert('{delete_error}');
+					alert("{msg_delete_error}");
 					console.log(xhr);
 				},
 		});

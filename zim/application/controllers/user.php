@@ -7,13 +7,13 @@ class User extends MY_Controller {
 	public function __construct() {
 		parent::__construct();
 		
-		$this->load->helper(array('userauth', 'errorcode'));
+		$this->load->helper(array('userauth', 'errorcode', 'corestatus'));
 		
 		// check local first
 		if (UserAuth_checkAccount()) {
 			// get access from sso, and check it again
-			if (UserAuth_getUserAccess($_SESSION[USERAUTH_TITLE_TOKEN])
-					&& UserAuth_checkAccount()) {
+			if (UserAuth_getUserAccess($_SESSION[USERAUTH_TITLE_TOKEN]) && UserAuth_checkView()
+					&& (!CoreStatus_checkCallUserManagement() || UserAuth_checkAccount())) {
 				return;
 			}
 		}
@@ -36,12 +36,31 @@ class User extends MY_Controller {
 		$this->lang->load('user/index', $this->config->item('language'));
 		
 		$template_data = array(
-				'button_add_user'	=> t('button_add_user'),
-				'button_list_user'	=> t('button_list_user'),
+				'button_user_info'		=> t('button_user_info'),
+				'button_newsletter'		=> t('button_newsletter'),
+				'button_edit_password'	=> t('button_edit_password'),
+				'button_delete_user'	=> t('button_delete_user'),
 		);
 		
 		$this->_parseBaseTemplate(t('pagetitle_user_index'),
 				$this->parser->parse('user/index', $template_data, TRUE));
+		
+		return;
+	}
+	
+	public function manage() {
+		$template_data = NULL; //array()
+		
+		$this->load->library('parser');
+		$this->lang->load('user/manage', $this->config->item('language'));
+		
+		$template_data = array(
+				'button_add_user'	=> t('button_add_user'),
+				'button_list_user'	=> t('button_list_user'),
+		);
+		
+		$this->_parseBaseTemplate(t('pagetitle_user_manage'),
+				$this->parser->parse('user/manage', $template_data, TRUE));
 		
 		return;
 	}
@@ -76,10 +95,10 @@ class User extends MY_Controller {
 				
 				switch ($ret_val) {
 					case ERROR_OK:
-						$url_redirect = '/user';
+						$url_redirect = '/user/manage';
 						
 						if (FALSE !== $this->input->post('edit_user')) {
-							$url_redirect .= '/userlist';
+							$url_redirect = '/user/userlist';
 						}
 						$this->output->set_header('Location: ' . $url_redirect);
 						
@@ -162,12 +181,111 @@ class User extends MY_Controller {
 				'message_delete'	=> t('message_delete'),
 				'button_delete_ok'	=> t('button_delete_ok'),
 				'button_delete_no'	=> t('button_delete_no'),
+				'msg_delete_error'	=> t('msg_delete_error'),
 				'error_get_list'	=> ($ret_val == ERROR_OK) ? NULL : t('error_get_list'),
 				'userlist'			=> $userlist_display,
 		);
 		
 		$this->_parseBaseTemplate(t('pagetitle_user_list'),
 				$this->parser->parse('user/list', $template_data, TRUE));
+		
+		return;
+	}
+	
+	public function info() {
+		$template_data = NULL; //array()
+		$user_info = array();
+		$assign_func = NULL; //function()
+		$user_birth = NULL;
+		$error = NULL;
+		$ret_val = 0;
+		
+		$this->load->helper('userauth');
+		$this->lang->load('user/info', $this->config->item('language'));
+		
+		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+			$this->load->library('form_validation');
+			
+// 			$this->form_validation->set_rules('user_country', 'lang:title_country', 'required');
+// 			$this->form_validation->set_rules('user_city', 'lang:title_city', 'required');
+// 			$this->form_validation->set_rules('user_birth', 'lang:title_birth', 'required');
+			$this->form_validation->set_rules('user_why', 'lang:title_why', 'max_length[200]');
+			$this->form_validation->set_rules('user_what', 'lang:title_what', 'max_length[200]');
+			
+			if ($this->form_validation->run() == FALSE) {
+				$error = validation_errors();
+			}
+			else {
+				$array_info = array();
+				
+				foreach (array(
+						USERAUTH_TITLE_COUNTRY	=> 'user_country',
+						USERAUTH_TITLE_CITY		=> 'user_city',
+						USERAUTH_TITLE_BIRTHDAY	=> 'user_birth',
+						USERAUTH_TITLE_WHY		=> 'user_why',
+						USERAUTH_TITLE_WHAT		=> 'user_what',
+				) as $key => $value) {
+					$array_info[$key] = ($this->input->post($value) !== FALSE) ? $this->input->post($value) : "";
+				}
+				
+				$ret_val = UserAuth_setUserInfo($array_info);
+				
+				switch ($ret_val) {
+					case ERROR_OK:
+						$this->output->set_header('Location: /user');
+						
+						return;
+						break; // never reach here
+						
+					case ERROR_MISS_PRM:
+					case ERROR_WRONG_PRM:
+						$error = t('error_parameter');
+						break;
+						
+					case ERROR_AUTHOR_FAIL:
+						$error = t('error_authorize');
+						break;
+						
+					default:
+						$error = t('error_unknown');
+						break;
+				}
+			}
+		}
+		
+		UserAuth_getUserInfo($user_info);
+		$assign_func = function ($key_array) use (&$user_info) {
+			return (isset($user_info[$key_array]) ? $user_info[$key_array] : NULL);
+		};
+		$user_birth = $assign_func(USERAUTH_TITLE_BIRTHDAY);
+		if ($user_birth) {
+			$obj_date = DateTime::createFromFormat('n/j/Y', $user_birth);
+			$user_birth = $obj_date->format('Y-m-d');
+		}
+		
+		$this->load->library('parser');
+		
+		$template_data = array(
+				'title_location'	=> t('title_location'),
+				'title_birth'		=> t('title_birth'),
+				'label_why'			=> t('label_why'),
+				'label_what'		=> t('label_what'),
+				'msg_head_hint'		=> t('msg_head_hint'),
+				'button_confirm'	=> t('button_confirm'),
+				'hint_country'		=> t('hint_country'),
+				'hint_city'			=> t('hint_city'),
+				'hint_why'			=> t('hint_why'),
+				'hint_what'			=> t('hint_what'),
+				'msg_error'			=> $error,
+				'value_country'		=> $assign_func(USERAUTH_TITLE_COUNTRY),
+				'value_city'		=> $assign_func(USERAUTH_TITLE_CITY),
+				'value_birth'		=> $user_birth,
+				'value_why'			=> $assign_func(USERAUTH_TITLE_WHY),
+				'value_what'		=> $assign_func(USERAUTH_TITLE_WHAT),
+		);
+		
+		$this->_parseBaseTemplate(t('pagetitle_user_info'),
+				$this->parser->parse('user/info', $template_data, TRUE));
 		
 		return;
 	}

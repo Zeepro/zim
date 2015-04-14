@@ -153,7 +153,7 @@ function CoreStatus_initialFile() {
 	
 	$state_file = $CI->config->item('conf') . CORESTATUS_FILENAME_WORK;
 	
-	if (!file_exists($state_file)) {
+	if (!file_exists($state_file) || 0 == filesize($state_file)) {
 		// prepare data array
 		$CI->load->helper('printerstate');
 		
@@ -628,6 +628,16 @@ function CoreStatus_checkCallNoBlockPageInConnection() {
 	return (CoreStatus__checkCallController(array('account', 'activation'))
 			|| CoreStatus__checkCallURI(array('/printerstate/sethostname' => NULL))
 	);
+}
+
+function CoreStatus_checkCallUserManagement() {
+	return CoreStatus__checkCallURI(array(
+			'/user'				=> NULL,
+			'/user/index'		=> NULL,
+			'/user/add'			=> NULL,
+			'/user/userlist'	=> NULL,
+			'/user/delete_ajax'	=> NULL,
+	));
 }
 
 function CoreStatus_setInIdle($last_error = FALSE, $error_message = FALSE) {

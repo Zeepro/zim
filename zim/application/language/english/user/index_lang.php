@@ -1,8 +1,12 @@
 <?php
 
 $lang['pagetitle_user_index']
-	= 'Zim - Manage users';
-$lang['button_add_user']
-	= 'Add new user';
-$lang['button_list_user']
-	= 'Existing users';
+	= 'Zim - My account';
+$lang['button_user_info']
+	= 'My profile';
+$lang['button_newsletter']
+	= 'Newsletters & alerts';
+$lang['button_edit_password']
+	= 'Change password';
+$lang['button_delete_user']
+	= 'Delete account';

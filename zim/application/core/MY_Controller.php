@@ -92,7 +92,7 @@ class ZP_Controller extends CI_Controller {
 }
 
 class MY_Controller extends ZP_Controller {
-	protected function errorToSSO($level, $msg, $file, $line, $context) {
+	public function errorToSSO($level, $msg, $file, $line, $context) {
 		$message = NULL;
 		
 		// do nothing when level is 0 or with @ (we don't care about error)

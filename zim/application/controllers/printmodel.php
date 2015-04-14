@@ -80,6 +80,7 @@ class Printmodel extends MY_Controller {
 		$bicolor = ($this->config->item('nb_extruder') >= 2);
 		$enable_print = 'true';
 		$enable_exchange = 'disabled="disabled"'; // select disable
+		$calibration = FALSE;
 		
 		$this->load->helper(array('printlist', 'printerstate', 'slicer', 'timedisplay'));
 		$this->load->library('parser');
@@ -92,6 +93,7 @@ class Printmodel extends MY_Controller {
 		if ($mid) {
 			if ($mid == 'calibration') {
 				$mid = ModelList_codeModelHash(PRINTLIST_MODEL_CALIBRATION);
+				$calibration = TRUE;
 			}
 			$cr = ModelList__getDetailAsArray($mid, $model_data, TRUE);
 			if (($cr != ERROR_OK) || is_null($model_data)) {
@@ -214,7 +216,7 @@ class Printmodel extends MY_Controller {
 				'l'	=> $array_data['r'][PRINTERSTATE_TITLE_NEED_L],
 				'r'	=> $array_data['l'][PRINTERSTATE_TITLE_NEED_L],
 		));
-		if ($cr == ERROR_OK) {
+		if ($cr == ERROR_OK && $calibration == FALSE) {
 			$enable_exchange = NULL;
 		}
 		// display not enough even if filament is unused (in mono-color model)

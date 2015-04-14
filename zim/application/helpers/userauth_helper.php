@@ -37,8 +37,13 @@ if (!defined('USERAUTH_VALUE_TIMEOUT')) {
 	define('USERAUTH_PRM_P_MANAGE',		'manage');
 	define('USERAUTH_PRM_P_VIEW',		'view');
 	
-	define('USERAUTH_TITLE_EMAIL',	'email');
-	define('USERAUTH_TITLE_NAME',	'name');
+	define('USERAUTH_TITLE_EMAIL',		'email');
+	define('USERAUTH_TITLE_NAME',		'name');
+	define('USERAUTH_TITLE_COUNTRY',	'country');
+	define('USERAUTH_TITLE_CITY',		'city');
+	define('USERAUTH_TITLE_BIRTHDAY',	'birth_date');
+	define('USERAUTH_TITLE_WHY',		'why');
+	define('USERAUTH_TITLE_WHAT',		'what');
 	
 	define('USERAUTH_VALUE_P_ON',	'yes');
 	define('USERAUTH_VALUE_P_OFF',	'no');
@@ -49,6 +54,8 @@ if (!defined('USERAUTH_VALUE_TIMEOUT')) {
 	define('USERAUTH_URI_GRANTUSER',	'grantuser.ashx');
 	define('USERAUTH_URI_LISTUSER',		'listuser.ashx');
 	define('USERAUTH_URI_REVOKEUSER',	'revokeuser.ashx');
+	define('USERAUTH_URI_GET_USERINFO',	'getuserinfo.ashx');
+	define('USERAUTH_URI_SET_USERINFO',	'setuserinfo.ashx');
 	
 	define('USERAUTH_RESPONSE_OK',			200);
 	define('USERAUTH_RESPONSE_MISS_PRM',	432);
@@ -84,7 +91,8 @@ function UserAuth__requestSSO($uri, $post_data, &$response = NULL) {
 }
 
 function UserAuth__checkAccess($flag_check) {
-	if ($_SESSION[USERAUTH_TITLE_ACCESS] & $flag_check == $flag_check) {
+	if (isset($_SESSION[USERAUTH_TITLE_ACCESS])
+			&& $_SESSION[USERAUTH_TITLE_ACCESS] & $flag_check == $flag_check) {
 		return TRUE;
 	}
 	
@@ -325,19 +333,17 @@ function UserAuth_revokeUser($user_email) {
 	$CI = &get_instance();
 	$ret_val = 0;
 	$cr = 0;
-	$post_data = NULL; //array()
 	
 	$CI->load->helper('zimapi');
 	
 	if (PHP_SESSION_NONE == session_status()) UserAuth_initialSession();
-	$post_data = array(
+	
+	// send request
+	$ret_val = UserAuth__requestSSO(USERAUTH_URI_REVOKEUSER, array(
 			USERAUTH_PRM_TOKEN	=> $_SESSION[USERAUTH_TITLE_TOKEN],
 			USERAUTH_PRM_SERIAL	=> ZimAPI_getSerial(),
 			USERAUTH_PRM_EMAIL	=> $user_email,
-	);
-	
-	// send request
-	$ret_val = UserAuth__requestSSO(USERAUTH_URI_REVOKEUSER, $post_data);
+	));
 	
 	switch ($ret_val) {
 		case USERAUTH_RESPONSE_OK:
@@ -360,6 +366,100 @@ function UserAuth_revokeUser($user_email) {
 			if ($cr == 0) $cr = ERROR_INTERNAL;
 			$CI->load->helper('printerlog');
 			PrinterLog_logError('sso revokeuser return failed: ' . $ret_val, __FILE__, __LINE__);
+			break;
+	}
+	
+	return $cr;
+}
+
+function UserAuth_getUserInfo(&$user_info) {
+	$CI = &get_instance();
+	$ret_val = 0;
+	$cr = 0;
+	$response = NULL;
+	
+	$CI->load->helper('zimapi');
+	
+	if (PHP_SESSION_NONE == session_status()) UserAuth_initialSession();
+	// send request
+	$ret_val = UserAuth__requestSSO(USERAUTH_URI_GET_USERINFO, array(
+			USERAUTH_PRM_TOKEN	=> $_SESSION[USERAUTH_TITLE_TOKEN],
+			USERAUTH_PRM_SERIAL	=> ZimAPI_getSerial(),
+	), $response);
+	
+	$user_info = array();
+	switch ($ret_val) {
+		case USERAUTH_RESPONSE_OK:
+			$array_return = NULL; //array()
+			
+			$cr = ERROR_OK;
+			$array_return = json_decode($response, TRUE);
+			if (is_array($array_return)) {
+				foreach (array(
+						USERAUTH_TITLE_COUNTRY, USERAUTH_TITLE_CITY, USERAUTH_TITLE_BIRTHDAY,
+						USERAUTH_TITLE_WHY, USERAUTH_TITLE_WHAT
+				) as $info_key) {
+					$user_info[$info_key] = isset($array_return[$info_key]) ? $array_return[$info_key] : NULL;
+				}
+			}
+			break;
+			
+		case USERAUTH_RESPONSE_MISS_PRM:
+			$cr = ERROR_MISS_PRM;
+			break;
+			
+		case USERAUTH_RESPONSE_UF_USER:
+			$cr = ERROR_AUTHOR_FAIL;
+			
+		default:
+			if ($cr == 0) $cr = ERROR_INTERNAL;
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('sso getuserinfo return failed: ' . $ret_val, __FILE__, __LINE__);
+			break;
+	}
+	
+	return $cr;
+}
+
+function UserAuth_setUserInfo($array_info) {
+	$CI = &get_instance();
+	$ret_val = 0;
+	$cr = 0;
+	
+	$CI->load->helper('zimapi');
+	
+	if (PHP_SESSION_NONE == session_status()) UserAuth_initialSession();
+	// send request
+	$ret_val = UserAuth__requestSSO(USERAUTH_URI_SET_USERINFO, array(
+			USERAUTH_PRM_TOKEN		=> $_SESSION[USERAUTH_TITLE_TOKEN],
+			USERAUTH_PRM_SERIAL		=> ZimAPI_getSerial(),
+			USERAUTH_TITLE_COUNTRY	=> $array_info[USERAUTH_TITLE_COUNTRY],
+			USERAUTH_TITLE_CITY		=> $array_info[USERAUTH_TITLE_CITY],
+			USERAUTH_TITLE_BIRTHDAY	=> $array_info[USERAUTH_TITLE_BIRTHDAY],
+			USERAUTH_TITLE_WHY		=> $array_info[USERAUTH_TITLE_WHY],
+			USERAUTH_TITLE_WHAT		=> $array_info[USERAUTH_TITLE_WHAT],
+	));
+	
+	switch ($ret_val) {
+		case USERAUTH_RESPONSE_OK:
+			$cr = ERROR_OK;
+			break;
+		
+		case USERAUTH_RESPONSE_MISS_PRM:
+			$cr = ERROR_MISS_PRM;
+			break;
+			
+		case USERAUTH_RESPONSE_WRONG_PRM:
+			$cr = ERROR_WRONG_PRM;
+			break;
+			
+		case USERAUTH_RESPONSE_UF_USER:
+			$cr = ERROR_AUTHOR_FAIL;
+			
+		default:
+			if ($cr == 0) $cr = ERROR_INTERNAL;
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('sso setuserinfo return failed: ' . $ret_val, __FILE__, __LINE__);
 			break;
 	}
 	
