@@ -40,7 +40,13 @@ div#link_logo {
 }
 .ui-grid-a .ui-block-b .ui-slider-switch,
 .ui-grid-a .ui-block-a .ui-slider-switch,
+.ui-field-contain .ui-slider-switch,
 .switch-larger .ui-slider-switch {
-	width: 12em;
+	width: 12em !important;
 	max-width: 100%;
+}
+
+.ui-field-contain.left-indent {
+	width: 95%;
+	margin-left: 5%;
 }

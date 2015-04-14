@@ -464,10 +464,11 @@ class Printerstate extends MY_Controller {
 	public function printerinfo() {
 		$template_data = array();
 		$temp_info = array();
-		$array_info = array();
+		$array_info = NULL; //array()
 // 		$sso_name = NULL;
 		$ssh_mode = NULL;
 		$ssh_link = NULL;
+// 		$ip_addr6 = NULL;
 		
 		$this->load->helper(array('printerstate', 'zimapi'));
 		$this->load->library('parser');
@@ -476,6 +477,17 @@ class Printerstate extends MY_Controller {
 // 		ZimAPI_getPrinterSSOName($sso_name);
 		
 		$temp_info = PrinterState_getInfoAsArray();
+// 		if (is_array($temp_info[ZIMAPI_TITLE_IPV6])) {
+// 			foreach ($temp_info[ZIMAPI_TITLE_IPV6] as $ip_scope => $ip_addr) {
+// 				if (!is_null($ip_addr6)) {
+// 					$ip_addr6 .= ', ';
+// 				}
+// 				$ip_addr6 .= $ip_addr . ' (' . t($ip_scope) . ')';
+// 			}
+// 		}
+// 		else {
+// 			$ip_addr6 = $temp_info[ZIMAPI_TITLE_IPV6];
+// 		}
 		if (ZimAPI_getSSH($ssh_mode, $ssh_link) && $ssh_mode == TRUE) {
 			$ssh_mode = t('function_on') . ' (' . $ssh_link . ')';
 		}
@@ -519,10 +531,10 @@ class Printerstate extends MY_Controller {
 						'title' => t('ip_address'),
 						'value'	=> $temp_info[ZIMAPI_TITLE_IP],
 				),
-				array(
-						'title' => t('ip_address_v6'),
-						'value'	=> $temp_info[ZIMAPI_TITLE_IPV6],
-				),
+// 				array(
+// 						'title' => t('ip_address_v6'),
+// 						'value'	=> $ip_addr6,
+// 				),
 				array(
 						'title'	=> t('remote_control'),
 						'value'	=> $ssh_mode,

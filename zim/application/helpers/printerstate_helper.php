@@ -2357,9 +2357,9 @@ function PrinterState_getInfoAsArray() {
 			PRINTERSTATE_TITLE_NB_EXTRUD	=> $CI->config->item('nb_extruder'),
 			PRINTERSTATE_TITLE_VER_MARLIN	=> $version_marlin,
 			PRINTERSTATE_TITLE_HOSTNAME		=> $hostname,
-			ZIMAPI_TITLE_IP					=> ($cr == ERROR_OK && !is_null($network_data[ZIMAPI_TITLE_IP]))
+			ZIMAPI_TITLE_IP					=> ($cr == ERROR_OK && isset($network_data[ZIMAPI_TITLE_IP]))
 					 ? $network_data[ZIMAPI_TITLE_IP] : 'N/A',
-			ZIMAPI_TITLE_IPV6				=> ($cr == ERROR_OK && !is_null($network_data[ZIMAPI_TITLE_IPV6]))
+			ZIMAPI_TITLE_IPV6				=> ($cr == ERROR_OK && isset($network_data[ZIMAPI_TITLE_IPV6]))
 					 ? $network_data[ZIMAPI_TITLE_IPV6] : 'N/A',
 	);
 	
