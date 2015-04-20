@@ -16,6 +16,9 @@
 				<select name="user_city" id="user_city" data-oldvalue="{value_city}">
 					<option value="">{hint_city}</option>
 				</select>
+				<div id="user_city_customInput" style="display: none;">
+					<input type="text" name="user_city_input" id="user_city_custom" data-clear-btn="true" value="{value_city}" />
+				</div>
 				<div class="ui-field-contain">
 					<label for="user_birth">{title_birth}</label>
 					<input type="date" name="user_birth" id="user_birth" data-clear-btn="true" value="{value_birth}" />
@@ -32,48 +35,89 @@
 
 <script>
 var var_location_list = null;
+var var_select_country = null;
+var var_select_city = null;
 
-// function sortArrayByName(a, b){
-// 	var aName = a.name.toLowerCase();
-// 	var bName = b.name.toLowerCase(); 
-// 	return ((aName < bName) ? -1 : ((aName > bName) ? 1 : 0));
-// }
-
-function onCountryChanged() {
-	if (var_location_list != null) {
-		var var_disable_city = ($("select#user_country").val().length == 0);
+function internalCountryChanged() {
+	var var_disable_city = (var_select_country.val().length == 0);
+	
+	var_select_city.empty();
+	var_select_city.textinput({disabled: var_disable_city});
+	var_select_city.append(new Option("{hint_city}", ""));
+	if (var_disable_city == false) {
+		var var_city_list = null;
+		var var_temp_dom = null;
+		var var_country_value = var_select_country.data("oldvalue");
+		var var_country_current = var_select_country.val();
+		var var_city_value = var_select_city.data("oldvalue");
+		var var_city_custom = (var_city_value != "" && var_country_value == var_country_current);
 		
-		$("select#user_city").textinput({disabled: var_disable_city});
-		$("select#user_city").empty();
-		$("select#user_city").append(new Option("{hint_city}", ""));
-		if (var_disable_city == false) {
-			var var_city_list = null;
-			var var_country_value = $("select#user_country").data("oldvalue");
-			var var_country_current = $("select#user_country").val();
-			var var_city_value = $("select#user_city").data("oldvalue");
-			
-			$.each(var_location_list, function(var_countryName, var_cityList) {
-				if (var_countryName == $("select#user_country").val()) {
-					var_city_list = var_cityList.sort();
-					return false;
-				}
-			});
+		var_city_list = var_location_list[var_select_country.val()].sort();
+		// make JS redundancy to win more performance
+		if (var_city_custom) {
 			$.each(var_city_list, function(var_i, var_cityName) {
 				if (var_cityName.length > 0) {
-					var var_selected = (var_country_value == var_country_current && var_cityName == var_city_value);
+					var var_selected = (var_cityName == var_city_value);
 					
-					$("select#user_city").append(new Option(var_cityName, var_cityName, var_selected));
+					var_temp_dom += (new Option(var_cityName, var_cityName, var_selected)).outerHTML;
 					if (var_selected == true) {
-						$("select#user_city").val(var_cityName);
+						var_city_custom = false;
 					}
 				}
 			});
 		}
-		$("select#user_city").trigger("change");
+		else {
+			$.each(var_city_list, function(var_i, var_cityName) {
+				if (var_cityName.length > 0) {
+					var_temp_dom += (new Option(var_cityName, var_cityName)).outerHTML;;
+				}
+			});
+		}
+		var_temp_dom += (new Option("{hint_not_found}", "_NOT_FOUND_IN_LIST_", var_city_custom)).outerHTML;
+		var_select_city.append(var_temp_dom);
+		var_select_city.val((var_city_custom ? "_NOT_FOUND_IN_LIST_" : var_city_value));
+	}
+	var_select_city.trigger("change");
+	
+	// spinner off
+	$("#overlay").removeClass("gray-overlay");
+	$(".ui-loader").css("display", "none");
+	
+	return;
+}
+
+function onCountryChanged() {
+	if (var_location_list != null) {
+		// spinner on
+		$("#overlay").addClass("gray-overlay");
+		$(".ui-loader").css("display", "block");
+		
+		// wait for spinner
+		setTimeout(internalCountryChanged, 500);
 	}
 	else {
 		console.log("error case");
 		load_locationList();
+	}
+	
+	return;
+}
+
+function onCityChanged() {
+	var var_citySelected = var_select_city.val();
+	
+	var_select_city.parent().children("span").removeClass();
+	if (var_citySelected == "_NOT_FOUND_IN_LIST_") {
+		$("input#user_city_custom").val((
+				(var_select_country.data("oldvalue") == var_select_country.val())
+				? var_select_city.data("oldvalue") : ""));
+		
+		$("div#user_city_customInput").show();
+		$("input#user_city_custom").textinput({disabled: false});
+	}
+	else {
+		$("div#user_city_customInput").hide();
+		$("input#user_city_custom").textinput({disabled: true});
 	}
 	
 	return;
@@ -88,43 +132,40 @@ function load_locationList() {
 			$("#overlay").addClass("gray-overlay");
 			$(".ui-loader").css("display", "block");
 		},
-		complete: function() {
-			$("#overlay").removeClass("gray-overlay");
-			$(".ui-loader").css("display", "none");
-		},
 		success: function(data) {
 			var var_country_list = [];
-			var var_country_value = $("select#user_country").data("oldvalue");
+			var var_country_value = var_select_country.data("oldvalue");
+			var var_temp_dom = null;
 			
 			var_location_list = data;
 			
 			// add country into list
-			$.each(var_location_list, function(var_country, var_cityList) {
-				if (var_country.length > 0) {
+			if (typeof(Object.keys) == "function") {
+				var_country_list = Object.keys(var_location_list);
+			}
+			else {
+				$.each(var_location_list, function(var_country, var_cityList) {
 					var_country_list.push(var_country);
-				}
-// 				$.each(var_cityList, function(var_i, var_cityName) {
-// 					;
-// 				});
-			});
+				});
+			}
 			var_country_list.sort();
 			$.each(var_country_list, function(var_i, var_countryName) {
-				var var_selected = (var_country_value == var_countryName);
-				
-				$("select#user_country").append(new Option(var_countryName, var_countryName, var_selected));
-				if (var_selected == true) {
-					$("select#user_country").val(var_countryName);
+				if (var_countryName.length > 0) {
+					var_temp_dom += (new Option(var_countryName, var_countryName)).outerHTML;
 				}
 			});
+			var_select_country.append(var_temp_dom);
+			var_select_country.val(var_country_value);
 			
-			$("select#user_country").change(onCountryChanged);
-			$("select#user_city").change(function() {
-				$("#user_city").parent().children("span").removeClass();
-			});
-			$("select#user_country").trigger("change");
+			var_select_country.change(onCountryChanged);
+			var_select_city.change(onCityChanged);
+			var_select_country.trigger("change");
 		},
 		error: function() {
 			var_location_list = null;
+			// clear spinner if error?
+			$("#overlay").removeClass("gray-overlay");
+			$(".ui-loader").css("display", "none");
 		},
 	});
 	
@@ -132,7 +173,11 @@ function load_locationList() {
 }
 
 $("#page_user_info").on("pagecreate",function() {
-	$("select#user_city").textinput({disabled: true});
+	var_select_country = $("select#user_country");
+	var_select_city = $("select#user_city");
+	
+	var_select_city.textinput({disabled: true});
+	$("input#user_city_custom").textinput({disabled: true});
 	load_locationList();
 });
 </script>

@@ -22,6 +22,8 @@ $lang['hint_country']
 	= 'Choisissez pays';
 $lang['hint_city']
 	= 'Choisissez ville';
+$lang['hint_not_found']
+	= '-Non listé';
 $lang['hint_why']
 	= '200 charactères Max.';
 $lang['hint_what']

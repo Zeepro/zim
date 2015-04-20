@@ -10,6 +10,7 @@ class User extends MY_Controller {
 		$this->load->helper(array('userauth', 'errorcode', 'corestatus'));
 		
 		// check local first
+		return;
 		if (UserAuth_checkAccount()) {
 			// get access from sso, and check it again
 			if (UserAuth_getUserAccess($_SESSION[USERAUTH_TITLE_TOKEN]) && UserAuth_checkView()
@@ -220,12 +221,19 @@ class User extends MY_Controller {
 				
 				foreach (array(
 						USERAUTH_TITLE_COUNTRY	=> 'user_country',
-						USERAUTH_TITLE_CITY		=> 'user_city',
+// 						USERAUTH_TITLE_CITY		=> 'user_city',
 						USERAUTH_TITLE_BIRTHDAY	=> 'user_birth',
 						USERAUTH_TITLE_WHY		=> 'user_why',
 						USERAUTH_TITLE_WHAT		=> 'user_what',
 				) as $key => $value) {
 					$array_info[$key] = ($this->input->post($value) !== FALSE) ? $this->input->post($value) : "";
+				}
+				$array_info[USERAUTH_TITLE_CITY] = "";
+				foreach (array('user_city_input', 'user_city') as $value) {
+					if ($this->input->post($value) !== FALSE && strlen($this->input->post($value)) > 0) {
+						$array_info[USERAUTH_TITLE_CITY] = $this->input->post($value);
+						break;
+					}
 				}
 				
 				$ret_val = UserAuth_setUserInfo($array_info);
@@ -274,6 +282,7 @@ class User extends MY_Controller {
 				'button_confirm'	=> t('button_confirm'),
 				'hint_country'		=> t('hint_country'),
 				'hint_city'			=> t('hint_city'),
+				'hint_not_found'	=> t('hint_not_found'),
 				'hint_why'			=> t('hint_why'),
 				'hint_what'			=> t('hint_what'),
 				'msg_error'			=> $error,

@@ -110,7 +110,7 @@ if [ -e $TIMELAPSE ]
 then
 	# default fps is 10
 	ffmpeg -r $tlvdfps -loop 1 -i $last_image -t 1 -y -vcodec libx264 -crf 23 -pix_fmt yuv420p $TEMPVIDEO
-	nice -n 19 ffmpeg -r $tlvdfps -f image2 -i $IMAGEPATH$IMAGESPAT -i $TEMPVIDEO -i $WATERMARK -i $POWEREDVD -f image2 -i $PREFINPAT -y -filter_complex "[0:v][4:v][1:v]concat=n=3:v=1[bg];[bg][2:v]overlay=main_w-overlay_w:0[pt];[pt]fade=t=out:$fadeptr:$tlvdfps:color=white[tl];[tl][3:v]concat=n=2:v=1" -vcodec libx264 -crf 29 -pix_fmt yuv420p $TIMELAPSE
+	nice -n 19 ffmpeg -r $tlvdfps -f image2 -i $IMAGEPATH$IMAGESPAT -i $TEMPVIDEO -i $WATERMARK -i $POWEREDVD -f image2 -i $PREFINPAT -y -filter_complex "[0:v][4:v][1:v]concat=n=3:v=1[bg];[bg][2:v]overlay=main_w-overlay_w:0[pt];[pt]fade=t=out:$fadeptr:$tlvdfps[tl];[tl][3:v]concat=n=2:v=1" -vcodec libx264 -crf 29 -pix_fmt yuv420p $TIMELAPSE
 	rm -fv $TEMPVIDEO
 	
 	chown www-data $TIMELAPSE
