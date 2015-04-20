@@ -10,7 +10,6 @@ class User extends MY_Controller {
 		$this->load->helper(array('userauth', 'errorcode', 'corestatus'));
 		
 		// check local first
-		return;
 		if (UserAuth_checkAccount()) {
 			// get access from sso, and check it again
 			if (UserAuth_getUserAccess($_SESSION[USERAUTH_TITLE_TOKEN]) && UserAuth_checkView()
