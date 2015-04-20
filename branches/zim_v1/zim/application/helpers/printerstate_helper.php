@@ -1341,8 +1341,8 @@ function PrinterState_checkBusyStatus(&$status_current, &$array_data = array()) 
 				$stats_info = PrinterState_prepareStatsSliceLabel(TRUE);
 				//detect remote slicing
 				if (file_exists(SLICER_FILE_REMOTE_REQUEST_URL)) {
-					$url_remote = @file_get_contents(SLICER_FILE_REMOTE_REQUEST_URL);
-					if (is_null($url_remote)) {
+					$url_remote = trim(@file_get_contents(SLICER_FILE_REMOTE_REQUEST_URL));
+					if (strlen($url_remote) == 0) {
 						$url_remote = PRINTERLOG_STATS_VALUE_REMOTE;
 					}
 				}
