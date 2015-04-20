@@ -389,14 +389,14 @@ function Slicer_slice($remote_slice = TRUE) {
 // 	if ($ret_val == SLICER_RESPONSE_OK) {
 	if ($ret_val == SLICER_RESPONSE_OK && CoreStatus_setInSlicing()) {
 // 		if (CoreStatus_setInSlicing()) {
-			if ($remote_slice == TRUE) {
-				// stats info (only do it in remote slicing - first time when we pass)
+// 			if ($remote_slice == TRUE) {
+// 				// stats info (only do it in remote slicing - first time when we pass)
 				$stats_info = array();
 				
 				$CI->load->helper(array('printerstate', 'printerlog'));
 				$stats_info = PrinterState_prepareStatsSliceLabel();
 				PrinterLog_statsSlice(PRINTERLOG_STATS_ACTION_START, $stats_info);
-			}
+// 			}
 			
 			$cr = ERROR_OK;
 // 		}
