@@ -21,7 +21,11 @@ $lang['overwrite_system_preset']
 $lang['same_user_preset']
 	= 'Another old preset with the same name detected when changing preset name, please check the overwrite box to confirm it during the modification';
 $lang['save_overwrite']
-	= 'Overwrite another old preset if you change preset name';
+	= 'The preset name already exists, overwrite ?';
+$lang['button_save_ok']
+	= 'Yes';
+$lang['button_save_no']
+	= 'No';
 
 $lang['fill_pattern1']
 	= 'rectilinear';

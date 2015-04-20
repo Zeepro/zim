@@ -21,7 +21,11 @@ $lang['overwrite_system_preset']
 $lang['same_user_preset']
 	= 'Nous avons trouvé une autre ancienne pré-selection avec le même nom quand vous changez le nom, cochez la confirmation de remplacement pendant la modification SVP';
 $lang['save_overwrite']
-	= 'Remplacer l\'autre ancienne pré-selection si vous changez le nom';
+	= 'Le nom de présélection existe déjà, souhaitez-vous l\'écraser ?';
+$lang['button_save_ok']
+	= 'Oui';
+$lang['button_save_no']
+	= 'Non';
 
 $lang['support_material_interface_speed']
 	= 'Interface des matériaux de support (mm/s or %%)';
