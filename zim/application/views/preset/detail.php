@@ -1,4 +1,4 @@
-<div data-role="page">
+<div data-role="page" style="overflow-y:hidden;">
 	<header data-role="header" class="page-header">
 		<a href="javascript:history.back();" data-role="button" data-icon="back" data-ajax="false">{back}</a>
 		<a href="/" data-icon="home" data-ajax="false">{home}</a>
@@ -16,12 +16,11 @@
 					<a href="/preset/delete?id={preset_id}" data-role="button" data-icon="delete" data-ajax="false" data-inline="true">Delete</a> <!-- class="ui-disabled" -->
 				</div>
 			</div>
-			<form action="/preset/detail?id={preset_id}{preset_newurl}" method="post" data-ajax="false">
+			<form action="/preset/detail?id={preset_id}{preset_newurl}" method="post" data-ajax="false" id="form_preset_detail">
 			<div id="save_as_container" style="{hide_submit}">
 				<h3><label for="save_as">{save_as_title}</label></h3>
-				<input type="text" data-clear-btn="true" name="save_as" value="{save_as_value}" id="save_as" required>
-				<input type="checkbox" id="save_overwrite" name="save_overwrite" data-mini="true" value="1">
-				<label for="save_overwrite">{save_overwrite}</label>
+				<input type="text" data-clear-btn="true" name="save_as" value="{save_as_value}" id="save_as" data-oldvalue="{save_as_value}" required>
+				<input type="hidden" id="save_overwrite" name="save_overwrite" value="0">
 			</div>
 			<div data-role="collapsible">
 				<h4>{layer_perimeter_title}</h4>
@@ -512,22 +511,76 @@
 					</div>
 				</div>
 			</div> <!-- advanced -->
-			<div id="submit_container" style="{hide_submit}"><input type="submit" value="{submit_button}"></div>
+			<div id="submit_container" style="{hide_submit}"><input type="button" value="{submit_button}" onclick="javascript: submitPreset();"></div>
 			</form>
 			<div class="zim-error">{error}</div>
 		</div>
+		<div id="overwrite_popup" data-role="popup" data-dismissible="false" class="ui-content" style="max-width: 250px; text-align: center;">
+			{save_overwrite}
+			<br /><br />
+			<div class="ui-grid-a">
+				<div class="ui-block-a">
+					<a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" onclick="javascript: do_overwritePreset();">{button_save_ok}</a>
+				</div>
+				<div class="ui-block-b">
+					<a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back">{button_save_no}</a>
+				</div>
+			</div>
+		</div>
 	</div>
-	<script>
-// 	console.log('{disable_all}');
-		if ({disable_all} == true)
-		{
-			$("input").attr('disabled', 'disabled');
-			$("select").attr('disabled', 'disabled');
-		}
+<script>
+var var_ajax;
+var var_submit_allow = false;
+
+if ({disable_all} == true) {
+	$("input").attr('disabled', 'disabled');
+	$("select").attr('disabled', 'disabled');
+}
+
+function expand_allErrorCollapsibles() {
+	$('div#collapsible_speed').collapsible('expand');
+	$('div#collapsible_advanced').collapsible('expand');
+}
+
+function do_overwritePreset() {
+	$("input#save_overwrite").val(1);
+	$("form#form_preset_detail").submit();
+	
+	return;
+}
+
+function submitPreset() {
+	if ($("input#save_as").data("oldvalue") == $("input#save_as").val()) {
+		$("form#form_preset_detail").submit();
 		
-		function expand_allErrorCollapsibles() {
-			$('div#collapsible_speed').collapsible('expand');
-			$('div#collapsible_advanced').collapsible('expand');
+		return;
+	}
+	
+	var_ajax = $.ajax({
+		url: "/preset/check_exist_ajax",
+		cache: false,
+		type: "POST",
+		data: { name: $("input#save_as").val() },
+		beforeSend: function() {
+			$("#overlay").addClass("gray-overlay");
+			$(".ui-loader").css("display", "block");
+		},
+		complete: function() {
+			$("#overlay").removeClass("gray-overlay");
+			$(".ui-loader").css("display", "none");
+		},
+	})
+	.done(function() {
+		$("form#form_preset_detail").submit();
+	})
+	.fail(function() {
+		if (var_ajax.status == 403) {
+			$("div#overwrite_popup").popup("open");
 		}
-	</script>
+		else {
+			console.log("unexpected error case: " + var_ajax.status);
+		}
+	});
+}
+</script>
 </div>

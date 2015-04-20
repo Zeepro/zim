@@ -626,6 +626,8 @@ class Preset extends MY_Controller {
 				'error'				=> $error,
 				'disable_all'		=> ($system_preset && $new_preset == NULL) ? 'true' : 'false',
 				'save_overwrite'	=> t('save_overwrite'),
+				'button_save_ok'	=> t('button_save_ok'),
+				'button_save_no'	=> t('button_save_no'),
 				'save_as_value'		=> $new_preset ? NULL : $array_info['name'],
 				// hint for select option of extruder
 				'extruder_left'			=> t('extruder_left'),
@@ -788,5 +790,13 @@ class Preset extends MY_Controller {
 		
 		return;
 	}
-
+	
+	public function check_exist_ajax() {
+		$name_preset = $this->input->post('name');
+		$ret_val = ZimAPI_checkPreset(ZimAPI_codePresetHash($name_preset));
+		
+		$this->output->set_status_header(($ret_val ? 403 : 200));
+		
+		return;
+	}
 }
