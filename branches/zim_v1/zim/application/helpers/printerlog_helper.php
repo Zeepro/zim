@@ -73,6 +73,7 @@ if (!defined('PRINTERLOG_STATS_TITLE_SERIAL')) {
 	
 	define('PRINTERLOG_STATS_TMPFILE_SLICE_UPLOAD_END',		$CI->config->item('temp') . '/remote_slice/upload_end');
 	define('PRINTERLOG_STATS_TMPFILE_SLICE_DOWNLOAD_START',	$CI->config->item('temp') . '/remote_slice/download_start');
+	define('PRINTERLOG_STATS_SESSION_GUID_FILE',	$CI->config->item('temp') . '/stats_session_guid.txt');
 	
 	if (DectectOS_checkWindows()) {
 		define('PRINTERLOG_STATS_FILEPATH_OFF',	$CI->config->item('conf') . 'stats_off');
@@ -213,11 +214,15 @@ function PrinterLog_getStats() {
 }
 
 function PrinterLog_statsPowerOff() {
+	$guid = @file_get_contents(PRINTERLOG_STATS_SESSION_GUID_FILE);
+	
+	if ((int)$guid <= 0) $guid = NULL;
+	
 	return PrinterLog__logStats(array(
 			PRINTERLOG_STATS_TITLE_CATEGORY	=> PRINTERLOG_STATS_CATEGORY_PRINTER,
 			PRINTERLOG_STATS_TITLE_ACTION	=> PRINTERLOG_STATS_ACTION_OFF,
 			PRINTERLOG_STATS_TITLE_LABEL	=> NULL,
-			PRINTERLOG_STATS_TITLE_VALUE	=> NULL,
+			PRINTERLOG_STATS_TITLE_VALUE	=> $guid,
 	));
 }
 
