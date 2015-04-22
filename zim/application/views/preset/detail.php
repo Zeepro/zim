@@ -511,7 +511,7 @@
 					</div>
 				</div>
 			</div> <!-- advanced -->
-			<div id="submit_container" style="{hide_submit}"><input type="button" value="{submit_button}" onclick="javascript: submitPreset();"></div>
+			<div id="submit_container" style="{hide_submit}"><input type="submit" value="{submit_button}"></div>
 			</form>
 			<div class="zim-error">{error}</div>
 		</div>
@@ -532,26 +532,11 @@
 var var_ajax;
 var var_submit_allow = false;
 
-if ({disable_all} == true) {
-	$("input").attr('disabled', 'disabled');
-	$("select").attr('disabled', 'disabled');
-}
-
-function expand_allErrorCollapsibles() {
-	$('div#collapsible_speed').collapsible('expand');
-	$('div#collapsible_advanced').collapsible('expand');
-}
-
-function do_overwritePreset() {
-	$("input#save_overwrite").val(1);
-	$("form#form_preset_detail").submit();
+var handlerPresetSubmit = function submitPreset(event) {
+	event.preventDefault();
 	
-	return;
-}
-
-function submitPreset() {
 	if ($("input#save_as").data("oldvalue") == $("input#save_as").val()) {
-		$("form#form_preset_detail").submit();
+		$("form#form_preset_detail").unbind("submit", handlerPresetSubmit).submit();
 		
 		return;
 	}
@@ -571,7 +556,7 @@ function submitPreset() {
 		},
 	})
 	.done(function() {
-		$("form#form_preset_detail").submit();
+		$("form#form_preset_detail").unbind("submit", handlerPresetSubmit).submit();
 	})
 	.fail(function() {
 		if (var_ajax.status == 403) {
@@ -582,5 +567,26 @@ function submitPreset() {
 		}
 	});
 }
+
+function do_overwritePreset() {
+	$("input#save_overwrite").val(1);
+	$("form#form_preset_detail").unbind("submit", handlerPresetSubmit).submit();
+	
+	return;
+}
+
+if ({disable_all} == true) {
+	$("input").attr('disabled', 'disabled');
+	$("select").attr('disabled', 'disabled');
+}
+
+$("#form_preset_detail").bind("submit", handlerPresetSubmit);
+
+// function expand_allErrorCollapsibles() {
+// 	$('div#collapsible_speed').collapsible('expand');
+// 	$('div#collapsible_advanced').collapsible('expand');
+	
+// 	return;
+// }
 </script>
 </div>
