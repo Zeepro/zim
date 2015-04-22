@@ -50,7 +50,8 @@ function internalCountryChanged() {
 		var var_country_value = var_select_country.data("oldvalue");
 		var var_country_current = var_select_country.val();
 		var var_city_value = var_select_city.data("oldvalue");
-		var var_city_custom = (var_city_value != "" && var_country_value == var_country_current);
+		var var_same_country = (var_country_value == var_country_current);
+		var var_city_custom = (var_city_value != "" && var_same_country);
 		
 		var_city_list = var_location_list[var_select_country.val()].sort();
 		// make JS redundancy to win more performance
@@ -75,7 +76,7 @@ function internalCountryChanged() {
 		}
 		var_temp_dom += (new Option("{hint_not_found}", "_NOT_FOUND_IN_LIST_", var_city_custom)).outerHTML;
 		var_select_city.append(var_temp_dom);
-		var_select_city.val((var_city_custom ? "_NOT_FOUND_IN_LIST_" : var_city_value));
+		var_select_city.val((var_city_custom ? "_NOT_FOUND_IN_LIST_" : (var_same_country ? var_city_value : "")));
 	}
 	var_select_city.trigger("change");
 	

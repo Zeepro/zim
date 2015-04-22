@@ -260,9 +260,13 @@ class User extends MY_Controller {
 			}
 		}
 		
-		UserAuth_getUserInfo($user_info);
+		$ret_val = UserAuth_getUserInfo($user_info);
+		if ($ret_val == ERROR_AUTHOR_FAIL) {
+			$error = t('error_authorize');
+		}
+		
 		$assign_func = function ($key_array) use (&$user_info) {
-			return (isset($user_info[$key_array]) ? $user_info[$key_array] : NULL);
+			return (isset($user_info[$key_array]) ? htmlspecialchars($user_info[$key_array]) : NULL);
 		};
 		$user_birth = $assign_func(USERAUTH_TITLE_BIRTHDAY);
 		if ($user_birth) {
