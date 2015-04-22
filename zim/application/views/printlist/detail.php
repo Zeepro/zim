@@ -167,7 +167,7 @@ function changecartridge(side) {
 						quantity = var_need_filament_r;
 					}
 				}
-				window.location.href="/printerstate/changecartridge?v=" + side + "&f=" + quantity + "&id=slice";
+				window.location.href="/printerstate/changecartridge?v=" + side + "&f=" + quantity + "&id={model_id}";
 				break;
 				
 			default:
