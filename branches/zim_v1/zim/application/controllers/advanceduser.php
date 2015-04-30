@@ -23,7 +23,8 @@ class Advanceduser extends MY_Controller {
 				'bicolor'	=> ($this->config->item('nb_extruder') >= 2) ? 'true' : 'false',
 		);
 		
-		$this->_parseBaseTemplate('Advanced user', $this->parser->parse('advanceduser/index', $template_data, TRUE));
+		$this->_parseBaseTemplate('Advanced user', $this->parser->parse('advanceduser/index', $template_data, TRUE),
+				'<link rel="stylesheet" href="/assets/jquery-mobile-fluid960.min.css">');
 		
 		return;
 	}
