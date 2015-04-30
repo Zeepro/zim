@@ -1,8 +1,4 @@
 <div data-role="page" data-url="/sliceupload/slice">
-	<style>
-		div.slicer_slider_adjustment_container input[type=number] { display: none !important; }
-		.zeeprocanvas { background-color: rgba(0,0,0,1.0); border: 0px; }
-	</style>
 	<div id="overlay"></div>
 	<header data-role="header" class="page-header">
 		<a href="#" data-icon="back" data-ajax="false" style="visibility:hidden">{back}</a>

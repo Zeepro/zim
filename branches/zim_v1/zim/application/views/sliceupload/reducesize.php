@@ -4,12 +4,6 @@
 		<a href="javascript:history.back();" data-icon="back" data-ajax="false" style="display: none;">{back}</a>
 	</header>
 	<div class="logo"><div id="link_logo"></div></div>
-	<style>
-    	input[type=number]
-    	{
-        	display : none !important;
-		}
-	</style>
 	<div data-role="content">
 		<div id="container">
 			<h2>{reducesize_title}</h2>
@@ -22,9 +16,9 @@
 				<input type="hidden" name="z" value="{zsize}">
 				<input type="hidden" name="ms" value="{max_percent}">
 				<label for="sizepercentage">{reducesize_scale}</label><br />
-				<div class="ui-grid-a">
-					<div class="ui-block-a" style="width:1%;position:relative;top:11px;left:28px;">
-						<span id="size_percentage"></span>
+				<div class="ui-grid-a slider-show-value-container">
+					<div class="ui-block-a" style="width:25%;max-width:80px;">
+						<span id="size_percentage" style="position:relative;top:11px;left:28px;"></span>
 					</div>
 					<div class="ui-block-b" id="size-slider" style="width:75%">
 						<input type="range" name="sizepercentage" id="sizepercentage" value="{max_percent}" min="1" max="100" />

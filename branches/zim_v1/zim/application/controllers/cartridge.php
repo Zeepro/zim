@@ -144,6 +144,7 @@ class Cartridge extends MY_Controller {
 				'info_not_changed'		=> t('information_not_changed'),
 				'writing_successed'		=> t('writing_successed'),
 				'error_writing'			=> t('error_writing'),
+				'bicolor'				=> ($this->config->item('nb_extruder') >= 2) ? 'true' : 'false',
 		);
 	
 		if ($cr == ERROR_OK) {

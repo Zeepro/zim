@@ -17,9 +17,6 @@
 	<script type="text/javascript" src="/assets/gcode/js/renderer.js"></script>
 	<script type="text/javascript" src="/assets/gcode/js/analyzer.js"></script>
 	
-	<style> #slider-horizontal { position: relative !important; } </style>
-	<!-- <style> div#rendering_layerslider_container input[type=number] { display : none !important; } </style> -->
-	
 	<header data-role="header" class="page-header">
 		<a href="javascript:history.back();" data-icon="back" data-ajax="false">{back}</a>
 		<a href="#" onclick="javascript: window.location.href='/';" data-icon="home" data-ajax="false" style="float:right">{home}</a>
@@ -36,8 +33,6 @@
 					</div>
 					<div id="rendering">
 						<canvas id="canvas" width="650" height="620"></canvas>
-<!-- 						<div id="slider-vertical"></div> -->
-<!-- 						<div id="slider-horizontal"></div> -->
 						<div id="rendering_layerslider_container" style="display: none;">
 							<h3>{layer_number}</h3>
 							<div id="rendering_layerslider_display_container" style="margin: 0;">

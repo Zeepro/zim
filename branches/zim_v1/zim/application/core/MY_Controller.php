@@ -143,8 +143,8 @@ class MY_Controller extends CI_Controller {
 			
 			// stats info (do not stats rest, app can initialize cookies in each request)
 			$this->load->library('session');
-			if (FALSE === $this->session->userdata('stats_browserLog')) {
-				$this->session->set_userdata('stats_browserLog', 'ok');
+			if (FALSE === $this->input->cookie('stats_browserLog')) {
+				$this->input->set_cookie('stats_browserLog', 'ok', 2592000); // 30 days for browser stats
 				PrinterLog_statsWebAgent();
 			}
 			

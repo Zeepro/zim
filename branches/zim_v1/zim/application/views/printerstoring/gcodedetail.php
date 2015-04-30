@@ -18,7 +18,7 @@
 			</div>
 			<div data-role="collapsible" data-collapsed="false" style="text-align: center;">
 				<h4>{title_current}</h4>
-				<div style="display: none;" class="widget_monocolor">
+				<div style="display: none;" class="widget_monocolor slider-show-value-container">
 					<div style="width: 75px; height: 75px; background-color: {state_c_r}; margin: 0 auto;">
 						<img src="/images/cartridge.png" style="width: 100%">
 					</div>
@@ -52,7 +52,7 @@
 							<a href="/printerstate/changecartridge?v=r&f={need_filament_r}&id=gcode{id}" data-role="button" data-ajax="false" data-iconpos="none" class="ui-shadow ui-corner-all">{change_filament_r}</a>
 						</div>
 					</div>
-					<div class="ui-grid-a">
+					<div class="ui-grid-a slider-show-value-container">
 						<div class="ui-block-a">{temp_adjustments_l}</div>
 						<div class="ui-block-b">{temp_adjustments_r}</div>
 						<div class="ui-block-a">
@@ -75,10 +75,10 @@
 					</div>
 				</div>
 				<p style="font-weight: bold;">{extrud_multiply}</p>
-				<div class="widget_monocolor slicer_slider_adjustment_container" style="display: none;">
+				<div class="widget_monocolor slider-show-value-container" style="display: none;">
 					<input type="range" id="slider_mono_em" value="{extrud_r}" min="{extrud_min}" max="{extrud_max}" data-show-value="true" />
 				</div>
-				<div class="widget_bicolor ui-grid-a slicer_slider_adjustment_container" style="display: none;">
+				<div class="widget_bicolor ui-grid-a slider-show-value-container" style="display: none;">
 					<div class="ui-block-a">
 						<label>{left_extrud_mult}</label>
 						<div id="extrud_l">
