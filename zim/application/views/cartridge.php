@@ -11,7 +11,7 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
-			<h2 style="text-align: center;">{side_cartridge}</h2>
+			<h2 style="text-align: center; display: none;" class="widget_bicolor">{side_cartridge}</h2>
 			
 			<p>{cartridge_code_hint} <span id="code">{cartridge_code}</span></p>
 			<table border="1">
@@ -116,8 +116,12 @@
 <script type="text/javascript">
 var_next_phase = '{next_phase}';
 var flag = false;
-
 var code = $("#code").html();
+var var_bicolor = {bicolor};
+
+if (var_bicolor == true) {
+	$(".widget_bicolor").show();
+}
 
 if (code.length == 32) {
 	var var_date = '{pack_date_val}';

@@ -346,7 +346,7 @@
 			</div> <!-- support material -->
 			<div data-role="collapsible">
 				<h4>{mutiple_extruder_title}</h4>
-				<div data-role="collapsible" data-collapsed="false" data-theme="d">
+				<div data-role="collapsible" data-collapsed="false" data-theme="d" class="widget_bicolor" style="display: none;">
 					<h4>{mutiple_extruder_subtitle1}</h4>
 					<div class="ui-field-contain">
 						<label for="perimeter_extruder">{perimeter_extruder}</label>
@@ -531,6 +531,7 @@
 <script>
 var var_ajax;
 var var_submit_allow = false;
+var var_bicolor = {bicolor};
 
 var handlerPresetSubmit = function submitPreset(event) {
 	event.preventDefault();
@@ -578,6 +579,10 @@ function do_overwritePreset() {
 if ({disable_all} == true) {
 	$("input").attr('disabled', 'disabled');
 	$("select").attr('disabled', 'disabled');
+}
+
+if (var_bicolor == true) {
+	$(".widget_bicolor").show();
 }
 
 $("#form_preset_detail").bind("submit", handlerPresetSubmit);

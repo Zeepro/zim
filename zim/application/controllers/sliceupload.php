@@ -861,10 +861,12 @@ class Sliceupload extends MY_Controller {
 			}
 			// display not enough even if filament is unused (in mono-color model)
 			else if ($bicolor_model == FALSE) {
-				if ($array_data['l'][PRINTERSTATE_TITLE_NEED_L] == 0) {
+				if ($array_data['l'][PRINTERSTATE_TITLE_NEED_L] == 0
+						&& $check_filament['l'] == t('filament_not_need')) {
 					$check_filament['l'] = t('filament_not_enough_for_switch');
 				}
-				else { // ($array_data['r'][PRINTERSTATE_TITLE_NEED_L] == 0)
+				else if ($array_data['r'][PRINTERSTATE_TITLE_NEED_L] == 0
+						&& $check_filament['r'] == t('filament_not_need')) {
 					$check_filament['r'] = t('filament_not_enough_for_switch');
 				}
 			}
