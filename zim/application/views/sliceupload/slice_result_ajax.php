@@ -22,7 +22,7 @@
 								</div>
 								<p id="state_f_mono">{state_f_r}</p>
 							</div>
-							<div class="slicer_slider_adjustment_container">
+							<div class="slider-show-value-container">
 								<label>{chg_temperature}</label>
 								<input type="range" id="slider_mono" value="{temper_r}" min="{temper_min}" max="{temper_max}" data-show-value="true" />
 							</div>
@@ -42,7 +42,7 @@
 							</div></div>
 						</div>
 						<p style="text-align: left;">{error_msg}</p>
-						<div class="ui-grid-a slicer_slider_adjustment_container widget_bicolor" style="display: none;">
+						<div class="ui-grid-a slider-show-value-container widget_bicolor" style="display: none;">
 							<div class="ui-block-a">
 								<label>{left_temperature}</label>
 								<div id="temper_l">
@@ -69,10 +69,10 @@
 							</div>
 						</div>
 						<p style="font-weight: bold;">{extrud_multiply}</p>
-						<div class="widget_monocolor slicer_slider_adjustment_container" style="display: none;">
+						<div class="widget_monocolor slider-show-value-container" style="display: none;">
 							<input type="range" id="slider_mono_em" value="{extrud_r}" min="{extrud_min}" max="{extrud_max}" data-show-value="true" />
 						</div>
-						<div class="widget_bicolor ui-grid-a slicer_slider_adjustment_container" style="display: none;">
+						<div class="widget_bicolor ui-grid-a slider-show-value-container" style="display: none;">
 							<div class="ui-block-a">
 								<label>{left_extrud_mult}</label>
 								<div id="extrud_l">

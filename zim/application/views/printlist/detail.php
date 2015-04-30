@@ -1,6 +1,5 @@
 <div id="overlay"></div>
 <div id="{random_prefix}printModel_detailPage" data-role="page">
-	<style> input[type=number] { display : none !important; } </style>
 	<header data-role="header" class="page-header">
 		<a href="javascript:history.back();" data-icon="back" data-ajax="false">{back}</a>
 		<a href="/" data-icon="home" data-ajax="false">{home}</a>
@@ -41,7 +40,7 @@
 			</div>
 			<div data-role="collapsible" data-collapsed="false" style="text-align: center;">
 				<h4>{title_current}</h4>
-				<div class="widget_monocolor" style="display: none;">
+				<div class="widget_monocolor slider-show-value-container" style="display: none;">
 					<div style="width: 75px; height: 75px; background-color: {state_c_r}; margin: 0 auto;">
 						<img src="/images/cartridge.png" style="width: 100%">
 					</div>
@@ -86,7 +85,7 @@
 							<a href="#" data-role="button" data-ajax="false" data-iconpos="none" class="ui-shadow ui-corner-all" onclick="javascript: changecartridge('r');">{change_filament_r}</a>
 						</div>
 					</div>
-					<div class="ui-grid-a">
+					<div class="ui-grid-a slider-show-value-container">
 						<div class="ui-block-a">
 							{temp_adjustments_l}
 						</div>
@@ -105,10 +104,10 @@
 			<div data-role="collapsible" style="text-align: center;">
 				<h4>{advanced}</h4>
 				<p style="font-weight: bold;">{extrud_multiply}</p>
-				<div class="widget_monocolor" style="display: none;">
+				<div class="widget_monocolor slider-show-value-container" style="display: none;">
 					<input type="range" id="slider_mono_em" value="{extrud_r}" min="{extrud_min}" max="{extrud_max}" data-show-value="true" />
 				</div>
-				<div class="widget_bicolor ui-grid-a" style="display: none;">
+				<div class="widget_bicolor ui-grid-a slider-show-value-container" style="display: none;">
 					<div class="ui-block-a">
 						<label>{left_extrud_mult}</label>
 						<div id="extrud_l">

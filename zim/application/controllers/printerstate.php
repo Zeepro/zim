@@ -451,7 +451,7 @@ class Printerstate extends MY_Controller {
 				'function_off'			=> t('function_off'),
 				'nozzles_adjustments'	=> t('nozzles_adjustments'),
 				'support'				=> t('support'),
-				'bicolor'				=> ($this->config->item('nb_extruder') >= 2) ? 'true' : 'false', 
+				'bicolor'				=> ($this->config->item('nb_extruder') >= 2) ? 'true' : 'false',
 		);
 		
 		// parse all page
@@ -710,6 +710,7 @@ class Printerstate extends MY_Controller {
 				'abb_cartridge'	=> $abb_cartridge,
 				'need_filament'	=> $need_filament,
 				'id_model'		=> $id_model,
+				'bicolor'		=> ($this->config->item('nb_extruder') >= 2) ? 'true' : 'false',
 		);
 		
 		// parse all page

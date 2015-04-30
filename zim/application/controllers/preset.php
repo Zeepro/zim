@@ -634,6 +634,7 @@ class Preset extends MY_Controller {
 				'extruder_right'		=> t('extruder_right'),
 				'extruder_left_val'		=> CLASS_PRESET_EXTRUDER_LEFT,
 				'extruder_right_val'	=> CLASS_PRESET_EXTRUDER_RIGHT,
+				'bicolor'				=> ($this->config->item('nb_extruder') >= 2) ? 'true' : 'false',
 		);
 		
 		switch ($array_setting['perimeter_extruder']) {

@@ -7,7 +7,7 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
-			<h2 style="text-align: center;">{title}</h2>
+			<h2 style="text-align: center; display: none;" class="widget_bicolor">{title}</h2>
 			<div id="cartridge_detail_info" style="text-align: center;">
 				<p>{wait_info}</p>
 			</div>
@@ -21,6 +21,12 @@ var var_ajax;
 var var_ajax_lock = false;
 var var_next_phase = '{first_status}';
 var var_auto_prime = -1;
+var var_bicolor = {bicolor};
+
+if (var_bicolor == true) {
+	$(".widget_bicolor").show();
+}
+
 $(document).ready(checkChangeStatus());
 
 function checkChangeStatus() {
