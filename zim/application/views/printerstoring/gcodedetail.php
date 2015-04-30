@@ -1,8 +1,5 @@
 <div id="overlay"></div>
 <div data-role="page">
-	<style>
-		input[type=number] { display : none !important; }
-	</style>
 	<header data-role="header" class="page-header">
 		<a href="javascript:history.back();" data-icon="back" data-ajax="false">{back}</a>
 		<a href="/" data-icon="home" data-ajax="false">{home}</a>
