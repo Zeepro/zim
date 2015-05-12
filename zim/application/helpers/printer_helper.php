@@ -27,6 +27,7 @@ if (!defined('PRINTER_FN_CHARGE')) {
 	
 	define('PRINTER_TYPE_MODELLIST',	'model');
 	define('PRINTER_TYPE_GCODELIB',		'gcode');
+	define('PRINTER_TYPE_USERLIB',		'userlib');
 	
 	define('PRINTER_VALUE_MID_API_CALL',	'API');
 // 	define('PRINTER_VALUE_DEFAULT_TEMPER',	230);
@@ -416,6 +417,50 @@ function Printer_printFromLibrary($id_gcode, $exchange_extruder = FALSE, $array_
 		
 		$CI->load->helper('corestatus');
 		$ret_val = Printer_printFromFile($gcode_path, CORESTATUS_VALUE_MID_PREFIXGCODE . $id_gcode, 0,
+				TRUE, $exchange_extruder, $array_filament, $array_temper);
+		
+		// stats info
+		$CI->load->helper('printerlog');
+		PrinterLog_statsLibraryGcode(PRINTERLOG_STATS_LABEL_PRINT, count($array_filament));
+	}
+	
+	return $ret_val;
+}
+
+function Printer_printFromUserLib($id_model, $timestamp, $exchange_extruder = FALSE, $array_temper = array()) {
+	$ret_val = 0;
+	$array_info = NULL; //array();
+	$gcode_path = NULL;
+	$CI = &get_instance();
+	
+	$ret_val = Printer_getFileFromUserLib($id_model, $timestamp, $gcode_path, NULL, $array_info);
+	if (($ret_val == ERROR_OK) && $gcode_path) {
+		$array_filament = array();
+		
+		if (Printer__getLengthFromJson(PRINTER_TYPE_USERLIB, $array_info, $array_filament)) {
+			if ($exchange_extruder) {
+				Printer__inverseFilament($array_filament);
+			}
+		}
+		else {
+			return ERROR_INTERNAL; // $ret_val = ERROR_INTERNAL;
+		}
+		
+		// modify the temperature of gcode file according to cartridge info
+		$ret_val = Printer__changeGcode($gcode_path, $array_filament, $exchange_extruder, $array_temper);
+		if ($ret_val != ERROR_OK) {
+			return $ret_val;
+		}
+		
+		$CI->load->helper('corestatus');
+		$ret_val = CoreStatus_setUserLibReference($id_model, $timestamp);
+		if ($ret_val == FALSE) {
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('set userlib reference error', __FILE__, __LINE__);
+			
+			return ERROR_INTERNAL;
+		}
+		$ret_val = Printer_printFromFile($gcode_path, CORESTATUS_VALUE_MID_USERLIB, 0,
 				TRUE, $exchange_extruder, $array_filament, $array_temper);
 		
 		// stats info
@@ -821,7 +866,7 @@ function Printer_getFileFromModel($type_model, $id_model, &$gcode_path, $filenam
 	$bz2_path = NULL;
 	$command = '';
 	$output = array();
-	$ret_val = 0;
+	$model_cr = 0;
 	$filename_json = NULL;
 	$filename_bz2 = NULL;
 	$filename_gcode = NULL;
@@ -904,6 +949,57 @@ function Printer_getFileFromModel($type_model, $id_model, &$gcode_path, $filenam
 	return ERROR_OK; // never reach here
 }
 
+function Printer_getFileFromUserLib($model_id, $timestamp, &$gcode_path, $filename = NULL, &$array_info = NULL) {
+	$cr = 0;
+	$CI = &get_instance();
+	
+	$CI->load->helper('userauth');
+	$cr = UserAuth_getUserPrint($model_id, $timestamp, $array_info);
+	
+	if ($cr == ERROR_OK) {
+		$path_gcode = NULL;
+		
+		if ($array_info[USERAUTH_TITLE_USERLIB_STATE] != USERAUTH_VALUE_UL_P_READY
+				|| !isset($array_info[USERAUTH_TITLE_PRINT_TAG_GCODE])) {
+			return ERROR_NO_SLICED;
+		}
+		else {
+			$path_gcode = USERAUTH_VALUE_FOLDER_CACHE . $array_info[USERAUTH_TITLE_PRINT_TAG_GCODE]
+					. USERAUTH_VALUE_FILE_P_CACHE_S;
+		}
+		
+		if (!file_exists($path_gcode)) {
+			return ERROR_WRONG_PRM;
+		}
+		else {
+			$zip = new ZipArchive();
+			
+			if ($zip->open($path_gcode) && ($zip->numFiles == 1)
+					&& ($name_inZip = $zip->getNameIndex(0))) { // $name_inZip is gernally "print.gcode"
+				if ($zip->extractTo($CI->config->item('temp'), $name_inZip)
+				&& file_exists($CI->config->item('temp') . $name_inZip)) {
+					if (is_null($filename)) $filename = USERAUTH_VALUE_FILE_GCODE_EXT;
+					
+					rename($CI->config->item('temp') . $name_inZip, $CI->config->item('temp') . $filename);
+					$gcode_path = $CI->config->item('temp') . $filename;
+					$zip->close();
+				}
+				else {
+					$CI->load->helper('printerlog');
+					PrinterLog_logError('extract print zip error', __FILE__, __LINE__);
+						
+					return ERROR_INTERNAL;
+				}
+			}
+			else {
+				return ERROR_UNKNOWN_MODEL;
+			}
+		}
+	}
+	
+	return ERROR_OK;
+}
+
 // internal function
 function Printer__getLengthFromJson($array_type, $array_info, &$array_filament) {
 	$key_length_r = NULL;
@@ -921,6 +1017,12 @@ function Printer__getLengthFromJson($array_type, $array_info, &$array_filament) 
 			$CI->load->helper('printerstoring');
 			$key_length_r = PRINTERSTORING_TITLE_LENG_R;
 			$key_length_l = PRINTERSTORING_TITLE_LENG_L;
+			break;
+			
+		case PRINTER_TYPE_USERLIB:
+			$CI->load->helper('userauth');
+			$key_length_r = USERAUTH_TITLE_PRINT_DESP_LENG1;
+			$key_length_l = USERAUTH_TITLE_PRINT_DESP_LENG2;
 			break;
 			
 		default:

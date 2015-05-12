@@ -24,7 +24,7 @@ class Apiv1 extends MY_Controller {
 		// verify slicer online
 		$slicer_ok = Slicer_checkOnline(TRUE);
 		
-		$fp = fopen($model_url, 'r');
+		$fp = @fopen($model_url, 'r');
 		if (!$fp) {
 			$this->_stlupload_fail('remote model url open failed');
 		}
@@ -43,7 +43,7 @@ class Apiv1 extends MY_Controller {
 			}
 		}
 		
-		$ret_val = Slicer_addModel(array($save_path), 'APIV1', TRUE, $slicer_return);
+		$ret_val = Slicer_addModel(array($save_path), 'APIV1', NULL, TRUE, $slicer_return);
 		if ($ret_val != ERROR_OK) {
 			$this->_stlupload_fail('remote model import failed');
 		}

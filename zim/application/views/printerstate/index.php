@@ -37,9 +37,9 @@
 				</div></div>
 			</div>
 			<ul data-role="listview" id="listview" class="shadowBox" data-inset="true">
-				<li><a href="/preset/listpreset">
-					<h2>{set_preset}</h2></a>
-				</li>
+<!-- 				<li><a href="/preset/listpreset"> -->
+<!-- 					<h2>{set_preset}</h2></a> -->
+<!-- 				</li> -->
 				<li class="widget_bicolor" style="display: none;"><a href="printerstate/nozzles_adjustment">
 					<h2>{nozzles_adjustments}</h2></a>
 				</li>
@@ -47,11 +47,11 @@
 					<h2>{reset_network}</h2></a>
 				</li>
 			</ul>
-			<ul data-role="listview" class="shadowBox" data-inset="true">
-				<li><a id="zim_support" href="http://zimsupport.zeepro.com/support/home" target="_blank">
-					<h2>{support}</h2></a>
-				</li>
-			</ul>
+<!-- 			<ul data-role="listview" class="shadowBox" data-inset="true"> -->
+<!-- 				<li><a id="zim_support" href="http://zimsupport.zeepro.com/support/home" target="_blank"> -->
+<!-- 					<h2>{support}</h2></a> -->
+<!-- 				</li> -->
+<!-- 			</ul> -->
 			<img src="/images/listShadow.png" class="shadow" alt="shadow">
 		</div>
 	</div>
@@ -110,9 +110,9 @@ $("#remote_control").change(function() {
  	});
 });
 
-$('a#zim_support').click(function(event) {
-	$.get('/printerstate/stats_support', function() { console.log('stats support call sent.'); });
-});
+// $('a#zim_support').click(function(event) {
+// 	$.get('/printerstate/stats_support', function() { console.log('stats support call sent.'); });
+// });
 </script>
 
 </div>

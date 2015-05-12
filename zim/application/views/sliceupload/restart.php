@@ -45,7 +45,7 @@ function checkOnline(var_first) {
 	.done(function(html) {
 		if (var_ajax.status == 202) { // already open
 			clearInterval(var_refreshChecking);
-			window.location.replace("/sliceupload/upload");
+			window.location.replace("{return_url}");
 		}
 	})
 	.fail(function() {

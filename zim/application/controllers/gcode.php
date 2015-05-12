@@ -4,16 +4,24 @@ if (!defined('BASEPATH'))
 
 class Gcode extends MY_Controller {
 	private function _analyse_gcode($mode = 'display', $gcode_id = NULL) {
-		$back_url = '/sliceupload/slice?callback';
-		$request_url = '/sliceupload/gcode_ajax';
+		$back_url = NULL;
+		$request_url = NULL;
 		$template_data = array();
 		
 		$this->load->library('parser');
 		$this->lang->load('gcode', $this->config->item('language'));
 		
-		if (!is_null($gcode_id)) {
+		if (is_null($gcode_id)) {
+			$back_url = '/sliceupload/slice?callback';
+			$request_url = '/sliceupload/gcode_ajax';
+		}
+		else if (FALSE === strpos($gcode_id, '|')) {
 			$back_url = '/printerstoring/gcodedetail?id=' . $gcode_id;
 			$request_url = '/printerstoring/gcode_ajax?id=' . $gcode_id;
+		}
+		else {
+			$back_url = '/userlib/gcodedetail?id=' . $gcode_id;
+			$request_url = '/userlib/gcode_ajax?id=' . $gcode_id;
 		}
 		
 		$template_data = array(
@@ -60,6 +68,14 @@ class Gcode extends MY_Controller {
 		$gcode_id = $this->input->get('id');
 		
 		$this->_analyse_gcode($mode, $gcode_id);
+		
+		return;
+	}
+	
+	public function userlib($mode = 'display') {
+		$userlib_id = $this->input->get('id');
+		
+		$this->_analyse_gcode($mode, $userlib_id);
 		
 		return;
 	}

@@ -206,6 +206,46 @@ class Printdetail extends MY_Controller {
 		return;
 	}
 	
+	public function printuserlib() {
+		$this->printuserlib_temp();
+		
+		return;
+	}
+	
+	public function printuserlib_temp() {
+		$exchange_extruder = 0;
+		$array_temper = array();
+		$userlib_id = $this->input->get('id');
+		
+		$this->get_extra_info($array_temper, $exchange_extruder);
+		
+		if ($userlib_id && FALSE !== strpos($userlib_id, '|')) {
+			$tmp_array = explode('|', $userlib_id);
+			$model_id = (int) $tmp_array[0];
+			$timestamp = (int) $tmp_array[1];
+			$print_info = array();
+			$ret_val = 0;
+			
+			$this->load->helper(array('userauth', 'printer', 'corestatus'));
+			
+			$ret_val = UserAuth_getUserPrint($model_id, $timestamp, $print_info);
+			if ($ret_val == ERROR_OK && $print_info[USERAUTH_TITLE_USERLIB_STATE] == USERAUTH_VALUE_UL_P_READY) {
+				$this->set_led();
+				$cr = Printer_printFromUserLib($model_id, $timestamp, $exchange_extruder, $array_temper);
+				
+				if ($cr == ERROR_OK) {
+					$this->output->set_header('Location: /printdetail/status?id=' . CORESTATUS_VALUE_MID_USERLIB);
+					
+					return;
+				}
+			}
+		}
+		
+		$this->output->set_header('Location: /userlib');
+		
+		return;
+	}
+	
 	public function printmodel() {
 		$this->printmodel_temp();
 		
@@ -305,7 +345,7 @@ class Printdetail extends MY_Controller {
 		$print_calibration = FALSE;
 		$status_strip = FALSE;
 		$status_head = FALSE;
-		$ret_val = 0;
+// 		$ret_val = 0;
 		$option_selected = 'selected="selected"';
 		$status_current = NULL;
 		
@@ -372,24 +412,55 @@ class Printdetail extends MY_Controller {
 			
 			switch ($array_status[CORESTATUS_TITLE_PRINTMODEL]) {
 				case CORESTATUS_VALUE_MID_SLICE:
-					$preset_id = NULL;
-					$model_filename = array();
+					$timestamp = NULL;
 					
-					$this->load->helper('slicer');
-					if (ERROR_OK == Slicer_getModelFile(0, $model_filename, TRUE)) {
-						$model_displayname = NULL;
+					$model_displayname = t('timelapse_info_modelname_slice');
+					if (CoreStatus_getUserLibReference($model_id, $timestamp)
+							&& !is_null($model_id)) {
+						$ret_val = 0;
+						$model_info = array();
+						$list_print = array();
 						
-						foreach($model_filename as $model_basename) {
-							if (strlen($model_displayname)) {
-								$model_displayname .= ' + ' . $model_basename;
-							}
-							else {
-								$model_displayname = $model_basename;
-							}
+						$this->load->helper('userauth');
+						$ret_val = UserAuth_getUserModelDetail($model_id, FALSE, TRUE, $list_print, $model_info);
+						
+						if ($ret_val == ERROR_OK && isset($model_info[USERAUTH_TITLE_MODEL_NAME])) {
+							$model_displayname = $model_info[USERAUTH_TITLE_MODEL_NAME];
 						}
 					}
 					else {
-						$model_displayname = t('timelapse_info_modelname_slice');
+						$model_filename = array();
+						
+						$this->load->helper('slicer');
+						if (ERROR_OK == Slicer_getModelFile(0, $model_filename, TRUE)) {
+							$model_displayname = NULL;
+							
+							foreach($model_filename as $model_basename) {
+								if (strlen($model_displayname)) {
+									$model_displayname .= ' + ' . $model_basename;
+								}
+								else {
+									$model_displayname = $model_basename;
+								}
+							}
+						}
+					}
+					break;
+					
+				case CORESTATUS_VALUE_MID_USERLIB:
+					$timestamp = NULL;
+					
+					$model_displayname = t('timelapse_info_modelname_userlib_print');
+					if (CoreStatus_getUserLibReference($model_id, $timestamp)
+							&& !is_null($model_id) && !is_null($timestamp)) {
+						$ret_val = 0;
+						$print_info = array();
+						
+						$this->load->helper('userauth');
+						$ret_val = UserAuth_getUserPrint($model_id, $timestamp, $print_info);
+						if ($ret_val == ERROR_OK && isset($print_info[USERAUTH_TITLE_PRINT_DESP_NAME])) {
+							$model_displayname = $print_info[USERAUTH_TITLE_PRINT_DESP_NAME];
+						}
 					}
 					break;
 					
@@ -548,6 +619,13 @@ class Printdetail extends MY_Controller {
 					$restart_url = NULL;
 					
 					switch ($array_status[CORESTATUS_TITLE_PRINTMODEL]) {
+						case CORESTATUS_VALUE_MID_USERLIB:
+							$model_id = 0;
+							$timestamp = 0;
+							CoreStatus_getUserLibReference($model_id, $timestamp);
+							$restart_url = '/printdetail/printuserlib?id=' . $model_id . '|' . $timestamp;
+							break;
+						
 						case CORESTATUS_VALUE_MID_SLICE:
 							$restart_url = '/printdetail/printslice';
 							break;
@@ -625,6 +703,7 @@ class Printdetail extends MY_Controller {
 		$restart_url = NULL;
 		$model_displayname = NULL;
 		$show_storegcode = FALSE;
+		$model_id_userlib = 0;
 		
 		$this->load->library('parser');
 		$this->load->helper('zimapi');
@@ -657,23 +736,40 @@ class Printdetail extends MY_Controller {
 				switch ($array_status[CORESTATUS_TITLE_PRINTMODEL]) {
 					case CORESTATUS_VALUE_MID_SLICE:
 						$preset_id = NULL;
+						$timestamp = NULL;
 						$model_filename = array();
 						$preset_name = t('timelapse_info_presetname_unknown');
 						
-						$this->load->helper('slicer');
-						if (ERROR_OK == Slicer_getModelFile(0, $model_filename, TRUE)) {
-							foreach($model_filename as $model_basename) {
-								if (strlen($model_displayname)) {
-									$model_displayname .= ' + ' . $model_basename;
-								}
-								else {
-									$model_displayname = $model_basename;
+						$model_displayname = t('timelapse_info_modelname_slice');
+						if (CoreStatus_getUserLibReference($model_id, $timestamp)
+								&& !is_null($model_id)) {
+							$ret_val = 0;
+							$model_info = array();
+							$list_print = array();
+							
+							$this->load->helper('userauth');
+							$ret_val = UserAuth_getUserModelDetail($model_id, FALSE, TRUE, $list_print, $model_info);
+							
+							if ($ret_val == ERROR_OK && isset($model_info[USERAUTH_TITLE_MODEL_NAME])) {
+								$model_displayname = $model_info[USERAUTH_TITLE_MODEL_NAME];
+							}
+							
+							$model_id_userlib = $model_id;
+						}
+						else {
+							$this->load->helper('slicer');
+							if (ERROR_OK == Slicer_getModelFile(0, $model_filename, TRUE)) {
+								foreach($model_filename as $model_basename) {
+									if (strlen($model_displayname)) {
+										$model_displayname .= ' + ' . $model_basename;
+									}
+									else {
+										$model_displayname = $model_basename;
+									}
 								}
 							}
 						}
-						else {
-							$model_displayname = t('timelapse_info_modelname_slice');
-						}
+						
 						$array_info[] = array(
 								'title'	=> t('timelapse_info_modelname_title'),
 								'value'	=> $model_displayname,
@@ -693,6 +789,30 @@ class Printdetail extends MY_Controller {
 						
 						$restart_url = '/printdetail/printslice';
 						$show_storegcode = TRUE;
+						break;
+						
+					case CORESTATUS_VALUE_MID_USERLIB:
+						$timestamp = NULL;
+						
+						$model_displayname = t('timelapse_info_modelname_userlib_print');
+						if (CoreStatus_getUserLibReference($model_id, $timestamp)
+								&& !is_null($model_id) && !is_null($timestamp)) {
+							$ret_val = 0;
+							$print_info = array();
+							
+							$this->load->helper('userauth');
+							$ret_val = UserAuth_getUserPrint($model_id, $timestamp, $print_info);
+							if ($ret_val == ERROR_OK && isset($print_info[USERAUTH_TITLE_PRINT_DESP_NAME])) {
+								$model_displayname = $print_info[USERAUTH_TITLE_PRINT_DESP_NAME];
+							}
+						}
+						
+						$array_info[] = array(
+								'title'	=> t('timelapse_info_modelname_title'),
+								'value'	=> $model_displayname,
+						);
+						
+						$restart_url = '/printdetail/printuserlib?id=' . $model_id . '|' . $timestamp;
 						break;
 						
 					case CORESTATUS_VALUE_MID_PRIME_R:
@@ -833,10 +953,13 @@ class Printdetail extends MY_Controller {
 				'restart_url'			=> $restart_url ? $restart_url : '/',
 				'send_email_modelname'	=> $model_displayname,
 				'display_storegocde'	=> $show_storegcode ? 'true' : 'false',
+				'userlib_model_id'		=> $model_id_userlib,
 				'storegcode_checkbox'	=> t('storegcode_info'),
 				'storegcode_hint'		=> t('storegcode_name'),
 				'storegcode_err_cfm'	=> t('storegcode_err_cfm'),
 				'storegcode_title'		=> t('storegcode_title'),
+				'storegcode_same_name'	=> t('storegcode_same_name'),
+				'storegcode_code_name'	=> ERROR_FULL_PRTLST,
 		);
 		
 		// parse all page
@@ -1116,6 +1239,34 @@ class Printdetail extends MY_Controller {
 		
 		$display = $cr . " " . t(MyERRMSG($cr));
 		$this->output->set_status_header($cr, $display);
+		
+		return;
+	}
+	
+	public function storegcode_ajax() {
+		$cr = ERROR_OK;
+		$name = $this->input->post('name');
+		$userlib_mid = (int) $this->input->post('mid');
+		
+		$this->load->helper('userauth');
+		
+		if ($userlib_mid <= 0) {
+			$model_id = 0;
+			
+			// create new model in userlib first
+			$cr = UserAuth_requestNewModelId($name, $model_id);
+			if ($cr == ERROR_OK) {
+				$userlib_mid = $model_id;
+				$cr = UserAuth_uploadUserModel($userlib_mid);
+			}
+		}
+		
+		if ($cr == ERROR_OK) {
+			// upload gcode at same time?
+			$cr = UserAuth_uploadUserPrint($userlib_mid, $name);
+		}
+		
+		$this->output->set_status_header($cr, $cr . " " . t(MyERRMSG($cr)));
 		
 		return;
 	}

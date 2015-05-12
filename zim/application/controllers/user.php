@@ -10,7 +10,7 @@ class User extends MY_Controller {
 		$this->load->helper(array('userauth', 'errorcode', 'corestatus'));
 		
 		// check local first
-		if (UserAuth_checkAccount()) {
+		if (UserAuth_checkView()) {
 			// get access from sso, and check it again
 			if (UserAuth_getUserAccess($_SESSION[USERAUTH_TITLE_TOKEN]) && UserAuth_checkView()
 					&& (!CoreStatus_checkCallUserManagement() || UserAuth_checkAccount())) {
@@ -303,14 +303,18 @@ class User extends MY_Controller {
 	}
 	
 	public function delete_ajax() {
-		$user_email = NULL;
 		$ret_val = 0;
-		
 		$user_email = $this->input->post('user_email');
-		$ret_val = UserAuth_revokeUser($user_email);
-		if ($ret_val != ERROR_OK) {
-			$this->load->helper('printerlog');
-			PrinterLog_logDebug('revoke user return code: ' . $ret_val, __FILE__, __LINE__);
+		
+		if ($user_email) {
+			$ret_val = UserAuth_revokeUser($user_email);
+			if ($ret_val != ERROR_OK) {
+				$this->load->helper('printerlog');
+				PrinterLog_logDebug('revoke user return code: ' . $ret_val, __FILE__, __LINE__);
+			}
+		}
+		else {
+			$ret_val = ERROR_MISS_PRM;
 		}
 		$this->output->set_status_header($ret_val, MyERRMSG($ret_val));
 		

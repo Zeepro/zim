@@ -6,10 +6,6 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
-			<style>
-/* 				div.ui-slider-switch div.ui-slider-inneroffset a.ui-slider-handle-snapping {display: none;}
-				div.ui-slider-switch {width: 150px;} */
-			</style>
 			<div style="clear: both;">
 				<h2>{preset_title}</h2>
 				<div style="float: right; margin-top: -4.5em; {hide_delete}" id="delete_container">

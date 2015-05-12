@@ -47,7 +47,7 @@ class Connectb2b extends MY_Controller {
 			}
 		}
 		
-		$ret_val = Slicer_addModel(array($save_path), PRINTERLOG_STATS_LABEL_3DSLASH, TRUE, $slicer_return);
+		$ret_val = Slicer_addModel(array($save_path), PRINTERLOG_STATS_LABEL_3DSLASH, NULL, TRUE, $slicer_return);
 		if ($ret_val != ERROR_OK) {
 			$this->_exitWithError500('3dslash model import failed');
 		}

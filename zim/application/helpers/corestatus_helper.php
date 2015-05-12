@@ -34,6 +34,7 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_TITLE_FILA_MAT',		'FilamentMaterial');
 	define('CORESTATUS_TITLE_GUID',			'RandomGUID');
 	define('CORESTATUS_TITLE_ESTIMATE_T',	'EstimateTime');
+	define('CORESTATUS_TITLE_USERLIB_REF',	'UserLibraryReference');
 	//TODO use estimate time value to control loading, unloading and printing
 	
 	define('CORESTATUS_VALUE_IDLE',				'idle');
@@ -57,6 +58,7 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 // 	define('CORESTATUS_VALUE_MID_CANCEL',		'cancel');
 	define('CORESTATUS_VALUE_MID_CALIBRATION',	'calibration');
 	define('CORESTATUS_VALUE_MID_PREFIXGCODE',	'gcode');
+	define('CORESTATUS_VALUE_MID_USERLIB',		'userlib');
 	
 	define('CORESTATUS_CMD_CHECK_SD',		'echo writable > ');
 	define('CORESTATUS_SUFFIX_CONF',		'conf/');
@@ -441,6 +443,7 @@ function CoreStatus_checkCallEndPrinting(&$url_redirect = '') {
 			'/printdetail/timelapse_ready_ajax'	=> NULL,
 			'/printdetail/timelapse_end_ajax'	=> NULL,
 			'/printdetail/sendemail_ajax'		=> NULL,
+			'/printdetail/storegcode_ajax'		=> NULL,
 // 			'/share/connect_google'				=> NULL,
 // 			'/share/connect_google/true'		=> NULL,
 // 			'/share/youtube_form'				=> NULL,
@@ -1052,6 +1055,43 @@ function CoreStatus_setDebugLevel($level = 1) {
 	}
 	
 	return TRUE;
+}
+
+function CoreStatus_setUserLibReference($ref_model = NULL, $ref_print = NULL) {
+	$array_status = array();
+	
+	if (CoreStatus_getStatusArray($array_status)) {
+		return CoreStatus__setInStatus($array_status[CORESTATUS_TITLE_STATUS],
+				array(CORESTATUS_TITLE_USERLIB_REF => $ref_model . '|' . $ref_print));
+	}
+	
+	return FALSE;
+}
+
+function CoreStatus_getUserLibReference(&$ref_model, &$ref_print) {
+	$array_status = array();
+	$ref_model = $ref_print = NULL;
+	
+	if (CoreStatus_getStatusArray($array_status)) {
+		if (!isset($array_status[CORESTATUS_TITLE_USERLIB_REF])) {
+			return TRUE;
+		}
+		else {
+			$string_ref = $array_status[CORESTATUS_TITLE_USERLIB_REF];
+			$array_ref = explode('|', $string_ref);
+			
+			if (count($array_ref) == 2) {
+				$ref_model = (int) $array_ref[0];
+				if ($ref_model <= 0) $ref_model = NULL;
+				$ref_print = (int) $array_ref[1];
+				if ($ref_print <= 0) $ret_print = NULL;
+				
+				return TRUE;
+			}
+		}
+	}
+	
+	return FALSE;
 }
 
 // internal function

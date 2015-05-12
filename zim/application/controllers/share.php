@@ -315,23 +315,58 @@ class Share extends MY_Controller
 			{
 				switch ($array_status[CORESTATUS_TITLE_PRINTMODEL])
 				{
-					case CORESTATUS_VALUE_MID_SLICE:
-						$preset_id = NULL;
-						$model_filename = array();
-						$this->load->helper('slicer');
-						if (ERROR_OK == Slicer_getModelFile(0, $model_filename, TRUE))
-						{
-							foreach($model_filename as $model_basename)
-							{
-								if (strlen($model_displayname))
-									$model_displayname .= ' + ' . $model_basename;
-								else
-									$model_displayname = $model_basename;
+					case CORESTATUS_VALUE_MID_USERLIB:
+						$timestamp = NULL;
+						
+						$model_displayname = t('timelapse_info_modelname_userlib_print');
+						if (CoreStatus_getUserLibReference($model_id, $timestamp)
+								&& !is_null($model_id) && !is_null($timestamp)) {
+							$ret_val = 0;
+							$print_info = array();
+							
+							$this->load->helper('userauth');
+							$ret_val = UserAuth_getUserPrint($model_id, $timestamp, $print_info);
+							if ($ret_val == ERROR_OK && isset($print_info[USERAUTH_TITLE_PRINT_DESP_NAME])) {
+								$model_displayname = $print_info[USERAUTH_TITLE_PRINT_DESP_NAME];
 							}
 						}
-						else
-							$model_displayname = t('timelapse_info_modelname_slice');
 						break;
+						
+					case CORESTATUS_VALUE_MID_SLICE:
+						$timestamp = NULL;
+						
+						$model_displayname = t('timelapse_info_modelname_slice');
+						if (CoreStatus_getUserLibReference($model_id, $timestamp)
+								&& !is_null($model_id)) {
+							$ret_val = 0;
+							$model_info = array();
+							$list_print = array();
+							
+							$this->load->helper('userauth');
+							$ret_val = UserAuth_getUserModelDetail($model_id, FALSE, TRUE, $list_print, $model_info);
+							
+							if ($ret_val == ERROR_OK && isset($model_info[USERAUTH_TITLE_MODEL_NAME])) {
+								$model_displayname = $model_info[USERAUTH_TITLE_MODEL_NAME];
+							}
+						}
+						else {
+							$model_filename = array();
+							
+							$this->load->helper('slicer');
+							if (ERROR_OK == Slicer_getModelFile(0, $model_filename, TRUE)) {
+								$model_displayname = NULL;
+								foreach($model_filename as $model_basename) {
+									if (strlen($model_displayname)) {
+										$model_displayname .= ' + ' . $model_basename;
+									}
+									else {
+										$model_displayname = $model_basename;
+									}
+								}
+							}
+						}
+						break;
+						
 					default:
 						// treat as pre-sliced model
 						$model_data = array();

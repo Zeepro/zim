@@ -338,6 +338,9 @@ class Sliceupload extends MY_Controller {
 	function restart() {
 		$template_data = array();
 		$in_boot = $this->input->get('inboot');
+		$return_userlib = FALSE;
+		
+		if (FALSE !== $this->input->get('userlib')) $return_userlib = TRUE;
 		
 		$this->load->library('parser');
 		$this->lang->load('sliceupload/upload', $this->config->item('language'));
@@ -347,6 +350,7 @@ class Sliceupload extends MY_Controller {
 				'home'			=> t('home'),
 				'check_in_boot'	=> $in_boot ? 'true' : 'false',
 				'wait_msg'		=> $in_boot ? t('wait_in_boot') : t('wait_in_restart'),
+				'return_url'	=> $return_userlib ? '/userlib/storemodel' : '/sliceupload/upload',
 		);
 		
 		$this->_parseBaseTemplate(t('sliceupload_slice_pagetitle'),
@@ -467,7 +471,7 @@ class Sliceupload extends MY_Controller {
 						
 						$this->load->helper('slicer');
 // 						$cr = Slicer_addModel($array_model);
-						$cr = Slicer_addModel($array_model, TRUE, FALSE, $array_return);
+						$cr = Slicer_addModel($array_model, TRUE, NULL, FALSE, $array_return);
 						if ($cr == ERROR_OK) {
 							try {
 								if ($array_return[SLICER_TITLE_MAXSCALE] < 100) {

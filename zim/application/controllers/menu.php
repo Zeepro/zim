@@ -9,6 +9,69 @@ class Menu extends MY_Controller {
 	}
 	
 	public function index() {
+		$this->load->helper(array('zimapi', 'userauth', 'url'));
+		
+		if (!ZimAPI_cameraOff()) {
+			$this->load->helper('printerlog');
+			PrinterLog_logError('can not turn off camera', __FILE__, __LINE__);
+		}
+		
+		redirect(USERAUTH_URL_REDIRECTION . USERAUTH_URI_REMOTE_INDEX);
+		
+		return;
+	}
+	
+	public function local() {
+		$this->load->helper('url');
+		redirect('/menu_home');
+		
+		return;
+	}
+	
+	public function m_print() {
+		$template_data = NULL; //array()
+		
+		$this->load->library('parser');
+		$this->lang->load('menu/print', $this->config->item('language'));
+		
+		$template_data = array(
+				'link_import_once'	=> t('link_import_once'),
+				'link_userlib'		=> t('link_userlib'),
+				'link_printlist'	=> t('link_printlist'),
+				'link_preset'		=> t('link_preset'),
+				'library_visible'	=> ($this->config->item('use_sdcard') == TRUE) ? 'block' : 'none',
+		);
+		
+		$this->_parseBaseTemplate(t('pagetitle_menu_print'),
+				$this->parser->parse('menu/print', $template_data, TRUE));
+		
+		return;
+	}
+	
+	public function m_config() {
+		$template_data = NULL; //array()
+		
+		$this->load->helper('userauth');
+		$this->load->library('parser');
+		$this->lang->load('menu/config', $this->config->item('language'));
+		
+		$template_data = array(
+				'link_manage_user'	=> t('link_manage_user'),
+				'link_control'		=> t('link_control'),
+				'link_config'		=> t('link_config'),
+				'link_about'		=> t('link_about'),
+				'show_mange_user'	=> (UserAuth_checkAccount()) ? 'true' : 'false',
+				'show_control'		=> (UserAuth_checkManage()) ? 'true' : 'false',
+		);
+		
+		$this->_parseBaseTemplate(t('pagetitle_menu_config'),
+				$this->parser->parse('menu/config', $template_data, TRUE));
+		
+		return;
+	}
+	
+	/*
+	public function index() {
 		$template_data = array();
 		$need_update = FALSE;
 		
@@ -44,4 +107,5 @@ class Menu extends MY_Controller {
 		
 		return;
 	}
+	 */
 }

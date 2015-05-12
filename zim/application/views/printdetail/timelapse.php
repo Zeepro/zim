@@ -89,6 +89,7 @@ var var_ajax_timelapse_end;
 var var_ajax_send_email;
 var var_internet_ok = {internet_ok};
 var var_display_storegocde = {display_storegocde};
+var var_userlib_modelid = {userlib_model_id};
 
 function load_jwplayer_video() {
 	var player = jwplayer("myVideo").setup({
@@ -105,14 +106,19 @@ function load_jwplayer_video() {
 }
 
 function store_gcode() {
+	var var_ajax_storegcode;
 	var_return = false;
 	
-	$.ajax({
+	var_ajax_storegcode = $.ajax({
 		cache: false,
 		type: "POST",
 		async: false,
-		url: "/rest/libstoregcode",
-		data: { "name": $('#storegcode_name').val()},
+// 		url: "/rest/libstoregcode",
+		url: "/printdetail/storegcode_ajax",
+		data: {
+			"name":	$('#storegcode_name').val(),
+			"mid":	var_userlib_modelid,
+		},
 		beforeSend: function() {
 			$("#overlay").addClass("gray-overlay");
 			$(".ui-loader").css("display", "block");
@@ -126,11 +132,17 @@ function store_gcode() {
 			var_return = true;
 		},
 		error: function (data, textStatus, xhr) {
-			var exit = confirm("{storegcode_err_cfm}");
-			
 			console.log(data);
-			if (exit == true) {
-				var_return = true;
+			
+			if (var_ajax_storegcode.status == {storegcode_code_name}) {
+				alert("{storegcode_same_name}");
+			}
+			else {
+				var exit = confirm("{storegcode_err_cfm}");
+				
+				if (exit == true) {
+					var_return = true;
+				}
 			}
 		},
 	});

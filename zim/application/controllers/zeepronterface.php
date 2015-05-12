@@ -8,11 +8,13 @@ if (!defined('PRONTERFACE_EMULATOR_LOG')) {
 
 class Zeepronterface extends MY_Controller {
 	function __construct() {
-		parent::__construct ();
-		$this->load->helper( array(
-				'url',
-				'errorcode'
-		) );
+		parent::__construct();
+		
+		$this->load->helper(array('url', 'errorcode'));
+		
+		if ('ok' != $this->input->cookie('beta_pronterFace')) {
+			$this->_exitWithError500('internal usage only, please use /advanceduser as instead');
+		}
 	}
 	
 	public function index() {

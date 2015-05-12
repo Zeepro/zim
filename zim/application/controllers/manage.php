@@ -4,11 +4,15 @@ if (!defined('BASEPATH'))
 
 class Manage extends MY_Controller {
 	function __construct() {
-		parent::__construct ();
-		$this->load->helper( array(
-				'url',
-				'errorcode'
-		) );
+		parent::__construct();
+		$this->load->helper(array('url', 'errorcode', 'userauth'));
+		
+		// check local only
+		if (UserAuth_checkManage()) {
+			return;
+		}
+		
+		$this->_exitWithError500('no permission to manage', 403);
 	}
 	
 	public function index() {

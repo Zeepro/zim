@@ -18,7 +18,7 @@
 					<a href="/printerstoring/libraries"><h2>{my_library}</h2></a>
 				</li>
 				<li>
-					<a id="zim_shop" href="http://zeepro.com/collections/all" target="_blank"><h2>{my_zim_shop}</h2></a>
+					<a id="zim_shop" href="http://zeepro.com/collections/all/products/pla-filament-cartridge" target="_blank"><h2>{my_zim_shop}</h2></a>
 				</li>
 			</ul>
 			<ul data-role="listview" id="listview_manage" class="shadowBox" data-inset="true">

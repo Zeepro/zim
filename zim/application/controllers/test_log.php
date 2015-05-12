@@ -104,6 +104,12 @@ class Test_log extends ZP_Controller {
 		return;
 	}
 	
+	public function userlib() {
+		$this->file('userlib');
+		
+		return;
+	}
+	
 	private function file($type = 'debug') {
 		$path_file = '';
 		
@@ -134,6 +140,11 @@ class Test_log extends ZP_Controller {
 			case 'remoteslice':
 				$this->load->helper('slicer');
 				$path_file = SLICER_FILE_REMOTE_LOG;
+				break;
+				
+			case 'userlib':
+				$this->load->helper('userauth');
+				$path_file = USERAUTH_VALUE_USERLIB_LOGF;
 				break;
 				
 			default:

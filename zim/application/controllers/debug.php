@@ -62,4 +62,10 @@ class Debug extends ZP_Controller {
 		return;
 	}
 	
+	public function pronterface() {
+		$this->input->set_cookie('beta_pronterFace', 'ok', 0); // session end
+		$this->output->set_header('Location: /zeepronterface');
+		
+		return;
+	}
 }

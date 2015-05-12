@@ -202,6 +202,18 @@ case "$1" in
 		clean_sliced
 		;;
 		
+	upload_stl)
+		/usr/bin/zeepro-userlib.sh upload_stl "$2" "$3" $4 > /dev/null 2>&1 &
+		;;
+		
+	upload_print)
+		/usr/bin/zeepro-userlib.sh upload_print "$2" "$3" $4 > /dev/null 2>&1 &
+		;;
+		
+	sync_all_local_lib)
+		/usr/bin/zeepro-userlib.sh sync_all "$2" > /dev/null 2>&1 &
+		;;
+		
 	*)
 		echo "Usage: $0 {force_reco|start_tomboning|stop_romboning|status_tomboning|restart_arcontrol|start_slic3r|unload|unload_pva|stats|remote_slice|remote_slice_stop|*}"
 		exit 1

@@ -175,7 +175,7 @@ function Slicer_checkSlicedModel() {
 	return TRUE;
 }
 
-function Slicer_addModel($models_path, $source = TRUE, $auto_resize = TRUE, &$array_return = array()) {
+function Slicer_addModel($models_path, $source = TRUE, $user_model = NULL, $auto_resize = TRUE, &$array_return = array()) {
 	$cr = 0;
 	$CI = &get_instance();
 	$ret_val = 0;
@@ -254,6 +254,9 @@ function Slicer_addModel($models_path, $source = TRUE, $auto_resize = TRUE, &$ar
 	}
 	
 	Slicer_cleanSlicerFiles(TRUE);
+	
+	$CI->load->helper('corestatus');
+	CoreStatus_setUserLibReference($user_model);
 	
 	return $cr;
 }

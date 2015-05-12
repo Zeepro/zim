@@ -1492,7 +1492,7 @@ class Rest extends MY_Controller {
 				else {
 					$array_return = array();
 					
-					$cr = Slicer_addModel($array_model, TRUE, FALSE, $array_return);
+					$cr = Slicer_addModel($array_model, TRUE, NULL, FALSE, $array_return);
 					if ($cr == ERROR_OK) {
 						$display = json_encode($array_return);
 						

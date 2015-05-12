@@ -13,6 +13,8 @@ if "%1"=="remote_slice_stop" goto :remoteSliceStop
 if "%1"=="clean_sliced" goto :cleanSliced
 if "%1"=="clean_slicerfiles" goto :cleanSlicerFiles
 if "%1"=="stats" goto :cleanStats
+if "%1"=="upload_stl" goto :cleanUserLibFolder
+if "%1"=="upload_print" goto :cleanUserLibFolder
 
 exit 0
 
@@ -34,6 +36,10 @@ goto :EOF
 del .\tmp\_slicer_preview.amf
 del .\tmp\_slicer_preview.stl
 goto :cleanSliced
+
+:cleanUserLibFolder
+rd /s /q %2
+goto :EOF
 
 :remoteSlice
 echo {"state":"working","extended":"0=edit ./tmp/remote_slice.json for test"} > ./tmp/remote_slice.json

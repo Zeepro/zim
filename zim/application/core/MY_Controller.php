@@ -4,13 +4,20 @@ if (!defined('BASEPATH'))
 	exit('No direct script access allowed');
 
 class ZP_Controller extends CI_Controller {
-	protected function _sendFileContent($file_path = NULL, $client_name = 'download.bin') {
+	protected function _sendFileContent($file_path = NULL, $client_name = 'download.bin', $force_download = TRUE) {
 		if (file_exists($file_path)) {
 			$encoding_header = isset($_SERVER['HTTP_ACCEPT_ENCODING']) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : NULL;
 			$support_compress = strpos($encoding_header, 'gzip') !== FALSE;
+			$content_type = 'application/octet-stream';
+			
+			if ($force_download == FALSE) {
+				$this->load->helper('file');
+				$type_by_extension = get_mime_by_extension($file_path);
+				if ($type_by_extension != FALSE) $content_type = $type_by_extension;
+			}
 			
 			header('Content-Description: File Transfer');
-			header('Content-Type: application/octet-stream');
+			header('Content-Type: ' . $content_type);
 			header('Content-Disposition: attachment; filename=' . $client_name);
 			header('Expires: 0');
 			header('Cache-Control: must-revalidate');
