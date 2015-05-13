@@ -95,8 +95,8 @@ class Set_cookie extends ZP_Controller {
 				$this->input->set_cookie('auth', $token_post, 0);
 				$this->input->set_cookie('token_system', 'old', 1800); // 30 mins
 				
-// 				$this->output->set_header('Location: /');
-				$this->_displayDenied('Old token system is out of support');
+				$this->output->set_header('Location: ' . USERAUTH_URL_REDIRECTION . USERAUTH_URI_REMOTE_INDEX);
+// 				$this->_displayDenied('Old token system is out of support');
 			}
 		}
 		else {

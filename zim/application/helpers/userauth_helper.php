@@ -179,7 +179,7 @@ function UserAuth__requestSSO($uri, $post_data, &$response = NULL) {
 
 function UserAuth__checkAccess($flag_check) {
 	if (isset($_SESSION[USERAUTH_TITLE_ACCESS])
-			&& $_SESSION[USERAUTH_TITLE_ACCESS] & $flag_check == $flag_check) {
+			&& ($_SESSION[USERAUTH_TITLE_ACCESS] & $flag_check) == $flag_check) {
 		return TRUE;
 	}
 	
