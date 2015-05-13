@@ -681,7 +681,7 @@ function UserAuth_getUserLib(&$userlib, $force_reload = FALSE) {
 		case USERAUTH_RESPONSE_OK:
 			$tmp_json = json_decode($response, TRUE);
 			
-			if ($tmp_json == NULL) {
+			if (!is_array($tmp_json)) { // is_null($tmp_json)
 				$cr = ERROR_INTERNAL;
 				
 				$CI->load->helper('printerlog');

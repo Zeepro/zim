@@ -10,6 +10,7 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_FILENAME_NOACTIVE',	'NeedActive.tmp');
 	define('CORESTATUS_FILENAME_NOHOST',	'NeedHostname.tmp');
 	define('CORESTATUS_FILENAME_REMOTEOFF',	'tromboning_off');
+	define('CORESTATUS_FILENAME_DEMO',		'Demo.tmp');
 	define('CORESTATUS_FILEPATH_PRODCON',	'/tmp/ProdTmpConnection.tmp');
 	
 	define('CORESTATUS_KEY_GLOBAL_VAR',		'status');
@@ -1089,6 +1090,39 @@ function CoreStatus_getUserLibReference(&$ref_model, &$ref_print) {
 				return TRUE;
 			}
 		}
+	}
+	
+	return FALSE;
+}
+
+function CoreStatus_checkInDemo() {
+	global $CFG;
+	
+	return (file_exists($CFG->config['conf'] . CORESTATUS_FILENAME_DEMO));
+}
+
+function CoreStatus_setInDemo($state = TRUE) {
+	global $CFG;
+	$file_state = $CFG->config['conf'] . CORESTATUS_FILENAME_DEMO;
+	
+	if ($state == TRUE) {
+		$fp = fopen($file_state, 'w');
+		if ($fp) {
+			fwrite($fp, time());
+			fclose($fp);
+			
+			return TRUE;
+		}
+		else {
+			$CI = &get_instance();
+			$CI->load->helper('printerlog');
+			PrinterLog_logError('write demo state file failed', __FILE__, __LINE__);
+			
+			return FALSE;
+		}
+	}
+	else {
+		return @unlink($file_state);
 	}
 	
 	return FALSE;

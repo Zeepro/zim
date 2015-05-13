@@ -29,41 +29,25 @@
 					</div>
 					<div data-role="collapsible" data-collapsed="false">
 						<h4>{title_access}</h4>
-						<div class="ui-grid-a">
-							<div class="ui-block-a"><div class="ui-bar ui-bar-f">
-								<label for="access_view">{title_p_view}</label>
-							</div></div>
-							<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-								<select name="access_view" data-role="slider" data-track-theme="a" data-theme="a">
-									<option value="0">{function_off}</option>
-									<option value="1" {user_p_view}>{function_on}</option>
-								</select>
-							</div></div>
-							<div class="ui-block-a"><div class="ui-bar ui-bar-f">
-								<label for="access_manage">{title_p_manage}</label>
-							</div></div>
-							<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-								<select name="access_manage" data-role="slider" data-track-theme="a" data-theme="a">
-									<option value="0">{function_off}</option>
-									<option value="1" {user_p_manage}>{function_on}</option>
-								</select>
-							</div></div>
-							<div class="ui-block-a"><div class="ui-bar ui-bar-f">
-								<label for="access_account">{title_p_account}</label>
-							</div></div>
-							<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-								<select name="access_account" data-role="slider" data-track-theme="a" data-theme="a">
-									<option value="0">{function_off}</option>
-									<option value="1" {user_p_account}>{function_on}</option>
-								</select>
-							</div></div>
-						</div>
+						<a href="#user_access_popup" data-rel="popup" class="ui-btn ui-icon-info ui-btn-icon-right ui-corner-all ui-shadow" data-transition="pop">?</a>
+						<fieldset data-role="controlgroup">
+							<input type="radio" name="user_access" id="user_access_{user_name}_{random_id}_v" value="1" {user_p_view}>
+							<label for="user_access_{user_name}_{random_id}_v">{title_p_view}</label>
+							<input type="radio" name="user_access" id="user_access_{user_name}_{random_id}_m" value="2" {user_p_manage}>
+							<label for="user_access_{user_name}_{random_id}_m">{title_p_manage}</label>
+							<input type="radio" name="user_access" id="user_access_{user_name}_{random_id}_a" value="3" {user_p_account}>
+							<label for="user_access_{user_name}_{random_id}_a">{title_p_account}</label>
+						</fieldset>
 					</div>
 					<input type="hidden" name="user_ori_email" value="{user_email}" />
 					<input type="submit" name="edit_user" value="{button_confirm}" />
 					</form>
 				</div>
 			{/userlist}
+			</div>
+			<div id="user_access_popup" data-role="popup" class="ui-content">
+				<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right"></a>
+				{hint_access}
 			</div>
 			<div class="zim-error">{error_get_list}</div>
 		</div>

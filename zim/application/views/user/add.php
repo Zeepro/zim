@@ -24,35 +24,19 @@
 			</div>
 			<div data-role="collapsible" data-collapsed="false">
 				<h4>{title_access}</h4>
-				<div class="ui-grid-a">
-					<div class="ui-block-a"><div class="ui-bar ui-bar-f">
-						<label for="access_view">{title_p_view}</label>
-					</div></div>
-					<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-						<select name="access_view" data-role="slider" data-track-theme="a" data-theme="a">
-							<option value="0">{function_off}</option>
-							<option value="1" selected>{function_on}</option>
-						</select>
-					</div></div>
-					<div class="ui-block-a"><div class="ui-bar ui-bar-f">
-						<label for="access_manage">{title_p_manage}</label>
-					</div></div>
-					<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-						<select name="access_manage" data-role="slider" data-track-theme="a" data-theme="a">
-							<option value="0">{function_off}</option>
-							<option value="1">{function_on}</option>
-						</select>
-					</div></div>
-					<div class="ui-block-a"><div class="ui-bar ui-bar-f">
-						<label for="access_account">{title_p_account}</label>
-					</div></div>
-					<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-						<select name="access_account" data-role="slider" data-track-theme="a" data-theme="a">
-							<option value="0">{function_off}</option>
-							<option value="1">{function_on}</option>
-						</select>
-					</div></div>
+				<a href="#user_access_popup" data-rel="popup" class="ui-btn ui-icon-info ui-btn-icon-right ui-corner-all ui-shadow" data-transition="pop">?</a>
+				<div id="user_access_popup" data-role="popup" class="ui-content">
+					<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right"></a>
+					{hint_access}
 				</div>
+				<fieldset data-role="controlgroup">
+					<input type="radio" name="user_access" id="user_access_v" value="1" checked>
+					<label for="user_access_v">{title_p_view}</label>
+					<input type="radio" name="user_access" id="user_access_m" value="2">
+					<label for="user_access_m">{title_p_manage}</label>
+					<input type="radio" name="user_access" id="user_access_a" value="3">
+					<label for="user_access_a">{title_p_account}</label>
+				</fieldset>
 			</div>
 			<input type="submit" value="{button_confirm}" />
 			</form>

@@ -11,20 +11,22 @@ $lang['title_email']
 $lang['title_access']
 	= 'Droits à conditionner';
 $lang['title_p_view']
-	= 'Consultation';
+	= 'Standard';
 $lang['title_p_manage']
-	= 'Gestion d\'imprimante';
+	= 'Or';
 $lang['title_p_account']
-	= 'Gestion de compte';
+	= 'Platine';
 $lang['button_confirm']
 	= 'Valider';
-$lang['function_on']
-	= 'Oui';
-$lang['function_off']
-	= 'Non';
+// $lang['function_on']
+// 	= 'Oui';
+// $lang['function_off']
+// 	= 'Non';
 $lang['error_parameter']
 	= 'Erreur de paramètre';
 $lang['error_authorize']
 	= 'Erreur d\'authentification';
 $lang['error_unknown']
 	= 'Erreur inconnue';
+$lang['hint_access']
+	= 'Standard :<br/>Lancer, consulter et partager impression<br/>Consulter et annuler impression des autres<br/><br/>Or :<br/>+ Accès au menu "Contrôles"<br/><br/>Platine :<br/>+ Accès à gestion d\'utilisateur d\'imprimante';

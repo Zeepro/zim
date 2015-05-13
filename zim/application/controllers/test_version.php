@@ -105,6 +105,22 @@ class Test_version extends ZP_Controller {
 		return;
 	}
 	
+	public function demo() {
+		$this->load->helper('corestatus');
+		
+		if (FALSE !== $this->input->get('off')) {
+			var_dump(CoreStatus_setInDemo(FALSE));
+		}
+		else if (FALSE !== $this->input->get('on')) {
+			var_dump(CoreStatus_setInDemo());
+		}
+		else {
+			var_dump(CoreStatus_checkInDemo());
+		}
+		
+		return;
+	}
+	
 	public function test_port() {
 		$cr = 500;
 		$port = (int) $this->input->get('v');

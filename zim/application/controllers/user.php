@@ -76,21 +76,24 @@ class User extends MY_Controller {
 			
 			$this->form_validation->set_rules('user_name', 'lang:title_name', 'required|alpha_dash');
 			$this->form_validation->set_rules('user_email', 'lang:title_email', 'required|valid_email');
-			$this->form_validation->set_rules('access_view', 'lang:title_p_view', 'required|is_natural|less_than[2]');
-			$this->form_validation->set_rules('access_manage', 'lang:title_p_manage', 'required|is_natural|less_than[2]');
-			$this->form_validation->set_rules('access_account', 'lang:title_p_account', 'required|is_natural|less_than[2]');
+// 			$this->form_validation->set_rules('access_view', 'lang:title_p_view', 'required|is_natural|less_than[2]');
+// 			$this->form_validation->set_rules('access_manage', 'lang:title_p_manage', 'required|is_natural|less_than[2]');
+// 			$this->form_validation->set_rules('access_account', 'lang:title_p_account', 'required|is_natural|less_than[2]');
+			$this->form_validation->set_rules('user_access', 'lang:title_access', 'required|is_natural_no_zero|less_than[4]');
 			
 			if ($this->form_validation->run() == FALSE) {
 				$error = validation_errors();
 			}
 			else {
+				$user_access = (int) $this->post('user_access');
+				
 				$ret_val = UserAuth_grantUser(
 						$this->input->post('user_email'),
 						$this->input->post('user_name'),
 						array(
-								USERAUTH_PRM_P_VIEW		=> $this->input->post('access_view')	? TRUE : FALSE,
-								USERAUTH_PRM_P_MANAGE	=> $this->input->post('access_manage')	? TRUE : FALSE,
-								USERAUTH_PRM_P_ACCOUNT	=> $this->input->post('access_account')	? TRUE : FALSE,
+								USERAUTH_PRM_P_VIEW		=> ($user_access > 0)	? TRUE : FALSE,
+								USERAUTH_PRM_P_MANAGE	=> ($user_access > 1)	? TRUE : FALSE,
+								USERAUTH_PRM_P_ACCOUNT	=> ($user_access > 2)	? TRUE : FALSE,
 				));
 				
 				switch ($ret_val) {
@@ -132,8 +135,9 @@ class User extends MY_Controller {
 				'title_p_manage'	=> t('title_p_manage'),
 				'title_p_account'	=> t('title_p_account'),
 				'button_confirm'	=> t('button_confirm'),
-				'function_on'		=> t('function_on'),
-				'function_off'		=> t('function_off'),
+				'hint_access'		=> t('hint_access'),
+// 				'function_on'		=> t('function_on'),
+// 				'function_off'		=> t('function_off'),
 				'error'				=> $error,
 		);
 		
@@ -148,15 +152,24 @@ class User extends MY_Controller {
 		$userlist_display = array();
 		$userlist_api = array();
 		$ret_val = UserAuth_getUserListArray($userlist_api);
-		$option_selected = 'selected';
+		$radio_checked = 'checked';
 		
 		foreach($userlist_api as $user_element) {
+			$user_access = 1; // $user_element[USERAUTH_PRM_P_VIEW] as default
+			
+			if ($user_element[USERAUTH_PRM_P_ACCOUNT]) {
+				$user_access = 3;
+			}
+			else if ($user_element[USERAUTH_PRM_P_MANAGE]) {
+				$user_access = 2;
+			}
+			
 			$userlist_display[] = array(
 					'user_name'			=> $user_element[USERAUTH_TITLE_NAME],
 					'user_email'		=> $user_element[USERAUTH_TITLE_EMAIL],
-					'user_p_view'		=> $user_element[USERAUTH_PRM_P_VIEW] ? $option_selected : NULL,
-					'user_p_manage'		=> $user_element[USERAUTH_PRM_P_MANAGE] ? $option_selected : NULL,
-					'user_p_account'	=> $user_element[USERAUTH_PRM_P_ACCOUNT] ? $option_selected : NULL,
+					'user_p_view'		=> ($user_access == 1) ? $radio_checked : NULL,
+					'user_p_manage'		=> ($user_access == 2) ? $radio_checked : NULL,
+					'user_p_account'	=> ($user_access == 3) ? $radio_checked : NULL,
 					'random_id'			=> rand(),
 			);
 		}
@@ -175,8 +188,9 @@ class User extends MY_Controller {
 				'title_p_manage'	=> t('title_p_manage'),
 				'title_p_account'	=> t('title_p_account'),
 				'button_confirm'	=> t('button_confirm'),
-				'function_on'		=> t('function_on'),
-				'function_off'		=> t('function_off'),
+				'hint_access'		=> t('hint_access'),
+// 				'function_on'		=> t('function_on'),
+// 				'function_off'		=> t('function_off'),
 				'button_delete'		=> t('button_delete'),
 				'message_delete'	=> t('message_delete'),
 				'button_delete_ok'	=> t('button_delete_ok'),
