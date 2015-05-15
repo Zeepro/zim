@@ -28,5 +28,7 @@ $lang['error_authorize']
 	= 'Erreur d\'authentification';
 $lang['error_unknown']
 	= 'Erreur inconnue';
+$lang['popup_what']
+	= "Aide";
 $lang['hint_access']
 	= 'Standard :<br/>Lancer, consulter et partager impression<br/>Consulter et annuler impression des autres<br/><br/>Or :<br/>+ Accès au menu "Contrôles"<br/><br/>Platine :<br/>+ Accès à gestion d\'utilisateur d\'imprimante';

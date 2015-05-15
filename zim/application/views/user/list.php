@@ -29,7 +29,7 @@
 					</div>
 					<div data-role="collapsible" data-collapsed="false">
 						<h4>{title_access}</h4>
-						<a href="#user_access_popup" data-rel="popup" class="ui-btn ui-icon-info ui-btn-icon-right ui-corner-all ui-shadow" data-transition="pop">?</a>
+						<a href="#user_access_popup" data-rel="popup" class="ui-btn ui-icon-info ui-btn-icon-right ui-corner-all ui-shadow" data-transition="pop">{popup_what}</a>
 						<fieldset data-role="controlgroup">
 							<input type="radio" name="user_access" id="user_access_{user_name}_{random_id}_v" value="1" {user_p_view}>
 							<label for="user_access_{user_name}_{random_id}_v">{title_p_view}</label>

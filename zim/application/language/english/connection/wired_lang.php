@@ -8,5 +8,5 @@ $lang['OK'] =
 $lang['Text2'] =
         "Manual settings (IP, DNS...)";
 $lang['Advanced'] =
-		"Avanced configuration";
+		"Advanced configuration";
 ?>

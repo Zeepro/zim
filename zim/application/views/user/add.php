@@ -24,7 +24,7 @@
 			</div>
 			<div data-role="collapsible" data-collapsed="false">
 				<h4>{title_access}</h4>
-				<a href="#user_access_popup" data-rel="popup" class="ui-btn ui-icon-info ui-btn-icon-right ui-corner-all ui-shadow" data-transition="pop">?</a>
+				<a href="#user_access_popup" data-rel="popup" class="ui-btn ui-icon-info ui-btn-icon-right ui-corner-all ui-shadow" data-transition="pop">{popup_what}</a>
 				<div id="user_access_popup" data-role="popup" class="ui-content">
 					<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right"></a>
 					{hint_access}

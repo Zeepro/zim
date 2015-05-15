@@ -28,5 +28,7 @@ $lang['error_authorize']
 	= 'Authorization error';
 $lang['error_unknown']
 	= 'Unknown error';
+$lang['popup_what']
+	= "What's this ?";
 $lang['hint_access']
 	= 'Standard:<br/>Launch, monitor and share prints<br/>View and cancel others\' prints<br/><br/>Gold:<br/>+ Access to "Controls" menu<br/><br/>Platinium:<br/>+ Ability to grant printer\'s access to other users';

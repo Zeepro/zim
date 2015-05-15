@@ -103,8 +103,8 @@ if (!defined('USERAUTH_VALUE_TIMEOUT')) {
 	define('USERAUTH_VALUE_USERLIB_COLOR2',	'#FF0000');
 	
 // 	define('USERAUTH_URL_REDIRECTION',	'http://home.dev'); // dev
-	define('USERAUTH_URL_REDIRECTION',	'http://zhomedev.azurewebsites.net'); // beta
-// 	define('USERAUTH_URL_REDIRECTION',	'https://zeeproshare.com'); // prod
+// 	define('USERAUTH_URL_REDIRECTION',	'https://zhomedev.azurewebsites.net'); // beta
+	define('USERAUTH_URL_REDIRECTION',	'https://zeeproshare.com'); // prod
 	define('USERAUTH_URL_SSO',			'https://sso.zeepro.com/');
 	define('USERAUTH_URI_USERLEVEL',	'useraccess.ashx');
 	define('USERAUTH_URI_GRANTUSER',	'grantuser.ashx');
