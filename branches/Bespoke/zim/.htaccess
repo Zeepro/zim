@@ -1,0 +1,13 @@
+RewriteEngine on
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond $1 !^(index\.php|images|js|resources|application|robots\.txt|favicon\.ico)
+RewriteRule ^(.*)$ /index.php/$1 [L,QSA]
+
+RedirectMatch ^/zim.m3u8$ http://88.175.62.75/zim.m3u8
+RedirectMatch ^/zim(.*).ts$ http://88.175.62.75/zim$1.ts
+
+#Redirect port
+#RewriteCond  %{SERVER_PORT} ^8080$
+#RedirectMatch ^/zim.m3u8$ http://%{SERVER_NAME}:81/zim.m3u8
+#RedirectMatch ^/zim(.*).ts$ http://%{SERVER_NAME}:81/zim$1.ts
