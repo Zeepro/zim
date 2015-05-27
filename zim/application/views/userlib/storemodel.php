@@ -11,7 +11,7 @@
 			<label for="name"><h2>{title_name}</h2></label>
 			<input type="text" name="name" id="usermodel_name" value="" data-clear-btn="true" required />
 			<br />
-			<div id="set" data-role="collapsible-set" data-inset="false">
+			<div id="set" data-role="collapsible-set" data-inset="true">
 				<div id="tab1" data-role="collapsible" data-collapsed="false">
 					<h3> {header_single} </h3>
 					<label for="file">{select_hint}</label>

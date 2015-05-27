@@ -18,15 +18,19 @@ class User extends MY_Controller {
 			}
 		}
 		
+		$this->_exit_redirectHome();
+	}
+	
+	private function _user_usortCompare($a, $b) {
+		return strcasecmp($a['user_name'], $b['user_name']);
+	}
+	
+	private function _exit_redirectHome() {
 		// remove session data, and redirect user to login page
 		//TODO think if it's better to logout directly to force login again to get a new token
 		UserAuth_removeSessionData();
 		header('Location: ' . USERAUTH_URL_REDIRECTION);
 		exit;
-	}
-	
-	private function _user_usortCompare($a, $b) {
-		return strcasecmp($a['user_name'], $b['user_name']);
 	}
 	
 	public function index() {
@@ -57,6 +61,8 @@ class User extends MY_Controller {
 		$template_data = array(
 				'button_add_user'	=> t('button_add_user'),
 				'button_list_user'	=> t('button_list_user'),
+				'msg_add_ok'		=> t('msg_add_ok'),
+				'display_add_ok'	=> ($this->input->get('add_success') !== FALSE) ? 'true' : 'false',
 		);
 		
 		$this->_parseBaseTemplate(t('pagetitle_user_manage'),
@@ -67,6 +73,7 @@ class User extends MY_Controller {
 	
 	public function add() {
 		$template_data = NULL; //array()
+		$userlist_api = array();
 		$error = NULL;
 		
 		$this->lang->load('user/add', $this->config->item('language'));
@@ -80,46 +87,88 @@ class User extends MY_Controller {
 // 			$this->form_validation->set_rules('access_manage', 'lang:title_p_manage', 'required|is_natural|less_than[2]');
 // 			$this->form_validation->set_rules('access_account', 'lang:title_p_account', 'required|is_natural|less_than[2]');
 			$this->form_validation->set_rules('user_access', 'lang:title_access', 'required|is_natural_no_zero|less_than[4]');
+			$this->form_validation->set_rules('user_message', 'lang:title_message', 'max_length[2048]');
 			
 			if ($this->form_validation->run() == FALSE) {
 				$error = validation_errors();
 			}
+			else if (ERROR_OK != UserAuth_getUserListArray($userlist_api)) {
+// 				$error = t('error_get_list');
+				$this->_exit_redirectHome();
+				
+				return; // never reach here
+			}
 			else {
-				$user_access = (int) $this->post('user_access');
+				$user_access = (int) $this->input->post('user_access');
+				$user_email = $this->input->post('user_email');
+				$user_name = $this->input->post('user_name');
+				$user_message = $this->input->post('user_message');
+				$user_edit = (FALSE !== $this->input->post('edit_user'));
+				$user_exist = FALSE;
 				
-				$ret_val = UserAuth_grantUser(
-						$this->input->post('user_email'),
-						$this->input->post('user_name'),
-						array(
-								USERAUTH_PRM_P_VIEW		=> ($user_access > 0)	? TRUE : FALSE,
-								USERAUTH_PRM_P_MANAGE	=> ($user_access > 1)	? TRUE : FALSE,
-								USERAUTH_PRM_P_ACCOUNT	=> ($user_access > 2)	? TRUE : FALSE,
-				));
-				
-				switch ($ret_val) {
-					case ERROR_OK:
-						$url_redirect = '/user/manage';
-						
-						if (FALSE !== $this->input->post('edit_user')) {
-							$url_redirect = '/user/userlist';
+				if ($user_edit) {
+					$user_oldname = $this->input->post('user_oldname');
+					
+					if ($user_name != $user_oldname) {
+						foreach ($userlist_api as $user_element) {
+							if ($user_name == $user_element[USERAUTH_TITLE_NAME]) {
+// 								$user_exist = TRUE;
+								$this->output->set_header('Location: /user/userlist?error_modify_exist');
+								
+								return;
+							}
 						}
-						$this->output->set_header('Location: ' . $url_redirect);
-						
-						return;
-						break; // never reach here
-						
-					case ERROR_MISS_PRM:
-					case ERROR_WRONG_PRM:
-						$error = t('error_parameter');
-						break;
-						
-					case ERROR_AUTHOR_FAIL:
-						$error = t('error_authorize');
-						break;
-						
-					default:
-						$error = t('error_unknown');
-						break;
+					}
+				}
+				else {
+					foreach ($userlist_api as $user_element) {
+						if ($user_name == $user_element[USERAUTH_TITLE_NAME]
+								|| $user_email == $user_element[USERAUTH_TITLE_EMAIL]) {
+							$user_exist = TRUE;
+							break;
+						}
+					}
+				}
+				
+				if ($user_exist) {
+					$error = t('error_exist');
+				}
+				else {
+					$ret_val = UserAuth_grantUser($user_email, $user_name,
+							array(
+									USERAUTH_PRM_P_VIEW		=> ($user_access > 0)	? TRUE : FALSE,
+									USERAUTH_PRM_P_MANAGE	=> ($user_access > 1)	? TRUE : FALSE,
+									USERAUTH_PRM_P_ACCOUNT	=> ($user_access > 2)	? TRUE : FALSE,
+							), $user_message);
+					
+					switch ($ret_val) {
+						case ERROR_OK:
+							$url_redirect = '/user/manage?add_success';
+							
+							if ($user_edit) {
+								$url_redirect = '/user/userlist';
+							}
+							$this->output->set_header('Location: ' . $url_redirect);
+							
+							return;
+							break; // never reach here
+							
+						case ERROR_MISS_PRM:
+						case ERROR_WRONG_PRM:
+							$error = t('error_parameter');
+							break;
+							
+						case ERROR_AUTHOR_FAIL:
+	// 						$error = t('error_authorize');
+							$this->_exit_redirectHome();
+							
+							return;
+							break; // never reach here
+							
+						default:
+							$error = t('error_unknown');
+							break;
+					}
 				}
 			}
 		}
@@ -134,9 +183,12 @@ class User extends MY_Controller {
 				'title_p_view'		=> t('title_p_view'),
 				'title_p_manage'	=> t('title_p_manage'),
 				'title_p_account'	=> t('title_p_account'),
+				'title_message'		=> t('title_message'),
+				'hint_message'		=> t('hint_message'),
 				'button_confirm'	=> t('button_confirm'),
 				'hint_access'		=> t('hint_access'),
 				'popup_what'		=> t('popup_what'),
+				'msg_grant_manage'	=> t('msg_grant_manage'),
 // 				'function_on'		=> t('function_on'),
 // 				'function_off'		=> t('function_off'),
 				'error'				=> $error,
@@ -153,7 +205,20 @@ class User extends MY_Controller {
 		$userlist_display = array();
 		$userlist_api = array();
 		$ret_val = UserAuth_getUserListArray($userlist_api);
+		$error = NULL;
 		$radio_checked = 'checked';
+		
+		$this->lang->load('user/add', $this->config->item('language'));
+		$this->lang->load('user/list', $this->config->item('language'));
+		
+		if ($ret_val != ERROR_OK) {
+			$this->_exit_redirectHome();
+			
+			return;
+		}
+		else if (FALSE !== $this->input->get('error_modify_exist')) {
+			$error = t('msg_error_modify_exist');
+		}
 		
 		foreach($userlist_api as $user_element) {
 			$user_access = 1; // $user_element[USERAUTH_PRM_P_VIEW] as default
@@ -178,8 +243,6 @@ class User extends MY_Controller {
 		usort($userlist_display, 'User::_user_usortCompare');
 		
 		$this->load->library('parser');
-		$this->lang->load('user/add', $this->config->item('language'));
-		$this->lang->load('user/list', $this->config->item('language'));
 		
 		$template_data = array(
 				'title_name'		=> t('title_name'),
@@ -188,6 +251,8 @@ class User extends MY_Controller {
 				'title_p_view'		=> t('title_p_view'),
 				'title_p_manage'	=> t('title_p_manage'),
 				'title_p_account'	=> t('title_p_account'),
+				'title_message'		=> t('title_message'),
+				'hint_message'		=> t('hint_message'),
 				'button_confirm'	=> t('button_confirm'),
 				'hint_access'		=> t('hint_access'),
 				'popup_what'		=> t('popup_what'),
@@ -198,7 +263,8 @@ class User extends MY_Controller {
 				'button_delete_ok'	=> t('button_delete_ok'),
 				'button_delete_no'	=> t('button_delete_no'),
 				'msg_delete_error'	=> t('msg_delete_error'),
-				'error_get_list'	=> ($ret_val == ERROR_OK) ? NULL : t('error_get_list'),
+				'msg_grant_manage'	=> t('msg_grant_manage'),
+				'error_get_list'	=> $error, //($ret_val == ERROR_OK) ? NULL : t('error_get_list'),
 				'userlist'			=> $userlist_display,
 		);
 		

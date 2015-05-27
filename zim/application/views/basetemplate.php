@@ -11,11 +11,11 @@
 		<link rel="stylesheet" href="/styles/jquery.mobile-1.4.0.min.css" />
 		<link rel="stylesheet" href="/styles/Custom-zim.min.css" />
 		<script src="/scripts/jquery-1.9.1.min.js"></script>
-		<script>
-			$(document).bind("mobileinit", function() {
-				$.mobile.defaultPageTransition = 'slide';
-			});
-		</script>
+<!-- 		<script> -->
+<!-- 			$(document).bind("mobileinit", function() { -->
+<!-- 				$.mobile.defaultPageTransition = 'slide'; -->
+<!-- 			}); -->
+<!-- 		</script> -->
 		<script src="/scripts/jquery.mobile-1.4.0.min.js"></script>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, target-densitydpi=medium-dpi, user-scalable=0" />
 		<link rel="stylesheet" href="/styles/Printer-zim.css" />
@@ -25,6 +25,10 @@
 			$(document).on("pageinit", function() {
 				if (typeof var_disable_logo_link == 'undefined' || var_disable_logo_link == false)
 					$('div#link_logo').click(function(){window.location.href='/'; return false;});
+				$('div#container').addClass('ui-transparent ui-corner-all ui-shadow zim-content-container');
+			})
+			.on("pagecreate", function() {
+				$('form.ui-filterable div.ui-input-search').addClass('ui-opaque');
 			});
 		</script>
 		{headers}

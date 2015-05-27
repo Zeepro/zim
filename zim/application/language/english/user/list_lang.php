@@ -12,3 +12,7 @@ $lang['button_delete_no']
 	= 'No';
 $lang['msg_delete_error']
 	= 'Revoke user failed';
+$lang['title_access']
+	= 'Rights granted';
+$lang['msg_error_modify_exist']
+	= 'Specified user name already exists';

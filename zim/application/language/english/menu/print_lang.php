@@ -2,7 +2,7 @@
 $lang['pagetitle_menu_print']
 	= 'Zim - Print';
 $lang['link_import_once']
-	= 'One-time print';
+	= 'Quick print';
 $lang['link_userlib']
 	= 'My Models';
 $lang['link_printlist']

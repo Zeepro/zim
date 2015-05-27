@@ -36,6 +36,7 @@ if (!defined('USERAUTH_VALUE_TIMEOUT')) {
 	define('USERAUTH_PRM_P_ACCOUNT',	'account');
 	define('USERAUTH_PRM_P_MANAGE',		'manage');
 	define('USERAUTH_PRM_P_VIEW',		'view');
+	define('USERAUTH_PRM_MESSAGE',		'message');
 	
 	define('USERAUTH_PRM_MODEL_ID',		'id');
 	define('USERAUTH_PRM_MODEL_NAME',	'name');
@@ -357,7 +358,7 @@ function UserAuth_getUserListArray(&$user_list) {
 	return $cr;
 }
 
-function UserAuth_grantUser($user_email, $user_name, $user_access) {
+function UserAuth_grantUser($user_email, $user_name, $user_access, $user_message = NULL) {
 	$CI = &get_instance();
 	$ret_val = 0;
 	$cr = 0;
@@ -373,6 +374,7 @@ function UserAuth_grantUser($user_email, $user_name, $user_access) {
 			USERAUTH_PRM_NAME	=> $user_name,
 	);
 	
+	// user permission
 	foreach(array(
 			USERAUTH_PRM_P_VIEW,
 			USERAUTH_PRM_P_MANAGE,
@@ -384,6 +386,10 @@ function UserAuth_grantUser($user_email, $user_name, $user_access) {
 		else {
 			$post_data[$key_check] = USERAUTH_VALUE_P_OFF;
 		}
+	}
+	// user message
+	if (strlen($user_message)) {
+		$post_data[USERAUTH_PRM_MESSAGE] = $user_message;
 	}
 	
 	// send request

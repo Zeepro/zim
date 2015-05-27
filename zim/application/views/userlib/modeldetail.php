@@ -6,7 +6,7 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
-			<h1>{model_name}</h1>
+			<h2 style="font-size: medium;">{model_name}</h2>
 			<p id="modelDetail_waitMessage">{msg_wait_prepare}</p>
 			<p id="modelDetail_3dfileNotReady" style="display: none;">{msg_3dfile_n_rdy}</p>
 			<div id="modelDetail_3dfileReady" style="display: none;">
@@ -103,6 +103,9 @@ else {
 }
 if (var_show_prints == true) {
 	$("div#modelDetail_havePrints").show();
+}
+else if (var_show_3dfile == true) {
+	start_importModel(); // auto enter into original file if no prints exists
 }
 
 </script>

@@ -12,3 +12,7 @@ $lang['button_delete_no']
 	= 'Non';
 $lang['msg_delete_error']
 	= 'Erreur de révocation d\'utilisateur';
+$lang['title_access']
+	= 'Droits conditionnés';
+$lang['msg_error_modify_exist']
+	= 'Le nom spécifié est déjà existant';

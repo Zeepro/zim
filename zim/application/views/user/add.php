@@ -6,21 +6,15 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
-			<form method="POST">
+			<form id="user_manage_add" method="POST">
 			<h2 style="text-align: center;">{title_add_form}</h2>
-			<div class="ui-grid-a">
-				<div class="ui-block-a"><div class="ui-bar ui-bar-f">
-					<label for="user_name"><h2>{title_name}</h2></label>
-				</div></div>
-				<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-					<input type="text" name="user_name" required />
-				</div></div>
-				<div class="ui-block-a"><div class="ui-bar ui-bar-f">
-					<label for="user_email"><h2>{title_email}</h2></label>
-				</div></div>
-				<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-					<input type="email" name="user_email" required />
-				</div></div>
+			<div class="ui-field-contain">
+				<label for="user_name">{title_name}</label>
+				<input type="text" name="user_name" required />
+			</div>
+			<div class="ui-field-contain">
+				<label for="user_email">{title_email}</label>
+				<input type="email" name="user_email" required />
 			</div>
 			<div data-role="collapsible" data-collapsed="false">
 				<h4>{title_access}</h4>
@@ -38,9 +32,21 @@
 					<label for="user_access_a">{title_p_account}</label>
 				</fieldset>
 			</div>
+			<div data-role="collapsible">
+				<h4>{title_message}</h4>
+				<textarea cols="40" rows="8" name="user_message" id="user_message" placeholder="{hint_message}" maxlength="2048"></textarea>
+			</div>
 			<input type="submit" value="{button_confirm}" />
 			</form>
 			<div class="zim-error">{error}</div>
 		</div>
 	</div>
+
+<script>
+$("form#user_manage_add").bind("submit", function() {
+	if (3 == $("input[name=user_access]").val()) {
+		alert("{msg_grant_manage}");
+	}
+});
+</script>
 </div>

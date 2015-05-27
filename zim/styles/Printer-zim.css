@@ -1,13 +1,25 @@
 /*!
 * Group all the style custom code into a specified file
 */
-
+body,
+body div,
+body input,
+body a,
+body p,
+body span {
+	font-family: Calibri, Arial, sans-serif !important;
+}
+body .ui-page /* .ui-content */ {
+	background: url("/images/home.jpg") 50% 100px;
+}
 div.logo {
 	width: 100%;
 	height: 66px;
-	background: url("/images/logo_zeeproshare.png") top center no-repeat;
-	margin-top: -20px;
-	margin-bottom: 14px;
+	/* background: url("/images/logo_zeeproshare.png") top center no-repeat; */
+	background: url("/images/logo_v2.jpg") top center no-repeat;
+	/* margin-top: -20px;
+	margin-bottom: 14px; */
+	margin-bottom: 10px;
 }
 div#link_logo {
 	margin: 0 auto;
@@ -21,7 +33,7 @@ div#link_logo {
 	background-size: 1px 100px; 
 }
 .page-header {
-	background: url("/images/headerBack.png") repeat-x !important;
+	background: url("/images/headerBack.jpg") center repeat-x !important;
 	border: 0px !important;
 	color: #333;
 	height: 40px;
@@ -57,4 +69,20 @@ div#link_logo {
 canvas.zeeprocanvas {
 	background-color: rgba(0, 0, 0, 1.0);
 	border: 0px;
+}
+.ui-transparent {
+	background: url("/images/tr200.png") repeat;
+}
+.ui-opaque {
+	background: url("/images/tr255.png") repeat;
+}
+.zim-content-container {
+	padding: 5px;
+	/* overflow: hidden; */
+}
+.ui-header:empty {
+	min-height: 40px !important;
+}
+h2 {
+	text-shadow: none !important;
 }

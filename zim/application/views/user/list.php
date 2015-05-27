@@ -12,20 +12,16 @@
 				<div data-role="collapsible" id="printeruser_{user_name}_{random_id}">
 					<h3>{user_name}</h3>
 					<a href="#delete_popup" data-role="button" data-rel="popup" onclick='javascript: pre_deleteUser("printeruser_{user_name}_{random_id}");'>{button_delete}</a>
-					<form method="POST" action="/user/add" data-ajax="false">
-					<div class="ui-grid-a">
-						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
-							<label for="user_name"><h2>{title_name}</h2></label>
-						</div></div>
-						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="text" name="user_name" value="{user_name}" required />
-						</div></div>
-						<div class="ui-block-a"><div class="ui-bar ui-bar-f">
-							<label for="user_email"><h2>{title_email}</h2></label>
-						</div></div>
-						<div class="ui-block-b"><div class="ui-bar ui-bar-f">
-							<input type="email" name="user_email" value="{user_email}" required />
-						</div></div>
+					<form method="POST" class="user_manage_edit" action="/user/add" data-ajax="false">
+					<div class="ui-field-contain">
+						<label for="user_name">{title_name}</label>
+						<input type="text" name="user_name" value="{user_name}" required />
+						<input type="hidden" name="user_oldname" value="{user_name}" required />
+					</div>
+					<div class="ui-field-contain">
+						<label for="user_email">{title_email}</label>
+						<input type="email" name="user_email_display" value="{user_email}" disabled />
+						<input type="hidden" name="user_email" value="{user_email}" required />
 					</div>
 					<div data-role="collapsible" data-collapsed="false">
 						<h4>{title_access}</h4>
@@ -38,6 +34,10 @@
 							<input type="radio" name="user_access" id="user_access_{user_name}_{random_id}_a" value="3" {user_p_account}>
 							<label for="user_access_{user_name}_{random_id}_a">{title_p_account}</label>
 						</fieldset>
+					</div>
+					<div data-role="collapsible" style="margin-top: 8px;">
+						<h4>{title_message}</h4>
+						<textarea cols="40" rows="8" name="user_message" id="user_message" placeholder="{hint_message}" maxlength="2048"></textarea>
 					</div>
 					<input type="hidden" name="user_ori_email" value="{user_email}" />
 					<input type="submit" name="edit_user" value="{button_confirm}" />
@@ -106,5 +106,11 @@ function do_deleteUser() {
 	
 	return;
 }
+
+$("form.user_manage_edit").bind("submit", function() {
+	if (3 == $(this).find("input[name=user_access]:checked").val()) {
+		alert("{msg_grant_manage}");
+	}
+});
 </script>
 </div>

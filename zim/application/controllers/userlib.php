@@ -476,7 +476,7 @@ class Userlib extends MY_Controller {
 		//TODO need generate own language file
 		$this->lang->load('sliceupload/upload', $this->config->item('language'));
 		$this->lang->load('printerstoring/storestl', $this->config->item('language'));
-// 		$this->lang->load('userlib/storemodel', $this->config->item('language'));
+		$this->lang->load('userlib/storemodel', $this->config->item('language'));
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$array_model = array();
 			$upload_config = array (
@@ -582,6 +582,9 @@ class Userlib extends MY_Controller {
 				'header_single' 	=> t('header_single'),
 				'header_multi'		=> t('header_multi'),
 				'upload_button'		=> t('upload_button'),
+				'save_overwrite'	=> t('save_overwrite'),
+				'button_save_ok'	=> t('button_save_ok'),
+				'button_save_no'	=> t('button_save_no'),
 				'error'				=> $error,
 				'model_id'			=> $model_id,
 				'title_name'		=> t('name'),

@@ -28,6 +28,34 @@ class Menu extends MY_Controller {
 		return;
 	}
 	
+	public function m_total() {
+		$template_data = NULL; //array()
+		
+		$this->load->helper('userauth');
+		$this->load->library('parser');
+		$this->lang->load('menu/config', $this->config->item('language'));
+		$this->lang->load('menu/print', $this->config->item('language'));
+		
+		$template_data = array(
+				'link_import_once'	=> t('link_import_once'),
+				'link_userlib'		=> t('link_userlib'),
+				'link_printlist'	=> t('link_printlist'),
+				'link_preset'		=> t('link_preset'),
+				'library_visible'	=> ($this->config->item('use_sdcard') == TRUE) ? 'block' : 'none',
+				'link_manage_user'	=> t('link_manage_user'),
+				'link_control'		=> t('link_control'),
+				'link_config'		=> t('link_config'),
+				'link_about'		=> t('link_about'),
+				'show_mange_user'	=> (UserAuth_checkAccount()) ? 'true' : 'false',
+				'show_control'		=> (UserAuth_checkManage()) ? 'true' : 'false',
+		);
+		
+		$this->_parseBaseTemplate(t('pagetitle_menu_print'),
+				$this->parser->parse('menu/total', $template_data, TRUE));
+		
+		return;
+	}
+	
 	public function m_print() {
 		$template_data = NULL; //array()
 		

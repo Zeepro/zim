@@ -16,6 +16,10 @@ $lang['title_p_manage']
 	= 'Gold';
 $lang['title_p_account']
 	= 'Platinium';
+$lang['title_message']
+	= 'Message';
+$lang['hint_message']
+	= 'Max. 2048 characters';
 $lang['button_confirm']
 	= 'Confirm';
 // $lang['function_on']
@@ -28,6 +32,10 @@ $lang['error_authorize']
 	= 'Authorization error';
 $lang['error_unknown']
 	= 'Unknown error';
+$lang['msg_grant_manage']
+	= 'Warning: you\'re about to grant MANAGE ACCOUNT right';
+$lang['error_exist']
+	= 'Same name or email exists';
 $lang['popup_what']
 	= "What's this ?";
 $lang['hint_access']

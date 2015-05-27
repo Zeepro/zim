@@ -16,6 +16,10 @@ $lang['title_p_manage']
 	= 'Or';
 $lang['title_p_account']
 	= 'Platine';
+$lang['title_message']
+	= 'Message';
+$lang['hint_message']
+	= '2048 charactères Max.';
 $lang['button_confirm']
 	= 'Valider';
 // $lang['function_on']
@@ -28,6 +32,10 @@ $lang['error_authorize']
 	= 'Erreur d\'authentification';
 $lang['error_unknown']
 	= 'Erreur inconnue';
+$lang['msg_grant_manage']
+	= 'Warning : Vous êtes en train de conditionner le droit de GESTION D\'UTILISATEUR';
+$lang['error_exist']
+	= 'Même nom ou mail détecté';
 $lang['popup_what']
 	= "Aide";
 $lang['hint_access']
