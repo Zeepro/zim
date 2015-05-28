@@ -19,7 +19,7 @@ $lang['title_p_account']
 $lang['title_message']
 	= 'Message';
 $lang['hint_message']
-	= '2048 charactères Max.';
+	= 'Inclure un message personnel (facultatif)';
 $lang['button_confirm']
 	= 'Valider';
 // $lang['function_on']
@@ -36,6 +36,10 @@ $lang['msg_grant_manage']
 	= 'Warning : Vous êtes en train de conditionner le droit de GESTION D\'UTILISATEUR';
 $lang['error_exist']
 	= 'Même nom ou mail détecté';
+$lang['msg_add_exist']
+	= 'Utilisateur déjà existant';
+$lang['button_ok']
+	= 'Ok';
 $lang['popup_what']
 	= "Aide";
 $lang['hint_access']

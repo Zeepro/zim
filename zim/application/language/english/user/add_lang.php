@@ -19,7 +19,7 @@ $lang['title_p_account']
 $lang['title_message']
 	= 'Message';
 $lang['hint_message']
-	= 'Max. 2048 characters';
+	= 'Include a personal message (optional)';
 $lang['button_confirm']
 	= 'Confirm';
 // $lang['function_on']
@@ -36,6 +36,10 @@ $lang['msg_grant_manage']
 	= 'Warning: you\'re about to grant MANAGE ACCOUNT right';
 $lang['error_exist']
 	= 'Same name or email exists';
+$lang['msg_add_exist']
+	= 'User already exists';
+$lang['button_ok']
+	= 'Ok';
 $lang['popup_what']
 	= "What's this ?";
 $lang['hint_access']

@@ -1,4 +1,4 @@
-<div data-role="page" data-url="/user/userlist" style="overflow:hidden;">
+<div data-role="page" data-url="/user/userlist" style="overflow-y: hidden;">
 	<div id="overlay"></div>
 	<header data-role="header" class="page-header">
 		<a href="javascript:history.back();" data-icon="back" data-ajax="false">{back}</a>
@@ -7,15 +7,16 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
+			<a href="/user/add" data-role="button" data-ajax="false">{button_add_user}</a>
 			<div data-role="collapsible-set" id="list_printeruser">
 			{userlist}
 				<div data-role="collapsible" id="printeruser_{user_name}_{random_id}">
 					<h3>{user_name}</h3>
 					<a href="#delete_popup" data-role="button" data-rel="popup" onclick='javascript: pre_deleteUser("printeruser_{user_name}_{random_id}");'>{button_delete}</a>
-					<form method="POST" class="user_manage_edit" action="/user/add" data-ajax="false">
+					<form method="POST" class="user_manage_edit" action="/user/add" data-ajax="false" data-fillmsg="false">
 					<div class="ui-field-contain">
 						<label for="user_name">{title_name}</label>
-						<input type="text" name="user_name" value="{user_name}" required />
+						<input type="text" name="user_name" value="{user_name}" pattern="[A-Za-z0-9_-]*" required />
 						<input type="hidden" name="user_oldname" value="{user_name}" required />
 					</div>
 					<div class="ui-field-contain">
@@ -35,11 +36,13 @@
 							<label for="user_access_{user_name}_{random_id}_a">{title_p_account}</label>
 						</fieldset>
 					</div>
-					<div data-role="collapsible" style="margin-top: 8px;">
-						<h4>{title_message}</h4>
-						<textarea cols="40" rows="8" name="user_message" id="user_message" placeholder="{hint_message}" maxlength="2048"></textarea>
-					</div>
+<!-- 					<div data-role="collapsible" style="margin-top: 8px;"> -->
+<!-- 						<h4>{title_message}</h4> -->
+<!-- 						<textarea cols="40" rows="8" name="user_message" placeholder="{hint_message}" maxlength="2048"></textarea> -->
+<!-- 					</div> -->
 					<input type="hidden" name="user_ori_email" value="{user_email}" />
+					<input type="hidden" name="user_message" />
+					<input type="hidden" name="edit_user" value="edit" />
 					<input type="submit" name="edit_user" value="{button_confirm}" />
 					</form>
 				</div>
@@ -63,10 +66,88 @@
 				</div>
 			</div>
 		</div>
+		<div id="list_exist_popup" data-role="popup" class="ui-content" style="max-width: 250px; text-align: center;">
+			<p class="zim-error">{msg_add_exist}</p>
+			<a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">{button_ok}</a>
+		</div>
+		<div id="user_edit_message_popup" data-role="popup" class="ui-content">
+			<textarea cols="40" rows="8" name="user_message" id="user_edit_message_popup_text" placeholder="{hint_message}" maxlength="2048"></textarea>
+			<a href="#" data-role="button" onclick="javascript: startSubmitUser();">{button_confirm}</a>
+		</div>
 	</div>
 
 <script>
 var var_id_toDelete = null;
+var var_formsubmit = null;
+var var_ajax;
+
+var handlerUserEditSubmit = function submitUserEdit(event) {
+	event.preventDefault();
+	
+	if (false == $(this).data("fillmsg")) {
+		var_formsubmit = $(this);
+		
+		if (3 == $(this).find("input[name=user_access]:checked").val()) {
+			alert("{msg_grant_manage}");
+		}
+		$("div#user_edit_message_popup").popup("open");
+		
+		return;
+	}
+	
+	var_ajax = $.ajax({
+		url: "/user/check_exist_ajax",
+		cache: false,
+		type: "POST",
+		data: {
+			action: "edit",
+			email: $(this).find("input[name=user_email]").val(),
+			name: $(this).find("input[name=user_name]").val(),
+			oldname: $(this).find("input[name=user_oldname]").val(),
+		},
+		beforeSend: function() {
+			$("#overlay").addClass("gray-overlay");
+			$(".ui-loader").css("display", "block");
+		},
+		complete: function() {
+			if (var_ajax.status != 200) {
+				$("#overlay").removeClass("gray-overlay");
+				$(".ui-loader").css("display", "none");
+			}
+		},
+	})
+	.done(function() {
+		if (var_ajax.status == 202) {
+			$("div#list_exist_popup").popup("open");
+		}
+		else if (var_formsubmit != null) {
+			var_formsubmit.unbind("submit", handlerUserEditSubmit).submit();
+		}
+	})
+	.fail(function() {
+		console.log("unexpected error case: " + var_ajax.status);
+	});
+}
+
+function startSubmitUser() {
+	if (var_formsubmit != null) {
+		var_formsubmit.find("input[name=user_message]").val($("textarea#user_edit_message_popup_text").val());
+		var_formsubmit.data("fillmsg", true);
+		$("div#user_edit_message_popup").popup("close");
+		
+		$("#overlay").addClass("gray-overlay");
+		$(".ui-loader").css("display", "block");
+		
+		setTimeout(function() {
+			var_formsubmit.submit();
+		}, 500);
+	}
+	else {
+		console.log("var_formsubmit is null in StartSubmitUser");
+	}
+	
+	return;
+}
 
 function pre_deleteUser(div_id) {
 	if (typeof(div_id) != "undefined" && $("div#" + div_id)) {
@@ -107,10 +188,6 @@ function do_deleteUser() {
 	return;
 }
 
-$("form.user_manage_edit").bind("submit", function() {
-	if (3 == $(this).find("input[name=user_access]:checked").val()) {
-		alert("{msg_grant_manage}");
-	}
-});
+$("form.user_manage_edit").bind("submit", handlerUserEditSubmit);
 </script>
 </div>

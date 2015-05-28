@@ -53,22 +53,25 @@ class User extends MY_Controller {
 	}
 	
 	public function manage() {
-		$template_data = NULL; //array()
-		
-		$this->load->library('parser');
-		$this->lang->load('user/manage', $this->config->item('language'));
-		
-		$template_data = array(
-				'button_add_user'	=> t('button_add_user'),
-				'button_list_user'	=> t('button_list_user'),
-				'msg_add_ok'		=> t('msg_add_ok'),
-				'display_add_ok'	=> ($this->input->get('add_success') !== FALSE) ? 'true' : 'false',
-		);
-		
-		$this->_parseBaseTemplate(t('pagetitle_user_manage'),
-				$this->parser->parse('user/manage', $template_data, TRUE));
+		$this->userlist();
 		
 		return;
+// 		$template_data = NULL; //array()
+		
+// 		$this->load->library('parser');
+// 		$this->lang->load('user/manage', $this->config->item('language'));
+		
+// 		$template_data = array(
+// 				'button_add_user'	=> t('button_add_user'),
+// 				'button_list_user'	=> t('button_list_user'),
+// 				'msg_add_ok'		=> t('msg_add_ok'),
+// 				'display_add_ok'	=> ($this->input->get('add_success') !== FALSE) ? 'true' : 'false',
+// 		);
+		
+// 		$this->_parseBaseTemplate(t('pagetitle_user_manage'),
+// 				$this->parser->parse('user/manage', $template_data, TRUE));
+		
+// 		return;
 	}
 	
 	public function add() {
@@ -143,12 +146,13 @@ class User extends MY_Controller {
 					
 					switch ($ret_val) {
 						case ERROR_OK:
-							$url_redirect = '/user/manage?add_success';
+// 							$url_redirect = '/user/manage?add_success';
 							
-							if ($user_edit) {
-								$url_redirect = '/user/userlist';
-							}
-							$this->output->set_header('Location: ' . $url_redirect);
+// 							if ($user_edit) {
+// 								$url_redirect = '/user/userlist';
+// 							}
+// 							$this->output->set_header('Location: ' . $url_redirect);
+							$this->output->set_header('Location: /user/userlist');
 							
 							return;
 							break; // never reach here
@@ -159,7 +163,7 @@ class User extends MY_Controller {
 							break;
 							
 						case ERROR_AUTHOR_FAIL:
-	// 						$error = t('error_authorize');
+// 							$error = t('error_authorize');
 							$this->_exit_redirectHome();
 							
 							return;
@@ -189,6 +193,8 @@ class User extends MY_Controller {
 				'hint_access'		=> t('hint_access'),
 				'popup_what'		=> t('popup_what'),
 				'msg_grant_manage'	=> t('msg_grant_manage'),
+				'msg_add_exist'		=> t('msg_add_exist'),
+				'button_ok'			=> t('button_ok'),
 // 				'function_on'		=> t('function_on'),
 // 				'function_off'		=> t('function_off'),
 				'error'				=> $error,
@@ -208,6 +214,7 @@ class User extends MY_Controller {
 		$error = NULL;
 		$radio_checked = 'checked';
 		
+		$this->lang->load('user/manage', $this->config->item('language'));
 		$this->lang->load('user/add', $this->config->item('language'));
 		$this->lang->load('user/list', $this->config->item('language'));
 		
@@ -245,6 +252,7 @@ class User extends MY_Controller {
 		$this->load->library('parser');
 		
 		$template_data = array(
+				'button_add_user'	=> t('button_add_user'),
 				'title_name'		=> t('title_name'),
 				'title_email'		=> t('title_email'),
 				'title_access'		=> t('title_access'),
@@ -264,6 +272,8 @@ class User extends MY_Controller {
 				'button_delete_no'	=> t('button_delete_no'),
 				'msg_delete_error'	=> t('msg_delete_error'),
 				'msg_grant_manage'	=> t('msg_grant_manage'),
+				'msg_add_exist'		=> t('msg_add_exist'),
+				'button_ok'			=> t('button_ok'),
 				'error_get_list'	=> $error, //($ret_val == ERROR_OK) ? NULL : t('error_get_list'),
 				'userlist'			=> $userlist_display,
 		);
@@ -398,6 +408,57 @@ class User extends MY_Controller {
 		else {
 			$ret_val = ERROR_MISS_PRM;
 		}
+		$this->output->set_status_header($ret_val, MyERRMSG($ret_val));
+		
+		return;
+	}
+	
+	public function check_exist_ajax() {
+		$ret_val = 0;
+		$userlist_api = array();
+		$user_action = $this->input->post('action');
+		$user_email = $this->input->post('email');
+		$user_name = $this->input->post('name');
+		
+		if ($user_action && $user_email && $user_name) {
+			$ret_val = UserAuth_getUserListArray($userlist_api);
+			if ($ret_val == ERROR_OK) {
+				switch ($user_action) {
+					case 'add':
+						$ret_val = ERROR_OK;
+						foreach ($userlist_api as $user_element) {
+							if ($user_name == $user_element[USERAUTH_TITLE_NAME]
+							|| $user_email == $user_element[USERAUTH_TITLE_EMAIL]) {
+								$ret_val = 202;
+								break;
+							}
+						}
+						break;
+						
+					case 'edit':
+						$user_oldname = $this->input->post('oldname');
+						
+						$ret_val = ERROR_OK;
+						if ($user_oldname && $user_name != $user_oldname) {
+							foreach ($userlist_api as $user_element) {
+								if ($user_name == $user_element[USERAUTH_TITLE_NAME]) {
+									$ret_val = 202;
+									break;
+								}
+							}
+						}
+						break;
+						
+					default:
+						$ret_val = ERROR_WRONG_PRM;
+						break;
+				}
+			}
+		}
+		else {
+			$ret_val = ERROR_MISS_PRM;
+		}
+		
 		$this->output->set_status_header($ret_val, MyERRMSG($ret_val));
 		
 		return;
