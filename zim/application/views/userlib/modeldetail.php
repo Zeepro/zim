@@ -58,6 +58,7 @@ function start_importModel() {
 			console.log("unexpected error case: " + var_ajax_download.status);
 			$("p#modelDetail_stateInfo").empty();
 			$("p#modelDetail_error").html("{msg_download_fail}");
+			$("div#modelDetail_3dfileReady").show();
 		}
 	});
 	
@@ -89,6 +90,7 @@ function do_importModel() {
 		console.log("unexpected error case: " + var_ajax_import.status);
 		$("p#modelDetail_stateInfo").empty();
 		$("p#modelDetail_error").html("{msg_import_fail}");
+		$("div#modelDetail_3dfileReady").show();
 	});
 	
 	return;
@@ -105,6 +107,7 @@ if (var_show_prints == true) {
 	$("div#modelDetail_havePrints").show();
 }
 else if (var_show_3dfile == true) {
+	$("div#modelDetail_3dfileReady").hide();
 	start_importModel(); // auto enter into original file if no prints exists
 }
 

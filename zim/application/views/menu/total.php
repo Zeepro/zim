@@ -1,12 +1,12 @@
 <div data-role="page" data-url="/menu/m_total">
 	<header data-role="header" class="page-header">
 		<a href="javascript:history.back();" data-icon="back" data-ajax="false">{back}</a>
-		<a href="/" data-icon="home" data-ajax="false">{home}</a>
+		<a href="/menu/home" data-icon="home" data-ajax="false">{home}</a>
 	</header>
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
-			<ul data-role="listview" id="listview_menu_print" class="shadowBox" data-inset="true">
+			<ul data-role="listview" id="listview_menu_print" data-inset="true">
 				<li id="print_import_once"><a href="/sliceupload/upload">
 					<h2>{link_import_once}</h2></a>
 				</li>
@@ -21,17 +21,17 @@
 				</li>
 			</ul>
 			<div style="clear: both; margin-top: 50px;"></div>
-			<ul data-role="listview" id="listview_menu_config_manageUser" class="shadowBox" data-inset="true" style="display: none;">
+			<ul data-role="listview" id="listview_menu_config_manageUser" data-inset="true" style="display: none;">
 				<li><a href="/user/manage">
 					<h2>{link_manage_user}</h2></a>
 				</li>
 			</ul>
-			<ul data-role="listview" id="listview_menu_config_controls" class="shadowBox" data-inset="true" style="display: none;">
+			<ul data-role="listview" id="listview_menu_config_controls" data-inset="true" style="display: none;">
 				<li><a href="/manage" data-ajax="false">
 					<h2>{link_control}</h2></a>
 				</li>
 			</ul>
-			<ul data-role="listview" id="listview_menu_config_general" class="shadowBox" data-inset="true">
+			<ul data-role="listview" id="listview_menu_config_general" class="shadowBox" data-inset="true" style="margin-bottom: 0;">
 				<li><a href="/printerstate">
 					<h2>{link_config}</h2></a>
 				</li>
@@ -39,7 +39,7 @@
 					<h2>{link_about}</h2></a>
 				</li>
 			</ul>
-			<img src="/images/listShadow.png" class="shadow" alt="shadow">
+			<div class="shadowContainer"><img src="/images/listShadow.png" class="shadow" alt="shadow"></div>
 		</div>
 	</div>
 

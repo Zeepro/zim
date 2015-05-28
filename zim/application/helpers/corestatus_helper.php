@@ -460,9 +460,11 @@ function CoreStatus_checkCallEndPrintingPlus() {
 			'/printdetail/printmodel'			=> NULL,
 			'/printdetail/printslice'			=> NULL,
 			'/printdetail/printgcode'			=> NULL,
+			'/printdetail/printuserlib'			=> NULL,
 			'/printdetail/printmodel_temp'		=> NULL,
 			'/printdetail/printslice_temp'		=> NULL,
 			'/printdetail/printgcode_temp'		=> NULL,
+			'/printdetail/printuserlib_temp'	=> NULL,
 			'/printmodel/detail'				=> array('id' => CORESTATUS_VALUE_MID_CALIBRATION),
 			'/printdetail/printprime'			=> NULL,
 	));

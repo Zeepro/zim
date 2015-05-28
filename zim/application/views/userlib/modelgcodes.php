@@ -7,7 +7,7 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
-			<ul data-role="listview" id="listview_userprint" class="shadowBox" data-inset="true" data-filter="true" data-filter-placeholder="{search_hint}" data-filter-theme="d" data-split-icon="delete" data-split-theme="b">
+			<ul data-role="listview" id="listview_userprint" data-inset="true" data-filter="true" data-filter-placeholder="{search_hint}" data-filter-theme="d" data-split-icon="delete" data-split-theme="b">
 				{print_list}
 				<li id="userprint_{model_id}_{timestamp}">
 					<a href="{link}"><img alt="Print image" src="{image}"><h2>{date}</h2><p>{preset_name_title}{preset}</p></a>

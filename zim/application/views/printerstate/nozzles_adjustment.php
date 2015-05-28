@@ -7,7 +7,7 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
-			<ul data-role="listview" id="listview" class="shadowBox" data-inset="true">
+			<ul data-role="listview" id="listview" data-inset="true">
 				<li>
 					<a href="/printmodel/detail?id=calibration" data-ajax="false" onclick="javascript: load_wait();">
 						<h2>{print_calibration}</h2>

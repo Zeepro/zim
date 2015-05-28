@@ -66,6 +66,7 @@ then
 	done
 else
 	tlvdfps=`expr $nbphoto / $VIDEOTIME`
+	[ $tlvdfps -le 0 ] && tlvdfps=1 # ensure fps bigger than 0
 	echo "fps changed : $tlvdfps"
 fi
 

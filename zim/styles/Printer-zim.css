@@ -4,6 +4,7 @@
 body,
 body div,
 body input,
+body button,
 body a,
 body p,
 body span {
@@ -39,10 +40,16 @@ div#link_logo {
 	height: 40px;
 	text-shadow: 0 -1px 1px #fff;
 }
+.shadowBox {
+	margin-bottom: 0 !important;
+}
+.shadowContainer {
+	max-height: 30px;
+}
 .shadow {
 	width: 100%;
 	position: relative;
-	top: -17px;
+	/* top: -17px; */
 	z-index: 5;
 }
 .zim-error {
@@ -78,7 +85,7 @@ canvas.zeeprocanvas {
 }
 .zim-content-container {
 	padding: 5px;
-	/* overflow: hidden; */
+	overflow: hidden;
 }
 .ui-header:empty {
 	min-height: 40px !important;

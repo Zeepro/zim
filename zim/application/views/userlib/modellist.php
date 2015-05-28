@@ -8,7 +8,7 @@
 	<div data-role="content">
 		<div id="container">
 			<a href="/userlib/storemodel" data-role="button">{button_add_model}</a>
-			<ul data-role="listview" id="listview_usermodel" class="shadowBox" data-inset="true" data-filter="true" data-filter-placeholder="{search_hint}" data-filter-theme="d" data-split-icon="delete" data-split-theme="b">
+			<ul data-role="listview" id="listview_usermodel" data-inset="true" data-filter="true" data-filter-placeholder="{search_hint}" data-filter-theme="d" data-split-icon="delete" data-split-theme="b">
 				{model_list}
 				<li id="usermodel_{id}">
 					<a href="{link}" data-rel="popup" data-callpopup="{popup}" id="usermodel_link_{id}" onclick="javascript: clickModelbyState('usermodel_link_{id}');">

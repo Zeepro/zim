@@ -16,7 +16,7 @@
 			</div>
 			<ul data-role="listview" id="listview-gcode" class="shadowBox" data-inset="true" data-filter="true" data-filter-placeholder="" data-filter-theme="d" data-split-icon="delete" data-split-theme="b"></ul>
 <!-- 			<h2>{title}</h2> -->
-			<img src="/images/listShadow.png" class="shadow" alt="shadow">
+			<div class="shadowContainer"><img src="/images/listShadow.png" class="shadow" alt="shadow"></div>
 		</div>
 		<div id="delete_popup" data-role="popup" data-dismissible="false" class="ui-content" style="max-width: 250px; text-align: center;">
 			{delete_popup_text}

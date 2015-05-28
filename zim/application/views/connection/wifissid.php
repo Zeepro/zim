@@ -13,7 +13,7 @@
 				{/list_ssid}
 				<li><a href="/connection/wifinotvisiblessid?{wizard}" class="needSpin" data-prefetch>{no_visable}</a></li>
 			</ul>
-			<img src="/images/listShadow.png" class="shadow" alt="shadow">
+			<div class="shadowContainer"><img src="/images/listShadow.png" class="shadow" alt="shadow"></div>
 		</div>
 	</div>
 	<script>

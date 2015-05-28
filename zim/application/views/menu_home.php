@@ -5,7 +5,7 @@
 	<div data-role="content">
 		<div id="container">
 			<a href="/printerstate/upgradenote?reboot"><b><span id="upgrade_notification">{update_available}</span></b></a>
-			<ul data-role="listview" id="listview_print" class="shadowBox" data-inset="true">
+			<ul data-role="listview" id="listview_print" data-inset="true">
 				<li><a href="/printmodel/listmodel">
 					<h2>{menu_printlist}</h2></a>
 				</li>
@@ -13,7 +13,7 @@
 					<h2>{upload}</h2></a>
 				</li>
 			</ul>
-			<ul data-role="listview" id="listview_library" class="shadowBox" data-inset="true">
+			<ul data-role="listview" id="listview_library" data-inset="true">
 				<li style="display: {library_visible};">
 					<a href="/printerstoring/libraries"><h2>{my_library}</h2></a>
 				</li>
@@ -21,7 +21,7 @@
 					<a id="zim_shop" href="http://zeepro.com/collections/all/products/pla-filament-cartridge" target="_blank"><h2>{my_zim_shop}</h2></a>
 				</li>
 			</ul>
-			<ul data-role="listview" id="listview_manage" class="shadowBox" data-inset="true">
+			<ul data-role="listview" id="listview_manage" data-inset="true">
 				<li><a href="/manage" data-ajax="false">
 					<h2>{manage}</h2></a>
 				</li>
@@ -34,7 +34,7 @@
 					<h2>{about}</h2></a>
 				</li>
 			</ul>
-			<img src="/images/listShadow.png" class="shadow" alt="shadow">
+			<div class="shadowContainer"><img src="/images/listShadow.png" class="shadow" alt="shadow"></div>
 		</div>
 	</div>
 <script>

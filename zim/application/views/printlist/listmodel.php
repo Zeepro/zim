@@ -15,7 +15,7 @@
 				</li>
 				{/model_lists}
 			</ul>
-			<img src="/images/listShadow.png" class="shadow" alt="shadow">
+			<div class="shadowContainer"><img src="/images/listShadow.png" class="shadow" alt="shadow"></div>
 		</div>
 	</div>
 	

@@ -16,6 +16,15 @@ class Menu extends MY_Controller {
 			PrinterLog_logError('can not turn off camera', __FILE__, __LINE__);
 		}
 		
+		$this->m_total();
+// 		redirect(USERAUTH_URL_REDIRECTION . USERAUTH_URI_REMOTE_INDEX);
+		
+		return;
+	}
+	
+	public function home() {
+		$this->load->helper(array('userauth', 'url'));
+		
 		redirect(USERAUTH_URL_REDIRECTION . USERAUTH_URI_REMOTE_INDEX);
 		
 		return;

@@ -6,12 +6,12 @@
 	<div class="logo"><div id="link_logo"></div></div>
 	<div data-role="content">
 		<div id="container">
-			<ul data-role="listview" id="listview_menu_config_manageUser" class="shadowBox" data-inset="true" style="display: none;">
+			<ul data-role="listview" id="listview_menu_config_manageUser" data-inset="true" style="display: none;">
 				<li><a href="/user/manage">
 					<h2>{link_manage_user}</h2></a>
 				</li>
 			</ul>
-			<ul data-role="listview" id="listview_menu_config_controls" class="shadowBox" data-inset="true" style="display: none;">
+			<ul data-role="listview" id="listview_menu_config_controls" data-inset="true" style="display: none;">
 				<li><a href="/manage">
 					<h2>{link_control}</h2></a>
 				</li>
@@ -24,7 +24,7 @@
 					<h2>{link_about}</h2></a>
 				</li>
 			</ul>
-			<img src="/images/listShadow.png" class="shadow" alt="shadow">
+			<div class="shadowContainer"><img src="/images/listShadow.png" class="shadow" alt="shadow"></div>
 		</div>
 	</div>
 

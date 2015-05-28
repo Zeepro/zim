@@ -52,7 +52,7 @@
 <!-- 					<h2>{support}</h2></a> -->
 <!-- 				</li> -->
 <!-- 			</ul> -->
-			<img src="/images/listShadow.png" class="shadow" alt="shadow">
+			<div class="shadowContainer"><img src="/images/listShadow.png" class="shadow" alt="shadow"></div>
 		</div>
 	</div>
 	
