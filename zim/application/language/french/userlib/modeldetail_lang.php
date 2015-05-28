@@ -8,7 +8,7 @@ $lang['button_prints']
 $lang['msg_wait_prepare']
 	= 'Préparer le détail du modèle';
 $lang['msg_3dfile_n_rdy']
-	= 'Vous n\'avez pas de fichier 3D ou il est en train d\'être chargé vers serveur.';
+	= 'Aucun fichier 3D disponible';
 $lang['msg_import_fail']
 	= 'Import du modèle échoué';
 $lang['msg_download_fail']
