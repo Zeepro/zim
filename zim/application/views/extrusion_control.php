@@ -49,6 +49,18 @@
 						</div>
 					</div>
 				</div>
+				<div class="widget_heatbed" style="display: none;">
+					<label for="temper_bed">Heating bed</label>
+					<div style="width:40px;float:left;margin-right:10px;">
+						<input type="text" data-clear-btn="false" name="temper_bed_current" id="temper_bed_current" value="0" disabled>
+					</div>
+					<div style="width:60px;float:left;margin-right:10px;">
+						<input type="number" style="text-align:right;" data-clear-btn="false" name="temper_bed" id="temper_bed" value="90">
+					</div>
+					<a href="#" data-role="button" data-icon="check" data-iconpos="left" data-inline="true" onclick="heat('b');">Set</a>
+					<a href="#" data-role="button" data-icon="delete" data-iconpos="left" data-inline="true" onclick="heat('b', 0);">Stop</a>
+					<a href="#" data-role="button" data-icon="refresh" data-iconpos="left" data-inline="true" onclick="refreshCheckTemper();">Refresh</a>
+				</div>
 			</div>
 			<div data-role="collapsible" data-collapsed="true" style="align: center;">
 				<h4>Filament</h4>
@@ -115,6 +127,7 @@ var var_ajax_lock = false;
 var var_checked_rfid = false;
 var var_verifyRFIDInterval = 0;
 var var_bicolor = {bicolor};
+var var_heatbed = {heat_bed};
 
 if (var_bicolor == true) {
 	$("div.widget_bicolor").show();
@@ -130,6 +143,9 @@ else {
 	$("input#temper_mono").change(function() {
 		$("input#speed_r").val($("input#speed_mono").val());
 	});
+}
+if (var_heatbed == true) {
+	$("div.widget_heatbed").show();
 }
 
 $(document).ready(checkTemper());
@@ -177,6 +193,9 @@ function refreshCheckTemper() {
 		$("#temper_l_current").val(response.left);
 		$("#temper_r_current").val(response.right);
 		$("#temper_mono_current").val(response.right);
+		if (typeof(response.bed) != "undefined") {
+			$("#temper_bed_current").val(response.bed);
+		}
 	})
 	.fail(function() {
 		$("#gcode_detail_info").html('ERROR');
@@ -203,7 +222,10 @@ function heat(var_extruder, var_value) {
 		return false;
 	}
 	if (var_value == 'get') {
-		if (var_extruder == 'l') {
+		if (var_extruder == 'b') {
+			var_value = $("#temper_bed").val();
+		}
+		else if (var_extruder == 'l') {
 			var_value = $("#temper_l").val();
 		}
 		else {

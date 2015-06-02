@@ -24,6 +24,7 @@ if (!defined('PRINTER_FN_CHARGE')) {
 	define('PRINTER_PRM_TEMPER_R_F',	' -r ');	// right temperature for first layer (or all layer)
 	define('PRINTER_PRM_FILE',			' -f ');	// file path
 	define('PRINTER_PRM_EXCHANGE_E',	' -c ');	// exchange extrduer
+	define('PRINTER_PRM_TEMPER_BED',	' -b ');
 	
 	define('PRINTER_TYPE_MODELLIST',	'model');
 	define('PRINTER_TYPE_GCODELIB',		'gcode');
@@ -548,7 +549,8 @@ function Printer_printFromFile($gcode_path, $model_id, $time_estimation, $need_p
 		
 		// change status json file
 		foreach($array_temper as $abb_filament => $tmp_temper) {
-			if (!array_key_exists($abb_filament, $array_filament) || $array_filament[$abb_filament] <= 0) {
+			if ($abb_filament != 'b' // allow heat bed temper to pass
+					&& (!array_key_exists($abb_filament, $array_filament) || $array_filament[$abb_filament] <= 0)) {
 				$temper_json[$abb_filament] = NULL;
 			}
 			else {
@@ -764,6 +766,7 @@ function Printer_checkPrintStatus(&$return_data) {
 	$data_status = array();
 	$temper_l = 0;
 	$temper_r = 0;
+	$temper_b = 0;
 	$current_phase = -1;
 	
 	$CI = &get_instance();
@@ -782,6 +785,9 @@ function Printer_checkPrintStatus(&$return_data) {
 		}
 		if (array_key_exists(PRINTERSTATE_TITLE_EXT_TEMP_R, $data_status[PRINTERSTATE_TITLE_EXTEND_PRM])) {
 			$temper_r = $data_status[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_EXT_TEMP_R];
+		}
+		if (array_key_exists(PRINTERSTATE_TITLE_EXT_TEMP_B, $data_status[PRINTERSTATE_TITLE_EXTEND_PRM])) {
+			$temper_b = $data_status[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_EXT_TEMP_B];
 		}
 	}
 	else {
@@ -815,6 +821,7 @@ function Printer_checkPrintStatus(&$return_data) {
 			'print_percent'	=> $data_status[PRINTERSTATE_TITLE_PERCENT],
 			'print_temperL'	=> $temper_l,
 			'print_temperR'	=> $temper_r,
+			'print_temperB'	=> $temper_b,
 			'print_tpassed'	=> $data_status[PRINTERSTATE_TITLE_PASSTIME],
 			'print_inPhase'	=> $current_phase,
 	);
@@ -1077,6 +1084,7 @@ function Printer__changeGcode(&$gcode_path, $array_filament = array(), $exchange
 	$temp_rs = 0; // right start temper
 	$temp_l = 0; // left normal temper
 	$temp_ls = 0; // left start temper
+	$temp_b = (isset($array_temper['b']) && $array_temper['b'] > 0) ? $array_temper['b'] : 0; // bed temper
 	$cr = 0;
 	$command = NULL;
 	$output = array();
@@ -1229,6 +1237,7 @@ function Printer__changeGcode(&$gcode_path, $array_filament = array(), $exchange
 	$command = $CI->config->item('gcdaemon')
 			. PRINTER_PRM_TEMPER_R_F . $temp_rs . PRINTER_PRM_TEMPER_R_N . $temp_r
 			. PRINTER_PRM_TEMPER_L_F . $temp_ls . PRINTER_PRM_TEMPER_L_N . $temp_l
+			. PRINTER_PRM_TEMPER_BED . $temp_b
 			. PRINTER_PRM_FILE . $gcode_path . ' > ' . $gcode_path . '.new';
 	
 	// debug message for test

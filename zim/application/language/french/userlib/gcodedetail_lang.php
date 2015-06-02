@@ -7,4 +7,7 @@ $lang['msg_gcode_download']
 	= 'Télécharger le fichier gcode en cours...';
 $lang['msg_download_fail']
 	= 'Ecouhé à télécharger le fichier gcode';
-
+$lang['title_heatbed']
+	= 'Plateau chauffant';
+$lang['enable_heatbed']
+	= 'Allumer';

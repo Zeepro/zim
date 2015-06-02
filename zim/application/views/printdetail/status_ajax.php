@@ -1,6 +1,7 @@
 					<p>{in_finish}</p>
 					<div id="print_detail_info_temper_l">{print_temperL}<br></div><br>
 					<div id="print_detail_info_temper_r">{print_temperR}<br></div><br>
+					<div id="print_detail_info_temper_b">{print_temperB}<br></div><br>
  					<p>{percent_title}</p>
 					<div id="print_progress"></div>
 					<p>{print_remain}</p>
@@ -26,10 +27,12 @@ var_temper_holder = {hold_temper};
 if (var_temper_holder == false) {
 	var_temper_l = {value_temperL};
 	var_temper_r = {value_temperR};
+	var_temper_b = {value_temperB};
 }
 else {
 	$("span#print_detail_info_temper_l_value").html(var_temper_l);
 	$("span#print_detail_info_temper_r_value").html(var_temper_r);
+	$("span#print_detail_info_temper_b_value").html(var_temper_b);
 }
 
 if (var_temper_l !== null) {
@@ -66,6 +69,24 @@ if (var_temper_r !== null) {
 }
 else {
 	$("div#print_detail_info_temper_r").hide();
+}
+
+if (var_temper_b !== null) {
+	$("div#print_detail_info_temper_b").show();
+	$('<input>').appendTo('#print_detail_info_temper_b')
+	.attr({'name':'slider','id':'sliderB','data-highlight':'true','min':'0','max':'150','value':var_temper_b,'type':'range'})
+	.slider({
+		create: function( event, ui ) {
+			$(this).parent().find('input').hide();
+			$(this).parent().find('input').css('margin-left','-9999px'); // Fix for some FF versions
+			$(this).parent().find('.ui-slider-track').css('margin-left','0px');
+			$(this).parent().find('.ui-slider-track').css('margin-right','0px');
+			$(this).parent().find('.ui-slider-handle').hide();
+		}
+	});
+}
+else {
+	$("div#print_detail_info_temper_b").hide();
 }
 
 refreshVideoURL({reload_player});

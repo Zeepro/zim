@@ -252,6 +252,7 @@ class Userlib extends MY_Controller {
 	
 	public function gcodedetail() {
 		$cr = 0;
+		$error = NULL;
 		$model_id = (int) $this->input->get('id');
 		$print_date = (int) $this->input->get('t');
 // 		$data_json = array();
@@ -264,6 +265,7 @@ class Userlib extends MY_Controller {
 		$enable_print = TRUE;
 		$key_suggest_temper = 'suggest_temperature';
 		$bicolor = ($this->config->item('nb_extruder') >= 2);
+		$heat_bed = $this->config->item('heat_bed');
 		
 		if ($model_id && $print_date) {
 			$cr = UserAuth_getUserPrint($model_id, $print_date, $print_info);
@@ -414,6 +416,18 @@ class Userlib extends MY_Controller {
 			}
 		}
 		
+// 		$print_info[USERAUTH_TITLE_PRINT_DESP_TEMPB] = 60;
+		// heat bed prepare (only display when we have heat bed and also need heat bed)
+		if ($print_info[USERAUTH_TITLE_PRINT_DESP_TEMPB] > 0) {
+			if ($heat_bed == FALSE) {
+				$enable_print = FALSE;
+				$error = t('msg_need_heatbed');
+			}
+		}
+		else {
+			$heat_bed = FALSE;
+		}
+		
 		$template_data = array(
 				'id'					=> $model_id . '|' . $print_date,
 				'title'					=> $print_info[USERAUTH_TITLE_PRINT_DESP_NAME],
@@ -457,6 +471,13 @@ class Userlib extends MY_Controller {
 				'extrud_max'			=> PRINTERSTATE_EXT_MULTIPLY_MAX,
 				'msg_gcode_download'	=> t('msg_gcode_download'),
 				'msg_download_fail'		=> t('msg_download_fail'),
+				'error'					=> $error,
+				'title_heatbed'			=> t('title_heatbed'),
+				'enable_heatbed'		=> t('enable_heatbed'),
+				'heat_bed'				=> $heat_bed ? 'true' : 'false',
+				'checked_heatbed'		=> $heat_bed ? 'checked="checked"' : NULL,
+				'value_heatbed'			=> (int) $print_info[USERAUTH_TITLE_PRINT_DESP_TEMPB],
+				'temper_delta'			=> PRINTERSTATE_TEMPER_CHANGE_VAL,
 		);
 		
 		// parse all page

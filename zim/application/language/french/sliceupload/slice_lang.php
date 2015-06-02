@@ -60,3 +60,5 @@ $lang['setmodel_fail']
 	= "Oops ! Le modèle dépasse la limite du plateau d'impression.";
 $lang['slice_risk_confirm']
 	= 'Le slicing risque d\'échouer, souhaitez-vous continuer ?';
+$lang['enable_heatbed']
+	= 'Plateau chauffant';

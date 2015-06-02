@@ -60,3 +60,5 @@ $lang['setmodel_fail']
 	= 'Oops! The item exceeds the available printing surface.';
 $lang['slice_risk_confirm']
 	= 'Slicing may fail, do you want to continue?';
+$lang['enable_heatbed']
+	= 'Heating bed';

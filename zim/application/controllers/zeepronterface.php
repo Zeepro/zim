@@ -25,6 +25,7 @@ class Zeepronterface extends MY_Controller {
 		
 		$template_data = array(
 				'bicolor'	=> ($this->config->item('nb_extruder') >= 2) ? 'true' : 'false',
+				'heat_bed'	=> $this->config->item('heat_bed') ? 'true' : 'false',
 		);
 		$this->_parseBaseTemplate('Pronterface#', $this->parser->parse('pronterface', $template_data, TRUE),
 				'<link rel="stylesheet" href="/assets/jquery-mobile-fluid960.min.css">');
@@ -190,10 +191,17 @@ class Zeepronterface extends MY_Controller {
 		}
 		
 		$this->load->helper(array('printerstate', 'errorcode'));
-		$cr = PrinterState_setExtruder($extruder);
-		if ($cr == ERROR_OK) {
-			$cr = PrinterState_setTemperature($temper);
+		
+		if ($extruder == 'b') {
+			$cr = PrinterState_setTemperature($temper, 'b');
 		}
+		else {
+// 			$cr = PrinterState_setExtruder($extruder);
+// 			if ($cr == ERROR_OK) {
+				$cr = PrinterState_setTemperature($temper, 'e', $extruder);
+// 			}
+		}
+		
 		if ($cr == ERROR_OK) {
 			$this->output->set_status_header(200);
 			return;
@@ -216,6 +224,10 @@ class Zeepronterface extends MY_Controller {
 			if (isset($array_temper[PRINTERSTATE_RIGHT_EXTRUD])) {
 				$array_temper['right'] = $array_temper[PRINTERSTATE_RIGHT_EXTRUD];
 				unset($array_temper[PRINTERSTATE_RIGHT_EXTRUD]);
+			}
+			if (isset($array_temper[PRINTERSTATE_HEAT_BED])) {
+				$array_temper['bed'] = $array_temper[PRINTERSTATE_HEAT_BED];
+				unset($array_temper[PRINTERSTATE_HEAT_BED]);
 			}
 			
 			$this->output->set_status_header(200);

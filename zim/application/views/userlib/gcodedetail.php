@@ -97,13 +97,20 @@
 					</div>
 				</div>
 			</div>
+			<div data-role="collapsible" class="heat_bed_widget slider-show-value-container" data-collapsed="false" style="clear: both; display: none;">
+				<h4>{title_heatbed}</h4>
+				<label>
+					<input type="checkbox" id="enable_heatbed" data-mini="true" value="1" {checked_heatbed}>{enable_heatbed}
+				</label>
+				<input type="range" name="b" id="bed_temper_control" value="{value_heatbed}" min="0" max="100" data-show-value="true" />
+			</div>
 			<p id="userPrintDetail_stateInfo" style="text-align: center; font-weight: bold;"></p>
 			<div style="clear: both;">
 				<input type="hidden" name="exchange" id="exchange_extruder_hidden" value="0">
 				<input type="submit" value="{print_button}" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh" />
 			</div>
 		</form>
-			<p id="userPrintDetail_error" class="zim-error"></p>
+			<p id="userPrintDetail_error" class="zim-error">{error}</p>
 		</div>
 	</div>
 
@@ -123,6 +130,8 @@ var var_typeAction_cached;
 var var_ajax;
 var var_show_video = {show_video};
 var var_video_initialized = false;
+var var_have_heatbed = {heat_bed};
+var delta_tmp = {temper_delta};
 
 var handlerUserPrintSubmit = function submitUserPrint(event) {
 	event.preventDefault();
@@ -228,6 +237,31 @@ function load_jwplayer_video() {
 	});
 }
 
+
+function onBedSliderSwitched(var_enable) {
+	var var_value2switch = var_minToChange = 0;
+	var var_maxToChange = 100;
+	var var_bed_slider_selector = "input#bed_temper_control";
+	
+	if (typeof(var_enable) != "undefined") {
+		if (var_enable) {
+			var_value2switch = {value_heatbed};
+			var_maxToChange = var_value2switch + delta_tmp;
+			var_minToChange = var_value2switch - delta_tmp;
+		}
+	}
+	$(var_bed_slider_selector).val(var_value2switch).attr("max", var_maxToChange).attr("min", var_minToChange);
+	if (var_value2switch == 0) {
+		$(var_bed_slider_selector).slider("disable");
+	}
+	else {
+		$(var_bed_slider_selector).slider("enable");
+	}
+	$(var_bed_slider_selector).slider("refresh");
+	
+	return;
+}
+
 $(document).on("pagecreate",function() {
 	if (var_bicolor == true) {
 		$(".widget_bicolor").show();
@@ -304,6 +338,14 @@ $(document).on("pagecreate",function() {
 				load_jwplayer_video();
 				var_video_initialized = true;
 			}
+		});
+	}
+	
+	onBedSliderSwitched(var_have_heatbed);
+	if (var_have_heatbed == true) {
+		$("div.heat_bed_widget").show();
+		$("input#enable_heatbed").change(function() {
+			$("input#bed_temper_control").slider(($("input#enable_heatbed").is(":checked") ? "enable" : "disable"));
 		});
 	}
 });

@@ -72,6 +72,9 @@ if (!defined('USERAUTH_VALUE_TIMEOUT')) {
 	define('USERAUTH_TITLE_PRINT_DESP_MAT2',	'm2');
 	define('USERAUTH_TITLE_PRINT_DESP_LENG1',	'l1');
 	define('USERAUTH_TITLE_PRINT_DESP_LENG2',	'l2');
+	define('USERAUTH_TITLE_PRINT_DESP_TEMP1',	't1');
+	define('USERAUTH_TITLE_PRINT_DESP_TEMP2',	't2');
+	define('USERAUTH_TITLE_PRINT_DESP_TEMPB',	'tb');
 	define('USERAUTH_TITLE_PRINT_DESP_PRESET',	'preset');
 	
 	define('USERAUTH_TITLE_USERLIB_STATE',	'state');
@@ -86,6 +89,9 @@ if (!defined('USERAUTH_VALUE_TIMEOUT')) {
 	define('USERAUTH_TITLE_JSON_P_MAT2',	'm2');
 	define('USERAUTH_TITLE_JSON_P_TIME',	'creation_time');
 	define('USERAUTH_TITLE_JSON_P_PRESET',	'preset');
+	define('USERAUTH_TITLE_JSON_P_TEMPER1',	't1');
+	define('USERAUTH_TITLE_JSON_P_TEMPER2',	't2');
+	define('USERAUTH_TITLE_JSON_P_TEMPERB',	'tb');
 	
 	define('USERAUTH_PRM_UTIL_UPLOAD_M',	' upload_stl ');
 	define('USERAUTH_PRM_UTIL_UPLOAD_P',	' upload_print ');
@@ -822,6 +828,9 @@ function UserAuth__getPrintDetailFromData($print_ele, &$print_info) {
 					USERAUTH_TITLE_PRINT_DESP_MAT2		=> 'tmp_string',
 					USERAUTH_TITLE_PRINT_DESP_PRESET	=> 'tmp_string',
 					USERAUTH_TITLE_PRINT_DESP_NAME		=> 'tmp_string',
+					USERAUTH_TITLE_PRINT_DESP_TEMP1		=> 'tmp_string',
+					USERAUTH_TITLE_PRINT_DESP_TEMP2		=> 'tmp_string',
+					USERAUTH_TITLE_PRINT_DESP_TEMPB		=> 'tmp_string',
 					USERAUTH_TITLE_PRINT_VIDEO			=> 'print_ele',
 					USERAUTH_TITLE_PRINT_TAG_VIDEO		=> 'print_ele',
 			) as $key_check => $array_check) {
@@ -1242,6 +1251,8 @@ function UserAuth_uploadUserPrint($model_id, $print_name) {
 	$data_json = NULL;
 	$array_length = array();
 	$array_material = array();
+	$array_temper = array();
+	$array_status = array();
 	$nb_models = 0;
 	$preset_id = NULL;
 	$temp_folder = NULL;
@@ -1275,6 +1286,23 @@ function UserAuth_uploadUserPrint($model_id, $print_name) {
 	// get preset id
 	if (!ZimAPI_getPreset($preset_id)) {
 		$preset_id = NULL;
+	}
+	
+	// prepare temperature info
+	$CI->load->helper('corestatus');
+	if (!CoreStatus_getStatusArray($array_status)) {
+		$CI->load->helper('printerlog');
+		PrinterLog_logError('get work status failed');
+		
+		return ERROR_INTERNAL;
+	} else {
+		foreach (array(
+				'r'	=> CORESTATUS_TITLE_P_TEMPER_R,
+				'l'	=> CORESTATUS_TITLE_P_TEMPER_L,
+				'b'	=> CORESTATUS_TITLE_P_TEMPER_B,
+		) as $abb_cartridge => $tmp_key) {
+			$array_temper[$abb_cartridge] = (isset($array_status[$tmp_key]) ? $array_status[$tmp_key] : NULL);
+		}
 	}
 	
 	// prepare folder
@@ -1330,6 +1358,9 @@ function UserAuth_uploadUserPrint($model_id, $print_name) {
 					USERAUTH_TITLE_JSON_P_MAT1		=> $array_material['r'],
 					USERAUTH_TITLE_JSON_P_MAT2		=> $array_material['l'],
 					USERAUTH_TITLE_JSON_P_PRESET	=> $preset_id,
+					USERAUTH_TITLE_JSON_P_TEMPER1	=> $array_temper['r'],
+					USERAUTH_TITLE_JSON_P_TEMPER2	=> $array_temper['l'],
+					USERAUTH_TITLE_JSON_P_TEMPERB	=> $array_temper['b'],
 			)));
 			fclose($fp);
 			

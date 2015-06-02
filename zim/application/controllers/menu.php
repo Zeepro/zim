@@ -38,12 +38,16 @@ class Menu extends MY_Controller {
 	}
 	
 	public function m_total() {
+		$need_update = FALSE;
 		$template_data = NULL; //array()
 		
-		$this->load->helper('userauth');
+		$this->load->helper(array('userauth', 'zimapi'));
 		$this->load->library('parser');
+		$this->lang->load('menu_home', $this->config->item('language'));
 		$this->lang->load('menu/config', $this->config->item('language'));
 		$this->lang->load('menu/print', $this->config->item('language'));
+		
+		$need_update = !(ZimAPI_getVersion(TRUE) == ZimAPI_getVersion(FALSE));
 		
 		$template_data = array(
 				'link_import_once'	=> t('link_import_once'),
@@ -57,6 +61,8 @@ class Menu extends MY_Controller {
 				'link_about'		=> t('link_about'),
 				'show_mange_user'	=> (UserAuth_checkAccount()) ? 'true' : 'false',
 				'show_control'		=> (UserAuth_checkManage()) ? 'true' : 'false',
+				'update_available'	=> $need_update ? t('update_available') : '',
+				'update_hint'		=> t('update_available'),
 		);
 		
 		$this->_parseBaseTemplate(t('pagetitle_menu_print'),

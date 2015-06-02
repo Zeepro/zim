@@ -31,6 +31,7 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_TITLE_ELAPSED_TIME',	'ElapsedTime');
 	define('CORESTATUS_TITLE_P_TEMPER_L',	'PrintTemperatureL');
 	define('CORESTATUS_TITLE_P_TEMPER_R',	'PrintTemperatureR');
+	define('CORESTATUS_TITLE_P_TEMPER_B',	'PrintTemperatureB');
 	define('CORESTATUS_TITLE_P_EXCH_BUS',	'PrintExchangeBus');
 	define('CORESTATUS_TITLE_FILA_MAT',		'FilamentMaterial');
 	define('CORESTATUS_TITLE_GUID',			'RandomGUID');
@@ -72,6 +73,7 @@ if (!defined('CORESTATUS_FILENAME_WORK')) {
 	define('CORESTATUS_FILE_LEVEL_NONE',	'_Level_None.tmp');
 	define('CORESTATUS_FILENAME_PAUSE',		'_Printer_inPause.tmp');
 	define('CORESTATUS_FILE_NB_EXTRUDER',	'_NbExtruder.tmp');
+	define('CORESTATUS_FILE_HEAT_BED',		'_HeatBed.tmp');
 	
 	define('CORESTATUS_GLOBAL_URL_RDV',		'zeepro.com');
 	
@@ -84,6 +86,7 @@ function CoreStatus_initialFile() {
 	$sdcard = FALSE;
 	$check_onboot = FALSE;
 	$nb_extruder = 0;
+	$heat_bed = 0;
 	
 	// for the first time, check if we can use all files in sdcard instead of config partition
 	// then save the choice in a status file in the temp to remember it
@@ -170,6 +173,7 @@ function CoreStatus_initialFile() {
 				CORESTATUS_TITLE_ELAPSED_TIME	=> 0,
 				CORESTATUS_TITLE_P_TEMPER_L		=> 0,
 				CORESTATUS_TITLE_P_TEMPER_R		=> 0,
+				CORESTATUS_TITLE_P_TEMPER_B		=> 0,
 				CORESTATUS_TITLE_P_EXCH_BUS		=> 0,
 				CORESTATUS_TITLE_FILA_MAT		=> PRINTERSTATE_DESP_MATERIAL_PLA,
 				CORESTATUS_TITLE_GUID			=> random_string('numeric', CORESTATUS_VALUE_RAND_STRING_LENGTH),
@@ -231,6 +235,33 @@ function CoreStatus_initialFile() {
 	}
 	if ($nb_extruder != 0) { // set printer in default mode (2) if error (0 extruder detected)
 		$CI->config->set_item('nb_extruder', $nb_extruder);
+	}
+	
+	// heat bed
+	$state_file = $CI->config->item('temp') . CORESTATUS_FILE_HEAT_BED;
+	if (file_exists($state_file)) {
+		$heat_bed = (int) @file_get_contents($state_file);
+		if ($heat_bed) {
+			$CI->config->set_item('heat_bed', TRUE);
+		}
+	}
+	else {
+		$CI->load->helper('printerstate');
+		$ret_val = PrinterState_getTemperature($heat_bed, 'b');
+		
+		if ($ret_val == ERROR_OK) {
+			$tmp_bool = ($heat_bed != PRINTERSTATE_TEMPER_NO_HEAT_BED);
+			$fp = fopen($state_file, 'w');
+			if ($fp) {
+				fwrite($fp, ($tmp_bool ? 1 : 0));
+				fclose($fp);
+				
+				$CI->config->set_item('heat_bed', $tmp_bool);
+			}
+			else {
+				return FALSE;
+			}
+		}
 	}
 	
 	return TRUE;
@@ -721,6 +752,7 @@ function CoreStatus_setInPrinting($model_id, $time_estimation, $exchange_extrude
 					CORESTATUS_TITLE_PRINTMODEL		=> $model_id,
 					CORESTATUS_TITLE_P_TEMPER_L		=> array_key_exists('l', $array_temper) ? $array_temper['l'] : NULL,
 					CORESTATUS_TITLE_P_TEMPER_R		=> array_key_exists('r', $array_temper) ? $array_temper['r'] : NULL,
+					CORESTATUS_TITLE_P_TEMPER_B		=> array_key_exists('b', $array_temper) ? $array_temper['b'] : NULL,
 					CORESTATUS_TITLE_P_EXCH_BUS		=> $exchange_extruder ? 1 : 0,
 					CORESTATUS_TITLE_GUID			=> random_string('numeric', CORESTATUS_VALUE_RAND_STRING_LENGTH),
 					CORESTATUS_TITLE_ESTIMATE_T		=> $time_estimation,

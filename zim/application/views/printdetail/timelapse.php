@@ -87,6 +87,7 @@ var var_interval_load_animation;
 var var_ajax_video_check;
 var var_ajax_timelapse_end;
 var var_ajax_send_email;
+var var_ajax_storegcode;
 var var_internet_ok = {internet_ok};
 var var_display_storegocde = {display_storegocde};
 var var_userlib_modelid = {userlib_model_id};
@@ -106,7 +107,6 @@ function load_jwplayer_video() {
 }
 
 function store_gcode() {
-	var var_ajax_storegcode;
 	var_return = false;
 	
 	var_ajax_storegcode = $.ajax({
@@ -134,7 +134,7 @@ function store_gcode() {
 		error: function (data, textStatus, xhr) {
 			console.log(data);
 			
-			if (var_ajax_storegcode.status == {storegcode_code_name}) {
+			if (data.status == {storegcode_code_name}) {
 				alert("{storegcode_same_name}");
 			}
 			else {

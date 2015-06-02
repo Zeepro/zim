@@ -124,11 +124,12 @@ class Test_version extends ZP_Controller {
 	public function test_port() {
 		$cr = 500;
 		$port = (int) $this->input->get('v');
+		$url_request = ($port == 443) ? "https://sso.zeepro.com/listrendezvous.ashx" : "http://portquiz.net:" . $port;
 		
 		if ($port <= 0) {
 			$cr = 403;
 		}
-		else if (FALSE === @file_get_contents("http://portquiz.net:" . $port)) {
+		else if (FALSE === @file_get_contents($url_request)) {
 			$cr = 404;
 		}
 		else {
