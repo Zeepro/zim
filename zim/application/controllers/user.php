@@ -33,6 +33,24 @@ class User extends MY_Controller {
 		exit;
 	}
 	
+	public function username_check($str = '') {
+		// block public access from website
+		if (CoreStatus__checkCallURI(array('/user/username_check' => NULL))) {
+			$this->_exitWithError500('no public access', 403);
+			return;
+		}
+		
+		$this->lang->load('user/add', $this->config->item('language'));
+		
+		if (preg_match("/^([-a-z0-9\.@ _-])+$/i", $str)) {
+			return TRUE;
+		}
+		else {
+			$this->form_validation->set_message('username_check', t('msg_name_pattern'));
+			return FALSE;
+		}
+	}
+	
 	public function index() {
 		$template_data = NULL; //array()
 		
@@ -84,7 +102,7 @@ class User extends MY_Controller {
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$this->load->library('form_validation');
 			
-			$this->form_validation->set_rules('user_name', 'lang:title_name', 'required|alpha_dash');
+			$this->form_validation->set_rules('user_name', 'lang:title_name', 'required|callback_username_check');
 			$this->form_validation->set_rules('user_email', 'lang:title_email', 'required|valid_email');
 // 			$this->form_validation->set_rules('access_view', 'lang:title_p_view', 'required|is_natural|less_than[2]');
 // 			$this->form_validation->set_rules('access_manage', 'lang:title_p_manage', 'required|is_natural|less_than[2]');
@@ -189,6 +207,7 @@ class User extends MY_Controller {
 				'title_p_account'	=> t('title_p_account'),
 				'title_message'		=> t('title_message'),
 				'hint_message'		=> t('hint_message'),
+				'hint_name_pattern'	=> t('hint_name_pattern'),
 				'button_confirm'	=> t('button_confirm'),
 				'hint_access'		=> t('hint_access'),
 				'popup_what'		=> t('popup_what'),
@@ -261,6 +280,7 @@ class User extends MY_Controller {
 				'title_p_account'	=> t('title_p_account'),
 				'title_message'		=> t('title_message'),
 				'hint_message'		=> t('hint_message'),
+				'hint_name_pattern'	=> t('hint_name_pattern'),
 				'button_confirm'	=> t('button_confirm'),
 				'hint_access'		=> t('hint_access'),
 				'popup_what'		=> t('popup_what'),

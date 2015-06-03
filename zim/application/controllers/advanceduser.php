@@ -359,4 +359,13 @@ class Advanceduser extends MY_Controller {
 		print json_encode($array_rfid);
 		return;
 	}
+	
+	public function clean_auth() {
+		$this->load->helper(array('url', 'userauth'));
+		
+		UserAuth_removeSessionData();
+		redirect('/');
+		
+		return;
+	}
 }

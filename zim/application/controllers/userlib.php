@@ -609,7 +609,7 @@ class Userlib extends MY_Controller {
 				'error'				=> $error,
 				'model_id'			=> $model_id,
 				'title_name'		=> t('name'),
-// 				'bicolor'			=> $bicolor ? 'true' : 'false',
+				'bicolor'			=> ($this->config->item('nb_extruder') >= 2) ? 'true' : 'false',
 		);
 		
 		$this->_parseBaseTemplate(t('userlib_storemodel_pagetitle'),

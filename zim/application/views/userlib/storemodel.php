@@ -11,21 +11,26 @@
 			<label for="name"><h2>{title_name}</h2></label>
 			<input type="text" name="name" id="usermodel_name" value="" data-clear-btn="true" required />
 			<br />
-			<div id="set" data-role="collapsible-set" data-inset="true">
-				<div id="tab1" data-role="collapsible" data-collapsed="false">
+			<div class="widget_monocolor" style="display: none;">
+				<h3>{header_single}</h3>
+				<label for="file">{select_hint_multi}</label>
+				<input type="file" data-clear-btn="true" name="file" id="file_upload_mono" />
+			</div>
+			<div id="set" data-role="collapsible-set" class="widget_bicolor" style="display: none;">
+				<div id="upload_model_tab_s" data-role="collapsible" data-collapsed="false">
 					<h3> {header_single} </h3>
 					<label for="file">{select_hint}</label>
-					<input type="file" data-clear-btn="true" name="file" id="file_upload1" />
+					<input type="file" data-clear-btn="true" name="file" id="file_upload_s" />
 				</div>
-				<div id="tab2" data-role="collapsible">
+				<div id="upload_model_tab_m" data-role="collapsible">
 					<h3> {header_multi} </h3>
 					<label for="file_c1">{select_hint_multi}</label>
-					<input type="file" data-clear-btn="true" name="file_c1" id="file_upload2" />
+					<input type="file" data-clear-btn="true" name="file_c1" id="file_upload_m1" />
 					<br />
-					<input type="file" data-clear-btn="true" name="file_c2" id="file_upload3" />
+					<input type="file" data-clear-btn="true" name="file_c2" id="file_upload_m2" />
 				</div>
-				<input type="submit" value="{upload_button}" data-icon="arrow-r" data-iconpos="right" /> <!-- onclick='javascript: uploadfile_wait();' -->
 			</div>
+			<input type="submit" value="{upload_button}" data-icon="arrow-r" data-iconpos="right" /> <!-- onclick='javascript: uploadfile_wait();' -->
 			</form>
 			<span class="zim-error" id="upload_error">{error}</span>
 		</div>
@@ -45,6 +50,7 @@
 
 <script>
 var var_submitModel = false;
+var var_bicolor = {bicolor};
 
 var handlerUserModelSubmit = function submitUserModel(event) {
 	event.preventDefault();
@@ -111,18 +117,26 @@ function uploadfile_wait() {
 	$(".ui-loader").css("display", "block");
 }
 
+if (var_bicolor == true) {
+	$(".widget_bicolor").show();
+	$("#file_upload_mono").attr("disabled", "disabled");
+	
+	$("#upload_model_tab_s").on("collapsibleexpand", function(event) {
+		$("#file_upload_m1").val("");
+		$("#file_upload_m2").val("");
+	}); 
+	
+	$("#upload_model_tab_m").on("collapsibleexpand", function(event) {
+		$("#file_upload_s").val("");
+	});
+}
+else {
+	$(".widget_monocolor").show();
+	$("#file_upload_s").attr("disabled", "disabled");
+}
+
 $("#form_userlib_storemodel").bind("submit", handlerUserModelSubmit);
 
-$("#tab1").on("collapsibleexpand", function(event)
-{
-	$("#file_upload2").val("");
-	$("#file_upload3").val("");
-}); 
-
-$("#tab2").on("collapsibleexpand", function(event)
-{
-	$("#file_upload1").val("");
-});
 
 </script>
 </div>

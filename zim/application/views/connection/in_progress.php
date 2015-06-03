@@ -110,7 +110,7 @@ function check_internet()
 		var pixel = new Image();
 		
 	
-		pixel.src = "http://home.zeepro.com/assets/img/pixel.png?_=" + (new Date()).getTime();
+		pixel.src = "https://zeeproshare.com/assets/img/pixel.png?_=" + (new Date()).getTime();
 		count++;
 		if (count == 60)
 		{

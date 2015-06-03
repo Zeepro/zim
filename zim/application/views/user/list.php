@@ -16,7 +16,7 @@
 					<form method="POST" class="user_manage_edit" action="/user/add" data-ajax="false" data-fillmsg="false">
 					<div class="ui-field-contain">
 						<label for="user_name">{title_name}</label>
-						<input type="text" name="user_name" value="{user_name}" pattern="[A-Za-z0-9_-]*" required />
+						<input type="text" name="user_name" value="{user_name}" pattern="[A-Za-z0-9\.@ _-]*" title="{hint_name_pattern}" required />
 						<input type="hidden" name="user_oldname" value="{user_name}" required />
 					</div>
 					<div class="ui-field-contain">

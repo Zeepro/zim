@@ -10,7 +10,7 @@
 			<h2 style="text-align: center;">{title_add_form}</h2>
 			<div class="ui-field-contain">
 				<label for="user_name">{title_name}</label>
-				<input type="text" name="user_name" pattern="[A-Za-z0-9_-]*" required />
+				<input type="text" name="user_name" pattern="[A-Za-z0-9\.@ _-]*" title="{hint_name_pattern}" required />
 			</div>
 			<div class="ui-field-contain">
 				<label for="user_email">{title_email}</label>

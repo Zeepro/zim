@@ -40,6 +40,15 @@ var var_bicolor = {bicolor};
 	if (var_bicolor == true) {
 		$(".widget_bicolor").show();
 		$("#file_upload_mono").attr("disabled", "disabled");
+		
+		$("#upload_model_tab_s").on("collapsibleexpand", function(event) {
+			$("#file_upload_m1").val("");
+			$("#file_upload_m2").val("");
+		}); 
+		
+		$("#upload_model_tab_m").on("collapsibleexpand", function(event) {
+			$("#file_upload_s").val("");
+		});
 	}
 	else {
 		$(".widget_monocolor").show();
@@ -51,17 +60,6 @@ var var_bicolor = {bicolor};
 		$("#overlay").addClass("gray-overlay");
 		$(".ui-loader").css("display", "block");
 	}
-	
-	$("#upload_model_tab_s").on("collapsibleexpand", function(event)
-	{
-		$("#file_upload_m1").val("");
-		$("#file_upload_m2").val("");
-	}); 
-	
-	$("#upload_model_tab_m").on("collapsibleexpand", function(event)
-	{
-		$("#file_upload_s").val("");
-	});
 // }
 
 </script>

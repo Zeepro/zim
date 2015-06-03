@@ -21,7 +21,7 @@
 		{	
 			if ({tromboning})
 			{
-				setTimeout(function(){window.location.href = "https://home.zeepro.com";}, 30000);
+				setTimeout(function(){window.location.href = "https://zeeproshare.com";}, 30000);
 			}
 			else
 			{

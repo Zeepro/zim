@@ -1,7 +1,7 @@
 <?php
 
 $lang['confirmation_message']
-	= "Your printer is now activated and can be remotely controlled through the Zeepro App or https://home.zeepro.com";
+	= "Your printer is now activated and can be remotely controlled through the Zeepro App or https://zeeproshare.com";
 $lang['congrats']
 	= "Your zim was correctly renamed";
 $lang['name_printer'] = "Name your printer";

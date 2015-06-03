@@ -1,9 +1,9 @@
 <?php
 
 $lang['pagetitle_user_add']
-	= 'Zim - Add new user';
+	= 'Zim - Add a new user';
 $lang['title_add_form']
-	= 'Add new user';
+	= 'Add a new user';
 $lang['title_name']
 	= 'Name';
 $lang['title_email']
@@ -15,11 +15,15 @@ $lang['title_p_view']
 $lang['title_p_manage']
 	= 'Gold';
 $lang['title_p_account']
-	= 'Platinium';
+	= 'Platinum';
 $lang['title_message']
 	= 'Message';
 $lang['hint_message']
 	= 'Include a personal message (optional)';
+$lang['hint_name_pattern']
+	= 'Alpha-numeric characters, underscores, dashes, pointes, spaces and at signs';
+$lang['msg_name_pattern']
+	= 'User name contains invalid characters';
 $lang['button_confirm']
 	= 'Confirm';
 // $lang['function_on']
@@ -43,4 +47,4 @@ $lang['button_ok']
 $lang['popup_what']
 	= "What's this ?";
 $lang['hint_access']
-	= 'Standard:<br/>Launch, monitor and share prints<br/>View and cancel others\' prints<br/><br/>Gold:<br/>+ Access to "Controls" menu<br/><br/>Platinium:<br/>+ Ability to grant printer\'s access to other users';
+	= 'Standard:<br/>Launch, monitor and share prints<br/>View and cancel others\' prints<br/><br/>Gold:<br/>+ Access to "Controls" menu<br/><br/>Platinum:<br/>+ Ability to grant printer\'s access to other users';

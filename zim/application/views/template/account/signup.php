@@ -37,7 +37,7 @@ OPTIN_END;
 		?>
 		<a href="{btn_url}" data-role="button">{back_or_already}</a>
 		<a class="lol" href="#" data-role="button" style="display:{has_skip}">{skip_title}</a>
-		<a href="https://home.zeepro.com/login/privacy" data-ajax="false" style="font-weight:normal;" target="_blank"><i>{privacy_policy_link}</i></a>
+		<a href="https://zeeproshare.com/login/privacy" data-ajax="false" style="font-weight:normal;" target="_blank"><i>{privacy_policy_link}</i></a>
 		</div>
 	</div>
 	<script>
