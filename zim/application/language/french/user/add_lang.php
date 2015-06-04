@@ -21,7 +21,7 @@ $lang['title_message']
 $lang['hint_message']
 	= 'Inclure un message personnel (facultatif)';
 $lang['hint_name_pattern']
-	= 'Alphanumérique caractères, soulignement, tirets, pointes, espaces et arobases';
+	= 'Alphanumérique caractères, soulignements, tirets, pointes, espaces et arobases';
 $lang['msg_name_pattern']
 	= 'Le nom d\'utilisateur contient des caractères invalides';
 $lang['button_confirm']

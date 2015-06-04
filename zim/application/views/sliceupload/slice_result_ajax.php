@@ -95,7 +95,7 @@
 								<li><a href="#" onclick="javascript: onBedSliderSwitched('PLA');">PLA</a></li>
 								<li><a href="#" onclick="javascript: onBedSliderSwitched('ABS');">ABS</a></li>
 							</ul>
-							<input type="range" name="b" id="bed_temper_control" value="0" min="0" max="100" data-show-value="true" />
+							<input type="range" name="b" id="bed_temper_control" value="0" min="0" max="{bed_temper_max}" data-show-value="true" />
 						</div>
 					</div>
 					<input type="submit" id="print_slice" value="{print_button}" />
@@ -149,19 +149,17 @@ function changecartridge(side) {
 }
 
 function onBedSliderSwitched(var_matType) {
-	var var_value2switch = var_minToChange = 0;
-	var var_maxToChange = 100;
+	var var_value2switch = 0;
 	var var_bed_slider_selector = "input#bed_temper_control";
 	
 	if (typeof(var_matType) != "undefined") {
 		switch (var_matType) {
 			case "PLA":
 				var_value2switch = {bed_temper_pla};
+				break;
 				
 			case "ABS":
-				if (var_value2switch == 0) var_value2switch = {bed_temper_abs};
-				var_maxToChange = var_value2switch + delta_tmp;
-				var_minToChange = var_value2switch - delta_tmp;
+				var_value2switch = {bed_temper_abs};
 				break;
 				
 			default:
@@ -169,7 +167,7 @@ function onBedSliderSwitched(var_matType) {
 				break;
 		}
 	}
-	$(var_bed_slider_selector).val(var_value2switch).attr("max", var_maxToChange).attr("min", var_minToChange);
+	$(var_bed_slider_selector).val(var_value2switch);
 	if (var_value2switch == 0) {
 		$(var_bed_slider_selector).slider("disable");
 	}

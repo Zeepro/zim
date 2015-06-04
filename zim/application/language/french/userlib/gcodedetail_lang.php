@@ -11,3 +11,5 @@ $lang['title_heatbed']
 	= 'Plateau chauffant';
 $lang['enable_heatbed']
 	= 'Allumer';
+$lang['msg_need_heatbed']
+	= 'Cette impression a besoin du plateau chauffant';

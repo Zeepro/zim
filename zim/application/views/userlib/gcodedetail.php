@@ -102,7 +102,7 @@
 				<label>
 					<input type="checkbox" id="enable_heatbed" data-mini="true" value="1" {checked_heatbed}>{enable_heatbed}
 				</label>
-				<input type="range" name="b" id="bed_temper_control" value="{value_heatbed}" min="0" max="100" data-show-value="true" />
+				<input type="range" name="b" id="bed_temper_control" value="{value_heatbed}" min="0" max="{bed_temper_max}" data-show-value="true" />
 			</div>
 			<p id="userPrintDetail_stateInfo" style="text-align: center; font-weight: bold;"></p>
 			<div style="clear: both;">
@@ -131,7 +131,7 @@ var var_ajax;
 var var_show_video = {show_video};
 var var_video_initialized = false;
 var var_have_heatbed = {heat_bed};
-var delta_tmp = {temper_delta};
+var limit_bed_max_tmp = {bed_temper_max};
 
 var handlerUserPrintSubmit = function submitUserPrint(event) {
 	event.preventDefault();
@@ -240,7 +240,7 @@ function load_jwplayer_video() {
 
 function onBedSliderSwitched(var_enable) {
 	var var_value2switch = var_minToChange = 0;
-	var var_maxToChange = 100;
+	var var_maxToChange = limit_bed_max_tmp;
 	var var_bed_slider_selector = "input#bed_temper_control";
 	
 	if (typeof(var_enable) != "undefined") {
@@ -248,6 +248,9 @@ function onBedSliderSwitched(var_enable) {
 			var_value2switch = {value_heatbed};
 			var_maxToChange = var_value2switch + delta_tmp;
 			var_minToChange = var_value2switch - delta_tmp;
+			if (var_maxToChange > limit_bed_max_tmp) {
+				var_maxToChange = limit_bed_max_tmp;
+			}
 		}
 	}
 	$(var_bed_slider_selector).val(var_value2switch).attr("max", var_maxToChange).attr("min", var_minToChange);

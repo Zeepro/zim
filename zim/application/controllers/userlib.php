@@ -477,7 +477,7 @@ class Userlib extends MY_Controller {
 				'heat_bed'				=> $heat_bed ? 'true' : 'false',
 				'checked_heatbed'		=> $heat_bed ? 'checked="checked"' : NULL,
 				'value_heatbed'			=> (int) $print_info[USERAUTH_TITLE_PRINT_DESP_TEMPB],
-				'temper_delta'			=> PRINTERSTATE_TEMPER_CHANGE_VAL,
+				'bed_temper_max'		=> PRINTERSTATE_TEMPER_MAX_H,
 		);
 		
 		// parse all page

@@ -938,6 +938,7 @@ class Sliceupload extends MY_Controller {
 				'heat_bed'			=> $heat_bed ? 'true' : 'false',
 				'bed_temper_pla'	=> PRINTERSTATE_TEMPER_BED_PLA,
 				'bed_temper_abs'	=> PRINTERSTATE_TEMPER_BED_ABS,
+				'bed_temper_max'	=> PRINTERSTATE_TEMPER_MAX_H,
 		);
 		$this->parser->parse('sliceupload/slice_result_ajax', $template_data);
 		
