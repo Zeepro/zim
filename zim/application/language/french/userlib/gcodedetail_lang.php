@@ -13,3 +13,5 @@ $lang['enable_heatbed']
 	= 'Allumer';
 $lang['msg_need_heatbed']
 	= 'Cette impression a besoin du plateau chauffant';
+$lang['button_bed_off']
+	= 'Éteint';

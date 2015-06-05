@@ -136,9 +136,9 @@ function prepareDisplay() {
 			$("div#control_modify_sliders").hide();
 			$("div#control_modify_mini_group").show();
 		}
-		if (var_have_heatbed == true) {
-			$("div.heat_bed_widget").show();
-		}
+// 		if (var_have_heatbed == true) {
+// 			$("div.heat_bed_widget").show();
+// 		}
 	}
 	else if (var_stage == "wait_print") {
 		// try to get sliced info

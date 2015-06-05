@@ -99,9 +99,18 @@
 			</div>
 			<div data-role="collapsible" class="heat_bed_widget slider-show-value-container" data-collapsed="false" style="clear: both; display: none;">
 				<h4>{title_heatbed}</h4>
-				<label>
-					<input type="checkbox" id="enable_heatbed" data-mini="true" value="1" {checked_heatbed}>{enable_heatbed}
-				</label>
+				<div class="heat_bed_pos_widget" style="display: none;">
+					<label>
+						<input type="checkbox" id="enable_heatbed" data-mini="true" value="1" {checked_heatbed}>{enable_heatbed}
+					</label>
+				</div>
+				<div data-role="navbar" class="heat_bed_neg_widget" style="margin-bottom: 1em; display: none;">
+					<ul>
+						<li><a href="#" onclick="javascript: onBedSliderSelected();" class="ui-btn-active">{button_bed_off}</a></li>
+						<li><a href="#" onclick="javascript: onBedSliderSelected('PLA');">PLA</a></li>
+						<li><a href="#" onclick="javascript: onBedSliderSelected('ABS');">ABS</a></li>
+					</ul>
+				</div>
 				<input type="range" name="b" id="bed_temper_control" value="{value_heatbed}" min="0" max="{bed_temper_max}" data-show-value="true" />
 			</div>
 			<p id="userPrintDetail_stateInfo" style="text-align: center; font-weight: bold;"></p>
@@ -131,6 +140,7 @@ var var_ajax;
 var var_show_video = {show_video};
 var var_video_initialized = false;
 var var_have_heatbed = {heat_bed};
+var var_contain_heatbed = {contain_heat_bed};
 var limit_bed_max_tmp = {bed_temper_max};
 
 var handlerUserPrintSubmit = function submitUserPrint(event) {
@@ -237,6 +247,36 @@ function load_jwplayer_video() {
 	});
 }
 
+function onBedSliderSelected(var_matType) {
+	var var_value2switch = 0;
+	var var_bed_slider_selector = "input#bed_temper_control";
+	
+	if (typeof(var_matType) != "undefined") {
+		switch (var_matType) {
+			case "PLA":
+				var_value2switch = {bed_temper_pla};
+				break;
+				
+			case "ABS":
+				var_value2switch = {bed_temper_abs};
+				break;
+				
+			default:
+				console.log("unknown material in onBedSliderSelected");
+				break;
+		}
+	}
+	$(var_bed_slider_selector).val(var_value2switch);
+	if (var_value2switch == 0) {
+		$(var_bed_slider_selector).slider("disable");
+	}
+	else {
+		$(var_bed_slider_selector).slider("enable");
+	}
+	$(var_bed_slider_selector).slider("refresh");
+	
+	return;
+}
 
 function onBedSliderSwitched(var_enable) {
 	var var_value2switch = var_minToChange = 0;
@@ -344,12 +384,24 @@ $(document).on("pagecreate",function() {
 		});
 	}
 	
-	onBedSliderSwitched(var_have_heatbed);
 	if (var_have_heatbed == true) {
 		$("div.heat_bed_widget").show();
-		$("input#enable_heatbed").change(function() {
-			$("input#bed_temper_control").slider(($("input#enable_heatbed").is(":checked") ? "enable" : "disable"));
-		});
+		
+		if (var_contain_heatbed == true) {
+			onBedSliderSwitched(true);
+			$("div.heat_bed_pos_widget").show();
+			
+			$("input#enable_heatbed").change(function() {
+				$("input#bed_temper_control").slider(($("input#enable_heatbed").is(":checked") ? "enable" : "disable"));
+			});
+		}
+		else {
+			onBedSliderSelected();
+			$("div.heat_bed_neg_widget").show();
+		}
+	}
+	else {
+		onBedSliderSwitched(false);
 	}
 });
 </script>

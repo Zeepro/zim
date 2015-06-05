@@ -13,3 +13,5 @@ $lang['enable_heatbed']
 	= 'Turn on';
 $lang['msg_need_heatbed']
 	= 'This print needs heating bed';
+$lang['button_bed_off']
+	= 'Off';

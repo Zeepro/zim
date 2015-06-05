@@ -78,6 +78,7 @@ class Printmodel extends MY_Controller {
 		$body_page = NULL;
 		$mono_model = FALSE;
 		$bicolor = ($this->config->item('nb_extruder') >= 2);
+		$heat_bed = $this->config->item('heat_bed');
 		$enable_print = 'true';
 		$enable_exchange = 'disabled="disabled"'; // select disable
 		$calibration = FALSE;
@@ -280,6 +281,12 @@ class Printmodel extends MY_Controller {
 				'extrud_l'				=> PRINTERSTATE_EXT_MULTIPLY_DEFAULT,
 				'extrud_min'			=> PRINTERSTATE_EXT_MULTIPLY_MIN,
 				'extrud_max'			=> PRINTERSTATE_EXT_MULTIPLY_MAX,
+				'title_heatbed'			=> t('title_heatbed'),
+				'button_bed_off'		=> t('button_bed_off'),
+				'heat_bed'				=> $heat_bed ? 'true' : 'false',
+				'bed_temper_pla'		=> PRINTERSTATE_TEMPER_BED_PLA,
+				'bed_temper_abs'		=> PRINTERSTATE_TEMPER_BED_ABS,
+				'bed_temper_max'		=> PRINTERSTATE_TEMPER_MAX_H,
 		);
 		$this->_parseBaseTemplate(t('ZeePro Personal Printer 21 - Printing details'),
 				$this->parser->parse('printlist/detail', $template_data, TRUE));

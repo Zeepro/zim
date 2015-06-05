@@ -266,6 +266,7 @@ class Userlib extends MY_Controller {
 		$key_suggest_temper = 'suggest_temperature';
 		$bicolor = ($this->config->item('nb_extruder') >= 2);
 		$heat_bed = $this->config->item('heat_bed');
+		$contain_heat_bed = FALSE;
 		
 		if ($model_id && $print_date) {
 			$cr = UserAuth_getUserPrint($model_id, $print_date, $print_info);
@@ -417,16 +418,18 @@ class Userlib extends MY_Controller {
 		}
 		
 // 		$print_info[USERAUTH_TITLE_PRINT_DESP_TEMPB] = 60;
-		// heat bed prepare (only display when we have heat bed and also need heat bed)
+// 		// heat bed prepare (only display when we have heat bed and also need heat bed)
+		// heat bed prepare (display adjust slider when we have heat bed and also need heat bed, select slider when we have it only)
 		if ($print_info[USERAUTH_TITLE_PRINT_DESP_TEMPB] > 0) {
+			$contain_heat_bed = TRUE;
 			if ($heat_bed == FALSE) {
 				$enable_print = FALSE;
 				$error = t('msg_need_heatbed');
 			}
 		}
-		else {
-			$heat_bed = FALSE;
-		}
+// 		else {
+// 			$heat_bed = FALSE;
+// 		}
 		
 		$template_data = array(
 				'id'					=> $model_id . '|' . $print_date,
@@ -474,10 +477,14 @@ class Userlib extends MY_Controller {
 				'error'					=> $error,
 				'title_heatbed'			=> t('title_heatbed'),
 				'enable_heatbed'		=> t('enable_heatbed'),
+				'button_bed_off'		=> t('button_bed_off'),
 				'heat_bed'				=> $heat_bed ? 'true' : 'false',
+				'contain_heat_bed'		=> $contain_heat_bed ? 'true' : 'false',
 				'checked_heatbed'		=> $heat_bed ? 'checked="checked"' : NULL,
 				'value_heatbed'			=> (int) $print_info[USERAUTH_TITLE_PRINT_DESP_TEMPB],
 				'bed_temper_max'		=> PRINTERSTATE_TEMPER_MAX_H,
+				'bed_temper_pla'		=> PRINTERSTATE_TEMPER_BED_PLA,
+				'bed_temper_abs'		=> PRINTERSTATE_TEMPER_BED_ABS,
 		);
 		
 		// parse all page
