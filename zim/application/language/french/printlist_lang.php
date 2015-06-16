@@ -66,3 +66,7 @@ $lang['left_extrud_mult']
 	= 'Gauche';
 $lang['right_extrud_mult']
 	= 'Droite';
+$lang['title_heatbed']
+	= 'Plateau chauffant';
+$lang['button_bed_off']
+	= 'Éteint';

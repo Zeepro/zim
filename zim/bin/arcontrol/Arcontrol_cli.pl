@@ -98,6 +98,7 @@ use constant CMD_SET_OFFSET          => 'M1660';
 use constant CMD_GET_POSITION        => 'M114';
 use constant CMD_GET_CONSUMPTION     => 'M1907';
 use constant CMD_CHECK_LEFT_SIDE     => 'M1625';
+use constant CMD_GET_TEMPER_BED      => 'M1626';
 
 use constant CMD_STOP_PRINT    => 'M1000';
 use constant CMD_RESET_PRINTER => 'M1100';
@@ -374,6 +375,7 @@ sub get_all_temperature {
 	get_temperature(CMD_GET_TEMPER1);
 	print " - TEMP 2:";
 	get_temperature(CMD_GET_TEMPER2);
+	print " - TEMP B:25.0";
 	
 	return;
 }
@@ -1205,6 +1207,9 @@ else {
 
 		#cmd: set speed / acceleration
 		exit(RC_OK);
+	}
+	elsif ( $command eq CMD_GET_TEMPER_BED ) {
+		print "25.0\n";
 	}
 	elsif ( $command eq CMD_GET_VERSION ) {
 		print "1.0.99\n";

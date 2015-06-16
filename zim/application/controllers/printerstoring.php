@@ -341,6 +341,7 @@ class Printerstoring extends MY_Controller {
 		$enable_print = TRUE;
 		$key_suggest_temper = 'suggest_temperature';
 		$bicolor = ($this->config->item('nb_extruder') >= 2);
+		$heat_bed = $this->config->item('heat_bed');
 		
 		$this->load->helper(array('printerstoring', 'printerstate'));
 		$data_json = PrinterStoring_getInfo('gcode', $gid);
@@ -526,6 +527,12 @@ class Printerstoring extends MY_Controller {
 				'extrud_l'				=> PRINTERSTATE_EXT_MULTIPLY_DEFAULT,
 				'extrud_min'			=> PRINTERSTATE_EXT_MULTIPLY_MIN,
 				'extrud_max'			=> PRINTERSTATE_EXT_MULTIPLY_MAX,
+				'title_heatbed'			=> t('title_heatbed'),
+				'button_bed_off'		=> t('button_bed_off'),
+				'heat_bed'				=> $heat_bed ? 'true' : 'false',
+				'bed_temper_pla'		=> PRINTERSTATE_TEMPER_BED_PLA,
+				'bed_temper_abs'		=> PRINTERSTATE_TEMPER_BED_ABS,
+				'bed_temper_max'		=> PRINTERSTATE_TEMPER_MAX_H,
 		);
 		
 		// parse all page

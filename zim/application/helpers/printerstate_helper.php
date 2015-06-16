@@ -92,6 +92,8 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_SET_EXT_MULTIPLY',	' M1663\ ');
 	define('PRINTERSTATE_MULTIPLY_L_LABEL',	'\ L');
 	define('PRINTERSTATE_MULTIPLY_R_LABEL',	'\ R');
+	define('PRINTERSTATE_GET_TEMPER_BED',	' M1626');
+	define('PRINTERSTATE_SET_TEMPER_BED',	' M140\ '); // add space in the last
 	
 	global $CFG;
 	if ($CFG->config['simulator']) {
@@ -117,13 +119,17 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	
 	define('PRINTERSTATE_RIGHT_EXTRUD',	0);
 	define('PRINTERSTATE_LEFT_EXTRUD',	1);
+	define('PRINTERSTATE_HEAT_BED',		9);
 	define('PRINTERSTATE_TEMPER_MIN_E',	0);
 	define('PRINTERSTATE_TEMPER_MAX_E',	260);
 	define('PRINTERSTATE_TEMPER_MIN_H',	0);
-	define('PRINTERSTATE_TEMPER_MAX_H',	100);
+	define('PRINTERSTATE_TEMPER_MAX_H',	130);
 	define('PRINTERSTATE_TEMPER_CHANGE_MAX',	260);
 	define('PRINTERSTATE_TEMPER_CHANGE_MIN',	155);
 	define('PRINTERSTATE_TEMPER_CHANGE_VAL',	20);
+	define('PRINTERSTATE_TEMPER_NO_HEAT_BED',	0);
+	define('PRINTERSTATE_TEMPER_BED_PLA',		60);
+	define('PRINTERSTATE_TEMPER_BED_ABS',		110);
 	
 	define('PRINTERSTATE_EXT_MULTIPLY_DEFAULT',	100);
 	define('PRINTERSTATE_EXT_MULTIPLY_MAX',		110);
@@ -154,6 +160,7 @@ if (!defined('PRINTERSTATE_CHECK_STATE')) {
 	define('PRINTERSTATE_TITLE_EXTEND_PRM',	'eXtended_parameters');
 	define('PRINTERSTATE_TITLE_EXT_TEMP_L',	'l_temperature');
 	define('PRINTERSTATE_TITLE_EXT_TEMP_R',	'r_temperature');
+	define('PRINTERSTATE_TITLE_EXT_TEMP_B',	'b_temperature');
 	define('PRINTERSTATE_TITLE_EXT_LENG_L',	'l_length');
 	define('PRINTERSTATE_TITLE_EXT_LENG_R',	'r_length');
 	define('PRINTERSTATE_TITLE_SLICE_ERR',	'slicing_error');
@@ -356,9 +363,10 @@ function PrinterState_getTemperature(&$val_temperature, $type = 'e', $abb_extrud
 			}
 			break;
 			
-		case 'h':
+		case 'b': // bed
+		case 'h': // heat bed
 			//TODO finish this case in future when functions of platform are finished
-			$command = 'echo -1'; // let default temperature of platform to be 20 CD
+			$command = $arcontrol_fullpath . PRINTERSTATE_GET_TEMPER_BED; // let default temperature of platform to be 20 CD
 			break;
 			
 		default:
@@ -405,8 +413,9 @@ function PrinterState_setTemperature($val_temperature, $type = 'e', $abb_extrude
 			default:
 				break;
 		}
-	} elseif ($type == 'h' && $val_temperature >= PRINTERSTATE_TEMPER_MIN_H && $val_temperature <= PRINTERSTATE_TEMPER_MAX_H) {
-		$command = 'echo ok';
+	} elseif (($type == 'h' || $type == 'b')
+			&& $val_temperature >= PRINTERSTATE_TEMPER_MIN_H && $val_temperature <= PRINTERSTATE_TEMPER_MAX_H) {
+		$command .= PRINTERSTATE_SET_TEMPER_BED . 'S' . $val_temperature;
 	} else {
 		PrinterLog_logError('input parameter error', __FILE__, __LINE__);
 		return ERROR_WRONG_PRM;
@@ -1664,6 +1673,8 @@ function PrinterState_checkStatusAsArray($extra_info = TRUE) {
 							= array_key_exists(PRINTERSTATE_LEFT_EXTRUD, $data_temperature) ? $data_temperature[PRINTERSTATE_LEFT_EXTRUD] : 0;
 					$data_json[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_EXT_TEMP_R]
 							= array_key_exists(PRINTERSTATE_RIGHT_EXTRUD, $data_temperature) ? $data_temperature[PRINTERSTATE_RIGHT_EXTRUD] : 0;
+					$data_json[PRINTERSTATE_TITLE_EXTEND_PRM][PRINTERSTATE_TITLE_EXT_TEMP_B]
+							= array_key_exists(PRINTERSTATE_HEAT_BED, $data_temperature) ? $data_temperature[PRINTERSTATE_HEAT_BED] : 0;
 				}
 			}
 			
@@ -1739,6 +1750,10 @@ function PrinterState_temperatureAbb2Number($abb) {
 			
 		case 'TEMP 2':
 			$num_cartridge = PRINTERSTATE_LEFT_EXTRUD;
+			break;
+			
+		case 'TEMP B':
+			$num_cartridge = PRINTERSTATE_HEAT_BED;
 			break;
 			
 		default:

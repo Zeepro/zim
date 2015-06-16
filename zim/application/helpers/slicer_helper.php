@@ -23,6 +23,7 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 	define('SLICER_URL_EXPORT_RENDER',	'export2render');
 	define('SLICER_URL_RESET_MODEL',	'resetmodel?id=');
 	define('SLICER_URL_EXPORT_ALL',		'export2slice');
+	define('SLICER_URL_GETPARAMETER',	'getparameter?p=');
 	
 	define('SLICER_PRM_ID',		'id');
 	define('SLICER_PRM_XPOS',	'xpos');
@@ -95,6 +96,7 @@ if (!defined('SLICER_URL_ADD_MODEL')) {
 	
 	define('SLICER_VALUE_DEFAULT_TEMPER',		230);
 	define('SLICER_VALUE_DEFAULT_FIRST_TEMPER',	235);
+	define('SLICER_VALUE_DEFAULT_BED_TEMPER',	3);
 	
 	define('SLICER_CMD_SLICER_PS_STATUS',	'ps -A | grep slic3r.bin');
 	define('SLICER_CMD_RESTART_SLICER',		'sudo /etc/init.d/zeepro-slic3r restart &');
@@ -1009,6 +1011,36 @@ function Slicer_rendering($rho, $theta, $delta, &$path_image, $color1 = NULL, $c
 	return $cr;
 }
 
+function Slicer_getParameter($param_key, &$param_value) {
+	$cr = 0;
+	$ret_val = 0;
+	
+	if (strlen($param_key) == 0) {
+		$cr = ERROR_MISS_PRM;
+	}
+	else {
+		$response = NULL;
+		$ret_val = Slicer__requestSlicer(SLICER_URL_GETPARAMETER . $param_key, TRUE, $response);
+		
+		switch($ret_val) {
+			case SLICER_RESPONSE_OK:
+				$param_value = $response;
+				
+			case SLICER_RESPONSE_WRONG_PRM:
+			case SLICER_RESPONSE_MISS_PRM:
+			case 404:
+				$cr = $ret_val;
+				break;
+				
+			default:
+				$cr = ERROR_INTERNAL;
+				break;
+		}
+	}
+	
+	return $cr;
+}
+
 function Slicer_changeParameter($array_setting) {
 	$cr = 0;
 	$ret_val = 0;
@@ -1054,7 +1086,7 @@ function Slicer_changeParameter($array_setting) {
 	return $cr;
 }
 
-function Slicer_changeTemperByCartridge($array_cartridge) {
+function Slicer_changeTemperByCartridge($array_cartridge, $heat_bed = FALSE) {
 	$json_cartridge = array();
 	$temperature = $first_temperature = NULL;
 	$array_danger_return = array(
@@ -1117,6 +1149,9 @@ function Slicer_changeTemperByCartridge($array_cartridge) {
 			'temperature'				=> $temperature,
 			'first_layer_temperature'	=> $first_temperature,
 	);
+	
+	if ($heat_bed) $array_setting['bed_temperature'] = SLICER_VALUE_DEFAULT_BED_TEMPER;
+	
 	$cr = Slicer_changeParameter($array_setting);
 	
 	return $cr;

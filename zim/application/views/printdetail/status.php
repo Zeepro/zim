@@ -105,6 +105,7 @@ var var_finish = false;
 var var_temper_holder;
 var var_temper_l = null;
 var var_temper_r = null;
+var var_temper_b = null;
 var var_timelapse_int;
 var var_timelapse_ajax;
 

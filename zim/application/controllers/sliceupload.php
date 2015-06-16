@@ -176,6 +176,7 @@ class Sliceupload extends MY_Controller {
 		$current_ysize = 0;
 		$current_zsize = 0;
 		$multi_part = FALSE;
+		$heat_bed = $this->config->item('heat_bed');
 		
 		// redirect the client when in slicing
 		$this->load->helper('corestatus');
@@ -242,7 +243,7 @@ class Sliceupload extends MY_Controller {
 		
 		// parse the main body
 		$template_data = array(
- 				'home'					=> t('home'),
+				'home'					=> t('home'),
 				'back'					=> t('back'),
 				'slice_button'			=> t('slice_button'),
 				'goto_preset'			=> t('goto_preset'),
@@ -284,6 +285,9 @@ class Sliceupload extends MY_Controller {
 				'model_zsize'			=> $current_zsize,
 				'model_smax'			=> $current_scale_max,
 				'multi_part'			=> $multi_part ? 'true' : 'false',
+				'enable_heatbed'		=> t('enable_heatbed'),
+				'heat_bed'				=> $heat_bed ? 'true' : 'false',
+				'checked_heatbed'		=> $heat_bed ? 'checked="checked"' : NULL,
 		);
 		
 		$this->_parseBaseTemplate(t('sliceupload_slice_pagetitle'),
@@ -513,10 +517,11 @@ class Sliceupload extends MY_Controller {
 		$array_cartridge = array();
 		$display = NULL;
 		$id_preset = $this->input->get('id');
-		$density = $this->input->get('density');
-		$skirt = $this->input->get('skirt');
-		$raft = $this->input->get('raft');
-		$support = $this->input->get('support');
+// 		$density = $this->input->get('density');
+// 		$skirt = $this->input->get('skirt');
+// 		$raft = $this->input->get('raft');
+// 		$support = $this->input->get('support');
+		$heat_bed = ($this->config->item('heat_bed') && ((int) $this->input->get('hb') > 0));
 		$array_setting = array();
 		$custom_change = FALSE;
 		
@@ -573,7 +578,7 @@ class Sliceupload extends MY_Controller {
 		}
 		
 		if ($cr == ERROR_OK) {
-			$cr = Slicer_changeTemperByCartridge($array_cartridge);
+			$cr = Slicer_changeTemperByCartridge($array_cartridge, $heat_bed);
 		}
 		
 		// start slice command after checking filament
@@ -684,6 +689,7 @@ class Sliceupload extends MY_Controller {
 		$bicolor_model = FALSE;
 		$exchange_select_snd = FALSE;
 		$bicolor_printer = ($this->config->item('nb_extruder') >= 2);
+		$heat_bed = $this->config->item('heat_bed');
 		$enable_print = 'false';
 		$enable_exchange = 'disabled="disabled"'; // select disable
 		$option_selected = 'selected="selected"';
@@ -872,6 +878,13 @@ class Sliceupload extends MY_Controller {
 			}
 		}
 		
+		if ($heat_bed) {
+			$bed_temper = 0;
+			
+			$cr = Slicer_getParameter('bed_temperature', $bed_temper);
+			$heat_bed = ((int)$bed_temper > 0); // disable heat bed if it is not set by user
+		}
+		
 		$template_data = array(
 				'cartridge_c_l'		=> $array_data['l'][PRINTERSTATE_TITLE_COLOR],
 				'cartridge_c_r'		=> $array_data['r'][PRINTERSTATE_TITLE_COLOR],
@@ -916,6 +929,12 @@ class Sliceupload extends MY_Controller {
 				'extrud_l'			=> PRINTERSTATE_EXT_MULTIPLY_DEFAULT,
 				'extrud_min'		=> PRINTERSTATE_EXT_MULTIPLY_MIN,
 				'extrud_max'		=> PRINTERSTATE_EXT_MULTIPLY_MAX,
+				'title_heatbed'		=> t('title_heatbed'),
+				'button_bed_off'	=> t('button_bed_off'),
+				'heat_bed'			=> $heat_bed ? 'true' : 'false',
+				'bed_temper_pla'	=> PRINTERSTATE_TEMPER_BED_PLA,
+				'bed_temper_abs'	=> PRINTERSTATE_TEMPER_BED_ABS,
+				'bed_temper_max'	=> PRINTERSTATE_TEMPER_MAX_H,
 		);
 		$this->parser->parse('sliceupload/slice_result_ajax', $template_data);
 		
