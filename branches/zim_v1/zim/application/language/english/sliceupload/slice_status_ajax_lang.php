@@ -92,3 +92,7 @@ $lang['left_extrud_mult']
 	= 'Left';
 $lang['right_extrud_mult']
 	= 'Right';
+$lang['title_heatbed']
+	= 'Heating bed';
+$lang['button_bed_off']
+	= 'Off';

@@ -68,6 +68,11 @@
 						<p style="text-align: center; margin: 0; font-size: x-small;">{select_hint}</p>
 						<!-- usage: $("option#p" + $("select#preset_menu").val()).attr("data-xxx"), or use /sliceupload/preset_prm_ajax?id=[PRESET_ID_HERE] to get json info -->
 					</div>
+					<div class="heat_bed_widget" style="display: none;">
+						<label>
+							<input type="checkbox" id="enable_heatbed" data-mini="true" value="1" {checked_heatbed}>{enable_heatbed}
+						</label>
+					</div>
 				</div>
 				<a href="#" id="slice_button" class="ui-disabled" data-role="button" onclick="javascript: startSlice();">{slice_button}</a>
 			</div>
@@ -99,6 +104,8 @@ var var_webgl_initialized = false;
 var var_mini_control_slider_type = 's'; // scale as default
 var var_multi_part = {multi_part};
 
+var var_have_heatbed = {heat_bed};
+
 
 $(document).ready(prepareDisplay());
 
@@ -129,6 +136,9 @@ function prepareDisplay() {
 			$("div#control_modify_sliders").hide();
 			$("div#control_modify_mini_group").show();
 		}
+// 		if (var_have_heatbed == true) {
+// 			$("div.heat_bed_widget").show();
+// 		}
 	}
 	else if (var_stage == "wait_print") {
 		// try to get sliced info
@@ -163,7 +173,6 @@ function onWebGL_finalized() {
 }
 
 function onWebGLRequest_rollback() {
-	var_printer_preview_failed = true;
 	var_webgl_initialized = true;
 	var_webgl_support = false;
 	$("div.slicer_printer_rendering").show();
@@ -246,6 +255,7 @@ function onMiniSliderChanged(value) {
 }
 
 function onPrinterPreviewMinorError_rollback() {
+	var_printer_preview_failed = true;
 //	alert("{preview_fail}");
 	$("#preview_zone").html("{preview_fail}");
 	$("div#detail_zone").show();
@@ -626,6 +636,7 @@ function startSlice(var_restart) {
 	
 	var_restart = typeof var_restart !== 'undefined' ? var_restart : false;
 	var var_id_preset = (var_restart == true) ? 'previous' : $("select#preset_menu").val();
+	var var_enable_heatbed = $("input#enable_heatbed").is(":checked") ? 1 : 0;
 	
 	// disable slice button
 	$("a#slice_button").addClass("ui-disabled");
@@ -637,6 +648,7 @@ function startSlice(var_restart) {
 		type: "GET",
 		data: {
 			id: var_id_preset,
+			hb: var_enable_heatbed,
 		},
 		cache: false,
 	})

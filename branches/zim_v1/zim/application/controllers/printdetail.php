@@ -66,6 +66,7 @@ class Printdetail extends MY_Controller {
 	private function get_extra_info(&$array_temper, &$exchange_extruder) {
 		$temperature_r = 0;
 		$temperature_l = 0;
+		$temperature_b = 0;
 		
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			// set extrusion multiply (reset to default if not exist)
@@ -88,6 +89,7 @@ class Printdetail extends MY_Controller {
 			// get temperature set from interface
 			$temperature_r = (int) $this->input->post('r');
 			$temperature_l = (int) $this->input->post('l');
+			$temperature_b = (int) $this->input->post('b');
 			$exchange_extruder = (int) $this->input->post('exchange');
 		}
 		else {
@@ -98,12 +100,14 @@ class Printdetail extends MY_Controller {
 			if (CoreStatus_checkInIdle($status_current, $array_status)) {
 				$temperature_r = $array_status[CORESTATUS_TITLE_P_TEMPER_R];
 				$temperature_l = $array_status[CORESTATUS_TITLE_P_TEMPER_L];
+				$temperature_b = $array_status[CORESTATUS_TITLE_P_TEMPER_B];
 				$exchange_extruder = $array_status[CORESTATUS_TITLE_P_EXCH_BUS];
 			}
 		}
 		
 		if ($temperature_r > 0) $array_temper['r'] = $temperature_r;
 		if ($temperature_l > 0) $array_temper['l'] = $temperature_l;
+		if ($temperature_b > 0) $array_temper['b'] = $temperature_b;
 		$exchange_extruder = ($exchange_extruder != 0) ? TRUE : FALSE;
 		
 		return;
@@ -633,6 +637,7 @@ class Printdetail extends MY_Controller {
 		if (CoreStatus_checkInIdle($status_current, $array_status) && array_key_exists(CORESTATUS_TITLE_PRINTMODEL, $array_status)) {
 			$model_id = NULL;
 			$abb_cartridge = NULL;
+			$model_temper = NULL;
 			
 			if (strpos($array_status[CORESTATUS_TITLE_PRINTMODEL], CORESTATUS_VALUE_MID_PREFIXGCODE) === 0) {
 				// gcode library model
@@ -760,41 +765,43 @@ class Printdetail extends MY_Controller {
 			if ($this->config->item('nb_extruder') < 2
 					&& array_key_exists(CORESTATUS_TITLE_P_TEMPER_R, $array_status)
 					&& $array_status[CORESTATUS_TITLE_P_TEMPER_R] > 0) {
-				$array_info[] = array(
-						'title'	=> t('timelapse_info_temperature_title'),
-						'value'	=> t('timelapse_info_temperature_value_mono', array(
-								$array_status[CORESTATUS_TITLE_P_TEMPER_R],
-						)),
-				);
+				$model_temper = t('timelapse_info_temperature_value_mono', array(
+						$array_status[CORESTATUS_TITLE_P_TEMPER_R],
+				));
 			}
 			else if (array_key_exists(CORESTATUS_TITLE_P_TEMPER_L, $array_status)
 					&& $array_status[CORESTATUS_TITLE_P_TEMPER_L] > 0
 					&& array_key_exists(CORESTATUS_TITLE_P_TEMPER_R, $array_status)
 					&& $array_status[CORESTATUS_TITLE_P_TEMPER_R] > 0) {
-				$array_info[] = array(
-						'title'	=> t('timelapse_info_temperature_title'),
-						'value'	=> t('timelapse_info_temperature_values', array(
-								$array_status[CORESTATUS_TITLE_P_TEMPER_L],
-								$array_status[CORESTATUS_TITLE_P_TEMPER_R],
-						)),
-				);
+				$model_temper = t('timelapse_info_temperature_values', array(
+						$array_status[CORESTATUS_TITLE_P_TEMPER_L],
+						$array_status[CORESTATUS_TITLE_P_TEMPER_R],
+				));
 			}
 			else if (array_key_exists(CORESTATUS_TITLE_P_TEMPER_R, $array_status)
 					&& $array_status[CORESTATUS_TITLE_P_TEMPER_R] > 0) {
-				$array_info[] = array(
-						'title'	=> t('timelapse_info_temperature_title'),
-						'value'	=> t('timelapse_info_temperature_value_r', array(
-								$array_status[CORESTATUS_TITLE_P_TEMPER_R],
-						)),
-				);
+				$model_temper = t('timelapse_info_temperature_value_r', array(
+						$array_status[CORESTATUS_TITLE_P_TEMPER_R],
+				));
 			}
 			else if (array_key_exists(CORESTATUS_TITLE_P_TEMPER_L, $array_status)
 					&& $array_status[CORESTATUS_TITLE_P_TEMPER_L] > 0) {
+				$model_temper = t('timelapse_info_temperature_value_l', array(
+						$array_status[CORESTATUS_TITLE_P_TEMPER_L],
+				));
+			}
+			
+			if ($model_temper) {
+				if (array_key_exists(CORESTATUS_TITLE_P_TEMPER_B, $array_status)
+					&& $array_status[CORESTATUS_TITLE_P_TEMPER_B] > 0) {
+					$model_temper .= t('timelapse_info_extra_temperature_value_b', array(
+							$array_status[CORESTATUS_TITLE_P_TEMPER_B],
+					));
+				}
+				
 				$array_info[] = array(
 						'title'	=> t('timelapse_info_temperature_title'),
-						'value'	=> t('timelapse_info_temperature_value_l', array(
-								$array_status[CORESTATUS_TITLE_P_TEMPER_L],
-						)),
+						'value'	=> $model_temper,
 				);
 			}
 		}
@@ -855,12 +862,14 @@ class Printdetail extends MY_Controller {
 		$time_passed = NULL;
 		$temper_l = 0;
 		$temper_r = 0;
+		$temper_b = 0;
 		$finish_hint = NULL;
 		$hold_temper = 'false';
 // 		$status_current = NULL;
 		$array_status = array();
 		$reload_player_times = 0;
 		$bicolor = ($this->config->item('nb_extruder') >= 2);
+		$heat_bed = $this->config->item('heat_bed');
 		
 		$this->load->helper(array('printer', 'timedisplay'));
 		$this->load->library('parser');
@@ -924,6 +933,7 @@ class Printdetail extends MY_Controller {
 // 			$hold_temper = 'false';
 			$temper_l = $data_status['print_temperL'];
 			$temper_r = $data_status['print_temperR'];
+			$temper_b = $data_status['print_temperB'];
 		}
 		
 		// parse the ajax part
@@ -938,8 +948,10 @@ class Printdetail extends MY_Controller {
 				'print_temperR'	=> $bicolor
 						? t('Temperature of the right extruder: %d °C', array($temper_r))
 						: t('print_temper_msg_mono', array($temper_r)),
+				'print_temperB'	=> $heat_bed ? t('print_temper_msg_bed', array($temper_b)) : NULL,
 				'value_temperL'	=> $bicolor ? $temper_l : 'null',
 				'value_temperR'	=> $temper_r,
+				'value_temperB'	=> $heat_bed ? $temper_b : 'null',
 				'in_finish'		=> $finish_hint,
 				'reload_player'	=> $reload_player_times,
 		);

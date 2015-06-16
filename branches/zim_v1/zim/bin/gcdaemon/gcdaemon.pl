@@ -64,9 +64,9 @@ my $mypath;
 my $extruder_current = 'T0';
 
 sub alter_file {
-	my ($filename, $temp_l, $temp_r, $temp_ls, $temp_rs) = @_;
+	my ($filename, $temp_l, $temp_r, $temp_ls, $temp_rs, $temp_b) = @_;
 	my @lines;
-	my $m104_before_m109 = TRUE;
+	my ($m104_before_m109, $m140_before_m104, $m190_before_m109) = (TRUE, undef, undef);
 	
 	open my $fh, '<', $filename;
 	if (tell($fh) != -1) {
@@ -81,6 +81,8 @@ sub alter_file {
 		my $pos_comment = -1;
 		my $pos_m109 = -1;
 		my $pos_m104 = -1;
+		my $pos_m190 = -1;
+		my $pos_m140 = -1;
 		my $pos_temp = -1;
 		
 		# do not count comment and empty line
@@ -104,12 +106,66 @@ sub alter_file {
 			}
 		}
 		
+		# count of m190
+		$pos_m190 = index($line, "M190");
+		if ($pos_m190 != -1) {
+			# do not count key word in comment
+			unless ($pos_comment != -1 && $pos_comment < $pos_m190) {
+				if (!defined($m190_before_m109)) {
+					# try to ignore the M190 before any heat commands like M104, M140 and M109
+					if (!defined($m140_before_m104)) {
+						next;
+					}
+					
+					$m190_before_m109 = TRUE;
+				}
+				
+				# start output directly if temperature is set
+				if ($temp_b != 0) {
+					print "M190 S" . $temp_b . "\n";
+				}
+				next;
+			}
+		}
+		
+		# count of m140
+		$pos_m140 = index($line, "M140");
+		if ($pos_m140 != -1) {
+#			# do not count the m140 command before first m109
+#			if ($m104_before_m109 == TRUE) {
+#				print $line . "\n";
+#				next;
+#			}
+			
+			# do not count key word in comment
+			unless ($pos_comment != -1 && $pos_comment < $pos_m140) {
+				if (!defined($m140_before_m104)) {
+					$m140_before_m104 = TRUE;
+				}
+				
+				# start output directly if temperature is set
+				if ($temp_b != 0) {
+					print "M140 S" . $temp_b . "\n";
+				}
+				next;
+			}
+		}
+		
 		# count of m109
 		$pos_m109 = index($line, "M109");
 		if ($pos_m109 != -1) {
 			# do not count key word in comment
 			unless ($pos_comment != -1 && $pos_comment < $pos_m109) {
 				my $extruder_set = "";
+				
+				if (!defined($m190_before_m109)) {
+					$m190_before_m109 = FALSE;
+					
+					# add heat bed command if not exist
+					if ($temp_b != 0) {
+						print "M190 S" . $temp_b . "\n";
+					}
+				}
 				
 				# count m109 and tx in only one line
 				if (index($line, "T0") != -1) {
@@ -138,10 +194,23 @@ sub alter_file {
 		# count of m104
 		$pos_m104 = index($line, "M104");
 		if ($pos_m104 != -1) {
+			my $first_layer_m104 = FALSE;
+			
 			# do not count the m104 command before first m109
 			if ($m104_before_m109 == TRUE) {
-				print $line . "\n";
-				next;
+				unless (($pos_comment != -1 && $pos_comment < $pos_m104)
+						|| defined($m140_before_m104)) {
+					$m140_before_m104 = FALSE;
+					
+					# add heat bed command if not exist
+					if ($temp_b != 0) {
+						print "M140 S" . $temp_b . "\n";
+					}
+				}
+				
+				$first_layer_m104 = TRUE;
+#				print $line . "\n";
+#				next;
 			}
 			
 			# do not count key word in comment
@@ -179,10 +248,10 @@ sub alter_file {
 #				print "look: " . looks_like_number $string_temp . "\r\n\r\n";
 				if ((int $string_temp) > CEILING_HEAT) {
 					if ($extruder_set eq "T0") {
-						print "M104 S" . $temp_rs . " T0\n";
+						print "M104 S" . ($first_layer_m104 ? $temp_r : $temp_rs) . " T0\n";
 					}
 					else { # T1
-						print "M104 S" . $temp_ls . " T1\n";
+						print "M104 S" . ($first_layer_m104 ? $temp_l : $temp_ls) . " T1\n";
 					}
 					next;
 				}
@@ -491,6 +560,7 @@ my %opt = ();
 		'temp_r|r=s'   => \$opt{temp_r},	# right temperature for first layer (or all layer)
 		'temp_ls|ll=s' => \$opt{temp_ls},	# left temperature for other layer (if exists)
 		'temp_rs|rr=s' => \$opt{temp_rs},	# right temperature for other layer (if exists)
+		'temp_b|b=s'   => \$opt{temp_b},	# bed temperature
 		'analyze|a'    => \$opt{analyze},
 		'change|c'     => \$opt{change_e},
 		'verify|v'     => \$opt{verify},
@@ -502,7 +572,7 @@ if ( $opt{help} ) {
 	usage(RC_OK);    #print help
 }
 elsif ( $opt{temp_l} || $opt{temp_r} ) {
-	my ($temp_ls, $temp_rs);
+	my ($temp_ls, $temp_rs, $temp_b);
 	unless ( $opt{openfile} ) {
 		usage(EXIT_ERROR_PRM);
 	}
@@ -516,8 +586,14 @@ elsif ( $opt{temp_l} || $opt{temp_r} ) {
 	} else {
 		$temp_rs = int $opt{temp_r};
 	}
+	if ( defined($opt{temp_b}) && int $opt{temp_b} != 0) {
+		$temp_b = int $opt{temp_b};
+	}
+	else {
+		$temp_b = 0;
+	}
 	
-	my $rc = alter_file($opt{openfile}, int $opt{temp_l}, int $opt{temp_r}, $temp_ls, $temp_rs);
+	my $rc = alter_file($opt{openfile}, int $opt{temp_l}, int $opt{temp_r}, $temp_ls, $temp_rs, $temp_b);
 	
 	exit($rc);
 }

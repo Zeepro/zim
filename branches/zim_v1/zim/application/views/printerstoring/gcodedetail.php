@@ -90,6 +90,17 @@
 					</div>
 				</div>
 			</div>
+			<div data-role="collapsible" class="heat_bed_widget" data-collapsed="false" style="clear: both; display: none;">
+				<h4>{title_heatbed}</h4>
+				<div data-role="navbar" class="slider-show-value-container" style="margin-bottom: 1em;">
+					<ul>
+						<li><a href="#" onclick="javascript: onBedSliderSwitched();" class="ui-btn-active">{button_bed_off}</a></li>
+						<li><a href="#" onclick="javascript: onBedSliderSwitched('PLA');">PLA</a></li>
+						<li><a href="#" onclick="javascript: onBedSliderSwitched('ABS');">ABS</a></li>
+					</ul>
+					<input type="range" name="b" id="bed_temper_control" value="0" min="0" max="{bed_temper_max}" data-show-value="true" />
+				</div>
+			</div>
 			<div style="clear: both;">
 				<input type="hidden" name="exchange" id="exchange_extruder_hidden" value="0">
 				<input type="submit" value="{print_button}" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh" />
@@ -109,6 +120,39 @@ var error_checked = false;
 var var_bicolor = {bicolor};
 var slider_l = "input#slider-l";
 var slider_r = var_bicolor ? "input#slider-r" : "input#slider-mono";
+
+var var_have_heatbed = {heat_bed};
+
+function onBedSliderSwitched(var_matType) {
+	var var_value2switch = 0;
+	var var_bed_slider_selector = "input#bed_temper_control";
+	
+	if (typeof(var_matType) != "undefined") {
+		switch (var_matType) {
+			case "PLA":
+				var_value2switch = {bed_temper_pla};
+				break;
+				
+			case "ABS":
+				var_value2switch = {bed_temper_abs};
+				break;
+				
+			default:
+				console.log("unknown material in onBedSliderSwitched");
+				break;
+		}
+	}
+	$(var_bed_slider_selector).val(var_value2switch);
+	if (var_value2switch == 0) {
+		$(var_bed_slider_selector).slider("disable");
+	}
+	else {
+		$(var_bed_slider_selector).slider("enable");
+	}
+	$(var_bed_slider_selector).slider("refresh");
+	
+	return;
+}
 
 $(document).on("pagecreate",function() {
 	if (var_bicolor == true) {
@@ -175,6 +219,12 @@ $(document).on("pagecreate",function() {
 		if ({need_filament_r} <= 0) {
 			$(slider_r).slider({disabled: true});
 		}
+	}
+	
+	// heat bed preparation
+	onBedSliderSwitched();
+	if (var_have_heatbed == true) {
+		$("div.heat_bed_widget").show();
 	}
 });
 </script>

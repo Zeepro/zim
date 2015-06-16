@@ -87,6 +87,17 @@
 							</div>
 						</div>
 					</div>
+					<div data-role="collapsible" class="heat_bed_widget" data-collapsed="false" style="clear: both; display: none;">
+						<h4>{title_heatbed}</h4>
+						<div data-role="navbar" class="slider-show-value-container" style="margin-bottom: 1em;">
+							<ul>
+								<li><a href="#" onclick="javascript: onBedSliderSwitched();" class="ui-btn-active">{button_bed_off}</a></li>
+								<li><a href="#" onclick="javascript: onBedSliderSwitched('PLA');">PLA</a></li>
+								<li><a href="#" onclick="javascript: onBedSliderSwitched('ABS');">ABS</a></li>
+							</ul>
+							<input type="range" name="b" id="bed_temper_control" value="0" min="0" max="{bed_temper_max}" data-show-value="true" />
+						</div>
+					</div>
 					<input type="submit" id="print_slice" value="{print_button}" />
 				</form>
 
@@ -103,6 +114,7 @@ var var_need_filament_r = {need_filament_r};
 var var_need_filament_l = {need_filament_l};
 var var_need_print_right = (var_need_filament_r > 0) ? true : false;
 var var_need_print_left = (var_need_filament_l > 0) ? true : false;
+var var_have_heatbed = {heat_bed};
 
 function changecartridge(side) {
 	if (typeof(side) == 'undefined') {
@@ -133,6 +145,37 @@ function changecartridge(side) {
 				break;
 		}
 	}
+	return;
+}
+
+function onBedSliderSwitched(var_matType) {
+	var var_value2switch = 0;
+	var var_bed_slider_selector = "input#bed_temper_control";
+	
+	if (typeof(var_matType) != "undefined") {
+		switch (var_matType) {
+			case "PLA":
+				var_value2switch = {bed_temper_pla};
+				break;
+				
+			case "ABS":
+				var_value2switch = {bed_temper_abs};
+				break;
+				
+			default:
+				console.log("unknown material in onBedSliderSwitched");
+				break;
+		}
+	}
+	$(var_bed_slider_selector).val(var_value2switch);
+	if (var_value2switch == 0) {
+		$(var_bed_slider_selector).slider("disable");
+	}
+	else {
+		$(var_bed_slider_selector).slider("enable");
+	}
+	$(var_bed_slider_selector).slider("refresh");
+	
 	return;
 }
 
@@ -282,4 +325,10 @@ $(widget_exchange).change(function() {
 		$(hidden_input_exchange).val($(widget_exchange).val());
 	}
 });
+
+// heat bed preparation
+onBedSliderSwitched();
+if (var_have_heatbed == true) {
+	$("div.heat_bed_widget").show();
+}
 </script>

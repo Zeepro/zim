@@ -1557,7 +1557,7 @@ class Rest extends MY_Controller {
 		$cr = Slicer_checkPlatformColor($array_cartridge, $custom_change);
 		
 		if ($cr == ERROR_OK) {
-			$cr = Slicer_changeTemperByCartridge($array_cartridge);
+			$cr = Slicer_changeTemperByCartridge($array_cartridge, $this->config->item('heat_bed'));
 		}
 		
 		// start slice command after checking filament
